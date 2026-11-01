@@ -3936,12 +3936,22 @@ a.hc-kpi.clickable:hover {
   text-align: left;
   background: transparent;
   border: 0;
+  border-left: 4px solid transparent;
   border-bottom: 1px solid var(--line-2);
+  padding: 12px 12px 12px 14px;
   cursor: pointer;
+  box-sizing: border-box;
 }
 
 .rx-list .rx-li.on {
   background: color-mix(in srgb, var(--accent-soft) 70%, var(--surface));
+}
+
+.rx-list .rx-li.risk-yellow,
+.rx-list .rx-li.risk-orange,
+.rx-list .rx-li.risk-red {
+  /* colour set inline; keep text clear of the rail */
+  padding-left: 14px;
 }
 
 .rx-detail-head {

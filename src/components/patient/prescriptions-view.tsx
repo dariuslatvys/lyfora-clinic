@@ -224,15 +224,17 @@ export function PrescriptionsView({
                   <button
                     key={r.id}
                     type="button"
-                    className={`li click rx-li${on ? " on" : ""}`}
+                    className={`li click rx-li${on ? " on" : ""}${
+                      risk.hasRisk && c ? ` risk-${c}` : ""
+                    }`}
                     onClick={() => setOpenId(r.id)}
                     style={
                       risk.hasRisk && c
                         ? {
-                            boxShadow: `inset 4px 0 0 ${COLOUR_HEX[c]}`,
+                            borderLeftColor: COLOUR_HEX[c],
                             background: on
                               ? undefined
-                              : `linear-gradient(90deg, ${COLOUR_SOFT[c]}, transparent 65%)`,
+                              : `linear-gradient(90deg, ${COLOUR_SOFT[c]}, transparent 70%)`,
                           }
                         : undefined
                     }

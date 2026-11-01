@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { Dictionary } from "@/lib/i18n/dictionary";
 import { markerItemColour } from "@/lib/health/marker-colour";
 import { PILL_CLASS, type RiskColour } from "@/lib/health/colours";
+import { isPhysicalMarkerKey } from "@/lib/health/physical-metrics";
 import { NormBar } from "@/components/patient/norm-bar";
 import { Sparkline } from "@/components/patient/sparkline";
 
@@ -32,8 +33,41 @@ function fmtDate(iso: string, locale: "lt" | "en") {
   });
 }
 
+/** Wearables / questionnaire — not laboratory packages. */
+const NON_LAB_SOURCES = new Set([
+  "oura",
+  "apple-health",
+  "apple_health",
+  "google-fit",
+  "google_fit",
+  "garmin",
+  "questionnaire",
+  "withings",
+  "fitbit",
+]);
+
+function isLabPackageRow(r: LabRow) {
+  if (isPhysicalMarkerKey(r.markerKey)) return false;
+  const src = (r.source || "").trim().toLowerCase();
+  if (!src) return true;
+  if (NON_LAB_SOURCES.has(src)) return false;
+  if (/oura|apple.?health|google.?fit|garmin|fitbit|withings|wearable/.test(src))
+    return false;
+  return true;
+}
+
 function packageTitle(source: string | null, locale: "lt" | "en") {
   if (!source) return locale === "en" ? "Lab package" : "Tyrimų paketas";
+  const key = source.trim().toLowerCase();
+  if (key === "demo-female-hormones" || key === "demo-male-hormones") {
+    return locale === "en" ? "Hormone panel" : "Hormonų panelė";
+  }
+  if (key === "neck-previsit-panel") {
+    return locale === "en" ? "Pre-visit lab panel" : "Priešvizitinė tyrimų panelė";
+  }
+  if (key === "demo-female" || key === "demo-male") {
+    return locale === "en" ? "Clinic lab panel" : "Klinikos tyrimų panelė";
+  }
   return source
     .replace(/\.pdf$/i, "")
     .replace(/_+/g, " ")
@@ -107,6 +141,7 @@ export function LabsView({
       { key: string; source: string | null; observedAt: string; items: LabRow[] }
     >();
     for (const r of rows) {
+      if (!isLabPackageRow(r)) continue;
       const key = `${r.source || "paketas"}::${r.observedAt}`;
       const cur = map.get(key);
       if (cur) cur.items.push(r);
@@ -118,9 +153,9 @@ export function LabsView({
           items: [r],
         });
     }
-    return [...map.values()].sort((a, b) =>
-      b.observedAt.localeCompare(a.observedAt)
-    );
+    return [...map.values()]
+      .filter((p) => p.items.length > 0)
+      .sort((a, b) => b.observedAt.localeCompare(a.observedAt));
   }, [rows]);
 
   const openPackage = packages.find((p) => p.key === openPkg) || null;
@@ -180,9 +215,7 @@ export function LabsView({
       <div className="labs-head">
         <div>
           <p className="eyebrow">
-            {locale === "en"
-              ? "Laboratory results (LOINC)"
-              : "Laboratoriniai tyrimai (LOINC)"}
+            {locale === "en" ? "Laboratory results" : "Laboratoriniai tyrimai"}
           </p>
           <h2 className="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-[-0.02em]">
             {labels.labs}

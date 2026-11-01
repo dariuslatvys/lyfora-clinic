@@ -1,0 +1,2043 @@
+{
+  "version": "2026-08-05",
+  "source": "Health_Questionnaire_Confluence.xlsx",
+  "localeQuestions": "en",
+  "steps": [
+    {
+      "id": "1_basic_profile_health_metrics",
+      "title": "1. Basic Profile & Health Metrics",
+      "fields": [
+        "1_basic_profile_health_metrics__biological_sex",
+        "1_basic_profile_health_metrics__age",
+        "1_basic_profile_health_metrics__height",
+        "1_basic_profile_health_metrics__weight",
+        "1_basic_profile_health_metrics__bmi",
+        "1_basic_profile_health_metrics__waist_circumference",
+        "1_basic_profile_health_metrics__known_blood_pressure",
+        "1_basic_profile_health_metrics__resting_heart_rate",
+        "1_basic_profile_health_metrics__hrv_30_day_average",
+        "1_basic_profile_health_metrics__vo_max",
+        "1_basic_profile_health_metrics__how_would_you_rate_your_overall_health"
+      ]
+    },
+    {
+      "id": "2_current_past_medical_conditions",
+      "title": "2. Current & Past Medical Conditions",
+      "fields": [
+        "2_current_past_medical_conditions__have_you_ever_been_diagnosed_with_any_medical_condition",
+        "2_current_past_medical_conditions__conditions__medical_conditions",
+        "2_current_past_medical_conditions__for_each_selected_condition__status",
+        "2_current_past_medical_conditions__for_each_selected_condition__year_diagnosed",
+        "2_current_past_medical_conditions__for_each_selected_condition__notes",
+        "2_current_past_medical_conditions__cancer_details__cancer_type",
+        "2_current_past_medical_conditions__cancer_details__status",
+        "2_current_past_medical_conditions__cancer_details__year_diagnosed",
+        "2_current_past_medical_conditions__cancer_details__treatment_received",
+        "2_current_past_medical_conditions__cancer_details__additional_info",
+        "2_current_past_medical_conditions__other_conditions__other_medical_condition"
+      ]
+    },
+    {
+      "id": "3_allergies",
+      "title": "3. Allergies",
+      "fields": [
+        "3_allergies__do_you_have_any_known_allergies",
+        "3_allergies__drug_allergies",
+        "3_allergies__food_allergies",
+        "3_allergies__environmental_allergies",
+        "3_allergies__insect_allergies",
+        "3_allergies__contact_allergies",
+        "3_allergies__severity"
+      ]
+    },
+    {
+      "id": "4_current_medications_supplements",
+      "title": "4. Current Medications & Supplements",
+      "fields": [
+        "4_current_medications_supplements__are_you_currently_taking_any_prescription_medications",
+        "4_current_medications_supplements__current_medications",
+        "4_current_medications_supplements__are_you_currently_taking_any_supplements",
+        "4_current_medications_supplements__supplements"
+      ]
+    },
+    {
+      "id": "5_significant_medical_events_symptoms",
+      "title": "5. Significant Medical Events & Symptoms",
+      "fields": [
+        "5_significant_medical_events_symptoms__5_1_prior_surgeries_procedures__have_you_ever_undergone_any_surgery_or_significant_medical_procedure",
+        "5_significant_medical_events_symptoms__5_1_prior_surgeries_procedures__procedure",
+        "5_significant_medical_events_symptoms__5_1_prior_surgeries_procedures__year",
+        "5_significant_medical_events_symptoms__5_2_major_injuries_health_events__have_you_experienced_any_major_injuries_or_serious_health_events",
+        "5_significant_medical_events_symptoms__5_2_major_injuries_health_events__event_type",
+        "5_significant_medical_events_symptoms__5_2_major_injuries_health_events__year",
+        "5_significant_medical_events_symptoms__5_2_major_injuries_health_events__long_term_effects",
+        "5_significant_medical_events_symptoms__hospitalizations__have_you_ever_been_hospitalized_excluding_planned_surgeries",
+        "5_significant_medical_events_symptoms__hospitalizations__reason",
+        "5_significant_medical_events_symptoms__hospitalizations__year",
+        "5_significant_medical_events_symptoms__abnormal_or_borderline_test_results__have_you_ever_been_informed_that_any_of_the_following_health_markers_were_abnormal_or_borderline",
+        "5_significant_medical_events_symptoms__abnormal_or_borderline_test_results__marker",
+        "5_significant_medical_events_symptoms__abnormal_or_borderline_test_results__approximate_year",
+        "5_significant_medical_events_symptoms__chronic_symptoms_functional_limitations__do_you_currently_experience_any_persistent_symptoms_that_affect_your_daily_life",
+        "5_significant_medical_events_symptoms__chronic_symptoms_functional_limitations__symptom",
+        "5_significant_medical_events_symptoms__chronic_symptoms_functional_limitations__severity",
+        "5_significant_medical_events_symptoms__chronic_symptoms_functional_limitations__duration"
+      ]
+    },
+    {
+      "id": "6_female_health",
+      "title": "6. Female Health",
+      "fields": [
+        "6_female_health__which_best_describes_your_current_situation",
+        "6_female_health__how_would_you_describe_your_typical_menstrual_flow",
+        "6_female_health__how_much_does_menstrual_pain_affect_your_daily_activities",
+        "6_female_health__do_you_experience_pelvic_pain_between_periods_and_or_pain_during_intercourse",
+        "6_female_health__have_your_periods_become_noticeably_more_irregular_in_the_last_12_months",
+        "6_female_health__are_you_currently_using_hormonal_contraception",
+        "6_female_health__are_you_currently_using_hormone_replacement_therapy_hrt"
+      ]
+    },
+    {
+      "id": "7_lifestyle",
+      "title": "7. Lifestyle",
+      "fields": [
+        "7_lifestyle__do_you_exercise_or_participate_in_sports",
+        "7_lifestyle__type_of_exercise_sport",
+        "7_lifestyle__exercise_frequency",
+        "7_lifestyle__average_sleep_duration",
+        "7_lifestyle__sleep_quality",
+        "7_lifestyle__diet_type",
+        "7_lifestyle__do_you_smoke_or_use_nicotine_products",
+        "7_lifestyle__nicotine_product_type",
+        "7_lifestyle__alcohol_consumption",
+        "7_lifestyle__recreational_drug_use"
+      ]
+    },
+    {
+      "id": "8_environment_social_support",
+      "title": "8. Environment & Social Support",
+      "fields": [
+        "8_environment_social_support__living_area",
+        "8_environment_social_support__work_conditions",
+        "8_environment_social_support__social_support",
+        "8_environment_social_support__noise_air_quality_concerns"
+      ]
+    },
+    {
+      "id": "9_psychological_emotional_health",
+      "title": "9. Psychological & Emotional Health",
+      "fields": [
+        "9_psychological_emotional_health__stress_level",
+        "9_psychological_emotional_health__mood_emotional_state",
+        "9_psychological_emotional_health__anxiety_symptoms",
+        "9_psychological_emotional_health__depression_symptoms",
+        "9_psychological_emotional_health__burnout_exhaustion",
+        "9_psychological_emotional_health__cognitive_performance",
+        "9_psychological_emotional_health__current_mental_health_care",
+        "9_psychological_emotional_health__overall_health_score"
+      ]
+    },
+    {
+      "id": "10_family_history",
+      "title": "10. Family History",
+      "fields": [
+        "10_family_history__family_member_entry_repeatable__relative",
+        "10_family_history__family_member_entry_repeatable__medical_conditions",
+        "10_family_history__family_member_entry_repeatable__notes"
+      ]
+    }
+  ],
+  "fields": [
+    {
+      "nr": 1,
+      "id": "1_basic_profile_health_metrics__biological_sex",
+      "step": "1. Basic Profile & Health Metrics",
+      "section": null,
+      "label": "Biological Sex",
+      "required": true,
+      "auto": false,
+      "type": "select",
+      "options": [
+        "Female",
+        "Male"
+      ],
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": "Controls questionnaire branching",
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 2,
+      "id": "1_basic_profile_health_metrics__age",
+      "step": "1. Basic Profile & Health Metrics",
+      "section": null,
+      "label": "Age",
+      "required": true,
+      "auto": false,
+      "type": "number",
+      "options": null,
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": "Risk stratification",
+      "repeatOf": null,
+      "unit": "Years"
+    },
+    {
+      "nr": 3,
+      "id": "1_basic_profile_health_metrics__height",
+      "step": "1. Basic Profile & Health Metrics",
+      "section": null,
+      "label": "Height",
+      "required": true,
+      "auto": false,
+      "type": "number",
+      "options": null,
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": "Used for BMI calculation",
+      "repeatOf": null,
+      "unit": "cm"
+    },
+    {
+      "nr": 4,
+      "id": "1_basic_profile_health_metrics__weight",
+      "step": "1. Basic Profile & Health Metrics",
+      "section": null,
+      "label": "Weight",
+      "required": true,
+      "auto": false,
+      "type": "number",
+      "options": null,
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": "Used for BMI calculation",
+      "repeatOf": null,
+      "unit": "kg"
+    },
+    {
+      "nr": 5,
+      "id": "1_basic_profile_health_metrics__bmi",
+      "step": "1. Basic Profile & Health Metrics",
+      "section": null,
+      "label": "BMI",
+      "required": false,
+      "auto": true,
+      "type": "calculated",
+      "options": null,
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": "Automatically calculated",
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 6,
+      "id": "1_basic_profile_health_metrics__waist_circumference",
+      "step": "1. Basic Profile & Health Metrics",
+      "section": null,
+      "label": "Waist Circumference",
+      "required": false,
+      "auto": false,
+      "type": "number",
+      "options": null,
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": "Cardiometabolic risk indicator",
+      "repeatOf": null,
+      "unit": "cm"
+    },
+    {
+      "nr": 7,
+      "id": "1_basic_profile_health_metrics__known_blood_pressure",
+      "step": "1. Basic Profile & Health Metrics",
+      "section": null,
+      "label": "Known Blood Pressure",
+      "required": false,
+      "auto": false,
+      "type": "blood_pressure",
+      "options": null,
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": "Cardiovascular assessment",
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 8,
+      "id": "1_basic_profile_health_metrics__resting_heart_rate",
+      "step": "1. Basic Profile & Health Metrics",
+      "section": null,
+      "label": "Resting Heart Rate",
+      "required": false,
+      "auto": false,
+      "type": "number",
+      "options": null,
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": "Cardiovascular fitness marker",
+      "repeatOf": null,
+      "unit": "bpm"
+    },
+    {
+      "nr": 9,
+      "id": "1_basic_profile_health_metrics__hrv_30_day_average",
+      "step": "1. Basic Profile & Health Metrics",
+      "section": null,
+      "label": "HRV (30-Day Average)",
+      "required": false,
+      "auto": false,
+      "type": "number",
+      "options": null,
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": "Recovery and autonomic nervous system marker",
+      "repeatOf": null,
+      "unit": "ms"
+    },
+    {
+      "nr": 10,
+      "id": "1_basic_profile_health_metrics__vo_max",
+      "step": "1. Basic Profile & Health Metrics",
+      "section": null,
+      "label": "VO₂max",
+      "required": false,
+      "auto": false,
+      "type": "number",
+      "options": null,
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": "If available from wearable device or fitness testing",
+      "repeatOf": null,
+      "unit": "ml/kg/min"
+    },
+    {
+      "nr": 11,
+      "id": "1_basic_profile_health_metrics__how_would_you_rate_your_overall_health",
+      "step": "1. Basic Profile & Health Metrics",
+      "section": null,
+      "label": "How would you rate your overall health?",
+      "required": true,
+      "auto": false,
+      "type": "select",
+      "options": [
+        "Excellent",
+        "Very Good",
+        "Good",
+        "Fair",
+        "Poor"
+      ],
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 12,
+      "id": "2_current_past_medical_conditions__have_you_ever_been_diagnosed_with_any_medical_condition",
+      "step": "2. Current & Past Medical Conditions",
+      "section": null,
+      "label": "Have you ever been diagnosed with any medical condition?",
+      "required": false,
+      "auto": false,
+      "type": "select",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": "If NO, skip the following. If YES, display conditions",
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 13,
+      "id": "2_current_past_medical_conditions__conditions__medical_conditions",
+      "step": "2. Current & Past Medical Conditions",
+      "section": "Conditions",
+      "label": "Medical conditions",
+      "required": false,
+      "auto": false,
+      "type": "multiselect",
+      "options": null,
+      "listRef": "Medical Conditions",
+      "showWhen": "Diagnosed = Yes",
+      "notes": "Female-specific only if Female; Male-specific only if Male",
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 14,
+      "id": "2_current_past_medical_conditions__for_each_selected_condition__status",
+      "step": "2. Current & Past Medical Conditions",
+      "section": "For each selected condition",
+      "label": "Status",
+      "required": true,
+      "auto": false,
+      "type": "select",
+      "options": [
+        "Current",
+        "Past"
+      ],
+      "listRef": null,
+      "showWhen": "Condition selected",
+      "notes": null,
+      "repeatOf": "conditions",
+      "unit": null
+    },
+    {
+      "nr": 15,
+      "id": "2_current_past_medical_conditions__for_each_selected_condition__year_diagnosed",
+      "step": "2. Current & Past Medical Conditions",
+      "section": "For each selected condition",
+      "label": "Year Diagnosed",
+      "required": false,
+      "auto": false,
+      "type": "year",
+      "options": null,
+      "listRef": null,
+      "showWhen": "Condition selected",
+      "notes": null,
+      "repeatOf": "conditions",
+      "unit": null
+    },
+    {
+      "nr": 16,
+      "id": "2_current_past_medical_conditions__for_each_selected_condition__notes",
+      "step": "2. Current & Past Medical Conditions",
+      "section": "For each selected condition",
+      "label": "Notes",
+      "required": false,
+      "auto": false,
+      "type": "text",
+      "options": null,
+      "listRef": null,
+      "showWhen": "Condition selected",
+      "notes": null,
+      "repeatOf": "conditions",
+      "unit": null
+    },
+    {
+      "nr": 17,
+      "id": "2_current_past_medical_conditions__cancer_details__cancer_type",
+      "step": "2. Current & Past Medical Conditions",
+      "section": "Cancer details",
+      "label": "Cancer Type",
+      "required": true,
+      "auto": false,
+      "type": "multiselect",
+      "options": null,
+      "listRef": "Cancer Type",
+      "showWhen": "Cancer selected",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 18,
+      "id": "2_current_past_medical_conditions__cancer_details__status",
+      "step": "2. Current & Past Medical Conditions",
+      "section": "Cancer details",
+      "label": "Status",
+      "required": true,
+      "auto": false,
+      "type": "select",
+      "options": [
+        "Active",
+        "Remission",
+        "Resolved"
+      ],
+      "listRef": null,
+      "showWhen": "Cancer selected",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 19,
+      "id": "2_current_past_medical_conditions__cancer_details__year_diagnosed",
+      "step": "2. Current & Past Medical Conditions",
+      "section": "Cancer details",
+      "label": "Year Diagnosed",
+      "required": false,
+      "auto": false,
+      "type": "year",
+      "options": null,
+      "listRef": null,
+      "showWhen": "Cancer selected",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 20,
+      "id": "2_current_past_medical_conditions__cancer_details__treatment_received",
+      "step": "2. Current & Past Medical Conditions",
+      "section": "Cancer details",
+      "label": "Treatment Received",
+      "required": false,
+      "auto": false,
+      "type": "multiselect",
+      "options": null,
+      "listRef": "Treatment Received",
+      "showWhen": "Cancer selected",
+      "notes": "Other = free text",
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 21,
+      "id": "2_current_past_medical_conditions__cancer_details__additional_info",
+      "step": "2. Current & Past Medical Conditions",
+      "section": "Cancer details",
+      "label": "Additional info",
+      "required": false,
+      "auto": false,
+      "type": "text",
+      "options": null,
+      "listRef": null,
+      "showWhen": "Cancer selected",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 22,
+      "id": "2_current_past_medical_conditions__other_conditions__other_medical_condition",
+      "step": "2. Current & Past Medical Conditions",
+      "section": "Other Conditions",
+      "label": "Other Medical Condition",
+      "required": false,
+      "auto": false,
+      "type": "text",
+      "options": null,
+      "listRef": null,
+      "showWhen": "Diagnosed = Yes",
+      "notes": "Reikalingumas nenurodytas",
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 23,
+      "id": "3_allergies__do_you_have_any_known_allergies",
+      "step": "3. Allergies",
+      "section": null,
+      "label": "Do you have any known allergies?",
+      "required": true,
+      "auto": false,
+      "type": "select",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": "Move to the next questions only if “Yes”",
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 24,
+      "id": "3_allergies__drug_allergies",
+      "step": "3. Allergies",
+      "section": null,
+      "label": "Drug Allergies",
+      "required": false,
+      "auto": false,
+      "type": "multiselect",
+      "options": null,
+      "listRef": "Drug Allergies",
+      "showWhen": "Allergies = Yes",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 25,
+      "id": "3_allergies__food_allergies",
+      "step": "3. Allergies",
+      "section": null,
+      "label": "Food Allergies",
+      "required": false,
+      "auto": false,
+      "type": "multiselect",
+      "options": null,
+      "listRef": "Food Allergies",
+      "showWhen": "Allergies = Yes",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 26,
+      "id": "3_allergies__environmental_allergies",
+      "step": "3. Allergies",
+      "section": null,
+      "label": "Environmental Allergies",
+      "required": false,
+      "auto": false,
+      "type": "multiselect",
+      "options": null,
+      "listRef": "Environmental Allergies",
+      "showWhen": "Allergies = Yes",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 27,
+      "id": "3_allergies__insect_allergies",
+      "step": "3. Allergies",
+      "section": null,
+      "label": "Insect Allergies",
+      "required": false,
+      "auto": false,
+      "type": "multiselect",
+      "options": null,
+      "listRef": "Insect Allergies",
+      "showWhen": "Allergies = Yes",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 28,
+      "id": "3_allergies__contact_allergies",
+      "step": "3. Allergies",
+      "section": null,
+      "label": "Contact Allergies",
+      "required": false,
+      "auto": false,
+      "type": "multiselect",
+      "options": null,
+      "listRef": "Contact Allergies",
+      "showWhen": "Allergies = Yes",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 29,
+      "id": "3_allergies__severity",
+      "step": "3. Allergies",
+      "section": null,
+      "label": "Severity",
+      "required": false,
+      "auto": false,
+      "type": "select",
+      "options": [
+        "Mild",
+        "Moderate",
+        "Severe",
+        "Anaphylaxis"
+      ],
+      "listRef": null,
+      "showWhen": "Allergies = Yes",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 30,
+      "id": "4_current_medications_supplements__are_you_currently_taking_any_prescription_medications",
+      "step": "4. Current Medications & Supplements",
+      "section": null,
+      "label": "Are you currently taking any prescription medications?",
+      "required": true,
+      "auto": false,
+      "type": "select",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": "Move to the next question only if “Yes”",
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 31,
+      "id": "4_current_medications_supplements__current_medications",
+      "step": "4. Current Medications & Supplements",
+      "section": null,
+      "label": "Current Medications",
+      "required": false,
+      "auto": false,
+      "type": "tags",
+      "options": null,
+      "listRef": "Vaistų paieška",
+      "showWhen": "Medications = Yes",
+      "notes": "Medication recognition and suggestions recommended",
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 32,
+      "id": "4_current_medications_supplements__are_you_currently_taking_any_supplements",
+      "step": "4. Current Medications & Supplements",
+      "section": null,
+      "label": "Are you currently taking any supplements?",
+      "required": true,
+      "auto": false,
+      "type": "select",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": "Move to the next question only if “Yes”",
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 33,
+      "id": "4_current_medications_supplements__supplements",
+      "step": "4. Current Medications & Supplements",
+      "section": null,
+      "label": "Supplements",
+      "required": false,
+      "auto": false,
+      "type": "tags",
+      "options": null,
+      "listRef": null,
+      "showWhen": "Supplements = Yes",
+      "notes": "Supplement recognition and suggestions recommended",
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 34,
+      "id": "5_significant_medical_events_symptoms__5_1_prior_surgeries_procedures__have_you_ever_undergone_any_surgery_or_significant_medical_procedure",
+      "step": "5. Significant Medical Events & Symptoms",
+      "section": "5.1 Prior Surgeries & Procedures",
+      "label": "Have you ever undergone any surgery or significant medical procedure?",
+      "required": false,
+      "auto": false,
+      "type": "select",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 35,
+      "id": "5_significant_medical_events_symptoms__5_1_prior_surgeries_procedures__procedure",
+      "step": "5. Significant Medical Events & Symptoms",
+      "section": "5.1 Prior Surgeries & Procedures",
+      "label": "Procedure",
+      "required": true,
+      "auto": false,
+      "type": "multiselect",
+      "options": null,
+      "listRef": "Procedures",
+      "showWhen": "Surgery = Yes",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 36,
+      "id": "5_significant_medical_events_symptoms__5_1_prior_surgeries_procedures__year",
+      "step": "5. Significant Medical Events & Symptoms",
+      "section": "5.1 Prior Surgeries & Procedures",
+      "label": "Year",
+      "required": false,
+      "auto": false,
+      "type": "year",
+      "options": null,
+      "listRef": null,
+      "showWhen": "Surgery = Yes",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 37,
+      "id": "5_significant_medical_events_symptoms__5_2_major_injuries_health_events__have_you_experienced_any_major_injuries_or_serious_health_events",
+      "step": "5. Significant Medical Events & Symptoms",
+      "section": "5.2 Major Injuries & Health Events",
+      "label": "Have you experienced any major injuries or serious health events?",
+      "required": false,
+      "auto": false,
+      "type": "select",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 38,
+      "id": "5_significant_medical_events_symptoms__5_2_major_injuries_health_events__event_type",
+      "step": "5. Significant Medical Events & Symptoms",
+      "section": "5.2 Major Injuries & Health Events",
+      "label": "Event Type",
+      "required": true,
+      "auto": false,
+      "type": "multiselect",
+      "options": null,
+      "listRef": "Injury / Health Events",
+      "showWhen": "Events = Yes",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 39,
+      "id": "5_significant_medical_events_symptoms__5_2_major_injuries_health_events__year",
+      "step": "5. Significant Medical Events & Symptoms",
+      "section": "5.2 Major Injuries & Health Events",
+      "label": "Year",
+      "required": false,
+      "auto": false,
+      "type": "year",
+      "options": null,
+      "listRef": null,
+      "showWhen": "Events = Yes",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 40,
+      "id": "5_significant_medical_events_symptoms__5_2_major_injuries_health_events__long_term_effects",
+      "step": "5. Significant Medical Events & Symptoms",
+      "section": "5.2 Major Injuries & Health Events",
+      "label": "Long-Term Effects",
+      "required": false,
+      "auto": false,
+      "type": "select",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "listRef": null,
+      "showWhen": "Events = Yes",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 41,
+      "id": "5_significant_medical_events_symptoms__hospitalizations__have_you_ever_been_hospitalized_excluding_planned_surgeries",
+      "step": "5. Significant Medical Events & Symptoms",
+      "section": "Hospitalizations",
+      "label": "Have you ever been hospitalized (excluding planned surgeries)?",
+      "required": false,
+      "auto": false,
+      "type": "select",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 42,
+      "id": "5_significant_medical_events_symptoms__hospitalizations__reason",
+      "step": "5. Significant Medical Events & Symptoms",
+      "section": "Hospitalizations",
+      "label": "Reason",
+      "required": true,
+      "auto": false,
+      "type": "multiselect",
+      "options": null,
+      "listRef": "Hospitalization Reasons",
+      "showWhen": "Hospitalized = Yes",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 43,
+      "id": "5_significant_medical_events_symptoms__hospitalizations__year",
+      "step": "5. Significant Medical Events & Symptoms",
+      "section": "Hospitalizations",
+      "label": "Year",
+      "required": false,
+      "auto": false,
+      "type": "year",
+      "options": null,
+      "listRef": null,
+      "showWhen": "Hospitalized = Yes",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 44,
+      "id": "5_significant_medical_events_symptoms__abnormal_or_borderline_test_results__have_you_ever_been_informed_that_any_of_the_following_health_markers_were_abnormal_or_borderline",
+      "step": "5. Significant Medical Events & Symptoms",
+      "section": "Abnormal or Borderline Test Results",
+      "label": "Have you ever been informed that any of the following health markers were abnormal or borderline?",
+      "required": false,
+      "auto": false,
+      "type": "select",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 45,
+      "id": "5_significant_medical_events_symptoms__abnormal_or_borderline_test_results__marker",
+      "step": "5. Significant Medical Events & Symptoms",
+      "section": "Abnormal or Borderline Test Results",
+      "label": "Marker",
+      "required": true,
+      "auto": false,
+      "type": "multiselect",
+      "options": null,
+      "listRef": "Abnormal Markers",
+      "showWhen": "Abnormal = Yes",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 46,
+      "id": "5_significant_medical_events_symptoms__abnormal_or_borderline_test_results__approximate_year",
+      "step": "5. Significant Medical Events & Symptoms",
+      "section": "Abnormal or Borderline Test Results",
+      "label": "Approximate Year",
+      "required": false,
+      "auto": false,
+      "type": "year",
+      "options": null,
+      "listRef": null,
+      "showWhen": "Abnormal = Yes",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 47,
+      "id": "5_significant_medical_events_symptoms__chronic_symptoms_functional_limitations__do_you_currently_experience_any_persistent_symptoms_that_affect_your_daily_life",
+      "step": "5. Significant Medical Events & Symptoms",
+      "section": "Chronic Symptoms & Functional Limitations",
+      "label": "Do you currently experience any persistent symptoms that affect your daily life?",
+      "required": false,
+      "auto": false,
+      "type": "select",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 48,
+      "id": "5_significant_medical_events_symptoms__chronic_symptoms_functional_limitations__symptom",
+      "step": "5. Significant Medical Events & Symptoms",
+      "section": "Chronic Symptoms & Functional Limitations",
+      "label": "Symptom",
+      "required": true,
+      "auto": false,
+      "type": "multiselect",
+      "options": null,
+      "listRef": "Symptoms",
+      "showWhen": "Symptoms = Yes",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 49,
+      "id": "5_significant_medical_events_symptoms__chronic_symptoms_functional_limitations__severity",
+      "step": "5. Significant Medical Events & Symptoms",
+      "section": "Chronic Symptoms & Functional Limitations",
+      "label": "Severity",
+      "required": false,
+      "auto": false,
+      "type": "select",
+      "options": [
+        "Mild",
+        "Moderate",
+        "Severe"
+      ],
+      "listRef": null,
+      "showWhen": "Symptoms = Yes",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 50,
+      "id": "5_significant_medical_events_symptoms__chronic_symptoms_functional_limitations__duration",
+      "step": "5. Significant Medical Events & Symptoms",
+      "section": "Chronic Symptoms & Functional Limitations",
+      "label": "Duration",
+      "required": false,
+      "auto": false,
+      "type": "select",
+      "options": [
+        "Less than 6 months",
+        "6–12 months",
+        "More than 1 year"
+      ],
+      "listRef": null,
+      "showWhen": "Symptoms = Yes",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 51,
+      "id": "6_female_health__which_best_describes_your_current_situation",
+      "step": "6. Female Health",
+      "section": null,
+      "label": "Which best describes your current situation?",
+      "required": true,
+      "auto": false,
+      "type": "select",
+      "options": [
+        "Regular periods",
+        "Irregular periods",
+        "Pregnant",
+        "Breastfeeding",
+        "Perimenopause (periods becoming irregular)",
+        "Menopause (no menstrual periods for 12+ months)",
+        "Other"
+      ],
+      "listRef": null,
+      "showWhen": "Biological Sex = Female",
+      "notes": "Used to personalize biomarker interpretation and recommendations. Move forward if not “Pregnant”",
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 52,
+      "id": "6_female_health__how_would_you_describe_your_typical_menstrual_flow",
+      "step": "6. Female Health",
+      "section": null,
+      "label": "How would you describe your typical menstrual flow?",
+      "required": false,
+      "auto": false,
+      "type": "select",
+      "options": [
+        "Light",
+        "Moderate",
+        "Heavy",
+        "Very Heavy"
+      ],
+      "listRef": null,
+      "showWhen": "Female; not Pregnant / Menopause",
+      "notes": "May indicate increased iron deficiency risk",
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 53,
+      "id": "6_female_health__how_much_does_menstrual_pain_affect_your_daily_activities",
+      "step": "6. Female Health",
+      "section": null,
+      "label": "How much does menstrual pain affect your daily activities?",
+      "required": false,
+      "auto": false,
+      "type": "select",
+      "options": [
+        "None",
+        "Mild",
+        "Moderate",
+        "Severe"
+      ],
+      "listRef": null,
+      "showWhen": "Female; not Pregnant / Menopause",
+      "notes": "May warrant discussion with a gynecologist; possible endometriosis signal",
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 54,
+      "id": "6_female_health__do_you_experience_pelvic_pain_between_periods_and_or_pain_during_intercourse",
+      "step": "6. Female Health",
+      "section": null,
+      "label": "Do you experience pelvic pain between periods and/or pain during intercourse?",
+      "required": false,
+      "auto": false,
+      "type": "select",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "listRef": null,
+      "showWhen": "Female; not Pregnant / Menopause",
+      "notes": "May warrant discussion with a gynecologist; possible endometriosis signal",
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 55,
+      "id": "6_female_health__have_your_periods_become_noticeably_more_irregular_in_the_last_12_months",
+      "step": "6. Female Health",
+      "section": null,
+      "label": "Have your periods become noticeably more irregular in the last 12 months?",
+      "required": false,
+      "auto": false,
+      "type": "select",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "listRef": null,
+      "showWhen": "Female; not Pregnant / Menopause",
+      "notes": "May indicate perimenopause, especially in women aged 40+",
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 56,
+      "id": "6_female_health__are_you_currently_using_hormonal_contraception",
+      "step": "6. Female Health",
+      "section": null,
+      "label": "Are You Currently Using Hormonal Contraception?",
+      "required": false,
+      "auto": false,
+      "type": "select",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "listRef": null,
+      "showWhen": "Biological Sex = Female",
+      "notes": "Affects interpretation of sex hormone biomarkers (e.g. SHBG, testosterone, estradiol)",
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 57,
+      "id": "6_female_health__are_you_currently_using_hormone_replacement_therapy_hrt",
+      "step": "6. Female Health",
+      "section": null,
+      "label": "Are You Currently Using Hormone Replacement Therapy (HRT)?",
+      "required": false,
+      "auto": false,
+      "type": "select",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "listRef": null,
+      "showWhen": "Biological Sex = Female",
+      "notes": "Affects interpretation of menopausal and hormone-related biomarkers",
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 58,
+      "id": "7_lifestyle__do_you_exercise_or_participate_in_sports",
+      "step": "7. Lifestyle",
+      "section": null,
+      "label": "Do you exercise or participate in sports?",
+      "required": true,
+      "auto": false,
+      "type": "select",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": "Initial screening question",
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 59,
+      "id": "7_lifestyle__type_of_exercise_sport",
+      "step": "7. Lifestyle",
+      "section": null,
+      "label": "Type of Exercise / Sport",
+      "required": false,
+      "auto": false,
+      "type": "multiselect",
+      "options": null,
+      "listRef": "Exercise Types",
+      "showWhen": "Exercise = Yes",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 60,
+      "id": "7_lifestyle__exercise_frequency",
+      "step": "7. Lifestyle",
+      "section": null,
+      "label": "Exercise Frequency",
+      "required": false,
+      "auto": false,
+      "type": "select",
+      "options": [
+        "Regularly (several times per week)",
+        "Irregularly"
+      ],
+      "listRef": null,
+      "showWhen": "Exercise = Yes",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 61,
+      "id": "7_lifestyle__average_sleep_duration",
+      "step": "7. Lifestyle",
+      "section": null,
+      "label": "Average Sleep Duration",
+      "required": true,
+      "auto": false,
+      "type": "select",
+      "options": [
+        "Less than 6 hours",
+        "6–7 hours",
+        "7–8 hours",
+        "More than 8 hours"
+      ],
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": "Average sleep per night",
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 62,
+      "id": "7_lifestyle__sleep_quality",
+      "step": "7. Lifestyle",
+      "section": null,
+      "label": "Sleep Quality",
+      "required": true,
+      "auto": false,
+      "type": "select",
+      "options": [
+        "Poor",
+        "Average",
+        "Good"
+      ],
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": "Self-assessment",
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 63,
+      "id": "7_lifestyle__diet_type",
+      "step": "7. Lifestyle",
+      "section": null,
+      "label": "Diet Type",
+      "required": true,
+      "auto": false,
+      "type": "select",
+      "options": [
+        "Balanced",
+        "Mediterranean",
+        "Low-Carb",
+        "Keto",
+        "Vegetarian",
+        "Vegan",
+        "Other"
+      ],
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": "Current dietary pattern",
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 64,
+      "id": "7_lifestyle__do_you_smoke_or_use_nicotine_products",
+      "step": "7. Lifestyle",
+      "section": null,
+      "label": "Do you smoke or use nicotine products?",
+      "required": true,
+      "auto": false,
+      "type": "select",
+      "options": [
+        "Never",
+        "Former User",
+        "Current User"
+      ],
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": "Includes all nicotine products",
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 65,
+      "id": "7_lifestyle__nicotine_product_type",
+      "step": "7. Lifestyle",
+      "section": null,
+      "label": "Nicotine Product Type",
+      "required": false,
+      "auto": false,
+      "type": "multiselect",
+      "options": [
+        "Cigarettes",
+        "E-cigarettes / Vaping",
+        "Nicotine pouches",
+        "Other"
+      ],
+      "listRef": null,
+      "showWhen": "Smoking = Current User",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 66,
+      "id": "7_lifestyle__alcohol_consumption",
+      "step": "7. Lifestyle",
+      "section": null,
+      "label": "Alcohol Consumption",
+      "required": true,
+      "auto": false,
+      "type": "select",
+      "options": [
+        "Never",
+        "Occasionally",
+        "Weekly",
+        "Daily"
+      ],
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": "Average consumption pattern",
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 67,
+      "id": "7_lifestyle__recreational_drug_use",
+      "step": "7. Lifestyle",
+      "section": null,
+      "label": "Recreational Drug Use",
+      "required": false,
+      "auto": false,
+      "type": "select",
+      "options": [
+        "Never",
+        "Occasionally",
+        "Regularly"
+      ],
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": "Optional",
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 68,
+      "id": "8_environment_social_support__living_area",
+      "step": "8. Environment & Social Support",
+      "section": null,
+      "label": "Living Area",
+      "required": false,
+      "auto": false,
+      "type": "select",
+      "options": [
+        "Urban",
+        "Suburban",
+        "Rural",
+        "Nature"
+      ],
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 69,
+      "id": "8_environment_social_support__work_conditions",
+      "step": "8. Environment & Social Support",
+      "section": null,
+      "label": "Work Conditions",
+      "required": false,
+      "auto": false,
+      "type": "select",
+      "options": [
+        "Office",
+        "Remote",
+        "Physical Labor",
+        "Mixed"
+      ],
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 70,
+      "id": "8_environment_social_support__social_support",
+      "step": "8. Environment & Social Support",
+      "section": null,
+      "label": "Social Support",
+      "required": false,
+      "auto": false,
+      "type": "select",
+      "options": [
+        "Low",
+        "Medium",
+        "High"
+      ],
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 71,
+      "id": "8_environment_social_support__noise_air_quality_concerns",
+      "step": "8. Environment & Social Support",
+      "section": null,
+      "label": "Noise / Air Quality Concerns",
+      "required": false,
+      "auto": false,
+      "type": "yes_no_details",
+      "options": null,
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 72,
+      "id": "9_psychological_emotional_health__stress_level",
+      "step": "9. Psychological & Emotional Health",
+      "section": null,
+      "label": "Stress Level",
+      "required": false,
+      "auto": false,
+      "type": "select",
+      "options": [
+        "0–10"
+      ],
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 73,
+      "id": "9_psychological_emotional_health__mood_emotional_state",
+      "step": "9. Psychological & Emotional Health",
+      "section": null,
+      "label": "Mood / Emotional State",
+      "required": false,
+      "auto": false,
+      "type": "select",
+      "options": [
+        "Stable",
+        "Fluctuating",
+        "Low Mood",
+        "Irritable",
+        "High Anxiety",
+        "Other"
+      ],
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 74,
+      "id": "9_psychological_emotional_health__anxiety_symptoms",
+      "step": "9. Psychological & Emotional Health",
+      "section": null,
+      "label": "Anxiety Symptoms",
+      "required": false,
+      "auto": false,
+      "type": "multiselect",
+      "options": [
+        "Worry",
+        "Restlessness",
+        "Panic",
+        "Sleep disruption",
+        "Other"
+      ],
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 75,
+      "id": "9_psychological_emotional_health__depression_symptoms",
+      "step": "9. Psychological & Emotional Health",
+      "section": null,
+      "label": "Depression Symptoms",
+      "required": false,
+      "auto": false,
+      "type": "multiselect",
+      "options": [
+        "Low mood",
+        "Loss of interest",
+        "Fatigue",
+        "Sleep changes",
+        "Appetite changes",
+        "Other"
+      ],
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 76,
+      "id": "9_psychological_emotional_health__burnout_exhaustion",
+      "step": "9. Psychological & Emotional Health",
+      "section": null,
+      "label": "Burnout / Exhaustion",
+      "required": false,
+      "auto": false,
+      "type": "select",
+      "options": [
+        "0–10"
+      ],
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 77,
+      "id": "9_psychological_emotional_health__cognitive_performance",
+      "step": "9. Psychological & Emotional Health",
+      "section": null,
+      "label": "Cognitive Performance",
+      "required": false,
+      "auto": false,
+      "type": "select",
+      "options": [
+        "1–5"
+      ],
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 78,
+      "id": "9_psychological_emotional_health__current_mental_health_care",
+      "step": "9. Psychological & Emotional Health",
+      "section": null,
+      "label": "Current Mental Health Care",
+      "required": false,
+      "auto": false,
+      "type": "multiselect",
+      "options": [
+        "None",
+        "Therapy",
+        "Medication",
+        "Both",
+        "Prefer not to say"
+      ],
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": null,
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 79,
+      "id": "9_psychological_emotional_health__overall_health_score",
+      "step": "9. Psychological & Emotional Health",
+      "section": null,
+      "label": "Overall Health Score",
+      "required": false,
+      "auto": false,
+      "type": "number",
+      "options": null,
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": null,
+      "repeatOf": null,
+      "unit": "0–10"
+    },
+    {
+      "nr": 80,
+      "id": "10_family_history__family_member_entry_repeatable__relative",
+      "step": "10. Family History",
+      "section": "Family Member Entry (repeatable)",
+      "label": "Relative",
+      "required": true,
+      "auto": false,
+      "type": "select_list",
+      "options": null,
+      "listRef": "Relatives",
+      "showWhen": "Visada",
+      "notes": "Relative-centric: user first selects a family member",
+      "repeatOf": "family",
+      "unit": null
+    },
+    {
+      "nr": 81,
+      "id": "10_family_history__family_member_entry_repeatable__medical_conditions",
+      "step": "10. Family History",
+      "section": "Family Member Entry (repeatable)",
+      "label": "Medical Conditions",
+      "required": false,
+      "auto": false,
+      "type": "multiselect",
+      "options": null,
+      "listRef": "Family History Conditions",
+      "showWhen": "Family member added",
+      "notes": null,
+      "repeatOf": "family",
+      "unit": null
+    },
+    {
+      "nr": 82,
+      "id": "10_family_history__family_member_entry_repeatable__notes",
+      "step": "10. Family History",
+      "section": "Family Member Entry (repeatable)",
+      "label": "Notes",
+      "required": false,
+      "auto": false,
+      "type": "text",
+      "options": null,
+      "listRef": null,
+      "showWhen": "Family member added",
+      "notes": null,
+      "repeatOf": "family",
+      "unit": null
+    }
+  ],
+  "lists": {
+    "Medical Conditions": {
+      "grouped": true,
+      "groups": [
+        {
+          "name": "Cardiovascular Conditions",
+          "items": [
+            "High Blood Pressure (Hypertension)",
+            "Coronary Artery Disease",
+            "Heart Failure",
+            "Arrhythmia / Atrial Fibrillation",
+            "Stroke / TIA",
+            "Peripheral Artery Disease"
+          ]
+        },
+        {
+          "name": "Metabolic Conditions",
+          "items": [
+            "Type 1 Diabetes",
+            "Type 2 Diabetes",
+            "Prediabetes / Insulin Resistance",
+            "Obesity",
+            "Metabolic Syndrome",
+            "High Cholesterol (Hypercholesterolemia / Dyslipidemia)",
+            "Gout"
+          ]
+        },
+        {
+          "name": "Hormonal & Endocrine Conditions",
+          "items": [
+            "Underactive Thyroid (Hypothyroidism)",
+            "Overactive Thyroid (Hyperthyroidism)",
+            "Graves’ Disease"
+          ]
+        },
+        {
+          "name": "Respiratory Conditions",
+          "items": [
+            "Asthma",
+            "COPD",
+            "Obstructive Sleep Apnea"
+          ]
+        },
+        {
+          "name": "Gastrointestinal & Liver Conditions",
+          "items": [
+            "Acid Reflux (GERD)",
+            "Irritable Bowel Syndrome (IBS)",
+            "Non-Alcoholic Fatty Liver Disease (NAFLD)",
+            "Inflammatory Bowel Disease (Crohn’s Disease / Ulcerative Colitis)"
+          ]
+        },
+        {
+          "name": "Neurological Conditions",
+          "items": [
+            "Migraine",
+            "Epilepsy",
+            "Parkinson’s Disease",
+            "Alzheimer’s Disease / Dementia"
+          ]
+        },
+        {
+          "name": "Musculoskeletal Conditions",
+          "items": [
+            "Osteoarthritis",
+            "Osteoporosis",
+            "Chronic Back Pain"
+          ]
+        },
+        {
+          "name": "Kidney & Urinary Conditions",
+          "items": [
+            "Chronic Kidney Disease",
+            "Kidney Stones"
+          ]
+        },
+        {
+          "name": "Autoimmune & Inflammatory Conditions",
+          "items": [
+            "Psoriasis",
+            "Systemic Lupus Erythematosus",
+            "Celiac Disease",
+            "Rheumatoid Arthritis",
+            "Hashimoto’s Thyroiditis"
+          ]
+        },
+        {
+          "name": "Mental Health Conditions",
+          "items": [
+            "Depression",
+            "Anxiety Disorder",
+            "Bipolar Disorder",
+            "ADHD"
+          ]
+        },
+        {
+          "name": "Cancer",
+          "items": [
+            "Cancer (opens Cancer Details)"
+          ]
+        },
+        {
+          "name": "Female-Specific Conditions (only if Female)",
+          "items": [
+            "Polycystic Ovary Syndrome (PCOS)",
+            "Endometriosis",
+            "Premature Menopause",
+            "Premature Ovarian Insufficiency (POI)",
+            "Female Infertility",
+            "Gestational Diabetes",
+            "Other (free text)"
+          ]
+        },
+        {
+          "name": "Male-Specific Conditions (only if Male)",
+          "items": [
+            "Benign Prostatic Hyperplasia (BPH)",
+            "Low Testosterone",
+            "Erectile Dysfunction",
+            "Male Infertility",
+            "Other (free text)"
+          ]
+        }
+      ]
+    },
+    "Cancer Type": {
+      "grouped": false,
+      "items": [
+        "Breast Cancer",
+        "Prostate Cancer",
+        "Colon / Colorectal Cancer",
+        "Lung Cancer",
+        "Melanoma",
+        "Thyroid Cancer",
+        "Ovarian Cancer",
+        "Cervical Cancer",
+        "Endometrial Cancer",
+        "Pancreatic Cancer",
+        "Kidney Cancer",
+        "Bladder Cancer",
+        "Testicular Cancer",
+        "Liver Cancer",
+        "Stomach Cancer",
+        "Esophageal Cancer",
+        "Brain Cancer",
+        "Leukemia",
+        "Lymphoma",
+        "Multiple Myeloma",
+        "Other (free text)"
+      ]
+    },
+    "Treatment Received": {
+      "grouped": false,
+      "items": [
+        "Surgery",
+        "Chemotherapy",
+        "Radiotherapy",
+        "Immunotherapy",
+        "Hormone Therapy",
+        "Other (free text)"
+      ]
+    },
+    "Drug Allergies": {
+      "grouped": false,
+      "items": [
+        "Penicillin",
+        "Antibiotics",
+        "NSAIDs",
+        "Aspirin",
+        "Sulfa Drugs",
+        "Anesthetics",
+        "Contrast Dye",
+        "Other"
+      ]
+    },
+    "Food Allergies": {
+      "grouped": false,
+      "items": [
+        "Peanuts",
+        "Tree Nuts",
+        "Milk",
+        "Eggs",
+        "Soy",
+        "Wheat",
+        "Fish",
+        "Shellfish",
+        "Sesame",
+        "Other"
+      ]
+    },
+    "Environmental Allergies": {
+      "grouped": false,
+      "items": [
+        "Pollen",
+        "Dust Mites",
+        "Mold",
+        "Animal Dander",
+        "Other"
+      ]
+    },
+    "Insect Allergies": {
+      "grouped": false,
+      "items": [
+        "Bee Stings",
+        "Wasp Stings",
+        "Other"
+      ]
+    },
+    "Contact Allergies": {
+      "grouped": false,
+      "items": [
+        "Latex",
+        "Nickel",
+        "Fragrances",
+        "Cosmetics",
+        "Cleaning Products",
+        "Other"
+      ]
+    },
+    "Procedures": {
+      "grouped": false,
+      "items": [
+        "Appendectomy (Appendix Removal)",
+        "Gallbladder Removal",
+        "Cesarean Section (C-Section)",
+        "Hysterectomy",
+        "Coronary Stent / Angioplasty",
+        "Coronary Artery Bypass Surgery",
+        "Bariatric Surgery",
+        "Joint Replacement",
+        "Hernia Repair",
+        "Tonsillectomy",
+        "Cataract Surgery",
+        "Cancer Surgery",
+        "Colonoscopy with Significant Findings",
+        "Other"
+      ]
+    },
+    "Injury / Health Events": {
+      "grouped": false,
+      "items": [
+        "Bone Fracture",
+        "Head Injury / Concussion",
+        "Major Burn",
+        "Ligament or Tendon Injury",
+        "Major Traffic Accident",
+        "ICU Admission",
+        "Severe Infection / Sepsis",
+        "Other"
+      ]
+    },
+    "Hospitalization Reasons": {
+      "grouped": false,
+      "items": [
+        "Pneumonia",
+        "Severe Infection / Sepsis",
+        "Asthma Exacerbation",
+        "COPD Exacerbation",
+        "Diabetic Ketoacidosis",
+        "Hypertensive Crisis",
+        "Pancreatitis",
+        "Psychiatric Hospitalization",
+        "Other"
+      ]
+    },
+    "Abnormal Markers": {
+      "grouped": false,
+      "items": [
+        "High LDL Cholesterol",
+        "High Total Cholesterol",
+        "High Triglycerides",
+        "High Blood Pressure",
+        "Elevated Blood Glucose",
+        "Elevated HbA1c",
+        "Elevated Liver Enzymes",
+        "Low Iron / Ferritin",
+        "Abnormal Thyroid Function (TSH)",
+        "Low Vitamin D",
+        "Low Vitamin B12",
+        "Elevated CRP",
+        "Microalbuminuria",
+        "Other"
+      ]
+    },
+    "Symptoms": {
+      "grouped": false,
+      "items": [
+        "Chronic Fatigue",
+        "Chronic Pain",
+        "Shortness of Breath During Physical Activity",
+        "Palpitations",
+        "Poor Exercise Tolerance",
+        "Insomnia",
+        "Frequent Headaches",
+        "Digestive Problems",
+        "Joint Pain",
+        "Back Pain",
+        "Brain Fog / Memory Problems",
+        "Other"
+      ]
+    },
+    "Exercise Types": {
+      "grouped": false,
+      "items": [
+        "Walking",
+        "Running",
+        "Cycling",
+        "Swimming",
+        "Gym / Strength Training",
+        "Group Fitness Classes",
+        "Yoga / Pilates",
+        "Team Sports",
+        "Tennis / Racquet Sports",
+        "Martial Arts",
+        "Hiking",
+        "Other"
+      ]
+    },
+    "Relatives": {
+      "grouped": false,
+      "items": [
+        "Mother",
+        "Father",
+        "Sister",
+        "Brother",
+        "Daughter",
+        "Son",
+        "Maternal Grandmother",
+        "Maternal Grandfather",
+        "Paternal Grandmother",
+        "Paternal Grandfather"
+      ]
+    },
+    "Family History Conditions": {
+      "grouped": true,
+      "groups": [
+        {
+          "name": "Cardiovascular",
+          "items": [
+            "Heart Attack / Myocardial Infarction",
+            "Stroke / TIA",
+            "High Blood Pressure",
+            "High Cholesterol",
+            "Heart Failure",
+            "Arrhythmia",
+            "Sudden Cardiac Death"
+          ]
+        },
+        {
+          "name": "Metabolic",
+          "items": [
+            "Type 1 Diabetes",
+            "Type 2 Diabetes",
+            "Obesity",
+            "Metabolic Syndrome",
+            "Gout"
+          ]
+        },
+        {
+          "name": "Cancer",
+          "items": [
+            "Breast Cancer",
+            "Ovarian Cancer",
+            "Prostate Cancer",
+            "Colon / Colorectal Cancer",
+            "Pancreatic Cancer",
+            "Melanoma",
+            "Other Cancer"
+          ]
+        },
+        {
+          "name": "Neurological",
+          "items": [
+            "Alzheimer’s Disease / Dementia",
+            "Parkinson’s Disease",
+            "Stroke",
+            "Epilepsy"
+          ]
+        },
+        {
+          "name": "Autoimmune",
+          "items": [
+            "Hashimoto’s Thyroiditis",
+            "Rheumatoid Arthritis",
+            "Celiac Disease",
+            "Psoriasis",
+            "Inflammatory Bowel Disease",
+            "Systemic Lupus Erythematosus"
+          ]
+        },
+        {
+          "name": "Other Hereditary Risks",
+          "items": [
+            "BRCA Mutation",
+            "Lynch Syndrome",
+            "Clotting Disorders",
+            "Hereditary Kidney Disease",
+            "Connective Tissue Disorders",
+            "Other"
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -3341,37 +3341,234 @@ a.hc-kpi.clickable:hover {
   color: var(--ink);
 }
 
-.privacy-pref-list {
+.privacy-pending,
+.privacy-prefs {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.privacy-pending-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.privacy-pending-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px 18px;
+  align-items: center;
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--r-yellow, #e5bd3a) 35%, var(--line-2));
+  background: color-mix(in srgb, var(--r-yellow, #e5bd3a) 10%, var(--surface));
+}
+
+.privacy-pending-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.privacy-pending-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+}
+
+.privacy-pending-title b {
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.privacy-pending-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 720px) {
+  .privacy-pending-item {
+    grid-template-columns: 1fr;
+  }
+}
+
+.privacy-pref-summary {
+  flex-shrink: 0;
+}
+
+.privacy-pref-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.privacy-pref-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.privacy-pref-group {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.privacy-pref {
+.privacy-pref-group-head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.privacy-pref-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.privacy-pref-list-split {
   display: grid;
-  grid-template-columns: 22px 1fr;
-  gap: 10px;
-  align-items: start;
-  padding: 10px 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+@media (max-width: 900px) {
+  .privacy-pref-list-split {
+    grid-template-columns: 1fr;
+  }
+}
+
+.privacy-pref {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  padding: 12px 14px;
   border-radius: 12px;
   border: 1px solid var(--line-2);
-  background: color-mix(in srgb, var(--accent-soft) 35%, var(--surface));
-  cursor: pointer;
+  background: color-mix(in srgb, var(--accent-soft) 28%, var(--surface));
 }
 
-.privacy-pref input {
-  margin-top: 3px;
-  accent-color: var(--accent);
+.privacy-pref.on {
+  border-color: color-mix(in srgb, var(--accent) 28%, var(--line-2));
+  background: color-mix(in srgb, var(--accent-soft) 42%, var(--surface));
 }
 
-.privacy-pref b {
-  display: block;
+.privacy-pref.required {
+  background: color-mix(in srgb, var(--accent-soft) 22%, var(--surface-2));
+}
+
+.privacy-pref-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+
+.privacy-pref-title-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  min-width: 0;
+}
+
+.privacy-pref-title-main b {
   font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.35;
 }
 
-.privacy-pref .small {
-  display: block;
-  margin-top: 2px;
+.privacy-pref-desc {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--ink-soft, var(--muted));
+  width: 100%;
+}
+
+.privacy-pref-basis {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: var(--muted);
+}
+
+.privacy-switch {
+  all: unset;
+  box-sizing: border-box;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 108px;
+  height: 36px;
+  padding: 0 10px 0 6px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  cursor: pointer;
+  color: var(--muted);
+  flex-shrink: 0;
+  justify-content: flex-start;
+}
+
+.privacy-switch-knob {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--muted) 55%, var(--surface));
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  transition: transform 0.16s ease, background 0.16s ease;
+  flex-shrink: 0;
+}
+
+.privacy-switch-text {
+  font-size: 0.78rem;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.privacy-switch.on {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--line));
+  background: color-mix(in srgb, var(--accent) 22%, var(--surface));
+  color: var(--ink);
+  justify-content: flex-end;
+  padding: 0 6px 0 10px;
+  flex-direction: row-reverse;
+}
+
+.privacy-switch.on .privacy-switch-knob {
+  background: var(--accent);
+}
+
+.privacy-switch.locked {
+  opacity: 0.85;
+  cursor: not-allowed;
+}
+
+.privacy-switch:disabled {
+  cursor: not-allowed;
+}
+
+.privacy-switch:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent) 70%, transparent);
+  outline-offset: 2px;
+}
+
+@media (max-width: 720px) {
+  .privacy-pref-title-row {
+    flex-wrap: wrap;
+  }
 }
 
 /* ---------- Marketplace ---------- */

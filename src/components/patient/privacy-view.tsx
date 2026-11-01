@@ -63,6 +63,64 @@ type LocaleCopy = {
   basis: string;
 };
 
+type PendingConsent = {
+  id: string;
+  titleLt: string;
+  titleEn: string;
+  fromLt: string;
+  fromEn: string;
+  detailLt: string;
+  detailEn: string;
+  requestedAt: string;
+  scopeLt: string;
+  scopeEn: string;
+};
+
+const DEMO_PENDING: PendingConsent[] = [
+  {
+    id: "pend-genetics-share",
+    titleLt: "Dalijimasis genetikos rezultatais su genetiku",
+    titleEn: "Share genetics results with a geneticist",
+    fromLt: "dr. Eglė Navickienė · genetika",
+    fromEn: "Dr Eglė Navickienė · genetics",
+    detailLt:
+      "Prašoma matyti jūsų SNP / NGS santrauką prieš planuojamą genetiko konsultaciją.",
+    detailEn:
+      "Request to view your SNP / NGS summary before a planned genetics consult.",
+    requestedAt: "2026-10-28",
+    scopeLt: "Genetika · 30 dienų",
+    scopeEn: "Genetics · 30 days",
+  },
+  {
+    id: "pend-lab-partner",
+    titleLt: "Siuntimo laboratorijos prieiga prie lipidų panelės",
+    titleEn: "Referral lab access to lipid panel",
+    fromLt: "Affidea laboratorija · siuntimas #SR-2026-118",
+    fromEn: "Affidea lab · referral #SR-2026-118",
+    detailLt:
+      "Partneris prašo gauti tik lipidų ir Lp(a) rezultatus mėginio paėmimui.",
+    detailEn:
+      "Partner asks for lipid and Lp(a) results only, for sample collection.",
+    requestedAt: "2026-10-30",
+    scopeLt: "Tyrimai · vienkartinė",
+    scopeEn: "Labs · one-time",
+  },
+  {
+    id: "pend-research",
+    titleLt: "Nuasmenintas kardiometabolinis tyrimas",
+    titleEn: "De-identified cardiometabolic study",
+    fromLt: "VU Gyvybės mokslų centras",
+    fromEn: "VU Life Sciences Centre",
+    detailLt:
+      "Etikos komiteto patvirtintas tyrimas — be vardo, be žalių genetikos failų.",
+    detailEn:
+      "Ethics-approved study — no name, no raw genetics files.",
+    requestedAt: "2026-10-22",
+    scopeLt: "Tyrimai · 12 mėn.",
+    scopeEn: "Research · 12 mo.",
+  },
+];
+
 export function PrivacyView({
   locale,
   patientHint = "demo",
@@ -73,6 +131,8 @@ export function PrivacyView({
   const [active, setActive] = useState<PolicyId>("privacy");
   const [prefs, setPrefs] = useState(DEFAULT_PREFS);
   const [savedFlash, setSavedFlash] = useState(false);
+  const [pending, setPending] = useState<PendingConsent[]>(DEMO_PENDING);
+  const [pendingFlash, setPendingFlash] = useState<string | null>(null);
 
   useEffect(() => {
     try {
@@ -325,6 +385,16 @@ export function PrivacyView({
             of: "of",
             acceptOptional: "Accept all optional",
             rejectOptional: "Reject optional",
+            pendingTitle: "Consents awaiting approval",
+            pendingBlurb:
+              "Partners or clinicians asked for extra access. Approve or decline each request.",
+            pendingEmpty: "No pending requests",
+            pendingApprove: "Approve",
+            pendingDecline: "Decline",
+            pendingApproved: "Approved",
+            pendingDeclined: "Declined",
+            pendingRequested: "Requested",
+            pendingFrom: "From",
           }
         : {
             eyebrow: "Teisinė info ir BDAR",
@@ -347,6 +417,16 @@ export function PrivacyView({
             of: "iš",
             acceptOptional: "Sutikti su visais neprivalomais",
             rejectOptional: "Atmesti neprivalomus",
+            pendingTitle: "Laukiančių patvirtinimo sutikimai",
+            pendingBlurb:
+              "Partneriai ar gydytojai paprašė papildomos prieigos. Kiekvieną užklausą patvirtinkite arba atmeskite.",
+            pendingEmpty: "Laukiančių užklausų nėra",
+            pendingApprove: "Patvirtinti",
+            pendingDecline: "Atmesti",
+            pendingApproved: "Patvirtinta",
+            pendingDeclined: "Atmesta",
+            pendingRequested: "Prašyta",
+            pendingFrom: "Kas prašo",
           },
     [locale]
   );
@@ -376,6 +456,12 @@ export function PrivacyView({
     });
   }
 
+  function resolvePending(id: string, approved: boolean) {
+    setPending((list) => list.filter((p) => p.id !== id));
+    setPendingFlash(approved ? copy.pendingApproved : copy.pendingDeclined);
+    window.setTimeout(() => setPendingFlash(null), 2200);
+  }
+
   return (
     <div className="stack privacy-page" style={{ gap: 16 }}>
       <header>
@@ -394,6 +480,67 @@ export function PrivacyView({
           · {PRIVACY_CONTROLLER.dpoEmail}
         </p>
       </header>
+
+      <section className="card privacy-pending">
+        <div className="card-head" style={{ alignItems: "flex-start" }}>
+          <div>
+            <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold m-0">
+              {copy.pendingTitle}
+            </h2>
+            <p className="small muted mt-1 mb-0">{copy.pendingBlurb}</p>
+          </div>
+          <div className="privacy-pref-summary">
+            {pendingFlash ? (
+              <span className="pill c-green">{pendingFlash}</span>
+            ) : (
+              <span className="pill plain c-yellow">{pending.length}</span>
+            )}
+          </div>
+        </div>
+
+        {pending.length === 0 ? (
+          <p className="small muted m-0">{copy.pendingEmpty}</p>
+        ) : (
+          <div className="privacy-pending-list">
+            {pending.map((item) => (
+              <article key={item.id} className="privacy-pending-item">
+                <div className="privacy-pending-copy">
+                  <div className="privacy-pending-title">
+                    <b>{locale === "en" ? item.titleEn : item.titleLt}</b>
+                    <span className="pill plain c-yellow">
+                      {locale === "en" ? item.scopeEn : item.scopeLt}
+                    </span>
+                  </div>
+                  <p className="privacy-pref-desc">
+                    {locale === "en" ? item.detailEn : item.detailLt}
+                  </p>
+                  <p className="privacy-pref-basis">
+                    {copy.pendingFrom}:{" "}
+                    {locale === "en" ? item.fromEn : item.fromLt} ·{" "}
+                    {copy.pendingRequested} {item.requestedAt}
+                  </p>
+                </div>
+                <div className="privacy-pending-actions">
+                  <button
+                    type="button"
+                    className="btn sm"
+                    onClick={() => resolvePending(item.id, true)}
+                  >
+                    {copy.pendingApprove}
+                  </button>
+                  <button
+                    type="button"
+                    className="btn ghost sm"
+                    onClick={() => resolvePending(item.id, false)}
+                  >
+                    {copy.pendingDecline}
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
 
       <section className="card privacy-prefs">
         <div className="card-head" style={{ alignItems: "flex-start" }}>
@@ -440,7 +587,11 @@ export function PrivacyView({
                 </h3>
                 <p className="small muted m-0">{g.blurb}</p>
               </div>
-              <div className="privacy-pref-list">
+              <div
+                className={`privacy-pref-list${
+                  g.id === "required" ? " privacy-pref-list-split" : ""
+                }`}
+              >
                 {g.items.map((meta) => {
                   const lab = labels[meta.key];
                   const on = prefs[meta.key];
@@ -451,8 +602,8 @@ export function PrivacyView({
                         on ? " on" : ""
                       }`}
                     >
-                      <div className="privacy-pref-copy">
-                        <div className="privacy-pref-title-row">
+                      <div className="privacy-pref-title-row">
+                        <div className="privacy-pref-title-main">
                           <b>{lab.t}</b>
                           <span
                             className={`pill plain ${
@@ -466,25 +617,25 @@ export function PrivacyView({
                                 : copy.off}
                           </span>
                         </div>
-                        <p className="privacy-pref-desc">{lab.d}</p>
-                        <p className="privacy-pref-basis">{lab.basis}</p>
+                        <button
+                          type="button"
+                          className={`privacy-switch${on ? " on" : ""}${
+                            meta.required ? " locked" : ""
+                          }`}
+                          role="switch"
+                          aria-checked={on}
+                          aria-label={lab.t}
+                          disabled={meta.required}
+                          onClick={() => setPref(meta.key, !on)}
+                        >
+                          <span className="privacy-switch-knob" />
+                          <span className="privacy-switch-text">
+                            {on ? copy.on : copy.off}
+                          </span>
+                        </button>
                       </div>
-                      <button
-                        type="button"
-                        className={`privacy-switch${on ? " on" : ""}${
-                          meta.required ? " locked" : ""
-                        }`}
-                        role="switch"
-                        aria-checked={on}
-                        aria-label={lab.t}
-                        disabled={meta.required}
-                        onClick={() => setPref(meta.key, !on)}
-                      >
-                        <span className="privacy-switch-knob" />
-                        <span className="privacy-switch-text">
-                          {on ? copy.on : copy.off}
-                        </span>
-                      </button>
+                      <p className="privacy-pref-desc">{lab.d}</p>
+                      <p className="privacy-pref-basis">{lab.basis}</p>
                     </div>
                   );
                 })}
@@ -493,7 +644,7 @@ export function PrivacyView({
           ))}
         </div>
 
-        <div className="row mt-4" style={{ gap: 8, flexWrap: "wrap" }}>
+        <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
           <button type="button" className="btn" onClick={savePrefs}>
             {copy.save}
           </button>

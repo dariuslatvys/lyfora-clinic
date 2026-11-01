@@ -26,8 +26,10 @@ export default function HomePage() {
             className="landing-logo"
           />
           <span className="landing-pill">
+            <span className="landing-pill-line">
+              Visa tavo sveikata vienoje vietoje
+            </span>
             <strong>24/7</strong>
-            <small>tavo individualus sveikatos dvynys</small>
           </span>
         </div>
 

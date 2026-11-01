@@ -922,6 +922,35 @@ a.who.on {
   line-height: 1.15;
 }
 
+.marker-hero-blurb {
+  margin: 0;
+  max-width: 52rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.marker-hero-note {
+  margin: 0;
+  max-width: 52rem;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+.marker-hero-advice {
+  margin: 0;
+  max-width: 52rem;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--r-orange) 35%, var(--line));
+  background: color-mix(in srgb, var(--r-orange-bg) 55%, var(--surface));
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: var(--ink);
+  font-weight: 550;
+}
+
 .surface-raised-card,
 .card.surface-raised-card {
   background: var(--surface-raised);

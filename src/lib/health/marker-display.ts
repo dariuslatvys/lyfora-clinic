@@ -172,44 +172,93 @@ export function explainMarkerPlain(
     fallbackLt?: string | null;
     fallbackEn?: string | null;
   }
-): { eyebrow: string; body: string; adviseDoctor: boolean } {
+): {
+  blurb: string;
+  advice: string | null;
+  disclaimer: string;
+  adviseDoctor: boolean;
+} {
   const physical = isPhysicalMarkerKey(markerKey);
   const copy = PHYSICAL_COPY[markerKey];
-  const high = opts.flag === "high" || opts.colour === "orange" || opts.colour === "red" || opts.colour === "yellow";
+  const outOfRange =
+    opts.flag === "high" ||
+    opts.flag === "low" ||
+    opts.colour === "orange" ||
+    opts.colour === "red" ||
+    opts.colour === "yellow";
   const low = opts.flag === "low";
 
+  const disclaimer = physical
+    ? opts.locale === "en"
+      ? "This is a physical reading — not a lab test and not a diagnosis."
+      : "Tai fizinis matavimas — ne laboratorinis tyrimas ir ne diagnozė."
+    : opts.locale === "en"
+      ? "Educational context for your lab marker — not a diagnosis. Discuss treatment only with your clinician."
+      : "Edukacinis žymens paaiškinimas — ne diagnozė. Gydymą aptarkite tik su gydytoju.";
+
   if (copy) {
-    let body = opts.locale === "en" ? copy.blurbEn : copy.blurbLt;
-    if (high && opts.flag !== "low") {
-      body += " " + (opts.locale === "en" ? copy.highEn : copy.highLt);
-    } else if (low) {
-      body += " " + (opts.locale === "en" ? copy.lowEn : copy.lowLt);
+    const blurb = opts.locale === "en" ? copy.blurbEn : copy.blurbLt;
+    let advice: string | null = null;
+    if (outOfRange) {
+      advice = low
+        ? opts.locale === "en"
+          ? copy.lowEn
+          : copy.lowLt
+        : opts.locale === "en"
+          ? copy.highEn
+          : copy.highLt;
     }
-    return {
-      eyebrow: opts.locale === "en" ? "In plain language" : "Paprastai tariant",
-      body,
-      adviseDoctor: !!(high || low),
-    };
+    return { blurb, advice, disclaimer, adviseDoctor: outOfRange };
   }
 
   if (physical) {
     return {
-      eyebrow: opts.locale === "en" ? "In plain language" : "Paprastai tariant",
-      body:
+      blurb:
         opts.locale === "en"
           ? "This is a physical / functional reading from your profile or device — not a laboratory blood test."
           : "Tai fizinis / funkcinis matavimas iš jūsų profilio ar įrenginio — ne laboratorinis kraujo tyrimas.",
-      adviseDoctor: !!(high || low),
+      advice: outOfRange
+        ? opts.locale === "en"
+          ? "The reading is outside the usual range — discuss it with your clinician."
+          : "Rodiklis už įprastos ribos — verta aptarti su gydytoju."
+        : null,
+      disclaimer,
+      adviseDoctor: outOfRange,
     };
   }
 
   return {
-    eyebrow: opts.locale === "en" ? "In plain language" : "Paprastai tariant",
-    body:
+    blurb:
       (opts.locale === "en" ? opts.fallbackEn : opts.fallbackLt) ||
       (opts.locale === "en"
         ? "Laboratory marker from your uploaded results. Compare the value with the reference range and trend over time."
         : "Laboratorinis rodiklis iš jūsų įkeltų tyrimų. Palyginkite reikšmę su norma ir pokyčiu laike."),
-    adviseDoctor: !!(high || low),
+    advice: outOfRange
+      ? opts.locale === "en"
+        ? "This value is outside the reference range — review it with your clinician."
+        : "Reikšmė už normos ribų — aptarkite su gydytoju."
+      : null,
+    disclaimer,
+    adviseDoctor: outOfRange,
   };
+}
+
+/** Specialty hint for booking CTA on physical metrics. */
+export function physicalBookingSpecialty(markerKey: string): "cardio" | "metabolic" | "general" {
+  if (
+    markerKey === "BLOOD_PRESSURE" ||
+    markerKey === "RESTING_HR" ||
+    markerKey === "HRV" ||
+    markerKey === "VO2MAX"
+  ) {
+    return "cardio";
+  }
+  if (
+    markerKey === "BMI" ||
+    markerKey === "WAIST_CIRCUMFERENCE" ||
+    markerKey === "ACTIVITY_DATA"
+  ) {
+    return "metabolic";
+  }
+  return "general";
 }

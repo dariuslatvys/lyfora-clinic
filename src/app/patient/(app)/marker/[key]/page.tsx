@@ -20,6 +20,7 @@ import {
   explainMarkerPlain,
   formatMarkerReading,
   formatMarkerReference,
+  physicalBookingSpecialty,
   physicalMarkerName,
 } from "@/lib/health/marker-display";
 import {
@@ -46,6 +47,29 @@ function guessCategory(categoriesJson: string): HealthCategoryId | null {
     if (hit) return hit.id;
   }
   return null;
+}
+
+function bookingSlotsFor(
+  markerKey: string,
+  locale: "lt" | "en"
+) {
+  const kind = physicalBookingSpecialty(markerKey);
+  const all = upcomingVisits();
+  const filtered = all.filter((v) => {
+    const s = `${v.specialtyEn} ${v.specialtyLt}`.toLowerCase();
+    if (kind === "cardio") return /cardio|kardiolog/.test(s);
+    if (kind === "metabolic") return /metabol|internal|vidaus|endocrin|endokrin/.test(s);
+    return true;
+  });
+  const mapped = (filtered.length ? filtered : all.slice(0, 3)).map((v) => ({
+    id: v.id,
+    when: formatVisitWhen(v, locale),
+    title: visitTitle(v, locale),
+    doctor: visitDoctor(v, locale),
+    place: visitPlace(v, locale),
+    href: `/patient/visits/${v.id}`,
+  }));
+  return mapped;
 }
 
 export default async function MarkerDetailPage({
@@ -88,15 +112,15 @@ export default async function MarkerDetailPage({
   const latest = history[history.length - 1] || null;
   const physical = isPhysicalMarkerKey(markerKey);
   const name =
-    physicalMarkerName(markerKey, locale) ||
-    def?.name ||
-    markerKey;
+    physicalMarkerName(markerKey, locale) || def?.name || markerKey;
   const colour = latest
     ? markerItemColour({
         value: latest.value,
         refLow: latest.refLow,
         refHigh: latest.refHigh,
         flag: latest.flag,
+        unit: latest.unit,
+        markerKey,
       })
     : ("grey" as const);
 
@@ -122,73 +146,32 @@ export default async function MarkerDetailPage({
       ? `Explain my ${physical ? "physical metric" : "marker"} ${name} (${reading || "no value"}) in plain language using my data`
       : `Paaiškink mano ${physical ? "fizinį rodiklį" : "žymenį"} ${name} (${reading || "nėra reikšmės"}) paprasta kalba pagal mano duomenis`;
 
-  const cardioSlots =
-    markerKey === "BLOOD_PRESSURE" || markerKey === "RESTING_HR" || markerKey === "HRV"
-      ? upcomingVisits()
-          .filter((v) => /cardio|kardiolog/i.test(v.specialtyEn + v.specialtyLt))
-          .map((v) => ({
-            id: v.id,
-            when: formatVisitWhen(v, locale),
-            title: visitTitle(v, locale),
-            doctor: visitDoctor(v, locale),
-            place: visitPlace(v, locale),
-            href: `/patient/visits/${v.id}`,
-          }))
-      : [];
-
-  // Extra demo cardiology slots if only one upcoming exists
-  const bookSlots =
-    cardioSlots.length > 0
-      ? cardioSlots
-      : markerKey === "BLOOD_PRESSURE"
-        ? [
-            {
-              id: "slot-cardio-1",
-              when:
-                locale === "en"
-                  ? "12 Nov 2026 · 10:30"
-                  : "2026-11-12 · 10:30",
-              title:
-                locale === "en"
-                  ? "Cardiology consultation"
-                  : "Kardiologo konsultacija",
-              doctor: "Dr. Andrius Kazlauskas",
-              place:
-                locale === "en" ? "Lyfora Heart Center" : "Lyfora Heart Center",
-              href: "/patient/visits/v-2026-11-12",
-            },
-            {
-              id: "slot-cardio-2",
-              when:
-                locale === "en"
-                  ? "19 Nov 2026 · 09:00"
-                  : "2026-11-19 · 09:00",
-              title:
-                locale === "en"
-                  ? "Cardiology consultation"
-                  : "Kardiologo konsultacija",
-              doctor: "Dr. Andrius Kazlauskas",
-              place:
-                locale === "en" ? "Lyfora Heart Center" : "Lyfora Heart Center",
-              href: "/patient/consultations",
-            },
-            {
-              id: "slot-cardio-3",
-              when:
-                locale === "en"
-                  ? "3 Dec 2026 · 14:15"
-                  : "2026-12-03 · 14:15",
-              title:
-                locale === "en"
-                  ? "Cardiology consultation"
-                  : "Kardiologo konsultacija",
-              doctor: "Dr. Andrius Kazlauskas",
-              place:
-                locale === "en" ? "Lyfora Heart Center" : "Lyfora Heart Center",
-              href: "/patient/consultations",
-            },
-          ]
-        : [];
+  const bookKind = physicalBookingSpecialty(markerKey);
+  const bookSlots = plain.adviseDoctor ? bookingSlotsFor(markerKey, locale) : [];
+  const bookLabel =
+    bookKind === "cardio"
+      ? locale === "en"
+        ? "Book cardiology consultation"
+        : "Rezervuoti kardiologo konsultaciją"
+      : bookKind === "metabolic"
+        ? locale === "en"
+          ? "Book metabolic consultation"
+          : "Rezervuoti metabolinės sveikatos konsultaciją"
+        : locale === "en"
+          ? "Book a consultation"
+          : "Rezervuoti konsultaciją";
+  const specialtyLabel =
+    bookKind === "cardio"
+      ? locale === "en"
+        ? "cardiology"
+        : "kardiologo"
+      : bookKind === "metabolic"
+        ? locale === "en"
+          ? "metabolic health"
+          : "metabolinės sveikatos"
+        : locale === "en"
+          ? "clinic"
+          : "klinikos";
 
   return (
     <div className="stack" style={{ gap: 18 }}>
@@ -207,7 +190,7 @@ export default async function MarkerDetailPage({
         }}
       >
         <div className="row between" style={{ alignItems: "flex-start" }}>
-          <div>
+          <div className="min-w-0" style={{ flex: 1 }}>
             <span className="eyebrow">
               {physical
                 ? locale === "en"
@@ -218,11 +201,28 @@ export default async function MarkerDetailPage({
             <h1 className="mt-1 font-[family-name:var(--font-display)] text-3xl font-semibold tracking-[-0.02em]">
               {name}
             </h1>
-            {reading ? (
-              <p className="marker-hero-reading mt-2">{reading}</p>
+            <p className="marker-hero-blurb mt-3">{plain.blurb}</p>
+            <p className="marker-hero-note mt-2">{plain.disclaimer}</p>
+            {plain.advice ? (
+              <p className="marker-hero-advice mt-3">{plain.advice}</p>
+            ) : null}
+            {plain.adviseDoctor && bookSlots.length > 0 ? (
+              <div className="mt-4">
+                <BookSpecialtySlots
+                  locale={locale}
+                  specialtyLabel={specialtyLabel}
+                  buttonLabel={bookLabel}
+                  hint={
+                    locale === "en"
+                      ? "Choose an available time — we’ll open the visit details."
+                      : "Pasirinkite laisvą laiką — atsidarys vizito detalės."
+                  }
+                  slots={bookSlots}
+                />
+              </div>
             ) : null}
           </div>
-          <div className="row" style={{ gap: 8 }}>
+          <div className="row" style={{ gap: 8, flexShrink: 0 }}>
             <span className={`pill ${PILL_CLASS[colour]}`}>
               {labels.colourLabels[colour]}
             </span>
@@ -271,43 +271,18 @@ export default async function MarkerDetailPage({
         )}
       </section>
 
-      <section className="card surface-raised-card">
-        <p className="eyebrow">{plain.eyebrow}</p>
-        <p className="mt-2 text-[0.98rem] leading-relaxed text-[var(--ink)]">
-          {plain.body}
-        </p>
-        <p className="disclaim mt-3">
-          {physical
-            ? locale === "en"
-              ? "This is a physical reading — not a lab test and not a diagnosis."
-              : "Tai fizinis matavimas — ne laboratorinis tyrimas ir ne diagnozė."
-            : locale === "en"
-              ? "Educational context for your lab marker — not a diagnosis. Discuss treatment only with your clinician."
-              : "Edukacinis žymens paaiškinimas — ne diagnozė. Gydymą aptarkite tik su gydytoju."}
-        </p>
-
-        {plain.adviseDoctor && bookSlots.length > 0 ? (
-          <div className="mt-4">
-            <BookSpecialtySlots
-              locale={locale}
-              specialtyLabel={
-                locale === "en" ? "cardiology" : "kardiologo"
-              }
-              buttonLabel={
-                locale === "en"
-                  ? "Book cardiology consultation"
-                  : "Rezervuoti kardiologo konsultaciją"
-              }
-              hint={
-                locale === "en"
-                  ? "Choose an available time — we’ll open the visit details."
-                  : "Pasirinkite laisvą laiką — atsidarys vizito detalės."
-              }
-              slots={bookSlots}
-            />
-          </div>
-        ) : null}
-      </section>
+      {!physical ? (
+        <section className="card surface-raised-card">
+          <p className="eyebrow">
+            {locale === "en" ? "In plain language" : "Paprastai tariant"}
+          </p>
+          <p className="mt-2 text-[0.98rem] leading-relaxed text-[var(--ink)]">
+            {plain.blurb}
+            {plain.advice ? ` ${plain.advice}` : ""}
+          </p>
+          <p className="disclaim mt-3">{plain.disclaimer}</p>
+        </section>
+      ) : null}
 
       <section className="card surface-raised-card">
         <p className="eyebrow mb-2">{labels.trend}</p>
@@ -341,6 +316,8 @@ export default async function MarkerDetailPage({
                     refLow: h.refLow,
                     refHigh: h.refHigh,
                     flag: h.flag,
+                    unit: h.unit,
+                    markerKey,
                   });
                   return (
                     <tr key={h.id}>

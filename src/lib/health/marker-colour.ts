@@ -6,10 +6,24 @@ export function markerItemColour(m: {
   refLow?: number | null;
   refHigh?: number | null;
   flag?: string | null;
+  unit?: string | null;
+  markerKey?: string;
 }): RiskColour {
-  const high =
+  let high =
     m.flag === "high" || (m.refHigh != null && m.value > m.refHigh);
-  const low = m.flag === "low" || (m.refLow != null && m.value < m.refLow);
+  let low = m.flag === "low" || (m.refLow != null && m.value < m.refLow);
+
+  // Blood pressure unit may carry "145/95 mmHg" — honour diastolic too.
+  if (m.markerKey === "BLOOD_PRESSURE" || (m.unit && /\d+\s*\/\s*\d+/.test(m.unit))) {
+    const match = String(m.unit || "").match(/(\d+)\s*\/\s*(\d+)/);
+    if (match) {
+      const sys = Number(match[1]);
+      const dia = Number(match[2]);
+      if (sys >= 140 || dia >= 90) high = true;
+      else if (sys > 129 || dia > 84) high = true;
+      if (sys < 90 || dia < 60) low = true;
+    }
+  }
 
   if (!high && !low) {
     if (m.refLow == null && m.refHigh == null && !m.flag) return "grey";

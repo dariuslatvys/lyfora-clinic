@@ -12,44 +12,20 @@ export type BodyMapCategory = {
   geneticMark?: string;
 };
 
-/** Top arc first, then lower half — symmetric around the circle. */
+/**
+ * Clockwise from heart at 12 o'clock, equal angular steps.
+ * hormones_women / hormones_men share one slot by sex.
+ */
 const ORBIT_ORDER = [
-  "pharmacogenetics",
   "cardiovascular",
   "hormones_women",
   "hormones_men",
   "mental",
+  "metabolic",
   "immune",
   "oncology",
-  "metabolic",
+  "pharmacogenetics",
 ];
-
-/**
- * Fixed degrees (0 = right, -90 = top).
- * Top trio: pharma · heart · hormones. Lower four mirrored L/R.
- */
-const ANGLE_BY_ID: Record<string, number> = {
-  pharmacogenetics: -152,
-  cardiovascular: -90,
-  hormones_men: -28,
-  hormones_women: -28,
-  oncology: 180,
-  immune: 142,
-  mental: 38,
-  metabolic: 0,
-};
-
-/** Side the title sits on — always beside the icon, clear of the ring. */
-const LABEL_SIDE: Record<string, "left" | "right" | "top"> = {
-  pharmacogenetics: "left",
-  cardiovascular: "top",
-  hormones_men: "right",
-  hormones_women: "right",
-  oncology: "left",
-  immune: "left",
-  mental: "right",
-  metabolic: "right",
-};
 
 /** Polished outline icons for each health domain. */
 const ICON_PATH: Record<string, string> = {
@@ -97,21 +73,41 @@ function orderCategories(categories: BodyMapCategory[]) {
   );
 }
 
+type LabelPlace = "top" | "left" | "right" | "bottom";
+
 type Slot = {
   x: number;
   y: number;
-  place: "top" | "left" | "right";
+  place: LabelPlace;
+  deg: number;
 };
 
-function slotFor(id: string, index: number, total: number): Slot {
-  const iconR = 34;
-  const fallbackDeg = -90 + (360 / Math.max(total, 1)) * index;
-  const deg = ANGLE_BY_ID[id] ?? fallbackDeg;
+/**
+ * Even orbit: heart (index 0) at top (-90° / 12 o'clock),
+ * then equal 360°/n steps clockwise.
+ */
+function slotFor(index: number, total: number): Slot {
+  const iconR = 39;
+  const n = Math.max(total, 1);
+  const step = 360 / n;
+  const deg = -90 + step * index;
   const rad = (deg * Math.PI) / 180;
   const x = 50 + iconR * Math.cos(rad);
   const y = 50 + iconR * Math.sin(rad);
-  const place = LABEL_SIDE[id] ?? (x < 50 ? "left" : "right");
-  return { x, y, place };
+
+  const a = ((deg % 360) + 360) % 360;
+  let place: LabelPlace;
+  if (index === 0) place = "top";
+  else if (a >= 45 && a < 135) place = "bottom";
+  else if (a >= 135 && a < 225) place = "left";
+  else if (a >= 225 && a < 315) place = "top";
+  else place = "right";
+
+  // Prefer side labels for near-horizontal upper slots (clear of heart title)
+  if (index !== 0 && a >= 225 && a < 315) place = "left";
+  if (index !== 0 && (a >= 315 || a < 45)) place = "right";
+
+  return { x, y, place, deg };
 }
 
 export function BodyMap({
@@ -131,9 +127,9 @@ export function BodyMap({
           <circle
             cx="50"
             cy="50"
-            r="32"
+            r="37"
             fill="none"
-            stroke="#d0dbe4"
+            stroke="var(--line)"
             strokeWidth="0.32"
             strokeDasharray="1.15 1.05"
           />
@@ -151,17 +147,19 @@ export function BodyMap({
         </div>
 
         {ordered.map((c, i) => {
-          const s = slotFor(c.id, i, ordered.length);
+          const s = slotFor(i, ordered.length);
           return (
             <Link
               key={c.id}
               href={`/patient/digital-twin/${c.id}`}
               className={`ring-node ring-place-${s.place}`}
               style={{
-                ["--nx" as string]: `${s.x}%`,
-                ["--ny" as string]: `${s.y}%`,
+                left: `${s.x}%`,
+                top: `${s.y}%`,
                 ["--cc" as string]: COLOUR_HEX[c.colour],
               }}
+              data-orbit-deg={s.deg.toFixed(1)}
+              data-orbit-i={i}
             >
               <span className="ring-dot">
                 <CatIcon id={c.id} />

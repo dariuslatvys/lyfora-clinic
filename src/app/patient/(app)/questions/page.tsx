@@ -27,7 +27,7 @@ export default async function Page() {
         <textarea
           id="q"
           rows={5}
-          className="mt-2 w-full rounded-[var(--radius-s)] border border-[var(--line)] bg-white px-3 py-2 text-sm"
+          className="mt-2 w-full rounded-[var(--radius-s)] border border-[var(--line)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--ink)]"
           placeholder={
             locale === "en"
               ? "Describe symptoms, medications, or what you need clarified…"

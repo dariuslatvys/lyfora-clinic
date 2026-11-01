@@ -530,9 +530,9 @@
     },
     {
       "snpId": "rs4149056",
-      "allele1": "T",
-      "allele2": "T",
-      "genotype": "TT"
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
     },
     {
       "snpId": "rs4244285",

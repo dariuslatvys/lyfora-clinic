@@ -60,7 +60,7 @@ export function SnpDetailPanel({
       </div>
 
       <div className="stack" style={{ gap: 14 }}>
-        <div className="rounded-[var(--radius-s)] border border-[var(--line)] bg-[var(--surface)] px-4 py-3">
+        <div className="rounded-[var(--radius-s)] border border-[var(--line)] bg-[var(--surface-raised)] px-4 py-3">
           <p className="text-sm font-semibold text-[var(--ink)]">
             {expl.genotypeLine}
           </p>
@@ -74,7 +74,7 @@ export function SnpDetailPanel({
           ) : null}
         </div>
 
-        <div className="rounded-[var(--radius-s)] border border-[var(--line)] bg-[var(--surface)] px-4 py-4">
+        <div className="rounded-[var(--radius-s)] border border-[var(--line)] bg-[var(--surface-raised)] px-4 py-4">
           <p className="eyebrow mb-2">
             {locale === "en" ? "In plain language" : "Paprastai tariant"}
           </p>

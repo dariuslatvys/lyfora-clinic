@@ -8,8 +8,10 @@
 :root {
   color-scheme: dark;
   --bg: #0b1412;
-  --surface: #121e1b;
-  --surface-2: #17251f;
+  --surface: #152420;
+  --surface-2: #1b2e29;
+  /* Slightly lighter green for info boxes / gene rows */
+  --surface-raised: #274740;
   --ink: #e3ece8;
   --ink-soft: #bccbc5;
   --muted: #8aa099;
@@ -1367,23 +1369,18 @@ a {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 16px;
-  padding: 28px 18px 16px;
+  padding: 44px 22px 40px;
   overflow: visible;
+  position: relative;
 }
 
 .ring-map-stage {
   position: relative;
-  width: min(100%, 460px);
-  max-height: min(50vh, 460px);
+  width: min(100%, 520px);
   aspect-ratio: 1 / 1;
-  margin: 12px auto 4px;
+  margin: 0 auto 8px;
   max-width: 100%;
-}
-
-.ring-map-stage::before {
-  content: "";
-  display: block;
-  padding-top: 4%;
+  /* Keep a true circle — avoid max-height squash that made spacing look uneven */
 }
 
 .ring-map-svg {
@@ -1398,9 +1395,10 @@ a {
 .ring-map-figure {
   position: absolute;
   left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: min(132px, 22%);
+  /* Lower than geometric center so head clears the heart node */
+  top: 58%;
+  transform: translate(-50%, -46%);
+  width: min(108px, 18%);
   z-index: 1;
   pointer-events: none;
 }
@@ -1416,8 +1414,7 @@ a {
 
 .ring-node {
   position: absolute;
-  left: var(--nx);
-  top: var(--ny);
+  /* left/top set inline as % from even-orbit math */
   z-index: 2;
   width: 0;
   height: 0;
@@ -1486,6 +1483,12 @@ a {
   width: 150px;
 }
 
+.ring-place-bottom .ring-label {
+  transform: translate(-50%, 34px);
+  text-align: center;
+  width: 150px;
+}
+
 .ring-label b {
   font-family: var(--font-display), Manrope, sans-serif;
   font-size: 0.72rem;
@@ -1511,9 +1514,14 @@ a {
 }
 
 .ring-map-hint {
-  margin: 4px 6px 0;
-  text-align: center;
-  font-size: 0.7rem;
+  position: absolute;
+  left: 14px;
+  bottom: 12px;
+  margin: 0;
+  max-width: 42%;
+  text-align: left;
+  font-size: 0.68rem;
+  line-height: 1.35;
   color: var(--muted);
 }
 
@@ -1953,7 +1961,7 @@ a {
   padding: 8px 10px;
   border-radius: 12px;
   border: 1px solid var(--line-2);
-  background: var(--surface-2);
+  background: var(--surface-raised);
   text-decoration: none;
   color: inherit;
   transition: border-color 0.15s ease, background 0.15s ease;

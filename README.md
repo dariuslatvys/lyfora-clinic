@@ -66,7 +66,7 @@ Pastaba: serverless cold start’e sesijos /tmp DB gali „atsinaujinti“ — d
 Šaltiniai: `data/lyfora-source/` ir normalizuoti JSON `data/parsed/`.
 
 - Vyrų demo — laboratoriniai žymenys iš Blood tests PDF + bazinis SNP microarray (23andMe sample) + NGS VCF (`MYBPC3`, `MSH2` demonstracinės pozicijos).
-- Moterų demo — demonstraciniai SNP genotipai + sintetinis NGS VCF (PALB2, RYR1).
+- Moterų demo — AncestryDNA SNP microarray (`sampleDNA.txt` → `snp_genotypes_female.json`) + sintetinis NGS VCF (PALB2, RYR1).
 
 ## Stack
 

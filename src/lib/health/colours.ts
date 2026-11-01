@@ -58,21 +58,22 @@ export function combineCategoryColour(
   };
 }
 
-/** Risk colours from Lyfora Klinika.html example */
+/** Risk colours — tuned for pine-green dark UI */
 export const COLOUR_HEX: Record<RiskColour, string> = {
-  grey: "#8b9c96",
-  green: "#12b886",
-  yellow: "#e0a800",
-  orange: "#f06a1a",
-  red: "#e03131",
-  badge: "#7c5cbf",
+  grey: "#6c7d78",
+  green: "#45c08a",
+  yellow: "#e5bd3a",
+  orange: "#f08a47",
+  red: "#f0626b",
+  badge: "#a594ff",
 };
 
+/** Soft fills for dark surfaces (was pastel-on-white). */
 export const COLOUR_SOFT: Record<RiskColour, string> = {
-  grey: "#eef1f0",
-  green: "#d3f9e8",
-  yellow: "#fff3bf",
-  orange: "#ffe8d6",
-  red: "#ffe3e3",
-  badge: "#ece4ff",
+  grey: "#1c2825",
+  green: "#12302a",
+  yellow: "#332b0f",
+  orange: "#3a2312",
+  red: "#3c1a1e",
+  badge: "#241f43",
 };

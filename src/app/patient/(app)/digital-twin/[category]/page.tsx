@@ -136,7 +136,7 @@ export default async function CategoryDetailPage({
             ? undefined
             : {
                 borderColor: COLOUR_HEX[cat.colour],
-                background: `linear-gradient(160deg, ${COLOUR_SOFT[cat.colour]}, rgba(255,255,255,0.8))`,
+                background: `linear-gradient(160deg, ${COLOUR_SOFT[cat.colour]}, var(--surface) 55%)`,
               }
         }
       >
@@ -277,7 +277,7 @@ export default async function CategoryDetailPage({
           <h3 className="font-[family-name:var(--font-display)] text-2xl">
             {labels.rareMutations}
           </h3>
-          <div className="rounded-lg border border-[var(--line)] bg-white/70 p-4">
+          <div className="rounded-lg border border-[var(--line)] bg-[var(--surface-raised)] p-4">
             <p className="text-sm font-semibold">{labels.ngsTitle}</p>
             <p className="mt-1 text-sm text-[var(--ink-soft)]">{labels.ngsBlurb}</p>
           </div>
@@ -362,7 +362,7 @@ export default async function CategoryDetailPage({
 
               {markerMeta && (
                 <div
-                  className="mt-4 rounded-lg border bg-white/80 p-4"
+                  className="mt-4 rounded-lg border bg-[var(--surface-raised)] p-4"
                   style={{
                     borderColor: COLOUR_HEX[markerItemColour(markerMeta)],
                   }}
@@ -438,7 +438,7 @@ export default async function CategoryDetailPage({
                 )}
               </div>
               {!genesOnly && cat.id !== "pharmacogenetics" && (
-                <div className="mt-2 rounded-lg border border-[var(--line)] bg-white/70 p-3">
+                <div className="mt-2 rounded-lg border border-[var(--line)] bg-[var(--surface-raised)] p-3">
                   <p className="text-sm font-semibold">{snpTitle}</p>
                   <p className="mt-1 text-xs text-[var(--ink-soft)]">
                     {labels.snpTestBlurb}
@@ -457,31 +457,34 @@ export default async function CategoryDetailPage({
                     s.colour != null &&
                     colourRank(s.colour) >=
                       Math.max(2, colourRank(cat.colour));
+                  const selected = selectedSnpId === s.snpId;
                   return (
                     <Link
                       key={`${s.gene}-${s.snpId}`}
                       href={`/patient/snp/${encodeURIComponent(s.snpId)}?cat=${category}`}
-                      className={`block rounded-md border px-3 py-2 transition hover:border-[var(--accent)] ${
-                        selectedSnpId === s.snpId
-                          ? "border-[var(--accent)] bg-[var(--accent-soft)]"
-                          : "border-[var(--line)] bg-white/70"
+                      className={`block rounded-md border px-3 py-2 text-[var(--ink)] no-underline transition hover:border-[var(--accent)] ${
+                        selected
+                          ? "border-[var(--accent)]"
+                          : "border-[var(--line)]"
                       }`}
                       style={{
                         borderLeft: `4px solid ${COLOUR_HEX[c]}`,
-                        background: isDriver
-                          ? `linear-gradient(90deg, ${COLOUR_SOFT[c]}, transparent 55%)`
-                          : undefined,
+                        background: selected
+                          ? "var(--accent-soft)"
+                          : isDriver
+                            ? `linear-gradient(90deg, ${COLOUR_SOFT[c]}, var(--surface-raised) 55%)`
+                            : "var(--surface-raised)",
                       }}
                     >
                       <div className="flex items-center justify-between gap-2">
                         <div className="min-w-0">
-                          <span className="font-medium">
+                          <span className="font-medium text-[var(--ink)]">
                             {s.gene}{" "}
-                            <span className="text-[var(--muted)] font-normal">
+                            <span className="text-[var(--ink-soft)] font-normal">
                               {s.snpId.split("__")[0]}
                             </span>
                           </span>
-                          <p className="text-xs text-[var(--muted)]">
+                          <p className="text-xs text-[var(--ink-soft)]">
                             {s.genotypeAvailable
                               ? `${s.allele1}/${s.allele2} · ${s.matchCount} ${
                                   s.matchCount === 1

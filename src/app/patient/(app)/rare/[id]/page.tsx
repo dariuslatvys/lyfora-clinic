@@ -80,7 +80,7 @@ export default async function RareDetailPage({
       </section>
 
       <section className="card">
-        <div className="rounded-lg border border-[var(--line)] bg-white/70 p-4">
+        <div className="rounded-lg border border-[var(--line)] bg-[var(--surface-raised)] p-4">
           <p className="text-sm font-semibold">{labels.ngsTitle}</p>
           <p className="mt-1 text-sm text-[var(--ink-soft)]">{labels.ngsBlurb}</p>
         </div>

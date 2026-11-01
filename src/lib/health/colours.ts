@@ -1,6 +1,6 @@
 export type RiskColour = "grey" | "green" | "yellow" | "orange" | "red" | "badge";
 
-const RANK: Record<RiskColour, number> = {
+export const COLOUR_RANK: Record<RiskColour, number> = {
   grey: 0,
   green: 1,
   badge: 1,
@@ -26,8 +26,25 @@ export function maxColour(colours: RiskColour[]): RiskColour {
   if (!colours.length) return "grey";
   const actionable = colours.filter((c) => c !== "badge");
   if (!actionable.length) return colours.includes("badge") ? "green" : "grey";
-  return actionable.reduce((a, b) => (RANK[b] > RANK[a] ? b : a), "green" as RiskColour);
+  return actionable.reduce(
+    (a, b) => (COLOUR_RANK[b] > COLOUR_RANK[a] ? b : a),
+    "green" as RiskColour
+  );
 }
+
+export function colourRank(c?: RiskColour | null): number {
+  if (!c) return -1;
+  return COLOUR_RANK[c];
+}
+
+export const PILL_CLASS: Record<RiskColour, string> = {
+  green: "c-green",
+  yellow: "c-yellow",
+  orange: "c-orange",
+  red: "c-red",
+  grey: "c-none",
+  badge: "c-badge",
+};
 
 export function combineCategoryColour(
   biomarker: RiskColour,

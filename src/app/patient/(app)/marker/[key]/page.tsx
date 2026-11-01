@@ -6,14 +6,29 @@ import { ensureSchema, getDb } from "@/lib/db";
 import { markerDefs, markerResults } from "@/lib/db/schema";
 import { t } from "@/lib/i18n/dictionary";
 import { markerItemColour } from "@/lib/health/marker-colour";
-import { COLOUR_HEX, PILL_CLASS } from "@/lib/health/colours";
+import { COLOUR_HEX, COLOUR_SOFT, PILL_CLASS } from "@/lib/health/colours";
 import { MarkerChart } from "@/components/patient/marker-chart";
 import { AskAiButton } from "@/components/patient/ask-ai-button";
 import { NormBar } from "@/components/patient/norm-bar";
+import { BookSpecialtySlots } from "@/components/patient/book-specialty-slots";
 import {
   HEALTH_CATEGORIES,
   type HealthCategoryId,
 } from "@/lib/health/categories";
+import { isPhysicalMarkerKey } from "@/lib/health/physical-metrics";
+import {
+  explainMarkerPlain,
+  formatMarkerReading,
+  formatMarkerReference,
+  physicalMarkerName,
+} from "@/lib/health/marker-display";
+import {
+  formatVisitWhen,
+  upcomingVisits,
+  visitDoctor,
+  visitPlace,
+  visitTitle,
+} from "@/lib/health/demo-visits";
 
 function guessCategory(categoriesJson: string): HealthCategoryId | null {
   let cats: string[] = [];
@@ -71,7 +86,11 @@ export default async function MarkerDetailPage({
   if (!history.length && !def) notFound();
 
   const latest = history[history.length - 1] || null;
-  const name = def?.name || markerKey;
+  const physical = isPhysicalMarkerKey(markerKey);
+  const name =
+    physicalMarkerName(markerKey, locale) ||
+    def?.name ||
+    markerKey;
   const colour = latest
     ? markerItemColour({
         value: latest.value,
@@ -81,20 +100,95 @@ export default async function MarkerDetailPage({
       })
     : ("grey" as const);
 
+  const reading = latest
+    ? formatMarkerReading(latest.value, latest.unit, markerKey)
+    : null;
+
   const catId =
     (sp.cat as HealthCategoryId | undefined) ||
-    (def ? guessCategory(def.categoriesJson) : null);
+    (def ? guessCategory(def.categoriesJson) : null) ||
+    (markerKey === "BLOOD_PRESSURE" ? "cardiovascular" : null);
 
-  const description =
-    (locale === "lt" ? def?.descriptionLt : def?.descriptionEn) ||
-    (locale === "en"
-      ? "Laboratory marker from your uploaded results. Compare the value with the reference range and trend over time."
-      : "Laboratorinis rodiklis iš jūsų įkeltų tyrimų. Palyginkite reikšmę su norma ir pokyčiu laike.");
+  const plain = explainMarkerPlain(markerKey, {
+    locale,
+    flag: latest?.flag,
+    colour,
+    fallbackLt: def?.descriptionLt,
+    fallbackEn: def?.descriptionEn,
+  });
 
   const ask =
     locale === "en"
-      ? `Explain my marker ${name} (${latest ? `${latest.value}${latest.unit ? " " + latest.unit : ""}` : "no value"}) in plain language using my data`
-      : `Paaiškink mano žymenį ${name} (${latest ? `${latest.value}${latest.unit ? " " + latest.unit : ""}` : "nėra reikšmės"}) paprasta kalba pagal mano duomenis`;
+      ? `Explain my ${physical ? "physical metric" : "marker"} ${name} (${reading || "no value"}) in plain language using my data`
+      : `Paaiškink mano ${physical ? "fizinį rodiklį" : "žymenį"} ${name} (${reading || "nėra reikšmės"}) paprasta kalba pagal mano duomenis`;
+
+  const cardioSlots =
+    markerKey === "BLOOD_PRESSURE" || markerKey === "RESTING_HR" || markerKey === "HRV"
+      ? upcomingVisits()
+          .filter((v) => /cardio|kardiolog/i.test(v.specialtyEn + v.specialtyLt))
+          .map((v) => ({
+            id: v.id,
+            when: formatVisitWhen(v, locale),
+            title: visitTitle(v, locale),
+            doctor: visitDoctor(v, locale),
+            place: visitPlace(v, locale),
+            href: `/patient/visits/${v.id}`,
+          }))
+      : [];
+
+  // Extra demo cardiology slots if only one upcoming exists
+  const bookSlots =
+    cardioSlots.length > 0
+      ? cardioSlots
+      : markerKey === "BLOOD_PRESSURE"
+        ? [
+            {
+              id: "slot-cardio-1",
+              when:
+                locale === "en"
+                  ? "12 Nov 2026 · 10:30"
+                  : "2026-11-12 · 10:30",
+              title:
+                locale === "en"
+                  ? "Cardiology consultation"
+                  : "Kardiologo konsultacija",
+              doctor: "Dr. Andrius Kazlauskas",
+              place:
+                locale === "en" ? "Lyfora Heart Center" : "Lyfora Heart Center",
+              href: "/patient/visits/v-2026-11-12",
+            },
+            {
+              id: "slot-cardio-2",
+              when:
+                locale === "en"
+                  ? "19 Nov 2026 · 09:00"
+                  : "2026-11-19 · 09:00",
+              title:
+                locale === "en"
+                  ? "Cardiology consultation"
+                  : "Kardiologo konsultacija",
+              doctor: "Dr. Andrius Kazlauskas",
+              place:
+                locale === "en" ? "Lyfora Heart Center" : "Lyfora Heart Center",
+              href: "/patient/consultations",
+            },
+            {
+              id: "slot-cardio-3",
+              when:
+                locale === "en"
+                  ? "3 Dec 2026 · 14:15"
+                  : "2026-12-03 · 14:15",
+              title:
+                locale === "en"
+                  ? "Cardiology consultation"
+                  : "Kardiologo konsultacija",
+              doctor: "Dr. Andrius Kazlauskas",
+              place:
+                locale === "en" ? "Lyfora Heart Center" : "Lyfora Heart Center",
+              href: "/patient/consultations",
+            },
+          ]
+        : [];
 
   return (
     <div className="stack" style={{ gap: 18 }}>
@@ -106,19 +200,27 @@ export default async function MarkerDetailPage({
       </Link>
 
       <section
-        className="panel"
+        className="panel marker-hero"
         style={{
           borderColor: COLOUR_HEX[colour],
-          background: `linear-gradient(160deg, color-mix(in srgb, ${COLOUR_HEX[colour]} 14%, white), white)`,
+          background: `linear-gradient(160deg, ${COLOUR_SOFT[colour]}, var(--surface) 55%)`,
         }}
       >
         <div className="row between" style={{ alignItems: "flex-start" }}>
           <div>
-            <span className="eyebrow">{labels.markers}</span>
+            <span className="eyebrow">
+              {physical
+                ? locale === "en"
+                  ? "Physical metric"
+                  : "Fizinis rodiklis"
+                : labels.markers}
+            </span>
             <h1 className="mt-1 font-[family-name:var(--font-display)] text-3xl font-semibold tracking-[-0.02em]">
               {name}
             </h1>
-            <p className="mt-1 text-xs text-[var(--muted)]">{markerKey}</p>
+            {reading ? (
+              <p className="marker-hero-reading mt-2">{reading}</p>
+            ) : null}
           </div>
           <div className="row" style={{ gap: 8 }}>
             <span className={`pill ${PILL_CLASS[colour]}`}>
@@ -129,24 +231,17 @@ export default async function MarkerDetailPage({
         </div>
       </section>
 
-      <section className="card">
+      <section className="card surface-raised-card">
         <div className="card-head">
           <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold">
-            {locale === "en" ? "Your values" : "Jūsų reikšmės"}
+            {locale === "en" ? "Your reading" : "Jūsų matavimas"}
           </h2>
         </div>
         {latest ? (
           <div className="grid gap-4 sm:grid-cols-3">
             <div>
               <p className="eyebrow">{labels.value}</p>
-              <p className="mt-1 text-2xl font-semibold">
-                {latest.value}
-                {latest.unit ? (
-                  <span className="ml-1 text-base font-medium text-[var(--muted)]">
-                    {latest.unit}
-                  </span>
-                ) : null}
-              </p>
+              <p className="mt-1 text-2xl font-semibold">{reading}</p>
               <p className="mt-1 text-xs text-[var(--muted)]">
                 {latest.observedAt}
               </p>
@@ -154,9 +249,12 @@ export default async function MarkerDetailPage({
             <div>
               <p className="eyebrow">{labels.reference}</p>
               <p className="mt-1 text-lg font-medium">
-                {latest.refLow != null || latest.refHigh != null
-                  ? `${latest.refLow ?? "—"} – ${latest.refHigh ?? "—"}`
-                  : "—"}
+                {formatMarkerReference(
+                  latest.refLow,
+                  latest.refHigh,
+                  markerKey,
+                  locale
+                )}
               </p>
             </div>
             <div>
@@ -173,19 +271,45 @@ export default async function MarkerDetailPage({
         )}
       </section>
 
-      <section className="card">
-        <p className="eyebrow">{labels.plainLanguage}</p>
+      <section className="card surface-raised-card">
+        <p className="eyebrow">{plain.eyebrow}</p>
         <p className="mt-2 text-[0.98rem] leading-relaxed text-[var(--ink)]">
-          {description}
+          {plain.body}
         </p>
         <p className="disclaim mt-3">
-          {locale === "en"
-            ? "This is educational context for your lab marker — not a diagnosis. Discuss treatment only with your clinician."
-            : "Tai edukacinis žymens paaiškinimas — ne diagnozė. Gydymą aptarkite tik su gydytoju."}
+          {physical
+            ? locale === "en"
+              ? "This is a physical reading — not a lab test and not a diagnosis."
+              : "Tai fizinis matavimas — ne laboratorinis tyrimas ir ne diagnozė."
+            : locale === "en"
+              ? "Educational context for your lab marker — not a diagnosis. Discuss treatment only with your clinician."
+              : "Edukacinis žymens paaiškinimas — ne diagnozė. Gydymą aptarkite tik su gydytoju."}
         </p>
+
+        {plain.adviseDoctor && bookSlots.length > 0 ? (
+          <div className="mt-4">
+            <BookSpecialtySlots
+              locale={locale}
+              specialtyLabel={
+                locale === "en" ? "cardiology" : "kardiologo"
+              }
+              buttonLabel={
+                locale === "en"
+                  ? "Book cardiology consultation"
+                  : "Rezervuoti kardiologo konsultaciją"
+              }
+              hint={
+                locale === "en"
+                  ? "Choose an available time — we’ll open the visit details."
+                  : "Pasirinkite laisvą laiką — atsidarys vizito detalės."
+              }
+              slots={bookSlots}
+            />
+          </div>
+        ) : null}
       </section>
 
-      <section className="card">
+      <section className="card surface-raised-card">
         <p className="eyebrow mb-2">{labels.trend}</p>
         <MarkerChart
           points={history.map((h) => ({
@@ -194,14 +318,18 @@ export default async function MarkerDetailPage({
           }))}
           refLow={latest?.refLow}
           refHigh={latest?.refHigh}
-          unit={latest?.unit}
+          unit={
+            markerKey === "BLOOD_PRESSURE"
+              ? "mmHg SYS"
+              : latest?.unit || undefined
+          }
         />
-        {history.length > 1 && (
+        {history.length > 0 && (
           <div className="mt-4 overflow-x-auto">
             <table className="labs-table">
               <thead>
                 <tr>
-                  <th>Data</th>
+                  <th>{locale === "en" ? "Date" : "Data"}</th>
                   <th>{labels.labsResult}</th>
                   <th>{labels.labsStatus}</th>
                 </tr>
@@ -218,8 +346,7 @@ export default async function MarkerDetailPage({
                     <tr key={h.id}>
                       <td>{h.observedAt}</td>
                       <td className="labs-val">
-                        {h.value}
-                        {h.unit ? ` ${h.unit}` : ""}
+                        {formatMarkerReading(h.value, h.unit, markerKey)}
                       </td>
                       <td>
                         <span className={`pill ${PILL_CLASS[c]}`}>

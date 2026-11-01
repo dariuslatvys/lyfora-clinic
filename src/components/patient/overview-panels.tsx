@@ -6,6 +6,7 @@ import { BodyMap, type BodyMapCategory } from "@/components/patient/body-map";
 import { CategoryCard } from "@/components/patient/category-card";
 import { PILL_CLASS, type RiskColour } from "@/lib/health/colours";
 import type { FlaggedLab } from "@/lib/health/marker-colour";
+import { formatMarkerReading } from "@/lib/health/marker-display";
 
 export type OverviewFlaggedLab = FlaggedLab;
 
@@ -206,10 +207,11 @@ export function OverviewPanels({
                         </div>
                         <div style={{ textAlign: "right" }}>
                           <b className="num">
-                            {m.value}
-                            {m.unit ? (
-                              <span className="xs muted"> {m.unit}</span>
-                            ) : null}
+                            {formatMarkerReading(
+                              m.value,
+                              m.unit,
+                              m.markerKey
+                            )}
                           </b>
                           <div>
                             <span className={`pill ${PILL_CLASS[m.colour]}`}>

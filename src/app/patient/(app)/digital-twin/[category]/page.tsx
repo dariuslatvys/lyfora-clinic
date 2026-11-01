@@ -11,6 +11,10 @@ import {
   type RiskColour,
 } from "@/lib/health/colours";
 import { markerItemColour } from "@/lib/health/marker-colour";
+import {
+  formatMarkerReading,
+  physicalMarkerName,
+} from "@/lib/health/marker-display";
 import { MarkerChart } from "@/components/patient/marker-chart";
 import { Sparkline } from "@/components/patient/sparkline";
 import { SnpDetailPanel } from "@/components/patient/snp-detail";
@@ -272,11 +276,12 @@ export default async function CategoryDetailPage({
                   style={{ borderLeftColor: COLOUR_HEX[c] }}
                 >
                   <span className="marker-row-name">
-                    {m.name || m.markerKey}
+                    {physicalMarkerName(m.markerKey, locale) ||
+                      m.name ||
+                      m.markerKey}
                   </span>
                   <span className="marker-row-val">
-                    {m.value}
-                    {m.unit ? ` ${m.unit}` : ""}
+                    {formatMarkerReading(m.value, m.unit, m.markerKey)}
                   </span>
                   <span className="marker-row-spark">
                     <Sparkline values={series} width={84} height={28} />
@@ -327,8 +332,7 @@ export default async function CategoryDetailPage({
                         {m.name || m.markerKey}
                       </span>
                       <span className="marker-row-val">
-                        {m.value}
-                        {m.unit ? ` ${m.unit}` : ""}
+                        {formatMarkerReading(m.value, m.unit, m.markerKey)}
                       </span>
                       <span className="marker-row-spark">
                         <Sparkline values={series} width={84} height={28} />

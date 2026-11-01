@@ -1,5 +1,6 @@
 import { isPhysicalMarkerKey } from "./physical-metrics";
 import { markerItemColour } from "./marker-colour";
+import { formatMarkerReading } from "./marker-display";
 import type { RiskColour } from "./colours";
 
 export type GoalItem = {
@@ -62,9 +63,7 @@ function progressTowardRange(m: MarkerLike, target: number): number {
 }
 
 function bpDisplay(m: MarkerLike) {
-  // Unit may already be "127/77 mmHg" after questionnaire sync
-  if (m.unit && /\d+\s*\/\s*\d+/.test(m.unit)) return m.unit.replace(/\s*mmHg/i, "");
-  return String(m.value);
+  return formatMarkerReading(m.value, m.unit, m.markerKey);
 }
 
 const TARGETS: TargetSpec[] = [

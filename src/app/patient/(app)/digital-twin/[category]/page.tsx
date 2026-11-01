@@ -115,6 +115,8 @@ export default async function CategoryDetailPage({
   );
   const hasDrivers =
     driverSnps.length > 0 || driverMarkers.length > 0 || hasRare;
+  // Pharmacogenetics (and any genes-only category): skip colour/driver chrome.
+  const genesOnly = hasSnps && !hasMarkers && !hasRare;
 
   const bothColumns = hasMarkers && hasSnps;
   const columnsClass = bothColumns
@@ -129,130 +131,146 @@ export default async function CategoryDetailPage({
 
       <section
         className="panel cat-hero"
-        style={{
-          borderColor: COLOUR_HEX[cat.colour],
-          background: `linear-gradient(160deg, ${COLOUR_SOFT[cat.colour]}, rgba(255,255,255,0.8))`,
-        }}
+        style={
+          genesOnly
+            ? undefined
+            : {
+                borderColor: COLOUR_HEX[cat.colour],
+                background: `linear-gradient(160deg, ${COLOUR_SOFT[cat.colour]}, rgba(255,255,255,0.8))`,
+              }
+        }
       >
-        <Pill colour={cat.colour} label={labels.colourLabels[cat.colour]} />
-        <h2 className="mt-2 font-[family-name:var(--font-display)] text-2xl sm:text-[1.75rem] font-semibold tracking-[-0.02em]">
+        {!genesOnly && (
+          <Pill colour={cat.colour} label={labels.colourLabels[cat.colour]} />
+        )}
+        <h2
+          className={`font-[family-name:var(--font-display)] text-2xl sm:text-[1.75rem] font-semibold tracking-[-0.02em] ${
+            genesOnly ? "" : "mt-2"
+          }`}
+        >
           {labels.categoryNames[cat.id as HealthCategoryId]}
         </h2>
         <p className="mt-2 w-full text-sm leading-relaxed text-[var(--ink-soft)]">
-          {cat.summary}
+          {genesOnly
+            ? locale === "en"
+              ? "SNP results that can affect how your body responds to medicines. Open a gene for the plain-language explanation."
+              : "SNP rezultatai, kurie gali keisti vaistų poveikį. Paspauskite geną — pamatysite paaiškinimą paprasta kalba."
+            : cat.summary}
         </p>
       </section>
 
-      <section className="card colour-sources">
-        <div className="colour-sources-head">
-          <h3 className="font-[family-name:var(--font-display)] text-[1.05rem] font-semibold">
-            {labels.colourLabels[cat.colour]}
-          </h3>
-          <Pill colour={cat.colour} label={labels.colourLabels[cat.colour]} />
-        </div>
-
-        <div
-          className={`colour-source-grid ${
-            [hasMarkers, hasSnps, hasRare].filter(Boolean).length > 1
-              ? "multi"
-              : ""
-          }`}
-        >
-          {hasMarkers && (
-            <a href="#section-markers" className="colour-source">
-              <span className="colour-source-label">{labels.markers}</span>
-              <Pill
-                colour={biomarkerColour}
-                label={labels.colourLabels[biomarkerColour]}
-              />
-            </a>
-          )}
-          {hasSnps && (
-            <a href="#section-genes" className="colour-source">
-              <span className="colour-source-label">{labels.genes}</span>
-              <Pill
-                colour={geneticColour}
-                label={
-                  cat.geneticColour
-                    ? labels.colourLabels[geneticColour]
-                    : labels.noRiskAlleles
-                }
-              />
-            </a>
-          )}
-          {hasRare && (
-            <a href="#section-rare" className="colour-source">
-              <span className="colour-source-label">{labels.rareShort}</span>
-              <Pill colour="red" label={labels.colourLabels.red} />
-            </a>
-          )}
-        </div>
-
-        {hasDrivers && (
-          <div className="mt-4">
-            <p className="eyebrow mb-2">{labels.colourDrivers}</p>
-            <div className="driver-chips">
-              {catRare.map((v) => {
-                const title =
-                  (locale === "lt" ? v.titleLt : v.titleEn) ||
-                  (locale === "en"
-                    ? `${v.gene} gene change`
-                    : `${v.gene} geno pokytis`);
-                const anchor = `rare-${encodeURIComponent(String(v.id ?? v.gene))}`;
-                return (
-                  <a
-                    key={v.id ?? `${v.gene}-rare`}
-                    href={`#${anchor}`}
-                    className="driver-chip driver-chip-red"
-                  >
-                    <Pill colour="red" label={labels.colourLabels.red} />
-                    <span className="driver-chip-text">
-                      <b>{title}</b>
-                    </span>
-                  </a>
-                );
-              })}
-              {driverMarkers.map((m) => {
-                const c = markerItemColour(m);
-                return (
-                  <Link
-                    key={`drv-m-${m.markerKey}`}
-                    href={`/patient/marker/${encodeURIComponent(m.markerKey)}?cat=${category}`}
-                    className="driver-chip"
-                    style={{ borderColor: COLOUR_HEX[c] }}
-                  >
-                    <Pill colour={c} label={labels.colourLabels[c]} />
-                    <span className="driver-chip-text">
-                      <b>{m.name || m.markerKey}</b>
-                      <em>
-                        {m.value}
-                        {m.unit ? ` ${m.unit}` : ""}
-                      </em>
-                    </span>
-                  </Link>
-                );
-              })}
-              {driverSnps.map((s) => {
-                const c = s.colour || "grey";
-                return (
-                  <Link
-                    key={`drv-s-${s.snpId}`}
-                    href={`/patient/snp/${encodeURIComponent(s.snpId)}?cat=${category}`}
-                    className="driver-chip"
-                    style={{ borderColor: COLOUR_HEX[c] }}
-                  >
-                    <Pill colour={c} label={labels.colourLabels[c]} />
-                    <span className="driver-chip-text">
-                      <b>{s.gene}</b>
-                      <em>{s.snpId.split("__")[0]}</em>
-                    </span>
-                  </Link>
-                );
-              })}
-            </div>
+      {!genesOnly && (
+        <section className="card colour-sources">
+          <div className="colour-sources-head">
+            <h3 className="font-[family-name:var(--font-display)] text-[1.05rem] font-semibold">
+              {labels.colourLabels[cat.colour]}
+            </h3>
+            <Pill colour={cat.colour} label={labels.colourLabels[cat.colour]} />
           </div>
-        )}
-      </section>
+
+          <div
+            className={`colour-source-grid ${
+              [hasMarkers, hasSnps, hasRare].filter(Boolean).length > 1
+                ? "multi"
+                : ""
+            }`}
+          >
+            {hasMarkers && (
+              <a href="#section-markers" className="colour-source">
+                <span className="colour-source-label">{labels.markers}</span>
+                <Pill
+                  colour={biomarkerColour}
+                  label={labels.colourLabels[biomarkerColour]}
+                />
+              </a>
+            )}
+            {hasSnps && (
+              <a href="#section-genes" className="colour-source">
+                <span className="colour-source-label">{labels.genes}</span>
+                <Pill
+                  colour={geneticColour}
+                  label={
+                    cat.geneticColour
+                      ? labels.colourLabels[geneticColour]
+                      : labels.noRiskAlleles
+                  }
+                />
+              </a>
+            )}
+            {hasRare && (
+              <a href="#section-rare" className="colour-source">
+                <span className="colour-source-label">{labels.rareShort}</span>
+                <Pill colour="red" label={labels.colourLabels.red} />
+              </a>
+            )}
+          </div>
+
+          {hasDrivers && (
+            <div className="mt-4">
+              <p className="eyebrow mb-2">{labels.colourDrivers}</p>
+              <div className="driver-chips">
+                {catRare.map((v) => {
+                  const title =
+                    (locale === "lt" ? v.titleLt : v.titleEn) ||
+                    (locale === "en"
+                      ? `${v.gene} gene change`
+                      : `${v.gene} geno pokytis`);
+                  const anchor = `rare-${encodeURIComponent(String(v.id ?? v.gene))}`;
+                  return (
+                    <a
+                      key={v.id ?? `${v.gene}-rare`}
+                      href={`#${anchor}`}
+                      className="driver-chip driver-chip-red"
+                    >
+                      <Pill colour="red" label={labels.colourLabels.red} />
+                      <span className="driver-chip-text">
+                        <b>{title}</b>
+                      </span>
+                    </a>
+                  );
+                })}
+                {driverMarkers.map((m) => {
+                  const c = markerItemColour(m);
+                  return (
+                    <Link
+                      key={`drv-m-${m.markerKey}`}
+                      href={`/patient/marker/${encodeURIComponent(m.markerKey)}?cat=${category}`}
+                      className="driver-chip"
+                      style={{ borderColor: COLOUR_HEX[c] }}
+                    >
+                      <Pill colour={c} label={labels.colourLabels[c]} />
+                      <span className="driver-chip-text">
+                        <b>{m.name || m.markerKey}</b>
+                        <em>
+                          {m.value}
+                          {m.unit ? ` ${m.unit}` : ""}
+                        </em>
+                      </span>
+                    </Link>
+                  );
+                })}
+                {driverSnps.map((s) => {
+                  const c = s.colour || "grey";
+                  return (
+                    <Link
+                      key={`drv-s-${s.snpId}`}
+                      href={`/patient/snp/${encodeURIComponent(s.snpId)}?cat=${category}`}
+                      className="driver-chip"
+                      style={{ borderColor: COLOUR_HEX[c] }}
+                    >
+                      <Pill colour={c} label={labels.colourLabels[c]} />
+                      <span className="driver-chip-text">
+                        <b>{s.gene}</b>
+                        <em>{s.snpId.split("__")[0]}</em>
+                      </span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </section>
+      )}
 
       {hasRare && (
         <section id="section-rare" className="panel space-y-3 scroll-mt-24">
@@ -408,16 +426,18 @@ export default async function CategoryDetailPage({
                 <h3 className="font-[family-name:var(--font-display)] text-2xl">
                   {labels.genes}
                 </h3>
-                <Pill
-                  colour={geneticColour}
-                  label={
-                    cat.geneticColour
-                      ? labels.colourLabels[geneticColour]
-                      : labels.colourLabels.grey
-                  }
-                />
+                {!genesOnly && (
+                  <Pill
+                    colour={geneticColour}
+                    label={
+                      cat.geneticColour
+                        ? labels.colourLabels[geneticColour]
+                        : labels.colourLabels.grey
+                    }
+                  />
+                )}
               </div>
-              {cat.id !== "pharmacogenetics" && (
+              {!genesOnly && cat.id !== "pharmacogenetics" && (
                 <div className="mt-2 rounded-lg border border-[var(--line)] bg-white/70 p-3">
                   <p className="text-sm font-semibold">{snpTitle}</p>
                   <p className="mt-1 text-xs text-[var(--ink-soft)]">
@@ -425,10 +445,15 @@ export default async function CategoryDetailPage({
                   </p>
                 </div>
               )}
-              <div className="mt-3 max-h-[480px] space-y-2 overflow-auto pr-1">
+              <div
+                className={`mt-3 space-y-2 pr-1 ${
+                  genesOnly ? "" : "max-h-[480px] overflow-auto"
+                }`}
+              >
                 {sortedSnps.map((s) => {
                   const c: RiskColour = s.colour || "grey";
                   const isDriver =
+                    !genesOnly &&
                     s.colour != null &&
                     colourRank(s.colour) >=
                       Math.max(2, colourRank(cat.colour));

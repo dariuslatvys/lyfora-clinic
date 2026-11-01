@@ -2,6 +2,11 @@ import type { Locale } from "@/lib/i18n/dictionary";
 import type { RiskColour } from "./colours";
 import type { EvaluatedSnp } from "./evaluate";
 import mechanismLtMap from "./snp_mechanism_lt.json";
+import {
+  humanizeMechanism,
+  riskAllelePhrase,
+  riskAllelePhraseObject,
+} from "./plain-mechanism";
 
 const LT_MAP = mechanismLtMap as Record<string, string>;
 
@@ -45,6 +50,8 @@ export function explainSnp(snp: EvaluatedSnp, locale: Locale): SnpExplanation {
   const gt = snp.genotypeAvailable
     ? `${snp.allele1}/${snp.allele2}`
     : null;
+  const allelePhrase = riskAllelePhrase(snp.matchCount, locale);
+  const alleleObject = riskAllelePhraseObject(snp.matchCount, locale);
 
   if (locale === "en") {
     const why =
@@ -53,23 +60,25 @@ export function explainSnp(snp: EvaluatedSnp, locale: Locale): SnpExplanation {
         : snp.matchCount === 0
           ? `Your genotype ${gt} has no risk alleles at this SNP, so it does not raise the category colour.`
           : snp.matchCount === 1
-            ? `Your genotype ${gt} carries 1 risk allele. In the risk matrix that maps to “${colourWord("en", colour)}” (Match 1).`
-            : `Your genotype ${gt} carries 2 risk alleles. In the risk matrix that maps to “${colourWord("en", colour)}” (Match 2) — the stronger of the two match levels.`;
+            ? `Your genotype ${gt} carries ${alleleObject}. In the risk matrix that maps to “${colourWord("en", colour)}” (Match 1).`
+            : `Your genotype ${gt} carries ${alleleObject}. In the risk matrix that maps to “${colourWord("en", colour)}” (Match 2) — the stronger of the two match levels.`;
+
+    const raw =
+      snp.mechanism?.trim() ||
+      "No mechanism text is available for this SNP in the reference table.";
 
     return {
       title: `${snp.gene} · ${rsId}`,
       genotypeLine: gt
-        ? `Your result: ${gt} · ${snp.matchCount} risk allele(s)`
+        ? `Your result: ${gt} · ${allelePhrase}`
         : "Genotype not available yet",
       whyColour: why,
       subcategoryLine: snp.subcategory
         ? `Focus area: ${snp.subcategory}`
         : null,
-      plainBody:
-        snp.mechanism?.trim() ||
-        "No mechanism text is available for this SNP in the reference table.",
+      plainBody: humanizeMechanism(raw, "en"),
       disclaimer:
-        "This is information from the Mechanism column of the gene–SNP risk table, written for understanding — not a diagnosis or a prescription change. Discuss medicines and doses only with your clinician.",
+        "Plain-language explanation based on the Mechanism column — not a diagnosis or a prescription change. Discuss medicines and doses only with your clinician.",
     };
   }
 
@@ -79,26 +88,25 @@ export function explainSnp(snp: EvaluatedSnp, locale: Locale): SnpExplanation {
       : snp.matchCount === 0
         ? `Jūsų genotipas ${gt} šioje SNP pozicijoje neturi rizikos alelių, todėl kategorijos spalvos nekelia.`
         : snp.matchCount === 1
-          ? `Jūsų genotipas ${gt} turi 1 rizikos alelį. Pagal rizikos matricą (stulpelis Match 1) tai atitinka signalą „${colourWord("lt", colour)}“.`
-          : `Jūsų genotipas ${gt} turi 2 rizikos alelius. Pagal rizikos matricą (stulpelis Match 2) tai atitinka stipresnį signalą „${colourWord("lt", colour)}“.`;
+          ? `Jūsų genotipas ${gt} turi ${alleleObject}. Pagal rizikos matricą (stulpelis Match 1) tai atitinka signalą „${colourWord("lt", colour)}“.`
+          : `Jūsų genotipas ${gt} turi ${alleleObject}. Pagal rizikos matricą (stulpelis Match 2) tai atitinka stipresnį signalą „${colourWord("lt", colour)}“.`;
 
-  const plainBody =
+  const raw =
     LT_MAP[snp.snpId]?.trim() ||
-    (snp.mechanism
-      ? `Pagal rizikos lentelės Mechanism stulpelį: ${snp.mechanism}`
-      : "Šiam SNP Mechanism paaiškinimas lentelėje dar nepateiktas.");
+    snp.mechanism?.trim() ||
+    "";
 
   return {
     title: `${snp.gene} · ${rsId}`,
     genotypeLine: gt
-      ? `Jūsų rezultatas: ${gt} · ${snp.matchCount} rizikos aleliai (-ių)`
+      ? `Jūsų rezultatas: ${gt} · ${allelePhrase}`
       : "Genotipas dar neprieinamas",
     whyColour: why,
     subcategoryLine: snp.subcategory
       ? `Sritis: ${snp.subcategory}`
       : null,
-    plainBody,
+    plainBody: humanizeMechanism(raw, "lt"),
     disclaimer:
-      "Tai informacija pagal rizikos lentelės Mechanism stulpelį, pateikta paprasta kalba. Tai nėra diagnozė ir ne vaisto skyrimo keitimas — dozes ir gydymą aptarkite tik su gydytoju.",
+      "Paaiškinimas paprasta kalba pagal rizikos lentelės Mechanism gaires. Tai nėra diagnozė ir ne vaisto skyrimo keitimas — dozes ir gydymą aptarkite tik su gydytoju.",
   };
 }

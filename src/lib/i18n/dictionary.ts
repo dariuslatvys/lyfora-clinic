@@ -78,7 +78,7 @@ export const dict = {
     askAi: "Ask AI",
     plainLanguage: "Paprastai tariant",
     noRiskAlleles: "Rizikos alelių sutapimų nėra",
-    riskAlleleMatches: "rizikos aleliai",
+    riskAlleleMatches: "rizikos alelis (-iai)",
     markers: "Žymenys",
     genes: "Genai (SNP)",
     rareMutations: "Retos genetinės mutacijos",

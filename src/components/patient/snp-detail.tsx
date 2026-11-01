@@ -96,9 +96,21 @@ export function SnpDetailPanel({
           <p className="eyebrow mb-2">
             {locale === "en" ? "In plain language" : "Paprastai tariant"}
           </p>
-          <p className="text-[0.98rem] leading-relaxed text-[var(--ink)]">
-            {expl.plainBody}
-          </p>
+          <div className="space-y-3 text-[0.98rem] leading-relaxed text-[var(--ink)]">
+            {expl.plainBody.split(/\n\n+/).map((para, i) => (
+              <p
+                key={i}
+                className={
+                  i === expl.plainBody.split(/\n\n+/).length - 1 &&
+                  /Ką tai gali reikšti|What this may mean/i.test(para)
+                    ? "rounded-[var(--radius-s)] bg-[var(--accent-soft)]/55 px-3 py-2.5 font-medium text-[var(--ink)]"
+                    : undefined
+                }
+              >
+                {para}
+              </p>
+            ))}
+          </div>
         </div>
 
         <p className="text-xs leading-relaxed text-[var(--muted)]">

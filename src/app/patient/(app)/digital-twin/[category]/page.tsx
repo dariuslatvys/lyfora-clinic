@@ -302,7 +302,13 @@ export default async function CategoryDetailPage({
                         </div>
                         <p className="mt-1 text-xs text-[var(--muted)]">
                           {s.allele1}/{s.allele2} · {s.matchCount}{" "}
-                          {labels.riskAlleleMatches}
+                          {s.matchCount === 1
+                            ? locale === "en"
+                              ? "risk allele"
+                              : "rizikos alelis"
+                            : locale === "en"
+                              ? "risk alleles"
+                              : "rizikos aleliai"}
                         </p>
                       </div>
                       <div className="row" style={{ gap: 6 }}>
@@ -521,7 +527,15 @@ export default async function CategoryDetailPage({
                           </span>
                           <p className="text-xs text-[var(--muted)]">
                             {s.genotypeAvailable
-                              ? `${s.allele1}/${s.allele2} · ${s.matchCount} ${labels.riskAlleleMatches}`
+                              ? `${s.allele1}/${s.allele2} · ${s.matchCount} ${
+                                  s.matchCount === 1
+                                    ? locale === "en"
+                                      ? "risk allele"
+                                      : "rizikos alelis"
+                                    : locale === "en"
+                                      ? "risk alleles"
+                                      : "rizikos aleliai"
+                                }`
                               : labels.awaitingDna}
                           </p>
                         </div>

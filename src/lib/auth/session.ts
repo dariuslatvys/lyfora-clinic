@@ -12,7 +12,9 @@ export async function createSession(userId: string) {
   const db = getDb();
   const id = randomUUID();
   const expires = new Date(Date.now() + 1000 * 60 * 60 * 24 * 14).toISOString();
-  await db.insert(sessions).values({ id, userId, expiresAt: expires });
+  db.insert(sessions)
+    .values({ id, userId, expiresAt: expires })
+    .run();
   const jar = await cookies();
   jar.set(COOKIE, id, {
     httpOnly: true,
@@ -29,7 +31,7 @@ export async function destroySession() {
   const id = jar.get(COOKIE)?.value;
   if (id) {
     const db = getDb();
-    await db.delete(sessions).where(eq(sessions.id, id));
+    db.delete(sessions).where(eq(sessions.id, id)).run();
     jar.delete(COOKIE);
   }
 }
@@ -43,7 +45,7 @@ export async function getCurrentUser() {
   const session = db.select().from(sessions).where(eq(sessions.id, id)).get();
   if (!session) return null;
   if (new Date(session.expiresAt).getTime() < Date.now()) {
-    await db.delete(sessions).where(eq(sessions.id, id));
+    db.delete(sessions).where(eq(sessions.id, id)).run();
     return null;
   }
   const user = db.select().from(users).where(eq(users.id, session.userId)).get();
@@ -65,7 +67,7 @@ export async function loginWithPassword(
   const user = db
     .select()
     .from(users)
-    .where(eq(users.email, email.trim().toLowerCase())) // emails stored lowercase
+    .where(eq(users.email, email.trim().toLowerCase()))
     .get();
   if (!user) return { ok: false as const, error: "invalid" };
   if (role && user.role !== role) return { ok: false as const, error: "role" };

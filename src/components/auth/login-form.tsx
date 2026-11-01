@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 export function LoginForm({
@@ -19,7 +18,6 @@ export function LoginForm({
     signIn: string;
   };
 }) {
-  const router = useRouter();
   const [email, setEmail] = useState(
     role === "patient" ? "pacientas@lyfora.lt" : "gydytojas@lyfora.lt"
   );
@@ -31,19 +29,24 @@ export function LoginForm({
     e.preventDefault();
     setLoading(true);
     setError("");
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password, role }),
-    });
-    setLoading(false);
-    if (!res.ok) {
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, role }),
+      });
+      if (!res.ok) {
+        setError("Nepavyko prisijungti / Sign-in failed");
+        setLoading(false);
+        return;
+      }
+      const data = await res.json();
+      // Full navigation so the session cookie is reliably picked up
+      window.location.assign(data.redirect || "/");
+    } catch {
       setError("Nepavyko prisijungti / Sign-in failed");
-      return;
+      setLoading(false);
     }
-    const data = await res.json();
-    router.push(data.redirect);
-    router.refresh();
   }
 
   return (
@@ -57,6 +60,8 @@ export function LoginForm({
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           type="email"
+          name="email"
+          autoComplete="username"
           required
         />
       </label>
@@ -67,12 +72,14 @@ export function LoginForm({
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           type="password"
+          name="password"
+          autoComplete="current-password"
           required
         />
       </label>
-      {error && <p className="text-sm text-[var(--colour-red,#C23B2E)]">{error}</p>}
+      {error && <p className="text-sm text-[#C23B2E]">{error}</p>}
       <Button type="submit" disabled={loading} className="w-full">
-        {labels.signIn}
+        {loading ? "…" : labels.signIn}
       </Button>
     </form>
   );

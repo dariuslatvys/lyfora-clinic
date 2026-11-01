@@ -22,6 +22,18 @@ const ORBIT: { left: string; top: string; side: "left" | "right" }[] = [
   { left: "64%", top: "78%", side: "right" },
 ];
 
+/** Preferred anatomical order around the figure. */
+const ORBIT_ORDER = [
+  "mental",
+  "cardiovascular",
+  "metabolic",
+  "immune",
+  "hormones_men",
+  "hormones_women",
+  "oncology",
+  "pharmacogenetics",
+];
+
 /** Anchor dots on the body for dotted connectors. */
 const ANCHORS = [
   { x: 42, y: 14 },
@@ -144,6 +156,13 @@ function BodySilhouette() {
   );
 }
 
+function orderCategories(categories: BodyMapCategory[]) {
+  const rank = new Map(ORBIT_ORDER.map((id, i) => [id, i]));
+  return [...categories].sort(
+    (a, b) => (rank.get(a.id) ?? 99) - (rank.get(b.id) ?? 99)
+  );
+}
+
 export function BodyMap({
   categories,
   geneHint,
@@ -151,6 +170,8 @@ export function BodyMap({
   categories: BodyMapCategory[];
   geneHint: string;
 }) {
+  const ordered = orderCategories(categories).slice(0, 8);
+
   return (
     <div className="body-map rise-in-delay">
       <div className="body-map-stage">
@@ -158,7 +179,7 @@ export function BodyMap({
           <div className="body-map-ring" />
           <BodySilhouette />
           <svg className="body-map-lines" viewBox="0 0 100 100" preserveAspectRatio="none">
-            {categories.slice(0, 8).map((c, i) => {
+            {ordered.map((c, i) => {
               const a = ANCHORS[i];
               const slot = ORBIT[i];
               const endX = slot.side === "left" ? 18 : 82;
@@ -180,7 +201,7 @@ export function BodyMap({
           </svg>
         </div>
 
-        {categories.slice(0, 8).map((c, i) => {
+        {ordered.map((c, i) => {
           const slot = ORBIT[i] || ORBIT[ORBIT.length - 1];
           return (
             <Link

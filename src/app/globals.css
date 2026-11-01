@@ -1892,6 +1892,54 @@ a.who.on {
   color: var(--muted);
 }
 
+.marker-chart {
+  height: 240px;
+  width: 100%;
+}
+
+.marker-chart .recharts-cartesian-axis-tick-value {
+  fill: #1a2e28;
+  font-weight: 650;
+}
+
+.marker-chart-label {
+  fill: #06473c;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.trend-delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  white-space: nowrap;
+}
+
+.trend-arrow {
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.trend-delta-up {
+  color: #c23b2e;
+}
+
+.trend-delta-down {
+  color: #0f6b5c;
+}
+
+.trend-delta-same,
+.trend-delta-none {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.trend-delta-num {
+  font-variant-numeric: tabular-nums;
+}
+
 .labs-val {
   font-weight: 700;
   white-space: nowrap;
@@ -2607,15 +2655,33 @@ a.hc-kpi.clickable:hover {
   padding: 28px 18px;
   text-align: center;
   background: color-mix(in srgb, var(--accent-soft) 45%, var(--surface));
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+
+.upload-drop.over {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent-soft) 80%, var(--surface));
+  transform: translateY(-1px);
+}
+
+.upload-drop.busy {
+  opacity: 0.72;
+  pointer-events: none;
 }
 
 .upload-cats {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 8px;
 }
 
-@media (max-width: 800px) {
+@media (max-width: 980px) {
+  .upload-cats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
   .upload-cats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -2633,6 +2699,47 @@ a.hc-kpi.clickable:hover {
 .upload-cat.on {
   border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
   background: color-mix(in srgb, var(--accent-soft) 70%, var(--surface));
+}
+
+.upload-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.upload-filter-btn {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line-2);
+  background: var(--surface-2);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.upload-filter-btn.on {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+  background: color-mix(in srgb, var(--accent-soft) 70%, var(--surface));
+  color: var(--ink);
+}
+
+.upload-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.upload-row-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.upload-del {
+  flex-shrink: 0;
 }
 
 .mono {

@@ -335,12 +335,13 @@ export default async function MarkerDetailPage({
                 <tr>
                   <th>{locale === "en" ? "Date" : "Data"}</th>
                   <th>{labels.labsResult}</th>
+                  <th>{locale === "en" ? "Change" : "Pokytis"}</th>
                   <th>{labels.labsStatus}</th>
                   <th>{locale === "en" ? "Source" : "Šaltinis"}</th>
                 </tr>
               </thead>
               <tbody>
-                {[...history].reverse().map((h) => {
+                {[...history].reverse().map((h, idx, rev) => {
                   const c = markerItemColour({
                     value: h.value,
                     refLow: h.refLow,
@@ -350,11 +351,70 @@ export default async function MarkerDetailPage({
                     markerKey,
                   });
                   const src = importSourceLabel(h.source, locale);
+                  // Chronologically previous = next row in newest-first list
+                  const prev = rev[idx + 1];
+                  let delta: "up" | "down" | "same" | null = null;
+                  let deltaAbs: number | null = null;
+                  if (prev) {
+                    const d = h.value - prev.value;
+                    deltaAbs = Math.abs(d);
+                    if (d > 0.00001) delta = "up";
+                    else if (d < -0.00001) delta = "down";
+                    else delta = "same";
+                  }
+                  const deltaTitle =
+                    delta === "up"
+                      ? locale === "en"
+                        ? "Higher than previous"
+                        : "Didesnė nei ankstesnė"
+                      : delta === "down"
+                        ? locale === "en"
+                          ? "Lower than previous"
+                          : "Mažesnė nei ankstesnė"
+                        : delta === "same"
+                          ? locale === "en"
+                            ? "Same as previous"
+                            : "Tokia pati kaip ankstesnė"
+                          : locale === "en"
+                            ? "First reading"
+                            : "Pirmas matavimas";
                   return (
                     <tr key={h.id}>
                       <td>{h.observedAt}</td>
                       <td className="labs-val">
                         {formatMarkerReading(h.value, h.unit, markerKey)}
+                      </td>
+                      <td>
+                        {delta ? (
+                          <span
+                            className={`trend-delta trend-delta-${delta}`}
+                            title={deltaTitle}
+                            aria-label={deltaTitle}
+                          >
+                            <span className="trend-arrow" aria-hidden="true">
+                              {delta === "up"
+                                ? "↑"
+                                : delta === "down"
+                                  ? "↓"
+                                  : "→"}
+                            </span>
+                            {delta !== "same" && deltaAbs != null ? (
+                              <span className="trend-delta-num">
+                                {deltaAbs >= 10
+                                  ? deltaAbs.toFixed(1)
+                                  : deltaAbs.toFixed(2)}
+                              </span>
+                            ) : (
+                              <span className="trend-delta-num">
+                                {locale === "en" ? "same" : "taip pat"}
+                              </span>
+                            )}
+                          </span>
+                        ) : (
+                          <span className="trend-delta trend-delta-none" title={deltaTitle}>
+                            —
+                          </span>
+                        )}
                       </td>
                       <td>
                         <span className={`pill ${PILL_CLASS[c]}`}>

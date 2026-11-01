@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 
 type UploadRow = {
@@ -22,11 +22,19 @@ const CATS: { id: string; lt: string; en: string }[] = [
   { id: "other", lt: "Kita", en: "Other" },
 ];
 
+function catLabel(id: string, locale: "lt" | "en") {
+  const c = CATS.find((x) => x.id === id);
+  if (!c) return id;
+  return locale === "en" ? c.en : c.lt;
+}
+
 export function UploadsView({ locale }: { locale: "lt" | "en" }) {
   const [category, setCategory] = useState("labs");
+  const [filter, setFilter] = useState<string>("all");
   const [note, setNote] = useState("");
   const [rows, setRows] = useState<UploadRow[]>([]);
   const [busy, setBusy] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -41,6 +49,11 @@ export function UploadsView({ locale }: { locale: "lt" | "en" }) {
   useEffect(() => {
     void load();
   }, [load]);
+
+  const visible = useMemo(() => {
+    if (filter === "all") return rows;
+    return rows.filter((r) => r.category === filter);
+  }, [rows, filter]);
 
   async function onFiles(files: FileList | null) {
     if (!files?.length) return;
@@ -70,6 +83,7 @@ export function UploadsView({ locale }: { locale: "lt" | "en" }) {
           : `Įkelta failų: ${files.length}.`
       );
       setNote("");
+      setFilter("all");
       await load();
     } catch (e) {
       setErr(
@@ -81,6 +95,24 @@ export function UploadsView({ locale }: { locale: "lt" | "en" }) {
       setBusy(false);
       if (inputRef.current) inputRef.current.value = "";
     }
+  }
+
+  async function onDelete(id: string, name: string) {
+    const confirmMsg =
+      locale === "en"
+        ? `Delete „${name}“?`
+        : `Ištrinti „${name}“?`;
+    if (!window.confirm(confirmMsg)) return;
+    setErr(null);
+    const res = await fetch(`/api/patient/uploads/${id}`, { method: "DELETE" });
+    if (!res.ok) {
+      setErr(
+        locale === "en" ? "Could not delete file." : "Nepavyko ištrinti failo."
+      );
+      return;
+    }
+    setMsg(locale === "en" ? "File deleted." : "Failas ištrintas.");
+    await load();
   }
 
   return (
@@ -105,8 +137,8 @@ export function UploadsView({ locale }: { locale: "lt" | "en" }) {
         </h2>
         <p className="small muted mt-1 mb-3">
           {locale === "en"
-            ? "Choose a category, then drop or pick files (PDF, images, VCF/TXT up to 25 MB)."
-            : "Pasirinkite kategoriją, tada vilkite ar pasirinkite failus (PDF, paveikslėliai, VCF/TXT iki 25 MB)."}
+            ? "Choose a category, then drop or pick files (PDF, images, VCF/TXT/CSV up to 25 MB)."
+            : "Pasirinkite kategoriją, tada vilkite ar pasirinkite failus (PDF, paveikslėliai, VCF/TXT/CSV iki 25 MB)."}
         </p>
 
         <div className="upload-cats mb-3">
@@ -138,10 +170,15 @@ export function UploadsView({ locale }: { locale: "lt" | "en" }) {
         />
 
         <div
-          className="upload-drop"
-          onDragOver={(e) => e.preventDefault()}
+          className={`upload-drop${dragOver ? " over" : ""}${busy ? " busy" : ""}`}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragOver(true);
+          }}
+          onDragLeave={() => setDragOver(false)}
           onDrop={(e) => {
             e.preventDefault();
+            setDragOver(false);
             void onFiles(e.dataTransfer.files);
           }}
         >
@@ -152,25 +189,40 @@ export function UploadsView({ locale }: { locale: "lt" | "en" }) {
           </p>
           <p className="small muted mt-1 mb-3">
             {locale === "en"
-              ? `Category: ${CATS.find((c) => c.id === category)?.en}`
-              : `Kategorija: ${CATS.find((c) => c.id === category)?.lt}`}
+              ? `Category: ${catLabel(category, "en")}`
+              : `Kategorija: ${catLabel(category, "lt")}`}
           </p>
           <input
             ref={inputRef}
             type="file"
             multiple
             accept=".pdf,.png,.jpg,.jpeg,.webp,.vcf,.txt,.csv"
-            className="mx-auto block"
+            className="sr-only"
             disabled={busy}
             onChange={(e) => void onFiles(e.target.files)}
           />
-          {busy ? (
-            <p className="small muted mt-3 mb-0">
-              {locale === "en" ? "Uploading…" : "Įkeliama…"}
+          <button
+            type="button"
+            className="btn"
+            disabled={busy}
+            onClick={() => inputRef.current?.click()}
+          >
+            {busy
+              ? locale === "en"
+                ? "Uploading…"
+                : "Įkeliama…"
+              : locale === "en"
+                ? "Choose files"
+                : "Pasirinkti failus"}
+          </button>
+          {msg ? (
+            <p className="small mt-3 mb-0 text-[var(--accent)]">{msg}</p>
+          ) : null}
+          {err ? (
+            <p className="small mt-3 mb-0" style={{ color: "#c45c4a" }}>
+              {err}
             </p>
           ) : null}
-          {msg ? <p className="small mt-3 mb-0 text-[var(--accent)]">{msg}</p> : null}
-          {err ? <p className="small mt-3 mb-0" style={{ color: "#c45c4a" }}>{err}</p> : null}
         </div>
       </section>
 
@@ -181,46 +233,80 @@ export function UploadsView({ locale }: { locale: "lt" | "en" }) {
           </h2>
           <span className="pill plain c-acc">{rows.length}</span>
         </div>
-        {rows.length ? (
-          <div className="list mt-2">
-            {rows.map((r) => (
-              <a
-                key={r.id}
-                href={r.href}
-                target="_blank"
-                rel="noreferrer"
-                className="li click"
+
+        <div className="upload-filter mt-3 mb-2">
+          <button
+            type="button"
+            className={`upload-filter-btn${filter === "all" ? " on" : ""}`}
+            onClick={() => setFilter("all")}
+          >
+            {locale === "en" ? "All" : "Visi"}
+          </button>
+          {CATS.map((c) => {
+            const n = rows.filter((r) => r.category === c.id).length;
+            if (!n) return null;
+            return (
+              <button
+                key={c.id}
+                type="button"
+                className={`upload-filter-btn${filter === c.id ? " on" : ""}`}
+                onClick={() => setFilter(c.id)}
               >
-                <div className="grow">
-                  <b>{r.originalName}</b>
-                  <span className="small muted">
-                    {CATS.find((c) => c.id === r.category)
-                      ? locale === "en"
-                        ? CATS.find((c) => c.id === r.category)!.en
-                        : CATS.find((c) => c.id === r.category)!.lt
-                      : r.category}
-                    {" · "}
-                    {r.sizeLabel}
-                    {" · "}
-                    {new Date(r.createdAt).toLocaleString(
-                      locale === "en" ? "en-GB" : "lt-LT"
-                    )}
+                {locale === "en" ? c.en : c.lt}
+                <span className="muted"> {n}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {visible.length ? (
+          <div className="list mt-2">
+            {visible.map((r) => (
+              <div key={r.id} className="li upload-row">
+                <a
+                  href={r.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="upload-row-main"
+                >
+                  <div className="grow">
+                    <b>{r.originalName}</b>
+                    <span className="small muted">
+                      {catLabel(r.category, locale)}
+                      {" · "}
+                      {r.sizeLabel}
+                      {" · "}
+                      {new Date(r.createdAt).toLocaleString(
+                        locale === "en" ? "en-GB" : "lt-LT"
+                      )}
+                    </span>
+                    {r.note ? (
+                      <span className="small muted">{r.note}</span>
+                    ) : null}
+                  </div>
+                  <span className="pill c-none">
+                    {locale === "en" ? "Open" : "Atidaryti"}
                   </span>
-                  {r.note ? (
-                    <span className="small muted">{r.note}</span>
-                  ) : null}
-                </div>
-                <span className="pill c-none">
-                  {locale === "en" ? "Open" : "Atidaryti"}
-                </span>
-              </a>
+                </a>
+                <button
+                  type="button"
+                  className="btn ghost sm upload-del"
+                  onClick={() => void onDelete(r.id, r.originalName)}
+                >
+                  {locale === "en" ? "Delete" : "Trinti"}
+                </button>
+              </div>
             ))}
           </div>
         ) : (
           <div className="empty mt-3">
-            {locale === "en"
-              ? "No files yet — upload your first document above."
-              : "Failų dar nėra — įkelkite pirmą dokumentą aukščiau."}
+            {rows.length
+              ? locale === "en"
+                ? "No files in this category."
+                : "Šioje kategorijoje failų nėra."
+              : locale === "en"
+                ? "No files yet — upload your first document above."
+                : "Failų dar nėra — įkelkite pirmą dokumentą aukščiau."}
           </div>
         )}
       </section>

@@ -86,6 +86,27 @@ export function resolveUploadFile(patientId: string, storedName: string) {
   return full;
 }
 
+export function deletePatientUpload(patientId: string, uploadId: string) {
+  const db = getDb();
+  const row = db
+    .select()
+    .from(patientUploads)
+    .where(eq(patientUploads.id, uploadId))
+    .get();
+  if (!row || row.patientId !== patientId) return false;
+
+  const full = resolveUploadFile(patientId, row.storedName);
+  if (full) {
+    try {
+      fs.unlinkSync(full);
+    } catch {
+      /* ignore missing disk file */
+    }
+  }
+  db.delete(patientUploads).where(eq(patientUploads.id, uploadId)).run();
+  return true;
+}
+
 /** Seed bundled public demo docs into patient_uploads once. */
 export function ensureDemoUploadsSeeded(patientId: string) {
   const existing = listPatientUploads(patientId);

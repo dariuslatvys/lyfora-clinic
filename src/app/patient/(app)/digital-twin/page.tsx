@@ -106,6 +106,7 @@ export default async function DigitalTwinPage() {
             geneticBadge: c.geneticBadge || c.rare.length > 0,
           }))}
           geneHint={labels.geneMarkerHint}
+          centerLabel={labels.brandShort}
         />
       </section>
     </div>

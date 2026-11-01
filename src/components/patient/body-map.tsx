@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import type { RiskColour } from "@/lib/health/colours";
 import { COLOUR_HEX } from "@/lib/health/colours";
@@ -11,7 +10,6 @@ export type BodyMapCategory = {
   geneticBadge?: boolean;
 };
 
-/** Preferred clockwise order starting near top-left. */
 const ORBIT_ORDER = [
   "mental",
   "cardiovascular",
@@ -62,31 +60,29 @@ function orderCategories(categories: BodyMapCategory[]) {
   );
 }
 
-/** Evenly spaced points on an ellipse around the body (percent of stage). */
+/** Even circle around the center hub. */
 function orbitPoint(index: number, total: number) {
   const n = Math.max(total, 1);
-  // Start at ~200° (upper-left) and go clockwise so left column then bottom then right then top
-  const startDeg = -140;
+  const startDeg = -90; // top
   const step = 360 / n;
   const deg = startDeg + index * step;
   const rad = (deg * Math.PI) / 180;
-  const rx = 42; // horizontal radius %
-  const ry = 40; // vertical radius %
-  const cx = 50 + rx * Math.cos(rad);
-  const cy = 50 + ry * Math.sin(rad);
-  const side: "left" | "right" = cx < 50 ? "left" : "right";
-  // Body hotspot roughly toward center from card
-  const ax = 50 + 14 * Math.cos(rad);
-  const ay = 48 + 18 * Math.sin(rad);
-  return { left: cx, top: cy, side, ax, ay, deg };
+  const rx = 38;
+  const ry = 38;
+  const left = 50 + rx * Math.cos(rad);
+  const top = 50 + ry * Math.sin(rad);
+  const side: "left" | "right" = left < 50 ? "left" : "right";
+  return { left, top, side };
 }
 
 export function BodyMap({
   categories,
   geneHint,
+  centerLabel,
 }: {
   categories: BodyMapCategory[];
   geneHint: string;
+  centerLabel?: string;
 }) {
   const ordered = orderCategories(categories).slice(0, 8);
   const slots = ordered.map((_, i) => orbitPoint(i, ordered.length));
@@ -95,16 +91,8 @@ export function BodyMap({
     <div className="body-map rise-in-delay">
       <div className="body-map-stage">
         <div className="body-map-orbit" aria-hidden="true" />
-
-        <div className="body-map-figure" aria-hidden="true">
-          <Image
-            src="/brand/health-body-anatomy.png"
-            alt=""
-            width={432}
-            height={576}
-            className="body-map-photo"
-            priority
-          />
+        <div className="body-map-hub" aria-hidden="true">
+          <span>{centerLabel || "Lyfora"}</span>
         </div>
 
         <svg
@@ -116,26 +104,17 @@ export function BodyMap({
           {ordered.map((c, i) => {
             const s = slots[i];
             return (
-              <g key={c.id}>
-                <line
-                  x1={s.ax}
-                  y1={s.ay}
-                  x2={s.left}
-                  y2={s.top}
-                  stroke={COLOUR_HEX[c.colour]}
-                  strokeWidth="0.28"
-                  strokeDasharray="1.05 1.15"
-                  opacity="0.5"
-                />
-                <circle
-                  cx={s.ax}
-                  cy={s.ay}
-                  r="1.05"
-                  fill="#fff"
-                  stroke={COLOUR_HEX[c.colour]}
-                  strokeWidth="0.35"
-                />
-              </g>
+              <line
+                key={c.id}
+                x1="50"
+                y1="50"
+                x2={s.left}
+                y2={s.top}
+                stroke={COLOUR_HEX[c.colour]}
+                strokeWidth="0.25"
+                strokeDasharray="1 1.1"
+                opacity="0.4"
+              />
             );
           })}
         </svg>

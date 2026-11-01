@@ -19,10 +19,14 @@ import {
   parseMedicationLabel,
   type DrugLookupInput,
 } from "@/lib/health/drug-pharma-map";
+import {
+  assessDrugGeneRisk,
+  geneRiskDisclaimer,
+} from "@/lib/health/assess-drug-gene-risk";
 import { pharmaSubcategoryLabel } from "@/lib/health/pharma-plain";
 import type { PharmaSnpRow } from "@/components/patient/pharma-genes-tabs";
 
-export type SelectedDrug = DrugLookupInput & {
+type SelectedDrug = DrugLookupInput & {
   key: string;
   display: string;
 };
@@ -31,28 +35,23 @@ function drugKey(d: DrugLookupInput) {
   return `${d.brandName || ""}|${d.activeSubstance || ""}|${d.label || ""}`.toLowerCase();
 }
 
+/**
+ * Instant medicine → genetics check: add one or more drugs, press Check, see results.
+ * Current / prescribed lists with colour flags live on the Vaistai “Sąrašas” tab.
+ */
 export function MedToleranceCheck({
   locale,
   snps,
   colourLabels,
   awaitingDna,
-  categoryHref = "/patient/digital-twin/pharmacogenetics",
-  presetLabels,
 }: {
   locale: "lt" | "en";
   snps: PharmaSnpRow[];
   colourLabels: Record<RiskColour, string>;
   awaitingDna: string;
-  categoryHref?: string;
-  /** Optional pre-selected labels (e.g. from health-card meds). */
-  presetLabels?: string[];
 }) {
-  const [selected, setSelected] = useState<SelectedDrug[]>(() =>
-    (presetLabels || []).map((label) => {
-      const parsed = parseMedicationLabel(label);
-      return { ...parsed, key: drugKey(parsed), display: label };
-    })
-  );
+  const [queue, setQueue] = useState<SelectedDrug[]>([]);
+  const [checked, setChecked] = useState<SelectedDrug[] | null>(null);
   const [draft, setDraft] = useState("");
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
@@ -75,10 +74,13 @@ export function MedToleranceCheck({
 
   function addDrug(input: DrugLookupInput, display: string) {
     const key = drugKey(input);
-    if (selected.some((s) => s.key === key)) return;
-    setSelected((prev) => [...prev, { ...input, key, display }]);
+    setQueue((prev) => {
+      if (prev.some((s) => s.key === key)) return prev;
+      return [...prev, { ...input, key, display }];
+    });
     setDraft("");
     setOpen(false);
+    setChecked(null);
   }
 
   function addSuggestion(s: MedicationSuggestion) {
@@ -122,41 +124,54 @@ export function MedToleranceCheck({
   const copy =
     locale === "en"
       ? {
+          title: "Instant tolerance check",
           blurb:
-            "Pick prescribed medicines from the catalogue. The system checks whether your DNA has risk alleles linked to those drugs — the reverse of browsing genes first.",
+            "Add one or more medicines from the catalogue and press Check. The system shows whether your DNA has risk alleles linked to those drugs.",
           hint: "Type brand or substance (e.g. Atoris, Plavix, Warfarin)…",
-          emptyPick: "Add at least one medicine to see genetic tolerance signals.",
+          check: "Check",
+          clear: "Clear",
+          empty: "Add at least one medicine, then press Check.",
+          results: "Results",
           noPgx:
-            "No pharmacogenetic panel link found for this medicine in the portal catalogue. That does not mean it is risk-free — ask your clinician.",
-          riskTitle: "Genes with risk alleles for this medicine",
-          clearTitle: "Related genes — no elevated risk alleles in your sample",
-          awaitingTitle: "Related genes — DNA result not available",
+            "No pharmacogenetic panel link for this medicine in the portal — ask your clinician.",
+          riskTitle: "Possible genetic intolerance / dosing signal",
+          clearTitle: "No elevated risk alleles for this medicine",
           alleles: (n: number) =>
             n === 1 ? "1 risk allele" : `${n} risk alleles`,
           focus: "Focus",
           openGene: "Open gene",
           remove: "Remove",
+          flagRisk: "Genetic signal",
+          flagOk: "No risk alleles",
+          flagUnknown: "Not in PGx panel",
         }
       : {
+          title: "Momentinis toleravimo tikrinimas",
           blurb:
-            "Pasirinkite paskirtus vaistus iš klasifikatoriaus. Sistema parodo, ar jūsų DNR turi rizikos alelių, susijusių su tais vaistais — atvirkščiai nei naršant nuo genų.",
+            "Įveskite vieną ar kelis vaistus iš klasifikatoriaus ir paspauskite „Tikrinti“. Sistema parodys, ar jūsų DNR turi su tais vaistais susijusių rizikos alelių.",
           hint: "Įveskite pavadinimą ar veikliąją medžiagą (pvz. Atoris, Plavix, Warfarin)…",
-          emptyPick:
-            "Pridėkite bent vieną vaistą, kad pamatytumėte genetinio toleravimo signalus.",
+          check: "Tikrinti",
+          clear: "Išvalyti",
+          empty: "Pridėkite bent vieną vaistą ir paspauskite „Tikrinti“.",
+          results: "Rezultatai",
           noPgx:
-            "Šiam vaistui portalo farmakogenetikos skydelyje nuorodos nerasta. Tai nereiškia, kad rizika lygi nuliui — pasitarkite su gydytoju.",
-          riskTitle: "Genai su rizikos aleliais šiam vaistui",
-          clearTitle: "Susiję genai — jūsų mėginyje nėra padidėjusių rizikos alelių",
-          awaitingTitle: "Susiję genai — DNR rezultato nėra",
+            "Šiam vaistui portalo farmakogenetikos skydelyje nuorodos nerasta — pasitarkite su gydytoju.",
+          riskTitle: "Galimas genetinis netoleravimas / dozavimo signalas",
+          clearTitle: "Šiam vaistui padidėjusių rizikos alelių nerasta",
           alleles: (n: number) =>
             n === 1 ? "1 rizikos alelis" : `${n} rizikos aleliai`,
           focus: "Sritis",
           openGene: "Atidaryti geną",
           remove: "Pašalinti",
+          flagRisk: "Genetikos signalas",
+          flagOk: "Be rizikos alelių",
+          flagUnknown: "Ne PGx skydelyje",
         };
 
-  const results = useMemo(() => {
-    return selected.map((drug) => {
+  const checkResults = useMemo(() => {
+    if (!checked) return null;
+    return checked.map((drug) => {
+      const risk = assessDrugGeneRisk(drug, snps, locale);
       const focuses = mapDrugToPharmaFocus(drug);
       const related = snps.filter((s) =>
         focuses.some(
@@ -172,29 +187,32 @@ export function MedToleranceCheck({
             colourRank(b.colour) - colourRank(a.colour) ||
             b.matchCount - a.matchCount
         );
-      const clear = related
+      const clearGenes = related
         .filter((s) => s.genotypeAvailable && (s.matchCount || 0) === 0)
         .sort((a, b) => a.gene.localeCompare(b.gene));
-      const awaiting = related.filter((s) => !s.genotypeAvailable);
-      return { drug, focuses, withRisk, clear, awaiting };
+      return { drug, risk, focuses, withRisk, clearGenes };
     });
-  }, [selected, snps]);
+  }, [checked, snps, locale]);
 
   return (
     <div className="stack med-tolerance" style={{ gap: 14 }}>
-      <p className="small muted m-0">{copy.blurb}</p>
+      <div>
+        <h4 className="m-0 text-base font-semibold">{copy.title}</h4>
+        <p className="small muted m-0 mt-1">{copy.blurb}</p>
+      </div>
 
       <div className="stack med-picker" style={{ gap: 8 }} ref={rootRef}>
         <div className="q-chips">
-          {selected.map((s) => (
+          {queue.map((s) => (
             <button
               key={s.key}
               type="button"
               className="chip on"
               aria-label={`${copy.remove} ${s.display}`}
-              onClick={() =>
-                setSelected((prev) => prev.filter((x) => x.key !== s.key))
-              }
+              onClick={() => {
+                setQueue((prev) => prev.filter((x) => x.key !== s.key));
+                setChecked(null);
+              }}
             >
               {s.display} ×
             </button>
@@ -242,8 +260,8 @@ export function MedToleranceCheck({
               ) : (
                 <div className="med-suggest-empty">
                   {locale === "en"
-                    ? `No catalogue match — press Enter to check “${draft.trim()}”`
-                    : `Kataloge nerasta — Enter tikrins „${draft.trim()}“`}
+                    ? `No catalogue match — press Enter to add “${draft.trim()}”`
+                    : `Kataloge nerasta — Enter pridės „${draft.trim()}“`}
                 </div>
               )}
             </div>
@@ -251,112 +269,116 @@ export function MedToleranceCheck({
         </div>
       </div>
 
-      {!selected.length ? (
-        <div className="empty">{copy.emptyPick}</div>
+      <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
+        <button
+          type="button"
+          className="btn"
+          disabled={!queue.length}
+          onClick={() => setChecked([...queue])}
+        >
+          {copy.check}
+        </button>
+        {queue.length ? (
+          <button
+            type="button"
+            className="btn ghost"
+            onClick={() => {
+              setQueue([]);
+              setChecked(null);
+            }}
+          >
+            {copy.clear}
+          </button>
+        ) : null}
+      </div>
+
+      {!checked ? (
+        <p className="small muted m-0">{copy.empty}</p>
       ) : (
-        <div className="stack" style={{ gap: 16 }}>
-          {results.map(({ drug, focuses, withRisk, clear, awaiting }) => (
+        <div className="stack" style={{ gap: 12 }}>
+          <p className="eyebrow m-0">{copy.results}</p>
+          {checkResults?.some((r) => r.risk.hasRisk) ? (
+            <p className="small m-0">
+              <b>{geneRiskDisclaimer(locale)}</b>
+            </p>
+          ) : null}
+          {checkResults?.map(({ drug, risk, focuses, withRisk, clearGenes }) => (
             <section
-              key={drug.key}
+              key={`res-${drug.key}`}
               className="rounded-md border border-[var(--line)] bg-[var(--surface-raised)] p-3"
+              style={
+                risk.hasRisk && risk.worstColour
+                  ? {
+                      borderLeft: `4px solid ${COLOUR_HEX[risk.worstColour]}`,
+                      background: COLOUR_SOFT[risk.worstColour],
+                    }
+                  : undefined
+              }
             >
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div>
-                  <h4 className="m-0 text-base font-semibold text-[var(--ink)]">
-                    {drug.display}
-                  </h4>
+                  <h4 className="m-0 text-base font-semibold">{drug.display}</h4>
                   {drug.activeSubstance ? (
                     <p className="xs muted m-0 mt-1">{drug.activeSubstance}</p>
                   ) : null}
                 </div>
-                {focuses.length ? (
-                  <div className="hc-link-row">
-                    {focuses.map((f) => (
-                      <span key={f.subcategory} className="pill plain c-acc">
-                        {pharmaSubcategoryLabel(f.subcategory, locale) ||
-                          f.subcategory}
-                      </span>
-                    ))}
-                  </div>
-                ) : null}
+                {risk.hasRisk && risk.worstColour ? (
+                  <span className={`pill ${PILL_CLASS[risk.worstColour]}`}>
+                    {copy.flagRisk} · {risk.hits[0]?.gene}
+                  </span>
+                ) : risk.hasPanelLink ? (
+                  <span className="pill c-green">{copy.flagOk}</span>
+                ) : (
+                  <span className="pill c-none">{copy.flagUnknown}</span>
+                )}
               </div>
 
               {!focuses.length ? (
                 <p className="small muted mt-3 mb-0">{copy.noPgx}</p>
               ) : (
-                <div className="stack mt-3" style={{ gap: 12 }}>
+                <div className="stack mt-3" style={{ gap: 10 }}>
+                  <p className="eyebrow m-0">
+                    {risk.hasRisk ? copy.riskTitle : copy.clearTitle}
+                  </p>
                   {focuses.map((f) => (
                     <p key={f.subcategory} className="small m-0 text-[var(--ink-soft)]">
                       <span className="eyebrow">{copy.focus}: </span>
                       {locale === "en" ? f.reasonEn : f.reasonLt}
                     </p>
                   ))}
-
                   {withRisk.length ? (
-                    <div>
-                      <p className="eyebrow mb-2">{copy.riskTitle}</p>
-                      <div className="space-y-2">
-                        {withRisk.map((s) => (
-                          <GeneHit
-                            key={`${s.gene}-${s.snpId}`}
-                            s={s}
-                            locale={locale}
-                            colourLabels={colourLabels}
-                            awaitingDna={awaitingDna}
-                            allelesLabel={copy.alleles(s.matchCount)}
-                            openLabel={copy.openGene}
-                            categoryHref={categoryHref}
-                          />
-                        ))}
-                      </div>
+                    <div className="space-y-2">
+                      {withRisk.map((s) => (
+                        <GeneHit
+                          key={`${s.gene}-${s.snpId}`}
+                          s={s}
+                          colourLabels={colourLabels}
+                          awaitingDna={awaitingDna}
+                          allelesLabel={copy.alleles(s.matchCount)}
+                          openLabel={copy.openGene}
+                          locale={locale}
+                        />
+                      ))}
                     </div>
                   ) : null}
-
-                  {clear.length ? (
-                    <div>
-                      <p className="eyebrow mb-2">{copy.clearTitle}</p>
-                      <div className="space-y-2">
-                        {clear.map((s) => (
-                          <GeneHit
-                            key={`${s.gene}-${s.snpId}`}
-                            s={s}
-                            locale={locale}
-                            colourLabels={colourLabels}
-                            awaitingDna={awaitingDna}
-                            allelesLabel={copy.alleles(0)}
-                            openLabel={copy.openGene}
-                            categoryHref={categoryHref}
-                          />
-                        ))}
-                      </div>
+                  {!withRisk.length && clearGenes.length ? (
+                    <div className="space-y-2">
+                      {clearGenes.slice(0, 4).map((s) => (
+                        <GeneHit
+                          key={`${s.gene}-${s.snpId}`}
+                          s={s}
+                          colourLabels={colourLabels}
+                          awaitingDna={awaitingDna}
+                          allelesLabel={copy.alleles(0)}
+                          openLabel={copy.openGene}
+                          locale={locale}
+                        />
+                      ))}
                     </div>
                   ) : null}
-
-                  {awaiting.length ? (
-                    <div>
-                      <p className="eyebrow mb-2">{copy.awaitingTitle}</p>
-                      <div className="space-y-2">
-                        {awaiting.map((s) => (
-                          <GeneHit
-                            key={`${s.gene}-${s.snpId}`}
-                            s={s}
-                            locale={locale}
-                            colourLabels={colourLabels}
-                            awaitingDna={awaitingDna}
-                            allelesLabel={awaitingDna}
-                            openLabel={copy.openGene}
-                            categoryHref={categoryHref}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  ) : null}
-
-                  {!withRisk.length && !clear.length && !awaiting.length ? (
-                    <p className="small muted m-0">
-                      {locale === "en"
-                        ? "Focus area matched, but no genotype rows are loaded for these genes yet."
-                        : "Sritis sutampa, bet šių genų genotipų eilučių dar nėra."}
+                  {risk.hasRisk ? (
+                    <p className="small m-0">
+                      <b>{geneRiskDisclaimer(locale)}</b>
                     </p>
                   ) : null}
                 </div>
@@ -376,7 +398,6 @@ function GeneHit({
   awaitingDna,
   allelesLabel,
   openLabel,
-  categoryHref,
 }: {
   s: PharmaSnpRow;
   locale: "lt" | "en";
@@ -384,7 +405,6 @@ function GeneHit({
   awaitingDna: string;
   allelesLabel: string;
   openLabel: string;
-  categoryHref: string;
 }) {
   const c: RiskColour = s.colour || "grey";
   const href = `/patient/snp/${encodeURIComponent(s.snpId)}?cat=pharmacogenetics`;
@@ -410,10 +430,12 @@ function GeneHit({
             {s.genotypeAvailable
               ? `${s.allele1}/${s.allele2} · ${allelesLabel}`
               : awaitingDna}
-            {" · "}
-            <span className="text-[var(--accent)]">
-              {locale === "en" ? "from" : "iš"} {categoryHref.split("/").pop()}
-            </span>
+            {s.subcategory ? (
+              <>
+                {" · "}
+                {pharmaSubcategoryLabel(s.subcategory, locale) || s.subcategory}
+              </>
+            ) : null}
           </p>
         </div>
         <span className={`pill ${PILL_CLASS[c]}`}>

@@ -438,9 +438,9 @@ function MedsPane({
 }) {
   const [sub, setSub] = useState<"list" | "tolerance">("list");
   const [openRisk, setOpenRisk] = useState<string | null>(null);
-  const presetLabels = useMemo(
-    () => card.meds.filter((m) => m.active).map((m) => m.name),
-    [card.meds]
+  const takingSet = useMemo(
+    () => new Set(card.takingMedNames.map((n) => n.trim().toLowerCase())),
+    [card.takingMedNames]
   );
   const riskCount = useMemo(
     () =>
@@ -527,6 +527,12 @@ function MedsPane({
                   const key = m.name + m.from;
                   const open = openRisk === key;
                   const c = risk.worstColour;
+                  const isTaking = takingSet.has(m.name.trim().toLowerCase());
+                  const isPrescribed =
+                    m.source === "prescription" ||
+                    card.prescribedMedNames.some(
+                      (n) => n.trim().toLowerCase() === m.name.trim().toLowerCase()
+                    );
                   return (
                     <Fragment key={key}>
                       <tr
@@ -534,7 +540,7 @@ function MedsPane({
                           risk.hasRisk && c
                             ? {
                                 background: `linear-gradient(90deg, ${COLOUR_SOFT[c]}, transparent 70%)`,
-                                boxShadow: `inset 4px 0 0 ${COLOUR_HEX[c]}`,
+                                borderLeft: `4px solid ${COLOUR_HEX[c]}`,
                               }
                             : undefined
                         }
@@ -574,17 +580,31 @@ function MedsPane({
                           )}
                         </td>
                         <td>
-                          <span
-                            className={`pill ${m.active ? "c-green" : "c-none"}`}
-                          >
-                            {m.active
-                              ? locale === "en"
-                                ? "Taking"
-                                : "Vartoja"
-                              : locale === "en"
-                                ? "Stopped"
-                                : "Nutraukta"}
-                          </span>
+                          <div className="hc-link-row" style={{ gap: 4 }}>
+                            {!m.active ? (
+                              <span className="pill c-none">
+                                {locale === "en" ? "Stopped" : "Nutraukta"}
+                              </span>
+                            ) : (
+                              <>
+                                {isTaking ? (
+                                  <span className="pill c-green">
+                                    {locale === "en" ? "Taking" : "Vartoja"}
+                                  </span>
+                                ) : null}
+                                {isPrescribed ? (
+                                  <span className="pill plain c-acc">
+                                    {locale === "en" ? "Prescribed" : "Paskirta"}
+                                  </span>
+                                ) : null}
+                                {!isTaking && !isPrescribed ? (
+                                  <span className="pill c-green">
+                                    {locale === "en" ? "Taking" : "Vartoja"}
+                                  </span>
+                                ) : null}
+                              </>
+                            )}
+                          </div>
                         </td>
                       </tr>
                       {open && risk.hasRisk ? (
@@ -687,18 +707,7 @@ function MedsPane({
             snps={pharmaSnps}
             colourLabels={colourLabels}
             awaitingDna={awaitingDna}
-            presetLabels={presetLabels}
           />
-          <p className="small muted mt-3 mb-0">
-            <b>{geneRiskDisclaimer(locale)}</b>
-          </p>
-          <p className="small muted mt-2 mb-0">
-            <Link href="/patient/digital-twin/pharmacogenetics">
-              {locale === "en"
-                ? "Open full pharmacogenetics"
-                : "Atidaryti farmakogenetiką"}
-            </Link>
-          </p>
         </div>
       )}
     </section>

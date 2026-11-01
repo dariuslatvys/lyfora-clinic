@@ -50,6 +50,8 @@ export type HealthCardMed = {
   byLt: string;
   byEn: string;
   active: boolean;
+  /** Origin for Sąrašas status badges (Vartoja / Paskirta). */
+  source?: "questionnaire" | "prescription" | "other";
   href?: string;
   links?: HealthCardLink[];
 };
@@ -131,6 +133,10 @@ export type HealthCardModel = {
   conditionsHref: string;
   episodes: HealthCardEpisode[];
   meds: HealthCardMed[];
+  /** Patient-reported current medicines (Sąrašas → Vartoja). */
+  takingMedNames: string[];
+  /** Clinic / e-prescription medicines (Sąrašas → Paskirta). */
+  prescribedMedNames: string[];
   medsHref: string;
   vaccines: HealthCardVaccine[];
   procedures: HealthCardProcedure[];
@@ -260,7 +266,11 @@ const DEMO_GENE_RISK_MED_NAMES = [
   "Imuran (Azathioprine)",
 ];
 
-function medFromName(name: string, qMeds: string): HealthCardMed {
+function medFromName(
+  name: string,
+  qMeds: string,
+  source: HealthCardMed["source"] = "other"
+): HealthCardMed {
   const meta = MED_META[name] || {
     atc: "—",
     doseLt: "Pagal paskyrimą",
@@ -277,6 +287,7 @@ function medFromName(name: string, qMeds: string): HealthCardMed {
     byLt: meta.byLt,
     byEn: meta.byEn,
     active: true,
+    source,
     href: "/patient/prescriptions",
     links: [
       { href: qMeds, labelLt: "Klausimynas", labelEn: "Questionnaire" },
@@ -542,20 +553,26 @@ export function buildHealthCard(input: {
     },
   ];
 
-  const medNames = [
-    ...DEMO_GENE_RISK_MED_NAMES,
-    ...((v[
+  const questionnaireMeds =
+    ((v[
       "4_current_medications_supplements__current_medications"
-    ] as string[]) || []),
-  ];
+    ] as string[]) || []).map((n) => n.trim()).filter(Boolean);
   const seenMed = new Set<string>();
   const meds: HealthCardMed[] = [];
-  for (const name of medNames) {
+  for (const name of DEMO_GENE_RISK_MED_NAMES) {
     const key = name.trim().toLowerCase();
     if (!key || seenMed.has(key)) continue;
     seenMed.add(key);
-    meds.push(medFromName(name, qMeds));
+    meds.push(medFromName(name, qMeds, "prescription"));
   }
+  for (const name of questionnaireMeds) {
+    const key = name.trim().toLowerCase();
+    if (!key || seenMed.has(key)) continue;
+    seenMed.add(key);
+    meds.push(medFromName(name, qMeds, "questionnaire"));
+  }
+  const takingMedNames = [...questionnaireMeds];
+  const prescribedMedNames = [...DEMO_GENE_RISK_MED_NAMES];
   if (
     v["4_current_medications_supplements__are_you_currently_taking_any_supplements"] ===
     "Yes"
@@ -569,11 +586,13 @@ export function buildHealthCard(input: {
       byLt: "Dr. Rūta Petrauskienė",
       byEn: "Dr. Ruta Petrauskienė",
       active: true,
+      source: "questionnaire",
       href: qMeds,
       links: [
         { href: qMeds, labelLt: "Klausimynas", labelEn: "Questionnaire" },
       ],
     });
+    takingMedNames.push("Vitaminas D3");
   }
 
   // Vaccines from uploaded PDFs / invoices
@@ -881,6 +900,8 @@ export function buildHealthCard(input: {
     conditionsHref: qConditions,
     episodes,
     meds,
+    takingMedNames,
+    prescribedMedNames,
     medsHref: qMeds,
     vaccines,
     procedures,

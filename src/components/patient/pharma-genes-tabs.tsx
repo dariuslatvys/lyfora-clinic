@@ -224,7 +224,7 @@ export function PharmaGenesTabs({
             purposeBlurb:
               "Same genes grouped by what the related medicines are typically taken for.",
             toleranceBlurb:
-              "Enter a prescribed medicine — see whether your sample has risk alleles for that drug.",
+              "Instant check: enter one or more medicines and press Check.",
             focus: "Focus",
             empty: "No genes in this group.",
           }
@@ -237,7 +237,7 @@ export function PharmaGenesTabs({
             purposeBlurb:
               "Tie patys genai sugrupuoti pagal tai, nuo ko paprastai geriami susiję vaistai.",
             toleranceBlurb:
-              "Įveskite paskirtą vaistą — sistema parodys, ar jūsų mėginyje yra rizikos alelių tam vaistui.",
+              "Momentinis tikrinimas: įveskite vieną ar kelis vaistus ir paspauskite „Tikrinti“.",
             focus: "Sritis",
             empty: "Šioje grupėje genų nėra.",
           },
@@ -340,13 +340,13 @@ export function PharmaGenesTabs({
         </button>
       </div>
 
-      <p className="small muted mt-2 mb-3">
-        {tab === "risk"
-          ? copy.riskBlurb
-          : tab === "purpose"
-            ? copy.purposeBlurb
-            : copy.toleranceBlurb}
-      </p>
+      {tab !== "tolerance" ? (
+        <p className="small muted mt-2 mb-3">
+          {tab === "risk" ? copy.riskBlurb : copy.purposeBlurb}
+        </p>
+      ) : (
+        <div className="mt-2" />
+      )}
 
       {tab === "risk" ? (
         <div className="space-y-2">
@@ -417,7 +417,6 @@ export function PharmaGenesTabs({
           snps={snps}
           colourLabels={colourLabels}
           awaitingDna={awaitingDna}
-          categoryHref={`/patient/digital-twin/${category}`}
         />
       )}
     </div>

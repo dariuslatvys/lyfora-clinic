@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import type { RiskColour } from "@/lib/health/colours";
 import { COLOUR_HEX } from "@/lib/health/colours";
@@ -40,11 +39,11 @@ function CatIcon({ id }: { id: string }) {
   return (
     <svg
       viewBox="0 0 24 24"
-      width="20"
-      height="20"
+      width="22"
+      height="22"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.7"
+      strokeWidth="1.8"
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
@@ -61,22 +60,35 @@ function orderCategories(categories: BodyMapCategory[]) {
   );
 }
 
-/** Even circle; start at top, go clockwise. */
-function orbitPoint(index: number, total: number) {
+type Slot = {
+  deg: number;
+  // percent of stage
+  x: number;
+  y: number;
+  labelX: number;
+  labelY: number;
+  align: "left" | "right" | "center";
+};
+
+/** Categories sit ON the circle; labels just outside. */
+function orbitSlots(total: number): Slot[] {
   const n = Math.max(total, 1);
-  const startDeg = -90;
-  const deg = startDeg + (360 / n) * index;
-  const rad = (deg * Math.PI) / 180;
-  // Icon ring
-  const ir = 34;
-  // Label ring (slightly outside)
-  const lr = 44;
-  const ix = 50 + ir * Math.cos(rad);
-  const iy = 50 + ir * Math.sin(rad);
-  const lx = 50 + lr * Math.cos(rad);
-  const ly = 50 + lr * Math.sin(rad);
-  const side: "left" | "right" = lx < 50 ? "left" : "right";
-  return { ix, iy, lx, ly, side, deg };
+  const ring = 36; // % radius for icon centers
+  const labelR = 46;
+  const slots: Slot[] = [];
+  for (let i = 0; i < n; i++) {
+    const deg = -90 + (360 / n) * i; // start at top
+    const rad = (deg * Math.PI) / 180;
+    const x = 50 + ring * Math.cos(rad);
+    const y = 50 + ring * Math.sin(rad);
+    const labelX = 50 + labelR * Math.cos(rad);
+    const labelY = 50 + labelR * Math.sin(rad);
+    let align: Slot["align"] = "center";
+    if (Math.cos(rad) > 0.35) align = "left";
+    else if (Math.cos(rad) < -0.35) align = "right";
+    slots.push({ deg, x, y, labelX, labelY, align });
+  }
+  return slots;
 }
 
 export function BodyMap({
@@ -88,46 +100,51 @@ export function BodyMap({
   centerLabel?: string;
 }) {
   const ordered = orderCategories(categories).slice(0, 8);
-  const slots = ordered.map((_, i) => orbitPoint(i, ordered.length));
+  const slots = orbitSlots(ordered.length);
 
   return (
-    <div className="body-map rise-in-delay">
-      <div className="body-map-stage">
-        <div className="body-map-orbit" aria-hidden="true" />
-
-        <div className="body-map-figure" aria-hidden="true">
-          <Image
-            src="/brand/body-twin-hub.png"
-            alt=""
-            width={480}
-            height={640}
-            className="body-map-photo"
-            priority
-          />
-        </div>
-
+    <div className="ring-map rise-in-delay">
+      <div className="ring-map-stage">
+        {/* Base circle */}
         <svg
-          className="body-map-lines"
+          className="ring-map-svg"
           viewBox="0 0 100 100"
-          preserveAspectRatio="none"
           aria-hidden="true"
         >
+          <circle
+            cx="50"
+            cy="50"
+            r="36"
+            fill="none"
+            stroke="#d5e0e8"
+            strokeWidth="0.35"
+          />
+          <circle
+            cx="50"
+            cy="50"
+            r="36"
+            fill="none"
+            stroke="#b7c9d6"
+            strokeWidth="0.2"
+            strokeDasharray="1.2 1.4"
+            opacity="0.9"
+          />
           {ordered.map((c, i) => {
             const s = slots[i];
             return (
               <line
-                key={c.id}
+                key={`line-${c.id}`}
                 x1="50"
                 y1="50"
-                x2={s.ix}
-                y2={s.iy}
-                stroke="#9eb6c8"
-                strokeWidth="0.22"
-                strokeDasharray="0.9 1.1"
-                opacity="0.75"
+                x2={s.x}
+                y2={s.y}
+                stroke="#c5d4e0"
+                strokeWidth="0.2"
+                strokeDasharray="0.8 1"
               />
             );
           })}
+          <circle cx="50" cy="50" r="2.2" fill="#e8f3f8" stroke="#b7c9d6" strokeWidth="0.25" />
         </svg>
 
         {ordered.map((c, i) => {
@@ -136,19 +153,19 @@ export function BodyMap({
             <Link
               key={c.id}
               href={`/patient/digital-twin/${c.id}`}
-              className={`twin-node twin-node-${s.side}`}
+              className={`ring-node ring-align-${s.align}`}
               style={{
-                ["--ix" as string]: `${s.ix}%`,
-                ["--iy" as string]: `${s.iy}%`,
-                ["--lx" as string]: `${s.lx}%`,
-                ["--ly" as string]: `${s.ly}%`,
+                ["--nx" as string]: `${s.x}%`,
+                ["--ny" as string]: `${s.y}%`,
+                ["--lx" as string]: `${s.labelX}%`,
+                ["--ly" as string]: `${s.labelY}%`,
                 ["--cc" as string]: COLOUR_HEX[c.colour],
               }}
             >
-              <span className="twin-dot" aria-hidden="true">
+              <span className="ring-dot">
                 <CatIcon id={c.id} />
               </span>
-              <span className="twin-label">
+              <span className="ring-label">
                 <b>{c.title}</b>
                 <em>
                   {c.colourLabel}
@@ -159,7 +176,7 @@ export function BodyMap({
           );
         })}
       </div>
-      <p className="body-map-hint">{geneHint}</p>
+      <p className="ring-map-hint">{geneHint}</p>
     </div>
   );
 }

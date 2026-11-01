@@ -110,7 +110,7 @@ function buildWhy(snp: EvaluatedSnp, locale: Locale): string {
     if (snp.matchCount > 0 && snp.colour) {
       text += ` That is why this result is marked “${colour}”.`;
     } else if (snp.matchCount === 0) {
-      text += " So it does not raise the category colour on its own.";
+      text += ` The genotype is known and does not carry risk alleles here, so it is marked “${colour}”.`;
     }
     return text;
   }
@@ -130,7 +130,7 @@ function buildWhy(snp: EvaluatedSnp, locale: Locale): string {
   if (snp.matchCount > 0 && snp.colour) {
     text += ` Todėl rezultatas pažymėtas kaip „${colour}“.`;
   } else if (snp.matchCount === 0) {
-    text += " Todėl pats savaime kategorijos spalvos nekelia.";
+    text += ` Genotipas žinomas ir rizikos alelių čia nėra, todėl pažymėta kaip „${colour}“.`;
   }
   return text;
 }

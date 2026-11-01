@@ -87,7 +87,8 @@ export function evaluateSnp(
   let colour: RiskColour | null = null;
   if (matchCount === 1) colour = normalizeColour(row.match1);
   if (matchCount === 2) colour = normalizeColour(row.match2);
-  if (matchCount === 0) colour = null;
+  // Genotype known but no risk alleles → calm/green, not "no data"
+  if (matchCount === 0) colour = "green";
   return {
     ...row,
     allele1: genotype.allele1,

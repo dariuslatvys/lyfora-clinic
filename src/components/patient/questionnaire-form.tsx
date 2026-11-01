@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   STEP_TITLE_LT,
   computeBmi,
@@ -34,15 +35,19 @@ export function QuestionnaireForm({
   initialDefinition: QDefinition;
   initialAnswers: QuestionnaireAnswers;
 }) {
+  const router = useRouter();
   const def = initialDefinition;
   const [answers, setAnswers] = useState<QuestionnaireAnswers>(initialAnswers);
+  const answersRef = useRef(answers);
+  answersRef.current = answers;
   const [stepIdx, setStepIdx] = useState(0);
-  // Always open ready to fill — view mode blocked list picks before.
+  // Open editable so chips/selects work; saved values are pre-filled from DB.
   const [mode, setMode] = useState<Mode>("edit");
   const [saving, setSaving] = useState(false);
   const [savedAt, setSavedAt] = useState<string | null>(
     initialAnswers.updatedAt
   );
+  const [saveFlash, setSaveFlash] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const sex = biologicalSex(answers, def);
@@ -90,31 +95,50 @@ export function QuestionnaireForm({
     }
   }, [answers, def, setValue]);
 
-  async function save() {
-    setSaving(true);
-    setError(null);
-    try {
-      const res = await fetch("/api/patient/questionnaire", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ answers }),
-      });
-      if (!res.ok) throw new Error("save failed");
-      const data = (await res.json()) as { answers: QuestionnaireAnswers };
-      setAnswers(data.answers);
-      setSavedAt(data.answers.updatedAt);
-      // Stay in edit so list/chip answers remain selectable after save.
-      setMode("edit");
-    } catch {
-      setError(
-        locale === "en"
-          ? "Could not save. Please try again."
-          : "Nepavyko išsaugoti. Bandykite dar kartą."
-      );
-    } finally {
-      setSaving(false);
-    }
-  }
+  const save = useCallback(
+    async (opts?: { finish?: boolean; silent?: boolean }) => {
+      setSaving(true);
+      setError(null);
+      if (!opts?.silent) setSaveFlash(null);
+      try {
+        const res = await fetch("/api/patient/questionnaire", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ answers: answersRef.current }),
+          cache: "no-store",
+        });
+        if (!res.ok) throw new Error("save failed");
+        const data = (await res.json()) as { answers: QuestionnaireAnswers };
+        setAnswers(data.answers);
+        answersRef.current = data.answers;
+        setSavedAt(data.answers.updatedAt);
+        setMode(opts?.finish ? "view" : "edit");
+        if (!opts?.silent) {
+          setSaveFlash(
+            locale === "en"
+              ? opts?.finish
+                ? "Saved — your answers will be used next time."
+                : "Draft saved — answers are kept for next visit."
+              : opts?.finish
+                ? "Išsaugota — kitą kartą naudosime šiuos atsakymus."
+                : "Juodraštis išsaugotas — kitą kartą atsakymus matysite čia."
+          );
+        }
+        router.refresh();
+        return true;
+      } catch {
+        setError(
+          locale === "en"
+            ? "Could not save. Please try again."
+            : "Nepavyko išsaugoti. Bandykite dar kartą."
+        );
+        return false;
+      } finally {
+        setSaving(false);
+      }
+    },
+    [locale, router]
+  );
 
   function stepTitle(title: string) {
     if (locale === "lt") return STEP_TITLE_LT[title] || title;
@@ -165,6 +189,8 @@ export function QuestionnaireForm({
           )}
         </div>
       </div>
+
+      {saveFlash ? <p className="q-saved">{saveFlash}</p> : null}
 
       <div className="q-progress">
         <i style={{ width: `${stats.percent}%` }} />
@@ -249,14 +275,27 @@ export function QuestionnaireForm({
                   disabled={saving}
                   onClick={() => void save()}
                 >
-                  {locale === "en" ? "Save draft" : "Išsaugoti juodraštį"}
+                  {saving
+                    ? locale === "en"
+                      ? "Saving…"
+                      : "Saugoma…"
+                    : locale === "en"
+                      ? "Save draft"
+                      : "Išsaugoti juodraštį"}
                 </button>
               ) : null}
               {stepIdx < steps.length - 1 ? (
                 <button
                   type="button"
                   className="btn"
-                  onClick={() => setStepIdx((i) => i + 1)}
+                  disabled={saving}
+                  onClick={() => {
+                    void (async () => {
+                      // Persist before leaving the step so values are not lost.
+                      const ok = await save({ silent: true });
+                      if (ok) setStepIdx((i) => i + 1);
+                    })();
+                  }}
                 >
                   {locale === "en" ? "Next" : "Toliau"}
                 </button>
@@ -265,7 +304,7 @@ export function QuestionnaireForm({
                   type="button"
                   className="btn"
                   disabled={saving}
-                  onClick={() => void save()}
+                  onClick={() => void save({ finish: true })}
                 >
                   {locale === "en" ? "Save & finish" : "Išsaugoti ir baigti"}
                 </button>

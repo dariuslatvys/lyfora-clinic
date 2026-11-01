@@ -6,6 +6,7 @@ import { t } from "@/lib/i18n/dictionary";
 import { patientDisplayName } from "@/lib/i18n/patient-name";
 import { OverviewPanels } from "@/components/patient/overview-panels";
 import { collectFlaggedLabs } from "@/lib/health/marker-colour";
+import { goalsFromMetrics } from "@/lib/health/goals-from-metrics";
 import type { RiskColour } from "@/lib/health/colours";
 import {
   formatVisitWhen,
@@ -69,18 +70,30 @@ export default async function DigitalTwinPage() {
     href: `/patient/visits/${v.id}`,
   }));
 
+  const computedGoals = goalsFromMetrics(twin.markers, locale, 5);
   const goals =
-    locale === "en"
-      ? [
-          { title: "LDL under 2.6 mmol/L", progress: 62 },
-          { title: "Walk 7,000 steps / day", progress: 48 },
-          { title: "Sleep 7+ hours", progress: 71 },
-        ]
-      : [
-          { title: "MTL < 2,6 mmol/L", progress: 62 },
-          { title: "7 000 žingsnių per dieną", progress: 48 },
-          { title: "Miegas 7+ val.", progress: 71 },
-        ];
+    computedGoals.length > 0
+      ? computedGoals.map((g) => ({
+          title: g.title,
+          detail: g.detail,
+          progress: g.progress,
+          href: `/patient/marker/${encodeURIComponent(g.markerKey)}`,
+        }))
+      : locale === "en"
+        ? [
+            {
+              title: "Keep labs and vitals in range",
+              detail: "No out-of-range signals right now — maintain the habit.",
+              progress: 100,
+            },
+          ]
+        : [
+            {
+              title: "Išlaikyti rodiklius normoje",
+              detail: "Šiuo metu nukrypimų nėra — tęskite gerus įpročius.",
+              progress: 100,
+            },
+          ];
 
   return (
     <div className="stack overview-page" style={{ gap: 8 }}>

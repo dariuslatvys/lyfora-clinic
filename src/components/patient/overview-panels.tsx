@@ -65,7 +65,7 @@ export function OverviewPanels({
   flaggedLabs: OverviewFlaggedLab[];
   steps: OverviewStep[];
   visits: OverviewVisit[];
-  goals: { title: string; progress: number }[];
+  goals: { title: string; detail?: string; progress: number; href?: string }[];
   planName: string;
   planPerks: string;
 }) {
@@ -230,17 +230,38 @@ export function OverviewPanels({
                   <h2>{labels.myGoals}</h2>
                 </div>
                 <div className="stack" style={{ gap: 10 }}>
-                  {goals.map((g) => (
-                    <div key={g.title}>
-                      <div className="row between small">
-                        <span>{g.title}</span>
-                        <b className="num">{g.progress} %</b>
-                      </div>
-                      <div className="progress">
-                        <i style={{ width: `${g.progress}%` }} />
-                      </div>
-                    </div>
-                  ))}
+                  {goals.map((g) => {
+                    const body = (
+                      <>
+                        <div className="row between small" style={{ gap: 8 }}>
+                          <span>{g.title}</span>
+                          <b className="num">{g.progress} %</b>
+                        </div>
+                        {g.detail ? (
+                          <p
+                            className="xs muted"
+                            style={{ margin: "4px 0 0" }}
+                          >
+                            {g.detail}
+                          </p>
+                        ) : null}
+                        <div className="progress" style={{ marginTop: 6 }}>
+                          <i style={{ width: `${g.progress}%` }} />
+                        </div>
+                      </>
+                    );
+                    return g.href ? (
+                      <Link
+                        key={g.title}
+                        href={g.href}
+                        className="goal-link"
+                      >
+                        {body}
+                      </Link>
+                    ) : (
+                      <div key={g.title}>{body}</div>
+                    );
+                  })}
                 </div>
               </section>
 

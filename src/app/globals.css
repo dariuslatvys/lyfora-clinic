@@ -842,6 +842,76 @@ a.who.on {
   border-radius: 99px;
 }
 
+.goal-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  border-radius: 10px;
+  padding: 6px 4px;
+  margin: -6px -4px;
+  transition: background 0.15s ease;
+}
+
+.goal-link:hover {
+  background: var(--surface-2);
+  color: inherit;
+}
+
+.visits-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+}
+
+.visits-tabs button {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  flex: 1 1 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+  font-family: var(--font-display), Manrope, sans-serif;
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  padding: 10px 12px;
+  border-radius: 9px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.visits-tabs button.on {
+  background: var(--surface-raised);
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+
+.visits-tab-count {
+  min-width: 1.4rem;
+  height: 1.4rem;
+  padding: 0 6px;
+  border-radius: 999px;
+  display: inline-grid;
+  place-items: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: var(--surface);
+  color: var(--ink-soft);
+  border: 1px solid var(--line);
+}
+
+.visits-tabs button.on .visits-tab-count {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
+}
+
 .btn.sm {
   padding: 6px 10px;
   font-size: 0.82rem;
@@ -2543,6 +2613,17 @@ a.who.on {
 .q-error {
   color: var(--r-red);
   font-size: 0.9rem;
+}
+
+.q-saved {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--line));
+  background: var(--accent-soft);
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 550;
 }
 
 /* ---------- Medication typeahead ---------- */

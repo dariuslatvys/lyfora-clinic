@@ -9,6 +9,7 @@ export const PHYSICAL_MARKER_KEYS = new Set([
   "SLEEP_DATA",
   "WAIST",
   "WAIST_CIRCUMFERENCE",
+  "WAIST_CIRC",
 ]);
 
 export function isPhysicalMarkerKey(key: string) {

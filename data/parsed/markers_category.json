@@ -118,6 +118,14 @@
     ]
   },
   {
+    "key": "WAIST_CIRCUMFERENCE",
+    "name": "Waist Circumference",
+    "categories": [
+      "Metabolic Health",
+      "Cardiovascular Health"
+    ]
+  },
+  {
     "key": "BILIRUBIN_TOTAL",
     "name": "Total bilirubin",
     "categories": [

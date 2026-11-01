@@ -1,7 +1,11 @@
 import fs from "fs";
 import path from "path";
 import bcrypt from "bcryptjs";
+import Database from "better-sqlite3";
 import { ensureSchema, getSqlite } from "../src/lib/db";
+import { loadQuestionnaireDefinition } from "../src/lib/health/questionnaire-loader";
+import { parseStoredAnswers } from "../src/lib/health/questionnaire";
+import { syncQuestionnaireMetrics } from "../src/lib/health/sync-questionnaire-metrics";
 
 type JsonSnp = {
   groupEn: string | null;
@@ -129,8 +133,25 @@ const MARKER_COPY: Record<
   },
 };
 
-function main() {
+async function main() {
   const dbPath = path.join(ROOT, "data", "db", "lyfora.sqlite");
+
+  // Snapshot patient questionnaire answers before wiping the DB file.
+  let preservedQ: { patient_id: string; key: string; value: string }[] = [];
+  if (fs.existsSync(dbPath)) {
+    try {
+      const prev = new Database(dbPath, { readonly: true, fileMustExist: true });
+      preservedQ = prev
+        .prepare(
+          `SELECT patient_id, key, value FROM questionnaire WHERE key = 'health_questionnaire_v1'`
+        )
+        .all() as { patient_id: string; key: string; value: string }[];
+      prev.close();
+    } catch {
+      preservedQ = [];
+    }
+  }
+
   if (fs.existsSync(dbPath)) fs.unlinkSync(dbPath);
   if (fs.existsSync(dbPath + "-wal")) fs.unlinkSync(dbPath + "-wal");
   if (fs.existsSync(dbPath + "-shm")) fs.unlinkSync(dbPath + "-shm");
@@ -142,6 +163,7 @@ function main() {
 
   ensureSchema();
   const sqlite = getSqlite();
+
   // Belt-and-braces: clear any leftover rows if schema bootstrap was odd
   sqlite.exec(`
     DELETE FROM snp_genotypes;
@@ -511,6 +533,22 @@ function main() {
   insertQ.run(patientId, "activity", "vidutinis");
   insertQ.run(patientId, "sleep_hours", "6-7");
 
+  // Restore patient-entered questionnaire and push vitals into markers
+  for (const row of preservedQ) {
+    const pid =
+      row.patient_id === "patient_female" ? femaleId : patientId;
+    insertQ.run(pid, row.key, row.value);
+  }
+  if (preservedQ.length) {
+    const def = await loadQuestionnaireDefinition();
+    for (const row of preservedQ) {
+      const pid =
+        row.patient_id === "patient_female" ? femaleId : patientId;
+      syncQuestionnaireMetrics(pid, parseStoredAnswers(row.value), def);
+    }
+    console.log("  restored questionnaire rows:", preservedQ.length);
+  }
+
   console.log("Seeded Lyfora DB");
   console.log("  patients: Jonas Jonaitis / John Doe (labs + SNP + NGS), Rasa Rasaitė / Jane Smith (AncestryDNA SNP + female VCF)");
   console.log("  SNPs:", snps.length);
@@ -525,4 +563,7 @@ function main() {
   console.log("  logins: pacientas@lyfora.lt / paciente@lyfora.lt / gydytojas@lyfora.lt  pass: lyfora2026");
 }
 
-main();
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

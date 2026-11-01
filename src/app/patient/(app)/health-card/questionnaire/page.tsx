@@ -10,6 +10,9 @@ import {
 } from "@/lib/health/questionnaire";
 import { loadQuestionnaireDefinition } from "@/lib/health/questionnaire-loader";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function QuestionnairePage() {
   const current = await getCurrentUser();
   if (!current?.patient) redirect("/login/patient");

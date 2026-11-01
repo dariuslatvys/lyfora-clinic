@@ -10,6 +10,7 @@ import {
   type QuestionnaireAnswers,
 } from "@/lib/health/questionnaire";
 import { loadQuestionnaireDefinition } from "@/lib/health/questionnaire-loader";
+import { syncQuestionnaireMetrics } from "@/lib/health/sync-questionnaire-metrics";
 
 export async function GET() {
   const current = await getCurrentUser();
@@ -98,6 +99,10 @@ export async function PUT(req: Request) {
       })
       .run();
   }
+
+  // Push vitals (BP, HRV, VO₂max, …) into the twin marker store
+  const def = await loadQuestionnaireDefinition();
+  syncQuestionnaireMetrics(current.patient.id, answers, def);
 
   return NextResponse.json({ ok: true, answers });
 }

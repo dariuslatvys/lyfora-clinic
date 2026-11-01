@@ -406,9 +406,6 @@ function main() {
       if (mode === "het") {
         a1 = eff;
         a2 = safe;
-      } else if (mode === "hom") {
-        a1 = eff;
-        a2 = eff;
       }
       insertGeno.run(femaleId, r.snpId, a1, a2, "demo_microarray");
     });

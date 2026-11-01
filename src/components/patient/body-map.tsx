@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { RiskColour } from "@/lib/health/colours";
 import { COLOUR_HEX } from "@/lib/health/colours";
+import { DnaMark } from "@/components/patient/dna-mark";
 
 export type BodyMapCategory = {
   id: string;
@@ -167,9 +168,9 @@ export function BodyMap({
               </span>
               <span className="ring-label">
                 <b>{c.title}</b>
-                <em>
-                  {c.colourLabel}
-                  {c.geneticBadge ? " · G" : ""}
+                <em className="ring-status">
+                  <span>{c.colourLabel}</span>
+                  {c.geneticBadge ? <DnaMark /> : null}
                 </em>
               </span>
             </Link>

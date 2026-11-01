@@ -65,7 +65,7 @@ export const dict = {
     categoriesTitle: "Sveikatos sritys",
     categoriesHint:
       "Spalva – aukščiausia nustatyta rizika iš tyrimų ir DNR.",
-    geneMarkerHint: "G – genetinis žymuo",
+    geneMarkerHint: "DNR ženklas – genetinis žymuo",
     healthIndex: "Sveikatos indeksas",
     goodMorning: "Laba diena",
     areasStable: "Visos sritys stabilios.",
@@ -193,7 +193,7 @@ export const dict = {
     categoriesTitle: "Health areas",
     categoriesHint:
       "Colour shows the highest risk from labs and DNA.",
-    geneMarkerHint: "G – genetic marker",
+    geneMarkerHint: "DNA mark – genetic finding",
     healthIndex: "Health index",
     goodMorning: "Good day",
     areasStable: "All areas are stable.",

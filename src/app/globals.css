@@ -752,6 +752,24 @@ a {
   color: var(--cc, var(--r-none));
 }
 
+.dna-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  background: var(--r-badge-bg);
+  color: var(--r-badge);
+  flex: none;
+  vertical-align: -0.15em;
+}
+
+.ring-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
 .gene-mark {
   display: inline-grid;
   place-items: center;

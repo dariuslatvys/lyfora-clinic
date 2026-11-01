@@ -5,6 +5,7 @@ import {
   matchPrimaryCategory,
   type HealthCategoryId,
 } from "./categories";
+import { rareGeneCategory, rareMutationForcesRed } from "./rare-genes";
 
 export type SnpRiskRow = {
   gene: string;
@@ -143,6 +144,24 @@ export function geneticCategoryColour(
   return maxColour(colours);
 }
 
+export type RareVariant = {
+  id?: number;
+  gene: string;
+  transcript?: string | null;
+  hgvs?: string | null;
+  chrom?: string | null;
+  pos?: number | null;
+  ref?: string | null;
+  alt?: string | null;
+  gt?: string | null;
+  significance?: string | null;
+  titleLt?: string | null;
+  titleEn?: string | null;
+  summaryLt?: string | null;
+  summaryEn?: string | null;
+  synthetic?: boolean | null;
+};
+
 export type CategoryEvaluation = {
   id: HealthCategoryId;
   biomarkerColour: RiskColour;
@@ -151,6 +170,7 @@ export type CategoryEvaluation = {
   geneticBadge: boolean;
   markers: MarkerResult[];
   snps: EvaluatedSnp[];
+  rare: RareVariant[];
   latestMarkerCount: number;
   snpMatchCount: number;
 };
@@ -170,9 +190,11 @@ export function evaluateDigitalTwin(input: {
   snpRows: SnpRiskRow[];
   genotypes: Genotype[];
   markers: MarkerResult[];
+  rare?: RareVariant[];
 }): CategoryEvaluation[] {
   const genoMap = new Map(input.genotypes.map((g) => [g.snpId.toLowerCase(), g]));
   const cats = categoriesForSex(input.sex);
+  const rare = input.rare ?? [];
 
   return cats.map((cat) => {
     const snps = input.snpRows
@@ -185,11 +207,19 @@ export function evaluateDigitalTwin(input: {
       markerBelongs(m.categories, cat.markerCategoryNames)
     );
 
+    const catRare = rare.filter((v) => rareGeneCategory(v.gene) === cat.id);
+
     const biomarkerColour = evaluateMarkerColour(markers);
     const geneticColour = geneticCategoryColour(snps);
     const combined = geneticColour
       ? combineCategoryColour(biomarkerColour, geneticColour)
       : { colour: biomarkerColour, geneticBadge: false };
+
+    // NGS rare pathogenic findings force the category to red
+    const hasRedRare = catRare.some((v) => rareMutationForcesRed(v.gene));
+    const colour = hasRedRare
+      ? maxColour([combined.colour, "red"])
+      : combined.colour;
 
     const latestByKey = new Map<string, MarkerResult>();
     for (const m of markers) latestByKey.set(m.markerKey, m);
@@ -198,10 +228,11 @@ export function evaluateDigitalTwin(input: {
       id: cat.id,
       biomarkerColour,
       geneticColour,
-      colour: combined.colour,
+      colour,
       geneticBadge: combined.geneticBadge,
       markers,
       snps,
+      rare: catRare,
       latestMarkerCount: latestByKey.size,
       snpMatchCount: snps.filter((s) => s.matchCount > 0).length,
     };
@@ -257,6 +288,13 @@ export function summarizeCategory(
           .join(", ")}.`
       );
     }
+    if (evaluation.rare.length) {
+      parts.push(
+        `NGS (išsamus genetinio kodo sekoskaitos tyrimas) rado ${evaluation.rare.length} retą(-as) mutaciją(-as): ${evaluation.rare
+          .map((r) => r.gene)
+          .join(", ")}. Tai kelia kategorijos signalą į raudoną — aptarkite su gydytoju genetiku.`
+      );
+    }
     if (!hasGeno) {
       parts.push(
         "Bazinio genetinio genotipavimo (SNP) rezultatai dar neįkelti — genetinė dalis bus papildyta gavus DNR failą."
@@ -291,6 +329,13 @@ export function summarizeCategory(
         .slice(0, 5)
         .map((m) => m.name || m.markerKey)
         .join(", ")}.`
+    );
+  }
+  if (evaluation.rare.length) {
+    parts.push(
+      `NGS found ${evaluation.rare.length} rare mutation(s): ${evaluation.rare
+        .map((r) => r.gene)
+        .join(", ")}. This raises the category signal to red — discuss with a clinical geneticist.`
     );
   }
   if (!hasGeno) {

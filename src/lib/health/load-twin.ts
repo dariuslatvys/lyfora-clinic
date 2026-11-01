@@ -88,6 +88,7 @@ export function loadDigitalTwin(patientId: string, locale: Locale) {
     snpRows,
     genotypes,
     markers: results,
+    rare,
   }).map((c) => ({
     ...c,
     summary: summarizeCategory(c, locale),

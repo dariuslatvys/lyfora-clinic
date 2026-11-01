@@ -79,6 +79,7 @@ export const dict = {
       hormones_women: "Hormonai (moterims)",
       mental: "Psichikos ir pažinimo sveikata",
       immune: "Imunitetas ir uždegimas",
+      oncology: "Onkologija",
     } as Record<string, string>,
     colourLabels: {
       grey: "Nėra duomenų",
@@ -167,6 +168,7 @@ export const dict = {
       hormones_women: "Hormones (Women)",
       mental: "Mental and Cognitive Health",
       immune: "Immune & Inflammation",
+      oncology: "Oncology",
     } as Record<string, string>,
     colourLabels: {
       grey: "No data",

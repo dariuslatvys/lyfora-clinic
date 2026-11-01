@@ -151,7 +151,7 @@ export default async function DigitalTwinPage() {
               title={labels.categoryNames[cat.id] || cat.id}
               colour={cat.colour}
               colourLabel={labels.colourLabels[cat.colour]}
-              geneticBadge={cat.geneticBadge}
+              geneticBadge={cat.geneticBadge || cat.rare.length > 0}
             />
           ))}
         </div>

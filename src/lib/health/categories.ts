@@ -5,7 +5,8 @@ export type HealthCategoryId =
   | "hormones_men"
   | "hormones_women"
   | "mental"
-  | "immune";
+  | "immune"
+  | "oncology";
 
 export const HEALTH_CATEGORIES: {
   id: HealthCategoryId;
@@ -52,6 +53,15 @@ export const HEALTH_CATEGORIES: {
     id: "immune",
     primaryKeys: ["Immune & Inflammation"],
     markerCategoryNames: ["Immune & Inflammation"],
+  },
+  {
+    id: "oncology",
+    primaryKeys: ["Oncology", "Cancer Risk", "Oncology / Cancer Risk"],
+    markerCategoryNames: [
+      "Oncology",
+      "Cancer Risk",
+      "Cancer RiskHormonal Health",
+    ],
   },
 ];
 

@@ -47,10 +47,8 @@ export default async function CategoryDetailPage({
     ? cat.snps.find((s) => s.snpId === selectedSnpId)
     : null;
 
-  const showRare =
-    cat.id === "cardiovascular" &&
-    twin.patient.hasNgsVcf &&
-    twin.rare.length > 0;
+  const catRare = cat.rare ?? [];
+  const showRare = twin.patient.hasNgsVcf && catRare.length > 0;
 
   const snpTitle =
     cat.id === "pharmacogenetics"
@@ -91,14 +89,19 @@ export default async function CategoryDetailPage({
             <p className="mt-1 text-sm text-[var(--ink-soft)]">{labels.ngsBlurb}</p>
           </div>
           <div className="grid gap-3">
-            {twin.rare.map((v) => (
+            {catRare.map((v) => (
               <article
-                key={v.id}
-                className="rounded-lg border border-[var(--line)] bg-white/80 p-4"
+                key={v.id ?? `${v.gene}-${v.hgvs}`}
+                className="rounded-lg border border-[var(--r-red)]/30 bg-[var(--r-red-bg)]/40 p-4"
               >
-                <h4 className="text-lg font-semibold">
-                  {locale === "lt" ? v.titleLt : v.titleEn}
-                </h4>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="pill c-red">
+                    {labels.colourLabels.red}
+                  </span>
+                  <h4 className="text-lg font-semibold">
+                    {locale === "lt" ? v.titleLt : v.titleEn}
+                  </h4>
+                </div>
                 <p className="mt-1 text-xs text-[var(--muted)]">
                   {v.gene} · {v.hgvs} · {v.chrom}:{v.pos} · GT {v.gt}
                 </p>
@@ -211,7 +214,7 @@ export default async function CategoryDetailPage({
             )}
             {cat.snps.map((s) => (
               <Link
-                key={`${s.gene}-${s.snpId}-${s.nr ?? 0}`}
+                key={`${s.gene}-${s.snpId}`}
                 href={`/patient/digital-twin/${category}?snp=${s.snpId}`}
                 className={`block rounded-md border px-3 py-2 transition hover:border-[var(--accent)] ${
                   selectedSnpId === s.snpId

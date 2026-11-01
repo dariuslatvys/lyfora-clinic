@@ -7,11 +7,13 @@ import { PILL_CLASS, type RiskColour } from "@/lib/health/colours";
 import {
   dnaCategoryLabel,
   dnaGroupLabel,
+  dnaSnpDetailHref,
   type DnaPanel,
+  type DnaResultColour,
   type DnaSnpResult,
 } from "@/lib/health/dna-panel";
 
-type FilterId = "all" | "risk" | "clinical" | "unknown";
+type FilterId = "all" | "risk" | "clinical" | "unknown" | DnaResultColour;
 
 function impactLabel(impact: string, locale: "lt" | "en") {
   const lt: Record<string, string> = {
@@ -126,6 +128,8 @@ export function DnaView({
             meaning: "What this means",
             explain: "Explain",
             empty: "No markers match this search or filter.",
+            open: "Open",
+            clearFilter: "Clear colour filter",
             howTitle: "How the result is calculated",
             how: [
               "Each SNP from the 32-marker table is looked up in the genotype file. If missing — “Not determined”.",
@@ -163,6 +167,8 @@ export function DnaView({
             meaning: "Ką tai reiškia",
             explain: "Paaiškinti",
             empty: "Pagal paiešką ar filtrą žymenų nerasta.",
+            open: "Atidaryti",
+            clearFilter: "Nuimti spalvos filtrą",
             howTitle: "Kaip skaičiuojamas rezultatas",
             how: [
               "Genotipo faile ieškomas kiekvienas SNP iš 32 žymenų lentelės. Jei SNP nerastas – „Nenustatyta“.",
@@ -187,6 +193,17 @@ export function DnaView({
         return false;
       if (filter === "clinical" && r.impact !== "clinical") return false;
       if (filter === "unknown" && r.matchCount != null) return false;
+      if (
+        (filter === "green" ||
+          filter === "badge" ||
+          filter === "yellow" ||
+          filter === "orange" ||
+          filter === "red" ||
+          filter === "none") &&
+        r.colour !== filter
+      ) {
+        return false;
+      }
       if (!query) return true;
       const hay = [
         r.gene,
@@ -225,12 +242,24 @@ export function DnaView({
     { id: "unknown", label: copy.fUnk },
   ];
 
+  const colourFilterActive =
+    filter === "green" ||
+    filter === "badge" ||
+    filter === "yellow" ||
+    filter === "orange" ||
+    filter === "red" ||
+    filter === "none";
+
   const kpis = [
-    { colour: "green", n: panel.counts.green, label: copy.kpiGreen },
-    { colour: "badge", n: panel.counts.badge, label: copy.kpiBadge },
-    { colour: "yellow", n: panel.counts.yellow, label: copy.kpiYellow },
-    { colour: "orange", n: panel.counts.orange, label: copy.kpiOrange },
-  ] as const;
+    { colour: "green" as const, n: panel.counts.green, label: copy.kpiGreen },
+    { colour: "badge" as const, n: panel.counts.badge, label: copy.kpiBadge },
+    { colour: "yellow" as const, n: panel.counts.yellow, label: copy.kpiYellow },
+    { colour: "orange" as const, n: panel.counts.orange, label: copy.kpiOrange },
+  ];
+
+  function toggleColourFilter(colour: DnaResultColour) {
+    setFilter((prev) => (prev === colour ? "all" : colour));
+  }
 
   return (
     <div className="stack dna-page" style={{ gap: 16 }}>
@@ -261,12 +290,31 @@ export function DnaView({
 
       <div className="dna-kpi-grid">
         {kpis.map((k) => (
-          <div key={k.colour} className={`card dna-kpi dna-kpi-${k.colour}`}>
+          <button
+            key={k.colour}
+            type="button"
+            className={`card dna-kpi dna-kpi-${k.colour}${
+              filter === k.colour ? " on" : ""
+            }`}
+            aria-pressed={filter === k.colour}
+            onClick={() => toggleColourFilter(k.colour)}
+          >
             <b className="num">{k.n}</b>
             <span>{k.label}</span>
-          </div>
+          </button>
         ))}
       </div>
+      {colourFilterActive ? (
+        <div className="row" style={{ gap: 8 }}>
+          <button
+            type="button"
+            className="btn ghost sm"
+            onClick={() => setFilter("all")}
+          >
+            {copy.clearFilter}
+          </button>
+        </div>
+      ) : null}
 
       <div className="card dna-toolbar">
         <div className="dna-file">
@@ -325,46 +373,69 @@ export function DnaView({
                         {group}) {dnaGroupLabel(group, locale)}
                       </td>
                     </tr>
-                    {rows.map((r) => (
-                      <tr key={r.snpId}>
-                        <td>
-                          <b>{r.gene}</b>
-                          <div className="xs muted">
-                            {dnaCategoryLabel(r.primaryCategoryEn, locale)}
-                          </div>
-                        </td>
-                        <td className="mono">{r.snpId}</td>
-                        <td>
-                          <GenotypeCell row={r} />
-                        </td>
-                        <td>
-                          <AlleleDots count={r.matchCount} />
-                        </td>
-                        <td>
-                          <span className={`pill plain ${pillClassFor(r.colour)}`}>
-                            {colourTitle(r.colour, locale)}
-                          </span>
-                          <div className="xs muted">
-                            {impactLabel(r.impact, locale)}
-                          </div>
-                        </td>
-                        <td className="small hide-mob dna-meaning">
-                          {locale === "en" ? r.infoEn : r.infoLt}
-                        </td>
-                        <td>
-                          {r.matchCount != null ? (
-                            <AskAiButton
-                              label={copy.explain}
-                              question={
-                                locale === "en"
-                                  ? `Explain ${r.gene} ${r.snpId} genotype ${r.genotype} from my DNA panel in plain language`
-                                  : `Paaiškink ${r.gene} ${r.snpId} genotipą ${r.genotype} pagal mano DNR panelę paprasta kalba`
-                              }
-                            />
-                          ) : null}
-                        </td>
-                      </tr>
-                    ))}
+                    {rows.map((r) => {
+                      const href = dnaSnpDetailHref(
+                        r.snpId,
+                        r.primaryCategoryEn,
+                        panel.sex
+                      );
+                      return (
+                        <tr key={r.snpId}>
+                          <td>
+                            <Link href={href} className="dna-gene-link">
+                              <b>{r.gene}</b>
+                            </Link>
+                            <div className="xs muted">
+                              {dnaCategoryLabel(r.primaryCategoryEn, locale)}
+                            </div>
+                          </td>
+                          <td className="mono">
+                            <Link href={href} className="dna-gene-link">
+                              {r.snpId}
+                            </Link>
+                          </td>
+                          <td>
+                            <GenotypeCell row={r} />
+                          </td>
+                          <td>
+                            <AlleleDots count={r.matchCount} />
+                          </td>
+                          <td>
+                            <span
+                              className={`pill plain ${pillClassFor(r.colour)}`}
+                            >
+                              {colourTitle(r.colour, locale)}
+                            </span>
+                            <div className="xs muted">
+                              {impactLabel(r.impact, locale)}
+                            </div>
+                          </td>
+                          <td className="small hide-mob dna-meaning">
+                            {locale === "en" ? r.infoEn : r.infoLt}
+                          </td>
+                          <td>
+                            <div
+                              className="row"
+                              style={{ gap: 6, flexWrap: "wrap" }}
+                            >
+                              <Link href={href} className="btn ghost sm">
+                                {copy.open}
+                              </Link>
+                              {r.matchCount != null ? (
+                                <AskAiButton
+                                  label={copy.explain}
+                                  question={
+                                    locale === "en"
+                                      ? `Explain ${r.gene} ${r.snpId} genotype ${r.genotype} from my DNA panel in plain language`
+                                      : `Paaiškink ${r.gene} ${r.snpId} genotipą ${r.genotype} pagal mano DNR panelę paprasta kalba`
+                                  }
+                                />
+                              ) : null}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </Fragment>
                 ))}
               </tbody>

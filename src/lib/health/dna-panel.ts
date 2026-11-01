@@ -70,3 +70,32 @@ export function dnaCategoryLabel(primaryEn: string, locale: "lt" | "en") {
 export function dnaGroupLabel(group: 1 | 2 | 3 | 4 | 5, locale: "lt" | "en") {
   return locale === "en" ? CORE_SNP_GROUPS[group].en : CORE_SNP_GROUPS[group].lt;
 }
+
+const PRIMARY_TO_CAT: Record<string, string> = {
+  "Cardiovascular Health": "cardiovascular",
+  "Metabolic Health": "metabolic",
+  "Immune & Inflammation": "immune",
+  "Drug Metabolism": "pharmacogenetics",
+  "Hormonal Health": "hormones_men",
+  "Lifestyle & Behavior": "mental",
+  "Renal Health": "metabolic",
+};
+
+export function dnaPrimaryToCategoryId(
+  primaryEn: string,
+  sex: "male" | "female" = "male"
+) {
+  if (primaryEn === "Hormonal Health") {
+    return sex === "female" ? "hormones_women" : "hormones_men";
+  }
+  return PRIMARY_TO_CAT[primaryEn] || "cardiovascular";
+}
+
+export function dnaSnpDetailHref(
+  snpId: string,
+  primaryEn: string,
+  sex: "male" | "female" = "male"
+) {
+  const cat = dnaPrimaryToCategoryId(primaryEn, sex);
+  return `/patient/dna/${encodeURIComponent(snpId)}?cat=${encodeURIComponent(cat)}`;
+}

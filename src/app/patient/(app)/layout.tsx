@@ -9,6 +9,8 @@ import {
   AiToggleButton,
 } from "@/components/patient/patient-shell";
 import { TopbarCrumb } from "@/components/patient/topbar-crumb";
+import { GlobalSearch } from "@/components/patient/global-search";
+import { TopbarActions } from "@/components/patient/topbar-actions";
 
 export default async function PatientLayout({
   children,
@@ -50,7 +52,14 @@ export default async function PatientLayout({
           <header className="topbar">
             <TopbarCrumb labels={labels} />
             <div className="sp" />
+            <GlobalSearch
+              locale={locale}
+              placeholder={labels.globalSearchPlaceholder}
+              emptyLabel={labels.globalSearchEmpty}
+              searchingLabel={labels.globalSearchSearching}
+            />
             <LocaleSwitch locale={locale} />
+            <TopbarActions locale={locale} />
             <AiToggleButton label={labels.askAi} />
           </header>
           <div className="page">{children}</div>

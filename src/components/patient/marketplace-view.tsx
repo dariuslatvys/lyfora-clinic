@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   MARKET_CATEGORIES,
   MARKETPLACE_ITEMS,
@@ -9,8 +10,11 @@ import {
   type MarketItem,
   type MarketKind,
 } from "@/lib/marketplace/catalog";
-
-type CartLine = { item: MarketItem; qty: number };
+import {
+  hydrateCart,
+  persistCartLines,
+  type CartLine,
+} from "@/lib/marketplace/cart-storage";
 
 function itemHasDetail(it: MarketItem) {
   return (
@@ -27,12 +31,36 @@ function itemHasDetail(it: MarketItem) {
 }
 
 export function MarketplaceView({ locale }: { locale: "lt" | "en" }) {
+  const searchParams = useSearchParams();
   const [category, setCategory] = useState<MarketCategory>("labs");
   const [kind, setKind] = useState<"all" | MarketKind>("package");
   const [q, setQ] = useState("");
   const [cart, setCart] = useState<CartLine[]>([]);
   const [flash, setFlash] = useState<string | null>(null);
   const [detailId, setDetailId] = useState<string | null>(null);
+  const [cartReady, setCartReady] = useState(false);
+
+  useEffect(() => {
+    setCart(hydrateCart());
+    setCartReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!cartReady) return;
+    persistCartLines(cart);
+  }, [cart, cartReady]);
+
+  useEffect(() => {
+    if (searchParams.get("cart") === "1" && typeof window !== "undefined") {
+      window.requestAnimationFrame(() => {
+        document
+          .querySelector(".market-cart")
+          ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+    const itemId = searchParams.get("item");
+    if (itemId) setDetailId(itemId);
+  }, [searchParams]);
 
   const copy = useMemo(
     () =>
@@ -185,6 +213,7 @@ export function MarketplaceView({ locale }: { locale: "lt" | "en" }) {
     setCart([]);
     setFlash(copy.ordered);
   }
+
 
   function openDetail(it: MarketItem) {
     if (!itemHasDetail(it)) return;

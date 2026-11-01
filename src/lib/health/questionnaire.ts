@@ -190,6 +190,12 @@ export const FIELD_LABEL_LT: Record<string, string> = {
   "HRV (30-Day Average)": "HRV (30 d. vidurkis)",
   "VO₂max": "VO₂ max",
   "How would you rate your overall health?": "Kaip vertinate bendrą sveikatą?",
+  "Are you currently taking any prescription medications?":
+    "Ar šiuo metu vartojate receptinius vaistus?",
+  "Current Medications": "Vartojami vaistai",
+  "Are you currently taking any supplements?":
+    "Ar šiuo metu vartojate maisto papildus?",
+  Supplements: "Papildai",
 };
 
 export const OPTION_LABEL_LT: Record<string, string> = {

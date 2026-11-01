@@ -17,6 +17,7 @@ import {
   completionStats,
   biologicalSex,
 } from "@/lib/health/questionnaire";
+import { MedicationPicker } from "@/components/patient/medication-picker";
 
 type Mode = "edit" | "view";
 
@@ -479,12 +480,22 @@ function FieldRenderer({
       ) : null}
 
       {field.type === "tags" ? (
-        <TagsInput
-          disabled={readOnly}
-          value={Array.isArray(value) ? (value as string[]) : []}
-          locale={locale}
-          onChange={(next) => onChange(field.id, next)}
-        />
+        field.label === "Current Medications" ||
+        field.listRef === "Vaistų paieška" ? (
+          <MedicationPicker
+            disabled={readOnly}
+            value={Array.isArray(value) ? (value as string[]) : []}
+            locale={locale}
+            onChange={(next) => onChange(field.id, next)}
+          />
+        ) : (
+          <TagsInput
+            disabled={readOnly}
+            value={Array.isArray(value) ? (value as string[]) : []}
+            locale={locale}
+            onChange={(next) => onChange(field.id, next)}
+          />
+        )
       ) : null}
 
       {field.type === "multiselect" ? (

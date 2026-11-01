@@ -1,0 +1,3873 @@
+{
+  "version": 1,
+  "source": "Medication_Classifier.xlsx",
+  "categories": [
+    {
+      "categoryName": "Blood pressure & heart",
+      "lyforaCategory": "Cardiovascular",
+      "helperText": "Also anything you take for a fast or irregular heartbeat, chest pain, or after a heart attack",
+      "searchKeywords": [
+        "blood pressure",
+        "high blood pressure",
+        "hypertension",
+        "heart",
+        "heart failure",
+        "irregular heartbeat",
+        "arrhythmia",
+        "angina",
+        "chest pain",
+        "after heart attack",
+        "pulse",
+        "kraujospūdis",
+        "aukštas kraujospūdis",
+        "hipertenzija",
+        "širdis",
+        "širdies ritmas",
+        "aritmija",
+        "pulsas",
+        "krūtinės skausmas",
+        "širdies nepakankamumas"
+      ]
+    },
+    {
+      "categoryName": "Cholesterol",
+      "lyforaCategory": "Cardiovascular",
+      "helperText": "Medication to lower fats in your blood. Usually one tablet in the evening",
+      "searchKeywords": [
+        "cholesterol",
+        "high cholesterol",
+        "lipids",
+        "triglycerides",
+        "statin",
+        "LDL",
+        "cholesterolis",
+        "riebalai kraujyje",
+        "trigliceridai",
+        "statinai",
+        "MTL"
+      ]
+    },
+    {
+      "categoryName": "Low-dose aspirin",
+      "lyforaCategory": "Cardiovascular",
+      "helperText": "75–100 mg taken every day to prevent blood clots. Not the one you take for a headache",
+      "searchKeywords": [
+        "aspirin",
+        "low-dose aspirin",
+        "blood clot",
+        "clot prevention",
+        "cardio aspirin",
+        "aspirinas",
+        "kraujo krešuliai",
+        "krešėjimas",
+        "kraujo skystinimas"
+      ]
+    },
+    {
+      "categoryName": "Blood thinners",
+      "lyforaCategory": "Cardiovascular",
+      "helperText": "Usually come with regular blood tests or a patient alert card",
+      "searchKeywords": [
+        "blood thinner",
+        "anticoagulant",
+        "atrial fibrillation",
+        "thrombosis",
+        "stroke prevention",
+        "INR",
+        "kraujo skiediklis",
+        "trombozė",
+        "prieširdžių virpėjimas",
+        "insulto prevencija"
+      ]
+    },
+    {
+      "categoryName": "Diabetes — tablets",
+      "lyforaCategory": "Metabolic",
+      "helperText": "Tablets to lower blood sugar",
+      "searchKeywords": [
+        "diabetes",
+        "type 2 diabetes",
+        "blood sugar",
+        "glucose",
+        "HbA1c",
+        "diabetas",
+        "cukrinis diabetas",
+        "cukrus kraujyje",
+        "gliukozė",
+        "antrojo tipo diabetas"
+      ]
+    },
+    {
+      "categoryName": "Diabetes — insulin",
+      "lyforaCategory": "Metabolic",
+      "helperText": "Any insulin you inject",
+      "searchKeywords": [
+        "insulin",
+        "type 1 diabetes",
+        "injection",
+        "insulinas",
+        "diabetas",
+        "pirmojo tipo diabetas",
+        "injekcijos"
+      ]
+    },
+    {
+      "categoryName": "Injections for diabetes or weight",
+      "lyforaCategory": "Metabolic",
+      "helperText": "Usually once a week or once a day, in a pen",
+      "searchKeywords": [
+        "weight",
+        "weight loss",
+        "obesity",
+        "weight injection",
+        "GLP-1",
+        "semaglutide",
+        "svoris",
+        "svorio metimas",
+        "nutukimas",
+        "injekcijos svoriui",
+        "antsvoris"
+      ]
+    },
+    {
+      "categoryName": "Gout",
+      "lyforaCategory": "Metabolic",
+      "helperText": "For painful, swollen joints caused by high uric acid, most often the big toe. Taken every day to prevent attacks, not only when the joint hurts",
+      "searchKeywords": [
+        "gout",
+        "uric acid",
+        "joint pain",
+        "big toe",
+        "podagra",
+        "šlapimo rūgštis",
+        "sąnarių skausmas",
+        "nykščio skausmas"
+      ]
+    },
+    {
+      "categoryName": "Thyroid",
+      "lyforaCategory": "Hormonal",
+      "helperText": "For an underactive or overactive thyroid gland. Usually one tablet every morning before breakfast, with regular blood tests",
+      "searchKeywords": [
+        "thyroid",
+        "hypothyroidism",
+        "hyperthyroidism",
+        "TSH",
+        "skydliaukė",
+        "skydliaukės hormonai",
+        "TTH",
+        "hipotirozė",
+        "hipertirozė"
+      ]
+    },
+    {
+      "categoryName": "Hormonal contraception",
+      "lyforaCategory": "Hormonal",
+      "helperText": "The pill, patch, ring, implant or hormonal coil",
+      "searchKeywords": [
+        "contraception",
+        "birth control",
+        "the pill",
+        "coil",
+        "IUD",
+        "implant",
+        "kontracepcija",
+        "tabletės nuo nėštumo",
+        "spiralė",
+        "kontraceptikai",
+        "hormoninė spiralė"
+      ]
+    },
+    {
+      "categoryName": "Hormone replacement therapy",
+      "lyforaCategory": "Hormonal",
+      "helperText": "Hormones for menopause symptoms such as hot flushes — tablets, patches, gels or sprays",
+      "searchKeywords": [
+        "menopause",
+        "hot flushes",
+        "hormone replacement",
+        "HRT",
+        "estrogen",
+        "menopauzė",
+        "karščio bangos",
+        "pakaitinė hormonų terapija",
+        "estrogenai",
+        "klimaksas"
+      ]
+    },
+    {
+      "categoryName": "Testosterone & male hormones",
+      "lyforaCategory": "Hormonal",
+      "helperText": "Gel, patch or injection",
+      "searchKeywords": [
+        "testosterone",
+        "low testosterone",
+        "male hormones",
+        "testosteronas",
+        "vyriški hormonai",
+        "androgenai"
+      ]
+    },
+    {
+      "categoryName": "Steroid tablets",
+      "lyforaCategory": "Immune and Inflammation",
+      "helperText": "Taken by mouth for inflammation or flare-ups. Not inhalers or skin creams",
+      "searchKeywords": [
+        "steroids",
+        "corticosteroids",
+        "prednisolone",
+        "inflammation",
+        "flare-up",
+        "steroidai",
+        "uždegimas",
+        "hormoniniai vaistai",
+        "kortikosteroidai"
+      ]
+    },
+    {
+      "categoryName": "Antidepressants & anti-anxiety",
+      "lyforaCategory": "Mental and Cognitive",
+      "helperText": "Medication for low mood, depression, anxiety or panic",
+      "searchKeywords": [
+        "depression",
+        "anxiety",
+        "antidepressant",
+        "panic",
+        "mood",
+        "stress",
+        "depresija",
+        "nerimas",
+        "antidepresantai",
+        "nuotaika",
+        "panikos priepuoliai",
+        "stresas",
+        "bloga savijauta"
+      ]
+    },
+    {
+      "categoryName": "Sleeping tablets & sedatives",
+      "lyforaCategory": "Mental and Cognitive",
+      "helperText": "Medication to help you sleep or to calm you down",
+      "searchKeywords": [
+        "sleep",
+        "sleep quality",
+        "insomnia",
+        "cannot sleep",
+        "waking at night",
+        "sleeping pills",
+        "sedative",
+        "calming",
+        "miegas",
+        "miego kokybė",
+        "nemiga",
+        "negaliu užmigti",
+        "migdomieji",
+        "raminamieji",
+        "prastas miegas",
+        "naktinis budrumas"
+      ]
+    },
+    {
+      "categoryName": "Epilepsy",
+      "lyforaCategory": "Mental and Cognitive",
+      "helperText": "Medication to prevent seizures",
+      "searchKeywords": [
+        "epilepsy",
+        "seizures",
+        "fits",
+        "nerve pain",
+        "neuropathy",
+        "epilepsija",
+        "priepuoliai",
+        "traukuliai",
+        "nervinis skausmas",
+        "neuropatija"
+      ]
+    },
+    {
+      "categoryName": "ADHD",
+      "lyforaCategory": "Mental and Cognitive",
+      "helperText": "Medication for attention and concentration",
+      "searchKeywords": [
+        "ADHD",
+        "attention",
+        "concentration",
+        "focus",
+        "hyperactivity",
+        "dėmesys",
+        "susikaupimas",
+        "aktyvumo ir dėmesio sutrikimas",
+        "hiperaktyvumas"
+      ]
+    },
+    {
+      "categoryName": "Heartburn & stomach acid",
+      "lyforaCategory": "Nutrient and Drug Metabolism",
+      "helperText": "Taken most days, not only now and then",
+      "searchKeywords": [
+        "heartburn",
+        "reflux",
+        "stomach acid",
+        "gastritis",
+        "ulcer",
+        "stomach",
+        "rėmuo",
+        "refliuksas",
+        "skrandžio rūgštingumas",
+        "gastritas",
+        "opa",
+        "skrandis",
+        "rūgštingumas"
+      ]
+    },
+    {
+      "categoryName": "Regular painkillers & anti-inflammatories",
+      "lyforaCategory": "Physical and Functional",
+      "helperText": "Only tick this if you take them most weeks",
+      "searchKeywords": [
+        "pain",
+        "painkillers",
+        "anti-inflammatory",
+        "joint pain",
+        "back pain",
+        "muscle pain",
+        "skausmas",
+        "skausmą malšinantys",
+        "uždegimas",
+        "sąnarių skausmas",
+        "nugaros skausmas",
+        "raumenų skausmas"
+      ]
+    },
+    {
+      "categoryName": "Asthma & lung inhalers",
+      "lyforaCategory": "Immune and Inflammation",
+      "helperText": "Something you breathe in",
+      "searchKeywords": [
+        "asthma",
+        "COPD",
+        "inhaler",
+        "breathing",
+        "wheezing",
+        "shortness of breath",
+        "astma",
+        "inhaliatorius",
+        "kvėpavimas",
+        "dusulys",
+        "LOPL",
+        "švokštimas"
+      ]
+    },
+    {
+      "categoryName": "Allergy tablets",
+      "lyforaCategory": "Immune and Inflammation",
+      "helperText": "For hay fever, a runny nose or itching",
+      "searchKeywords": [
+        "allergy",
+        "hay fever",
+        "runny nose",
+        "itching",
+        "antihistamine",
+        "rash",
+        "alergija",
+        "šienligė",
+        "sloga",
+        "niežulys",
+        "antihistamininiai",
+        "bėrimas"
+      ]
+    },
+    {
+      "categoryName": "Immune-suppressing medication",
+      "lyforaCategory": "Immune and Inflammation",
+      "helperText": "Usually long-term for rheumatoid arthritis, psoriasis, or bowel disease such as Crohn's or ulcerative colitis, often as an injection",
+      "searchKeywords": [
+        "immune suppressing",
+        "immunosuppressant",
+        "biologics",
+        "rheumatoid arthritis",
+        "psoriasis",
+        "Crohn",
+        "ulcerative colitis",
+        "autoimmune",
+        "imunitetą slopinantys",
+        "reumatoidinis artritas",
+        "psoriazė",
+        "Krono liga",
+        "opinis kolitas",
+        "autoimuninė liga",
+        "biologiniai vaistai"
+      ]
+    },
+    {
+      "categoryName": "Antibiotics or antivirals right now",
+      "lyforaCategory": "Immune and Inflammation",
+      "helperText": "A short course you're in the middle of",
+      "searchKeywords": [
+        "antibiotic",
+        "antiviral",
+        "infection",
+        "current course",
+        "antibiotikai",
+        "antivirusiniai",
+        "infekcija",
+        "uždegimas",
+        "kursas"
+      ]
+    },
+    {
+      "categoryName": "Cancer treatment",
+      "lyforaCategory": "Immune and Inflammation",
+      "helperText": "Chemotherapy, immunotherapy, or hormone therapy",
+      "searchKeywords": [
+        "cancer",
+        "chemotherapy",
+        "immunotherapy",
+        "hormone therapy",
+        "oncology",
+        "tumour",
+        "vėžys",
+        "chemoterapija",
+        "imunoterapija",
+        "onkologija",
+        "navikas",
+        "hormonų terapija"
+      ]
+    },
+    {
+      "categoryName": "Something else",
+      "lyforaCategory": null,
+      "helperText": "Free text if none of the categories fit",
+      "searchKeywords": [
+        "other",
+        "something else",
+        "kita",
+        "nežinau"
+      ]
+    }
+  ],
+  "drugs": [
+    {
+      "brandName": "Concor",
+      "activeSubstance": "Bisoprolol",
+      "atcCode": "C07AB07",
+      "form": "Tablets",
+      "categoryName": "Blood pressure & heart",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "concor",
+        "bisoprolol"
+      ]
+    },
+    {
+      "brandName": "Betaloc",
+      "activeSubstance": "Metoprolol",
+      "atcCode": "C07AB02",
+      "form": "Tablets",
+      "categoryName": "Blood pressure & heart",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "betaloc",
+        "metoprolol"
+      ]
+    },
+    {
+      "brandName": "Betaloc ZOK",
+      "activeSubstance": "Metoprolol",
+      "atcCode": "C07AB02",
+      "form": "Tablets",
+      "categoryName": "Blood pressure & heart",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "betaloc zok",
+        "metoprolol"
+      ]
+    },
+    {
+      "brandName": "Nebilet",
+      "activeSubstance": "Nebivolol",
+      "atcCode": "C07AB12",
+      "form": "Tablets",
+      "categoryName": "Blood pressure & heart",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "nebilet",
+        "nebivolol"
+      ]
+    },
+    {
+      "brandName": "Coryol",
+      "activeSubstance": "Carvedilol",
+      "atcCode": "C07AG02",
+      "form": "Tablets",
+      "categoryName": "Blood pressure & heart",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "coryol",
+        "carvedilol"
+      ]
+    },
+    {
+      "brandName": "Norvasc",
+      "activeSubstance": "Amlodipine",
+      "atcCode": "C08CA01",
+      "form": "Tablets",
+      "categoryName": "Blood pressure & heart",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "norvasc",
+        "amlodipine"
+      ]
+    },
+    {
+      "brandName": "Prestarium",
+      "activeSubstance": "Perindopril",
+      "atcCode": "C09AA04",
+      "form": "Tablets",
+      "categoryName": "Blood pressure & heart",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "prestarium",
+        "perindopril"
+      ]
+    },
+    {
+      "brandName": "Co-Prestarium",
+      "activeSubstance": "Perindopril + amlodipine",
+      "atcCode": "C09BB04",
+      "form": "Tablets",
+      "categoryName": "Blood pressure & heart",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "co-prestarium",
+        "perindopril + amlodipine",
+        "perindopril",
+        "amlodipine"
+      ]
+    },
+    {
+      "brandName": "Amlessa",
+      "activeSubstance": "Perindopril + amlodipine",
+      "atcCode": "C09BB04",
+      "form": "Tablets",
+      "categoryName": "Blood pressure & heart",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "amlessa",
+        "perindopril + amlodipine",
+        "perindopril",
+        "amlodipine"
+      ]
+    },
+    {
+      "brandName": "Noliprel",
+      "activeSubstance": "Perindopril + indapamide",
+      "atcCode": "C09BA04",
+      "form": "Tablets",
+      "categoryName": "Blood pressure & heart",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "noliprel",
+        "perindopril + indapamide",
+        "perindopril",
+        "indapamide"
+      ]
+    },
+    {
+      "brandName": "Triplixam",
+      "activeSubstance": "Perindopril + indapamide + amlodipine",
+      "atcCode": "C09BX01",
+      "form": "Tablets",
+      "categoryName": "Blood pressure & heart",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "triplixam",
+        "perindopril + indapamide + amlodipine",
+        "perindopril",
+        "indapamide",
+        "amlodipine"
+      ]
+    },
+    {
+      "brandName": "Egiramlon",
+      "activeSubstance": "Ramipril + amlodipine",
+      "atcCode": "C09BB07",
+      "form": "Capsules",
+      "categoryName": "Blood pressure & heart",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "egiramlon",
+        "ramipril + amlodipine",
+        "ramipril",
+        "amlodipine"
+      ]
+    },
+    {
+      "brandName": "Tritace",
+      "activeSubstance": "Ramipril",
+      "atcCode": "C09AA05",
+      "form": "Tablets",
+      "categoryName": "Blood pressure & heart",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "tritace",
+        "ramipril"
+      ]
+    },
+    {
+      "brandName": "Ramipril",
+      "activeSubstance": "Ramipril",
+      "atcCode": "C09AA05",
+      "form": "Tablets",
+      "categoryName": "Blood pressure & heart",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "ramipril",
+        "ramipril"
+      ]
+    },
+    {
+      "brandName": "Enap",
+      "activeSubstance": "Enalapril",
+      "atcCode": "C09AA02",
+      "form": "Tablets",
+      "categoryName": "Blood pressure & heart",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "enap",
+        "enalapril"
+      ]
+    },
+    {
+      "brandName": "Diroton",
+      "activeSubstance": "Lisinopril",
+      "atcCode": "C09AA03",
+      "form": "Tablets",
+      "categoryName": "Blood pressure & heart",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "diroton",
+        "lisinopril"
+      ]
+    },
+    {
+      "brandName": "Lorista",
+      "activeSubstance": "Losartan",
+      "atcCode": "C09CA01",
+      "form": "Tablets",
+      "categoryName": "Blood pressure & heart",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "lorista",
+        "losartan"
+      ]
+    },
+    {
+      "brandName": "Valsacor",
+      "activeSubstance": "Valsartan",
+      "atcCode": "C09CA03",
+      "form": "Tablets",
+      "categoryName": "Blood pressure & heart",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "valsacor",
+        "valsartan"
+      ]
+    },
+    {
+      "brandName": "Tezeo",
+      "activeSubstance": "Telmisartan",
+      "atcCode": "C09CA07",
+      "form": "Tablets",
+      "categoryName": "Blood pressure & heart",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "tezeo",
+        "telmisartan"
+      ]
+    },
+    {
+      "brandName": "Indap",
+      "activeSubstance": "Indapamide",
+      "atcCode": "C03BA11",
+      "form": "Capsules",
+      "categoryName": "Blood pressure & heart",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "indap",
+        "indapamide"
+      ]
+    },
+    {
+      "brandName": "Verospiron",
+      "activeSubstance": "Spironolactone",
+      "atcCode": "C03DA01",
+      "form": "Tablets",
+      "categoryName": "Blood pressure & heart",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "verospiron",
+        "spironolactone"
+      ]
+    },
+    {
+      "brandName": "Furosemide",
+      "activeSubstance": "Furosemide",
+      "atcCode": "C03CA01",
+      "form": "Tablets",
+      "categoryName": "Blood pressure & heart",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "furosemide",
+        "furosemide"
+      ]
+    },
+    {
+      "brandName": "Furon",
+      "activeSubstance": "Furosemide",
+      "atcCode": "C03CA01",
+      "form": "Tablets",
+      "categoryName": "Blood pressure & heart",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "furon",
+        "furosemide"
+      ]
+    },
+    {
+      "brandName": "Cardura",
+      "activeSubstance": "Doxazosin",
+      "atcCode": "C02CA04",
+      "form": "Tablets",
+      "categoryName": "Blood pressure & heart",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "cardura",
+        "doxazosin"
+      ]
+    },
+    {
+      "brandName": "Physiotens",
+      "activeSubstance": "Moxonidine",
+      "atcCode": "C02AC05",
+      "form": "Tablets",
+      "categoryName": "Blood pressure & heart",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "physiotens",
+        "moxonidine"
+      ]
+    },
+    {
+      "brandName": "Digoxin",
+      "activeSubstance": "Digoxin",
+      "atcCode": "C01AA05",
+      "form": "Tablets",
+      "categoryName": "Blood pressure & heart",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "digoxin",
+        "digoxin"
+      ]
+    },
+    {
+      "brandName": "Cordarone",
+      "activeSubstance": "Amiodarone",
+      "atcCode": "C01BD01",
+      "form": "Tablets",
+      "categoryName": "Blood pressure & heart",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "cordarone",
+        "amiodarone"
+      ]
+    },
+    {
+      "brandName": "Amiodarone",
+      "activeSubstance": "Amiodarone",
+      "atcCode": "C01BD01",
+      "form": "Tablets",
+      "categoryName": "Blood pressure & heart",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "amiodarone",
+        "amiodarone"
+      ]
+    },
+    {
+      "brandName": "Propanorm",
+      "activeSubstance": "Propafenone",
+      "atcCode": "C01BC03",
+      "form": "Tablets",
+      "categoryName": "Blood pressure & heart",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "propanorm",
+        "propafenone"
+      ]
+    },
+    {
+      "brandName": "Procoralan",
+      "activeSubstance": "Ivabradine",
+      "atcCode": "C01EB17",
+      "form": "Tablets",
+      "categoryName": "Blood pressure & heart",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "procoralan",
+        "ivabradine"
+      ]
+    },
+    {
+      "brandName": "Isoket",
+      "activeSubstance": "Isosorbide / glyceryl nitrate",
+      "atcCode": "C01DA",
+      "form": "Tablets, spray",
+      "categoryName": "Blood pressure & heart",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "isoket",
+        "isosorbide / glyceryl nitrate"
+      ]
+    },
+    {
+      "brandName": "Nitroglycerin",
+      "activeSubstance": "Isosorbide / glyceryl nitrate",
+      "atcCode": "C01DA",
+      "form": "Tablets, spray",
+      "categoryName": "Blood pressure & heart",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "nitroglycerin",
+        "isosorbide / glyceryl nitrate"
+      ]
+    },
+    {
+      "brandName": "Atoris",
+      "activeSubstance": "Atorvastatin",
+      "atcCode": "C10AA05",
+      "form": "Tablets",
+      "categoryName": "Cholesterol",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "atoris",
+        "atorvastatin"
+      ]
+    },
+    {
+      "brandName": "Sortis",
+      "activeSubstance": "Atorvastatin",
+      "atcCode": "C10AA05",
+      "form": "Tablets",
+      "categoryName": "Cholesterol",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "sortis",
+        "atorvastatin"
+      ]
+    },
+    {
+      "brandName": "Torvacard",
+      "activeSubstance": "Atorvastatin",
+      "atcCode": "C10AA05",
+      "form": "Tablets",
+      "categoryName": "Cholesterol",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "torvacard",
+        "atorvastatin"
+      ]
+    },
+    {
+      "brandName": "Roswera",
+      "activeSubstance": "Rosuvastatin",
+      "atcCode": "C10AA07",
+      "form": "Tablets",
+      "categoryName": "Cholesterol",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "roswera",
+        "rosuvastatin"
+      ]
+    },
+    {
+      "brandName": "Crestor",
+      "activeSubstance": "Rosuvastatin",
+      "atcCode": "C10AA07",
+      "form": "Tablets",
+      "categoryName": "Cholesterol",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "crestor",
+        "rosuvastatin"
+      ]
+    },
+    {
+      "brandName": "Rosulip",
+      "activeSubstance": "Rosuvastatin",
+      "atcCode": "C10AA07",
+      "form": "Capsules",
+      "categoryName": "Cholesterol",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "rosulip",
+        "rosuvastatin"
+      ]
+    },
+    {
+      "brandName": "Zocor",
+      "activeSubstance": "Simvastatin",
+      "atcCode": "C10AA01",
+      "form": "Tablets",
+      "categoryName": "Cholesterol",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "zocor",
+        "simvastatin"
+      ]
+    },
+    {
+      "brandName": "Simvacor",
+      "activeSubstance": "Simvastatin",
+      "atcCode": "C10AA01",
+      "form": "Tablets",
+      "categoryName": "Cholesterol",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "simvacor",
+        "simvastatin"
+      ]
+    },
+    {
+      "brandName": "Ezetrol",
+      "activeSubstance": "Ezetimibe",
+      "atcCode": "C10AX09",
+      "form": "Tablets",
+      "categoryName": "Cholesterol",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "ezetrol",
+        "ezetimibe"
+      ]
+    },
+    {
+      "brandName": "Atozet",
+      "activeSubstance": "Atorvastatin + ezetimibe",
+      "atcCode": "C10BA05",
+      "form": "Tablets",
+      "categoryName": "Cholesterol",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "atozet",
+        "atorvastatin + ezetimibe",
+        "atorvastatin",
+        "ezetimibe"
+      ]
+    },
+    {
+      "brandName": "Rosulip Plus",
+      "activeSubstance": "Rosuvastatin + ezetimibe",
+      "atcCode": "C10BA06",
+      "form": "Capsules",
+      "categoryName": "Cholesterol",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "rosulip plus",
+        "rosuvastatin + ezetimibe",
+        "rosuvastatin",
+        "ezetimibe"
+      ]
+    },
+    {
+      "brandName": "Lipanthyl",
+      "activeSubstance": "Fenofibrate",
+      "atcCode": "C10AB05",
+      "form": "Capsules",
+      "categoryName": "Cholesterol",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "lipanthyl",
+        "fenofibrate"
+      ]
+    },
+    {
+      "brandName": "Repatha",
+      "activeSubstance": "Evolocumab",
+      "atcCode": "C10AX13",
+      "form": "Pen injector",
+      "categoryName": "Cholesterol",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "repatha",
+        "evolocumab"
+      ]
+    },
+    {
+      "brandName": "Praluent",
+      "activeSubstance": "Alirocumab",
+      "atcCode": "C10AX14",
+      "form": "Pen injector",
+      "categoryName": "Cholesterol",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "praluent",
+        "alirocumab"
+      ]
+    },
+    {
+      "brandName": "Aspirin Cardio",
+      "activeSubstance": "Acetylsalicylic acid",
+      "atcCode": "B01AC06",
+      "form": "Tablets",
+      "categoryName": "Low-dose aspirin",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "aspirin cardio",
+        "acetylsalicylic acid"
+      ]
+    },
+    {
+      "brandName": "Thrombo ASS",
+      "activeSubstance": "Acetylsalicylic acid",
+      "atcCode": "B01AC06",
+      "form": "Tablets",
+      "categoryName": "Low-dose aspirin",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "thrombo ass",
+        "acetylsalicylic acid"
+      ]
+    },
+    {
+      "brandName": "Polocard",
+      "activeSubstance": "Acetylsalicylic acid",
+      "atcCode": "B01AC06",
+      "form": "Tablets",
+      "categoryName": "Low-dose aspirin",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "polocard",
+        "acetylsalicylic acid"
+      ]
+    },
+    {
+      "brandName": "Godasal",
+      "activeSubstance": "Acetylsalicylic acid",
+      "atcCode": "B01AC06",
+      "form": "Tablets",
+      "categoryName": "Low-dose aspirin",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "godasal",
+        "acetylsalicylic acid"
+      ]
+    },
+    {
+      "brandName": "Eliquis",
+      "activeSubstance": "Apixaban",
+      "atcCode": "B01AF02",
+      "form": "Tablets",
+      "categoryName": "Blood thinners",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "eliquis",
+        "apixaban"
+      ]
+    },
+    {
+      "brandName": "Xarelto",
+      "activeSubstance": "Rivaroxaban",
+      "atcCode": "B01AF01",
+      "form": "Tablets",
+      "categoryName": "Blood thinners",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "xarelto",
+        "rivaroxaban"
+      ]
+    },
+    {
+      "brandName": "Lixiana",
+      "activeSubstance": "Edoxaban",
+      "atcCode": "B01AF03",
+      "form": "Tablets",
+      "categoryName": "Blood thinners",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "lixiana",
+        "edoxaban"
+      ]
+    },
+    {
+      "brandName": "Pradaxa",
+      "activeSubstance": "Dabigatran",
+      "atcCode": "B01AE07",
+      "form": "Capsules",
+      "categoryName": "Blood thinners",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "pradaxa",
+        "dabigatran"
+      ]
+    },
+    {
+      "brandName": "Orfarin",
+      "activeSubstance": "Warfarin",
+      "atcCode": "B01AA03",
+      "form": "Tablets",
+      "categoryName": "Blood thinners",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "orfarin",
+        "warfarin"
+      ]
+    },
+    {
+      "brandName": "Warfarin",
+      "activeSubstance": "Warfarin",
+      "atcCode": "B01AA03",
+      "form": "Tablets",
+      "categoryName": "Blood thinners",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "warfarin",
+        "warfarin"
+      ]
+    },
+    {
+      "brandName": "Plavix",
+      "activeSubstance": "Clopidogrel",
+      "atcCode": "B01AC04",
+      "form": "Tablets",
+      "categoryName": "Blood thinners",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "plavix",
+        "clopidogrel"
+      ]
+    },
+    {
+      "brandName": "Zyllt",
+      "activeSubstance": "Clopidogrel",
+      "atcCode": "B01AC04",
+      "form": "Tablets",
+      "categoryName": "Blood thinners",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "zyllt",
+        "clopidogrel"
+      ]
+    },
+    {
+      "brandName": "Egitromb",
+      "activeSubstance": "Clopidogrel",
+      "atcCode": "B01AC04",
+      "form": "Tablets",
+      "categoryName": "Blood thinners",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "egitromb",
+        "clopidogrel"
+      ]
+    },
+    {
+      "brandName": "Brilique",
+      "activeSubstance": "Ticagrelor",
+      "atcCode": "B01AC24",
+      "form": "Tablets",
+      "categoryName": "Blood thinners",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "brilique",
+        "ticagrelor"
+      ]
+    },
+    {
+      "brandName": "Efient",
+      "activeSubstance": "Prasugrel",
+      "atcCode": "B01AC22",
+      "form": "Tablets",
+      "categoryName": "Blood thinners",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "efient",
+        "prasugrel"
+      ]
+    },
+    {
+      "brandName": "Clexane",
+      "activeSubstance": "Enoxaparin",
+      "atcCode": "B01AB05",
+      "form": "Pre-filled syringe",
+      "categoryName": "Blood thinners",
+      "lyforaCategory": "Cardiovascular",
+      "searchKeywords": [
+        "clexane",
+        "enoxaparin"
+      ]
+    },
+    {
+      "brandName": "Metformin",
+      "activeSubstance": "Metformin",
+      "atcCode": "A10BA02",
+      "form": "Tablets",
+      "categoryName": "Diabetes — tablets",
+      "lyforaCategory": "Metabolic",
+      "searchKeywords": [
+        "metformin",
+        "metformin"
+      ]
+    },
+    {
+      "brandName": "Siofor",
+      "activeSubstance": "Metformin",
+      "atcCode": "A10BA02",
+      "form": "Tablets",
+      "categoryName": "Diabetes — tablets",
+      "lyforaCategory": "Metabolic",
+      "searchKeywords": [
+        "siofor",
+        "metformin"
+      ]
+    },
+    {
+      "brandName": "Glucophage",
+      "activeSubstance": "Metformin",
+      "atcCode": "A10BA02",
+      "form": "Tablets",
+      "categoryName": "Diabetes — tablets",
+      "lyforaCategory": "Metabolic",
+      "searchKeywords": [
+        "glucophage",
+        "metformin"
+      ]
+    },
+    {
+      "brandName": "Diaprel",
+      "activeSubstance": "Gliclazide",
+      "atcCode": "A10BB09",
+      "form": "Tablets",
+      "categoryName": "Diabetes — tablets",
+      "lyforaCategory": "Metabolic",
+      "searchKeywords": [
+        "diaprel",
+        "gliclazide"
+      ]
+    },
+    {
+      "brandName": "Amaryl",
+      "activeSubstance": "Glimepiride",
+      "atcCode": "A10BB12",
+      "form": "Tablets",
+      "categoryName": "Diabetes — tablets",
+      "lyforaCategory": "Metabolic",
+      "searchKeywords": [
+        "amaryl",
+        "glimepiride"
+      ]
+    },
+    {
+      "brandName": "Jardiance",
+      "activeSubstance": "Empagliflozin",
+      "atcCode": "A10BK03",
+      "form": "Tablets",
+      "categoryName": "Diabetes — tablets",
+      "lyforaCategory": "Metabolic",
+      "searchKeywords": [
+        "jardiance",
+        "empagliflozin"
+      ]
+    },
+    {
+      "brandName": "Forxiga",
+      "activeSubstance": "Dapagliflozin",
+      "atcCode": "A10BK01",
+      "form": "Tablets",
+      "categoryName": "Diabetes — tablets",
+      "lyforaCategory": "Metabolic",
+      "searchKeywords": [
+        "forxiga",
+        "dapagliflozin"
+      ]
+    },
+    {
+      "brandName": "Januvia",
+      "activeSubstance": "Sitagliptin",
+      "atcCode": "A10BH01",
+      "form": "Tablets",
+      "categoryName": "Diabetes — tablets",
+      "lyforaCategory": "Metabolic",
+      "searchKeywords": [
+        "januvia",
+        "sitagliptin"
+      ]
+    },
+    {
+      "brandName": "Trajenta",
+      "activeSubstance": "Linagliptin",
+      "atcCode": "A10BH05",
+      "form": "Tablets",
+      "categoryName": "Diabetes — tablets",
+      "lyforaCategory": "Metabolic",
+      "searchKeywords": [
+        "trajenta",
+        "linagliptin"
+      ]
+    },
+    {
+      "brandName": "Galvus",
+      "activeSubstance": "Vildagliptin",
+      "atcCode": "A10BH02",
+      "form": "Tablets",
+      "categoryName": "Diabetes — tablets",
+      "lyforaCategory": "Metabolic",
+      "searchKeywords": [
+        "galvus",
+        "vildagliptin"
+      ]
+    },
+    {
+      "brandName": "Janumet",
+      "activeSubstance": "Sitagliptin + metformin",
+      "atcCode": "A10BD07",
+      "form": "Tablets",
+      "categoryName": "Diabetes — tablets",
+      "lyforaCategory": "Metabolic",
+      "searchKeywords": [
+        "janumet",
+        "sitagliptin + metformin",
+        "sitagliptin",
+        "metformin"
+      ]
+    },
+    {
+      "brandName": "Xigduo",
+      "activeSubstance": "Dapagliflozin + metformin",
+      "atcCode": "A10BD15",
+      "form": "Tablets",
+      "categoryName": "Diabetes — tablets",
+      "lyforaCategory": "Metabolic",
+      "searchKeywords": [
+        "xigduo",
+        "dapagliflozin + metformin",
+        "dapagliflozin",
+        "metformin"
+      ]
+    },
+    {
+      "brandName": "Synjardy",
+      "activeSubstance": "Empagliflozin + metformin",
+      "atcCode": "A10BD20",
+      "form": "Tablets",
+      "categoryName": "Diabetes — tablets",
+      "lyforaCategory": "Metabolic",
+      "searchKeywords": [
+        "synjardy",
+        "empagliflozin + metformin",
+        "empagliflozin",
+        "metformin"
+      ]
+    },
+    {
+      "brandName": "Lantus",
+      "activeSubstance": "Insulin glargine",
+      "atcCode": "A10AE04",
+      "form": "Pen injector",
+      "categoryName": "Diabetes — insulin",
+      "lyforaCategory": "Metabolic",
+      "searchKeywords": [
+        "lantus",
+        "insulin glargine"
+      ]
+    },
+    {
+      "brandName": "Toujeo",
+      "activeSubstance": "Insulin glargine",
+      "atcCode": "A10AE04",
+      "form": "Pen injector",
+      "categoryName": "Diabetes — insulin",
+      "lyforaCategory": "Metabolic",
+      "searchKeywords": [
+        "toujeo",
+        "insulin glargine"
+      ]
+    },
+    {
+      "brandName": "Tresiba",
+      "activeSubstance": "Insulin degludec",
+      "atcCode": "A10AE06",
+      "form": "Pen injector",
+      "categoryName": "Diabetes — insulin",
+      "lyforaCategory": "Metabolic",
+      "searchKeywords": [
+        "tresiba",
+        "insulin degludec"
+      ]
+    },
+    {
+      "brandName": "Levemir",
+      "activeSubstance": "Insulin detemir",
+      "atcCode": "A10AE05",
+      "form": "Pen injector",
+      "categoryName": "Diabetes — insulin",
+      "lyforaCategory": "Metabolic",
+      "searchKeywords": [
+        "levemir",
+        "insulin detemir"
+      ]
+    },
+    {
+      "brandName": "Humalog",
+      "activeSubstance": "Insulin lispro",
+      "atcCode": "A10AB04",
+      "form": "Pen injector",
+      "categoryName": "Diabetes — insulin",
+      "lyforaCategory": "Metabolic",
+      "searchKeywords": [
+        "humalog",
+        "insulin lispro"
+      ]
+    },
+    {
+      "brandName": "NovoRapid",
+      "activeSubstance": "Insulin aspart",
+      "atcCode": "A10AB05",
+      "form": "Pen injector",
+      "categoryName": "Diabetes — insulin",
+      "lyforaCategory": "Metabolic",
+      "searchKeywords": [
+        "novorapid",
+        "insulin aspart"
+      ]
+    },
+    {
+      "brandName": "Apidra",
+      "activeSubstance": "Insulin glulisine",
+      "atcCode": "A10AB06",
+      "form": "Pen injector",
+      "categoryName": "Diabetes — insulin",
+      "lyforaCategory": "Metabolic",
+      "searchKeywords": [
+        "apidra",
+        "insulin glulisine"
+      ]
+    },
+    {
+      "brandName": "Humulin",
+      "activeSubstance": "Human insulin",
+      "atcCode": "A10AB01",
+      "form": "Pen injector, vial",
+      "categoryName": "Diabetes — insulin",
+      "lyforaCategory": "Metabolic",
+      "searchKeywords": [
+        "humulin",
+        "human insulin"
+      ]
+    },
+    {
+      "brandName": "NovoMix 30",
+      "activeSubstance": "Insulin aspart (biphasic)",
+      "atcCode": "A10AD05",
+      "form": "Pen injector",
+      "categoryName": "Diabetes — insulin",
+      "lyforaCategory": "Metabolic",
+      "searchKeywords": [
+        "novomix 30",
+        "insulin aspart (biphasic)"
+      ]
+    },
+    {
+      "brandName": "Ryzodeg",
+      "activeSubstance": "Insulin degludec + aspart",
+      "atcCode": "A10AD06",
+      "form": "Pen injector",
+      "categoryName": "Diabetes — insulin",
+      "lyforaCategory": "Metabolic",
+      "searchKeywords": [
+        "ryzodeg",
+        "insulin degludec + aspart",
+        "insulin degludec",
+        "aspart"
+      ]
+    },
+    {
+      "brandName": "Ozempic",
+      "activeSubstance": "Semaglutide",
+      "atcCode": "A10BJ06",
+      "form": "Pen injector",
+      "categoryName": "Injections for diabetes or weight",
+      "lyforaCategory": "Metabolic",
+      "searchKeywords": [
+        "ozempic",
+        "semaglutide"
+      ]
+    },
+    {
+      "brandName": "Wegovy",
+      "activeSubstance": "Semaglutide",
+      "atcCode": "A10BJ06",
+      "form": "Pen injector",
+      "categoryName": "Injections for diabetes or weight",
+      "lyforaCategory": "Metabolic",
+      "searchKeywords": [
+        "wegovy",
+        "semaglutide"
+      ]
+    },
+    {
+      "brandName": "Rybelsus",
+      "activeSubstance": "Semaglutide",
+      "atcCode": "A10BJ06",
+      "form": "Tablets",
+      "categoryName": "Injections for diabetes or weight",
+      "lyforaCategory": "Metabolic",
+      "searchKeywords": [
+        "rybelsus",
+        "semaglutide"
+      ]
+    },
+    {
+      "brandName": "Mounjaro",
+      "activeSubstance": "Tirzepatide",
+      "atcCode": "A10BX16",
+      "form": "Pen injector",
+      "categoryName": "Injections for diabetes or weight",
+      "lyforaCategory": "Metabolic",
+      "searchKeywords": [
+        "mounjaro",
+        "tirzepatide"
+      ]
+    },
+    {
+      "brandName": "Trulicity",
+      "activeSubstance": "Dulaglutide",
+      "atcCode": "A10BJ05",
+      "form": "Pen injector",
+      "categoryName": "Injections for diabetes or weight",
+      "lyforaCategory": "Metabolic",
+      "searchKeywords": [
+        "trulicity",
+        "dulaglutide"
+      ]
+    },
+    {
+      "brandName": "Saxenda",
+      "activeSubstance": "Liraglutide",
+      "atcCode": "A10BJ02",
+      "form": "Pen injector",
+      "categoryName": "Injections for diabetes or weight",
+      "lyforaCategory": "Metabolic",
+      "searchKeywords": [
+        "saxenda",
+        "liraglutide"
+      ]
+    },
+    {
+      "brandName": "Victoza",
+      "activeSubstance": "Liraglutide",
+      "atcCode": "A10BJ02",
+      "form": "Pen injector",
+      "categoryName": "Injections for diabetes or weight",
+      "lyforaCategory": "Metabolic",
+      "searchKeywords": [
+        "victoza",
+        "liraglutide"
+      ]
+    },
+    {
+      "brandName": "Allopurinol",
+      "activeSubstance": "Allopurinol",
+      "atcCode": "M04AA01",
+      "form": "Tablets",
+      "categoryName": "Gout",
+      "lyforaCategory": "Metabolic",
+      "searchKeywords": [
+        "allopurinol",
+        "allopurinol"
+      ]
+    },
+    {
+      "brandName": "Milurit",
+      "activeSubstance": "Allopurinol",
+      "atcCode": "M04AA01",
+      "form": "Tablets",
+      "categoryName": "Gout",
+      "lyforaCategory": "Metabolic",
+      "searchKeywords": [
+        "milurit",
+        "allopurinol"
+      ]
+    },
+    {
+      "brandName": "Adenuric",
+      "activeSubstance": "Febuxostat",
+      "atcCode": "M04AA03",
+      "form": "Tablets",
+      "categoryName": "Gout",
+      "lyforaCategory": "Metabolic",
+      "searchKeywords": [
+        "adenuric",
+        "febuxostat"
+      ]
+    },
+    {
+      "brandName": "Colchicine",
+      "activeSubstance": "Colchicine",
+      "atcCode": "M04AC01",
+      "form": "Tablets",
+      "categoryName": "Gout",
+      "lyforaCategory": "Metabolic",
+      "searchKeywords": [
+        "colchicine",
+        "colchicine"
+      ]
+    },
+    {
+      "brandName": "Euthyrox",
+      "activeSubstance": "Levothyroxine",
+      "atcCode": "H03AA01",
+      "form": "Tablets",
+      "categoryName": "Thyroid",
+      "lyforaCategory": "Hormonal",
+      "searchKeywords": [
+        "euthyrox",
+        "levothyroxine"
+      ]
+    },
+    {
+      "brandName": "L-Thyroxin",
+      "activeSubstance": "Levothyroxine",
+      "atcCode": "H03AA01",
+      "form": "Tablets",
+      "categoryName": "Thyroid",
+      "lyforaCategory": "Hormonal",
+      "searchKeywords": [
+        "l-thyroxin",
+        "levothyroxine"
+      ]
+    },
+    {
+      "brandName": "Letrox",
+      "activeSubstance": "Levothyroxine",
+      "atcCode": "H03AA01",
+      "form": "Tablets",
+      "categoryName": "Thyroid",
+      "lyforaCategory": "Hormonal",
+      "searchKeywords": [
+        "letrox",
+        "levothyroxine"
+      ]
+    },
+    {
+      "brandName": "Eltroxin",
+      "activeSubstance": "Levothyroxine",
+      "atcCode": "H03AA01",
+      "form": "Tablets",
+      "categoryName": "Thyroid",
+      "lyforaCategory": "Hormonal",
+      "searchKeywords": [
+        "eltroxin",
+        "levothyroxine"
+      ]
+    },
+    {
+      "brandName": "Thyrozol",
+      "activeSubstance": "Thiamazole",
+      "atcCode": "H03BB02",
+      "form": "Tablets",
+      "categoryName": "Thyroid",
+      "lyforaCategory": "Hormonal",
+      "searchKeywords": [
+        "thyrozol",
+        "thiamazole"
+      ]
+    },
+    {
+      "brandName": "Propycil",
+      "activeSubstance": "Propylthiouracil",
+      "atcCode": "H03BA02",
+      "form": "Tablets",
+      "categoryName": "Thyroid",
+      "lyforaCategory": "Hormonal",
+      "searchKeywords": [
+        "propycil",
+        "propylthiouracil"
+      ]
+    },
+    {
+      "brandName": "Yasmin",
+      "activeSubstance": "Drospirenone + ethinylestradiol",
+      "atcCode": "G03AA12",
+      "form": "Tablets",
+      "categoryName": "Hormonal contraception",
+      "lyforaCategory": "Hormonal",
+      "searchKeywords": [
+        "yasmin",
+        "drospirenone + ethinylestradiol",
+        "drospirenone",
+        "ethinylestradiol"
+      ]
+    },
+    {
+      "brandName": "Yaz",
+      "activeSubstance": "Drospirenone + ethinylestradiol",
+      "atcCode": "G03AA12",
+      "form": "Tablets",
+      "categoryName": "Hormonal contraception",
+      "lyforaCategory": "Hormonal",
+      "searchKeywords": [
+        "yaz",
+        "drospirenone + ethinylestradiol",
+        "drospirenone",
+        "ethinylestradiol"
+      ]
+    },
+    {
+      "brandName": "Lindynette",
+      "activeSubstance": "Gestodene + ethinylestradiol",
+      "atcCode": "G03AA10",
+      "form": "Tablets",
+      "categoryName": "Hormonal contraception",
+      "lyforaCategory": "Hormonal",
+      "searchKeywords": [
+        "lindynette",
+        "gestodene + ethinylestradiol",
+        "gestodene",
+        "ethinylestradiol"
+      ]
+    },
+    {
+      "brandName": "Logest",
+      "activeSubstance": "Gestodene + ethinylestradiol",
+      "atcCode": "G03AA10",
+      "form": "Tablets",
+      "categoryName": "Hormonal contraception",
+      "lyforaCategory": "Hormonal",
+      "searchKeywords": [
+        "logest",
+        "gestodene + ethinylestradiol",
+        "gestodene",
+        "ethinylestradiol"
+      ]
+    },
+    {
+      "brandName": "Novynette",
+      "activeSubstance": "Desogestrel + ethinylestradiol",
+      "atcCode": "G03AA09",
+      "form": "Tablets",
+      "categoryName": "Hormonal contraception",
+      "lyforaCategory": "Hormonal",
+      "searchKeywords": [
+        "novynette",
+        "desogestrel + ethinylestradiol",
+        "desogestrel",
+        "ethinylestradiol"
+      ]
+    },
+    {
+      "brandName": "Marvelon",
+      "activeSubstance": "Desogestrel + ethinylestradiol",
+      "atcCode": "G03AA09",
+      "form": "Tablets",
+      "categoryName": "Hormonal contraception",
+      "lyforaCategory": "Hormonal",
+      "searchKeywords": [
+        "marvelon",
+        "desogestrel + ethinylestradiol",
+        "desogestrel",
+        "ethinylestradiol"
+      ]
+    },
+    {
+      "brandName": "Jeanine",
+      "activeSubstance": "Dienogest + ethinylestradiol",
+      "atcCode": "G03AA16",
+      "form": "Tablets",
+      "categoryName": "Hormonal contraception",
+      "lyforaCategory": "Hormonal",
+      "searchKeywords": [
+        "jeanine",
+        "dienogest + ethinylestradiol",
+        "dienogest",
+        "ethinylestradiol"
+      ]
+    },
+    {
+      "brandName": "Dienille",
+      "activeSubstance": "Dienogest + ethinylestradiol",
+      "atcCode": "G03AA16",
+      "form": "Tablets",
+      "categoryName": "Hormonal contraception",
+      "lyforaCategory": "Hormonal",
+      "searchKeywords": [
+        "dienille",
+        "dienogest + ethinylestradiol",
+        "dienogest",
+        "ethinylestradiol"
+      ]
+    },
+    {
+      "brandName": "Cerazette",
+      "activeSubstance": "Desogestrel",
+      "atcCode": "G03AC09",
+      "form": "Tablets",
+      "categoryName": "Hormonal contraception",
+      "lyforaCategory": "Hormonal",
+      "searchKeywords": [
+        "cerazette",
+        "desogestrel"
+      ]
+    },
+    {
+      "brandName": "Azalia",
+      "activeSubstance": "Desogestrel",
+      "atcCode": "G03AC09",
+      "form": "Tablets",
+      "categoryName": "Hormonal contraception",
+      "lyforaCategory": "Hormonal",
+      "searchKeywords": [
+        "azalia",
+        "desogestrel"
+      ]
+    },
+    {
+      "brandName": "Mirena",
+      "activeSubstance": "Levonorgestrel",
+      "atcCode": "G02BA03",
+      "form": "Intrauterine system",
+      "categoryName": "Hormonal contraception",
+      "lyforaCategory": "Hormonal",
+      "searchKeywords": [
+        "mirena",
+        "levonorgestrel"
+      ]
+    },
+    {
+      "brandName": "NuvaRing",
+      "activeSubstance": "Etonogestrel + ethinylestradiol",
+      "atcCode": "G02BB01",
+      "form": "Vaginal ring",
+      "categoryName": "Hormonal contraception",
+      "lyforaCategory": "Hormonal",
+      "searchKeywords": [
+        "nuvaring",
+        "etonogestrel + ethinylestradiol",
+        "etonogestrel",
+        "ethinylestradiol"
+      ]
+    },
+    {
+      "brandName": "Implanon NXT",
+      "activeSubstance": "Etonogestrel",
+      "atcCode": "G03AC08",
+      "form": "Implant",
+      "categoryName": "Hormonal contraception",
+      "lyforaCategory": "Hormonal",
+      "searchKeywords": [
+        "implanon nxt",
+        "etonogestrel"
+      ]
+    },
+    {
+      "brandName": "Femoston",
+      "activeSubstance": "Estradiol + dydrogesterone",
+      "atcCode": "G03FB08",
+      "form": "Tablets",
+      "categoryName": "Hormone replacement therapy",
+      "lyforaCategory": "Hormonal",
+      "searchKeywords": [
+        "femoston",
+        "estradiol + dydrogesterone",
+        "estradiol",
+        "dydrogesterone"
+      ]
+    },
+    {
+      "brandName": "Angeliq",
+      "activeSubstance": "Estradiol + drospirenone",
+      "atcCode": "G03FA17",
+      "form": "Tablets",
+      "categoryName": "Hormone replacement therapy",
+      "lyforaCategory": "Hormonal",
+      "searchKeywords": [
+        "angeliq",
+        "estradiol + drospirenone",
+        "estradiol",
+        "drospirenone"
+      ]
+    },
+    {
+      "brandName": "Divina",
+      "activeSubstance": "Estradiol + medroxyprogesterone",
+      "atcCode": "G03FB06",
+      "form": "Tablets",
+      "categoryName": "Hormone replacement therapy",
+      "lyforaCategory": "Hormonal",
+      "searchKeywords": [
+        "divina",
+        "estradiol + medroxyprogesterone",
+        "estradiol",
+        "medroxyprogesterone"
+      ]
+    },
+    {
+      "brandName": "Estrofem",
+      "activeSubstance": "Estradiol",
+      "atcCode": "G03CA03",
+      "form": "Tablets",
+      "categoryName": "Hormone replacement therapy",
+      "lyforaCategory": "Hormonal",
+      "searchKeywords": [
+        "estrofem",
+        "estradiol"
+      ]
+    },
+    {
+      "brandName": "Divigel",
+      "activeSubstance": "Estradiol",
+      "atcCode": "G03CA03",
+      "form": "Gel",
+      "categoryName": "Hormone replacement therapy",
+      "lyforaCategory": "Hormonal",
+      "searchKeywords": [
+        "divigel",
+        "estradiol"
+      ]
+    },
+    {
+      "brandName": "Estreva",
+      "activeSubstance": "Estradiol",
+      "atcCode": "G03CA03",
+      "form": "Gel",
+      "categoryName": "Hormone replacement therapy",
+      "lyforaCategory": "Hormonal",
+      "searchKeywords": [
+        "estreva",
+        "estradiol"
+      ]
+    },
+    {
+      "brandName": "Ovestin",
+      "activeSubstance": "Estriol",
+      "atcCode": "G03CA04",
+      "form": "Cream, tablets",
+      "categoryName": "Hormone replacement therapy",
+      "lyforaCategory": "Hormonal",
+      "searchKeywords": [
+        "ovestin",
+        "estriol"
+      ]
+    },
+    {
+      "brandName": "Duphaston",
+      "activeSubstance": "Dydrogesterone",
+      "atcCode": "G03DB01",
+      "form": "Tablets",
+      "categoryName": "Hormone replacement therapy",
+      "lyforaCategory": "Hormonal",
+      "searchKeywords": [
+        "duphaston",
+        "dydrogesterone"
+      ]
+    },
+    {
+      "brandName": "Utrogestan",
+      "activeSubstance": "Progesterone",
+      "atcCode": "G03DA04",
+      "form": "Capsules",
+      "categoryName": "Hormone replacement therapy",
+      "lyforaCategory": "Hormonal",
+      "searchKeywords": [
+        "utrogestan",
+        "progesterone"
+      ]
+    },
+    {
+      "brandName": "Nebido",
+      "activeSubstance": "Testosterone undecanoate",
+      "atcCode": "G03BA03",
+      "form": "Injection",
+      "categoryName": "Testosterone & male hormones",
+      "lyforaCategory": "Hormonal",
+      "searchKeywords": [
+        "nebido",
+        "testosterone undecanoate"
+      ]
+    },
+    {
+      "brandName": "Sustanon 250",
+      "activeSubstance": "Testosterone esters",
+      "atcCode": "G03BA03",
+      "form": "Injection",
+      "categoryName": "Testosterone & male hormones",
+      "lyforaCategory": "Hormonal",
+      "searchKeywords": [
+        "sustanon 250",
+        "testosterone esters"
+      ]
+    },
+    {
+      "brandName": "Androgel",
+      "activeSubstance": "Testosterone",
+      "atcCode": "G03BA03",
+      "form": "Gel",
+      "categoryName": "Testosterone & male hormones",
+      "lyforaCategory": "Hormonal",
+      "searchKeywords": [
+        "androgel",
+        "testosterone"
+      ]
+    },
+    {
+      "brandName": "Testogel",
+      "activeSubstance": "Testosterone",
+      "atcCode": "G03BA03",
+      "form": "Gel",
+      "categoryName": "Testosterone & male hormones",
+      "lyforaCategory": "Hormonal",
+      "searchKeywords": [
+        "testogel",
+        "testosterone"
+      ]
+    },
+    {
+      "brandName": "Prednisolone",
+      "activeSubstance": "Prednisolone",
+      "atcCode": "H02AB06",
+      "form": "Tablets",
+      "categoryName": "Steroid tablets",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "prednisolone",
+        "prednisolone"
+      ]
+    },
+    {
+      "brandName": "Medrol",
+      "activeSubstance": "Methylprednisolone",
+      "atcCode": "H02AB04",
+      "form": "Tablets",
+      "categoryName": "Steroid tablets",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "medrol",
+        "methylprednisolone"
+      ]
+    },
+    {
+      "brandName": "Dexamethasone",
+      "activeSubstance": "Dexamethasone",
+      "atcCode": "H02AB02",
+      "form": "Tablets",
+      "categoryName": "Steroid tablets",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "dexamethasone",
+        "dexamethasone"
+      ]
+    },
+    {
+      "brandName": "Hydrocortisone",
+      "activeSubstance": "Hydrocortisone",
+      "atcCode": "H02AB09",
+      "form": "Tablets",
+      "categoryName": "Steroid tablets",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "hydrocortisone",
+        "hydrocortisone"
+      ]
+    },
+    {
+      "brandName": "Zoloft",
+      "activeSubstance": "Sertraline",
+      "atcCode": "N06AB06",
+      "form": "Tablets",
+      "categoryName": "Antidepressants & anti-anxiety",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "zoloft",
+        "sertraline"
+      ]
+    },
+    {
+      "brandName": "Asentra",
+      "activeSubstance": "Sertraline",
+      "atcCode": "N06AB06",
+      "form": "Tablets",
+      "categoryName": "Antidepressants & anti-anxiety",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "asentra",
+        "sertraline"
+      ]
+    },
+    {
+      "brandName": "Serlift",
+      "activeSubstance": "Sertraline",
+      "atcCode": "N06AB06",
+      "form": "Tablets",
+      "categoryName": "Antidepressants & anti-anxiety",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "serlift",
+        "sertraline"
+      ]
+    },
+    {
+      "brandName": "Cipralex",
+      "activeSubstance": "Escitalopram",
+      "atcCode": "N06AB10",
+      "form": "Tablets",
+      "categoryName": "Antidepressants & anti-anxiety",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "cipralex",
+        "escitalopram"
+      ]
+    },
+    {
+      "brandName": "Elicea",
+      "activeSubstance": "Escitalopram",
+      "atcCode": "N06AB10",
+      "form": "Tablets",
+      "categoryName": "Antidepressants & anti-anxiety",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "elicea",
+        "escitalopram"
+      ]
+    },
+    {
+      "brandName": "Citalopram",
+      "activeSubstance": "Citalopram",
+      "atcCode": "N06AB04",
+      "form": "Tablets",
+      "categoryName": "Antidepressants & anti-anxiety",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "citalopram",
+        "citalopram"
+      ]
+    },
+    {
+      "brandName": "Prozac",
+      "activeSubstance": "Fluoxetine",
+      "atcCode": "N06AB03",
+      "form": "Capsules",
+      "categoryName": "Antidepressants & anti-anxiety",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "prozac",
+        "fluoxetine"
+      ]
+    },
+    {
+      "brandName": "Fluoxetine",
+      "activeSubstance": "Fluoxetine",
+      "atcCode": "N06AB03",
+      "form": "Capsules",
+      "categoryName": "Antidepressants & anti-anxiety",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "fluoxetine",
+        "fluoxetine"
+      ]
+    },
+    {
+      "brandName": "Seroxat",
+      "activeSubstance": "Paroxetine",
+      "atcCode": "N06AB05",
+      "form": "Tablets",
+      "categoryName": "Antidepressants & anti-anxiety",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "seroxat",
+        "paroxetine"
+      ]
+    },
+    {
+      "brandName": "Paroxetine",
+      "activeSubstance": "Paroxetine",
+      "atcCode": "N06AB05",
+      "form": "Tablets",
+      "categoryName": "Antidepressants & anti-anxiety",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "paroxetine",
+        "paroxetine"
+      ]
+    },
+    {
+      "brandName": "Velaxin",
+      "activeSubstance": "Venlafaxine",
+      "atcCode": "N06AX16",
+      "form": "Capsules",
+      "categoryName": "Antidepressants & anti-anxiety",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "velaxin",
+        "venlafaxine"
+      ]
+    },
+    {
+      "brandName": "Efectin",
+      "activeSubstance": "Venlafaxine",
+      "atcCode": "N06AX16",
+      "form": "Capsules",
+      "categoryName": "Antidepressants & anti-anxiety",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "efectin",
+        "venlafaxine"
+      ]
+    },
+    {
+      "brandName": "Cymbalta",
+      "activeSubstance": "Duloxetine",
+      "atcCode": "N06AX21",
+      "form": "Capsules",
+      "categoryName": "Antidepressants & anti-anxiety",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "cymbalta",
+        "duloxetine"
+      ]
+    },
+    {
+      "brandName": "Duloxetine",
+      "activeSubstance": "Duloxetine",
+      "atcCode": "N06AX21",
+      "form": "Capsules",
+      "categoryName": "Antidepressants & anti-anxiety",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "duloxetine",
+        "duloxetine"
+      ]
+    },
+    {
+      "brandName": "Mirzaten",
+      "activeSubstance": "Mirtazapine",
+      "atcCode": "N06AX11",
+      "form": "Tablets",
+      "categoryName": "Antidepressants & anti-anxiety",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "mirzaten",
+        "mirtazapine"
+      ]
+    },
+    {
+      "brandName": "Remeron",
+      "activeSubstance": "Mirtazapine",
+      "atcCode": "N06AX11",
+      "form": "Tablets",
+      "categoryName": "Antidepressants & anti-anxiety",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "remeron",
+        "mirtazapine"
+      ]
+    },
+    {
+      "brandName": "Trittico",
+      "activeSubstance": "Trazodone",
+      "atcCode": "N06AX05",
+      "form": "Tablets",
+      "categoryName": "Antidepressants & anti-anxiety",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "trittico",
+        "trazodone"
+      ]
+    },
+    {
+      "brandName": "Wellbutrin",
+      "activeSubstance": "Bupropion",
+      "atcCode": "N06AX12",
+      "form": "Tablets",
+      "categoryName": "Antidepressants & anti-anxiety",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "wellbutrin",
+        "bupropion"
+      ]
+    },
+    {
+      "brandName": "Spitomin",
+      "activeSubstance": "Buspirone",
+      "atcCode": "N05BE01",
+      "form": "Tablets",
+      "categoryName": "Antidepressants & anti-anxiety",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "spitomin",
+        "buspirone"
+      ]
+    },
+    {
+      "brandName": "Buspirone",
+      "activeSubstance": "Buspirone",
+      "atcCode": "N05BE01",
+      "form": "Tablets",
+      "categoryName": "Antidepressants & anti-anxiety",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "buspirone",
+        "buspirone"
+      ]
+    },
+    {
+      "brandName": "Atarax",
+      "activeSubstance": "Hydroxyzine",
+      "atcCode": "N05BB01",
+      "form": "Tablets",
+      "categoryName": "Antidepressants & anti-anxiety",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "atarax",
+        "hydroxyzine"
+      ]
+    },
+    {
+      "brandName": "Sanval",
+      "activeSubstance": "Zolpidem",
+      "atcCode": "N05CF02",
+      "form": "Tablets",
+      "categoryName": "Sleeping tablets & sedatives",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "sanval",
+        "zolpidem"
+      ]
+    },
+    {
+      "brandName": "Hypnogen",
+      "activeSubstance": "Zolpidem",
+      "atcCode": "N05CF02",
+      "form": "Tablets",
+      "categoryName": "Sleeping tablets & sedatives",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "hypnogen",
+        "zolpidem"
+      ]
+    },
+    {
+      "brandName": "Imovane",
+      "activeSubstance": "Zopiclone",
+      "atcCode": "N05CF01",
+      "form": "Tablets",
+      "categoryName": "Sleeping tablets & sedatives",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "imovane",
+        "zopiclone"
+      ]
+    },
+    {
+      "brandName": "Somnol",
+      "activeSubstance": "Zopiclone",
+      "atcCode": "N05CF01",
+      "form": "Tablets",
+      "categoryName": "Sleeping tablets & sedatives",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "somnol",
+        "zopiclone"
+      ]
+    },
+    {
+      "brandName": "Circadin",
+      "activeSubstance": "Melatonin",
+      "atcCode": "N05CH01",
+      "form": "Tablets",
+      "categoryName": "Sleeping tablets & sedatives",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "circadin",
+        "melatonin"
+      ]
+    },
+    {
+      "brandName": "Xanax",
+      "activeSubstance": "Alprazolam",
+      "atcCode": "N05BA12",
+      "form": "Tablets",
+      "categoryName": "Sleeping tablets & sedatives",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "xanax",
+        "alprazolam"
+      ]
+    },
+    {
+      "brandName": "Helex",
+      "activeSubstance": "Alprazolam",
+      "atcCode": "N05BA12",
+      "form": "Tablets",
+      "categoryName": "Sleeping tablets & sedatives",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "helex",
+        "alprazolam"
+      ]
+    },
+    {
+      "brandName": "Relanium",
+      "activeSubstance": "Diazepam",
+      "atcCode": "N05BA01",
+      "form": "Tablets",
+      "categoryName": "Sleeping tablets & sedatives",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "relanium",
+        "diazepam"
+      ]
+    },
+    {
+      "brandName": "Diazepam",
+      "activeSubstance": "Diazepam",
+      "atcCode": "N05BA01",
+      "form": "Tablets",
+      "categoryName": "Sleeping tablets & sedatives",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "diazepam",
+        "diazepam"
+      ]
+    },
+    {
+      "brandName": "Lorafen",
+      "activeSubstance": "Lorazepam",
+      "atcCode": "N05BA06",
+      "form": "Tablets",
+      "categoryName": "Sleeping tablets & sedatives",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "lorafen",
+        "lorazepam"
+      ]
+    },
+    {
+      "brandName": "Lorazepam",
+      "activeSubstance": "Lorazepam",
+      "atcCode": "N05BA06",
+      "form": "Tablets",
+      "categoryName": "Sleeping tablets & sedatives",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "lorazepam",
+        "lorazepam"
+      ]
+    },
+    {
+      "brandName": "Rivotril",
+      "activeSubstance": "Clonazepam",
+      "atcCode": "N03AE01",
+      "form": "Tablets",
+      "categoryName": "Sleeping tablets & sedatives",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "rivotril",
+        "clonazepam"
+      ]
+    },
+    {
+      "brandName": "Keppra",
+      "activeSubstance": "Levetiracetam",
+      "atcCode": "N03AX14",
+      "form": "Tablets",
+      "categoryName": "Epilepsy",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "keppra",
+        "levetiracetam"
+      ]
+    },
+    {
+      "brandName": "Levetiracetam",
+      "activeSubstance": "Levetiracetam",
+      "atcCode": "N03AX14",
+      "form": "Tablets",
+      "categoryName": "Epilepsy",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "levetiracetam",
+        "levetiracetam"
+      ]
+    },
+    {
+      "brandName": "Lamictal",
+      "activeSubstance": "Lamotrigine",
+      "atcCode": "N03AX09",
+      "form": "Tablets",
+      "categoryName": "Epilepsy",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "lamictal",
+        "lamotrigine"
+      ]
+    },
+    {
+      "brandName": "Lamotrigine",
+      "activeSubstance": "Lamotrigine",
+      "atcCode": "N03AX09",
+      "form": "Tablets",
+      "categoryName": "Epilepsy",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "lamotrigine",
+        "lamotrigine"
+      ]
+    },
+    {
+      "brandName": "Depakine",
+      "activeSubstance": "Valproic acid",
+      "atcCode": "N03AG01",
+      "form": "Tablets",
+      "categoryName": "Epilepsy",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "depakine",
+        "valproic acid"
+      ]
+    },
+    {
+      "brandName": "Convulex",
+      "activeSubstance": "Valproic acid",
+      "atcCode": "N03AG01",
+      "form": "Tablets",
+      "categoryName": "Epilepsy",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "convulex",
+        "valproic acid"
+      ]
+    },
+    {
+      "brandName": "Finlepsin",
+      "activeSubstance": "Carbamazepine",
+      "atcCode": "N03AF01",
+      "form": "Tablets",
+      "categoryName": "Epilepsy",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "finlepsin",
+        "carbamazepine"
+      ]
+    },
+    {
+      "brandName": "Tegretol",
+      "activeSubstance": "Carbamazepine",
+      "atcCode": "N03AF01",
+      "form": "Tablets",
+      "categoryName": "Epilepsy",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "tegretol",
+        "carbamazepine"
+      ]
+    },
+    {
+      "brandName": "Trileptal",
+      "activeSubstance": "Oxcarbazepine",
+      "atcCode": "N03AF02",
+      "form": "Tablets",
+      "categoryName": "Epilepsy",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "trileptal",
+        "oxcarbazepine"
+      ]
+    },
+    {
+      "brandName": "Topamax",
+      "activeSubstance": "Topiramate",
+      "atcCode": "N03AX11",
+      "form": "Tablets",
+      "categoryName": "Epilepsy",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "topamax",
+        "topiramate"
+      ]
+    },
+    {
+      "brandName": "Neurontin",
+      "activeSubstance": "Gabapentin",
+      "atcCode": "N03AX12",
+      "form": "Capsules",
+      "categoryName": "Epilepsy",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "neurontin",
+        "gabapentin"
+      ]
+    },
+    {
+      "brandName": "Gabapentin",
+      "activeSubstance": "Gabapentin",
+      "atcCode": "N03AX12",
+      "form": "Capsules",
+      "categoryName": "Epilepsy",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "gabapentin",
+        "gabapentin"
+      ]
+    },
+    {
+      "brandName": "Lyrica",
+      "activeSubstance": "Pregabalin",
+      "atcCode": "N03AX16",
+      "form": "Capsules",
+      "categoryName": "Epilepsy",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "lyrica",
+        "pregabalin"
+      ]
+    },
+    {
+      "brandName": "Pregabalin",
+      "activeSubstance": "Pregabalin",
+      "atcCode": "N03AX16",
+      "form": "Capsules",
+      "categoryName": "Epilepsy",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "pregabalin",
+        "pregabalin"
+      ]
+    },
+    {
+      "brandName": "Concerta",
+      "activeSubstance": "Methylphenidate",
+      "atcCode": "N06BA04",
+      "form": "Tablets",
+      "categoryName": "ADHD",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "concerta",
+        "methylphenidate"
+      ]
+    },
+    {
+      "brandName": "Medikinet",
+      "activeSubstance": "Methylphenidate",
+      "atcCode": "N06BA04",
+      "form": "Tablets",
+      "categoryName": "ADHD",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "medikinet",
+        "methylphenidate"
+      ]
+    },
+    {
+      "brandName": "Ritalin",
+      "activeSubstance": "Methylphenidate",
+      "atcCode": "N06BA04",
+      "form": "Tablets",
+      "categoryName": "ADHD",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "ritalin",
+        "methylphenidate"
+      ]
+    },
+    {
+      "brandName": "Elvanse",
+      "activeSubstance": "Lisdexamfetamine",
+      "atcCode": "N06BA12",
+      "form": "Capsules",
+      "categoryName": "ADHD",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "elvanse",
+        "lisdexamfetamine"
+      ]
+    },
+    {
+      "brandName": "Strattera",
+      "activeSubstance": "Atomoxetine",
+      "atcCode": "N06BA09",
+      "form": "Capsules",
+      "categoryName": "ADHD",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "strattera",
+        "atomoxetine"
+      ]
+    },
+    {
+      "brandName": "Atomoxetine",
+      "activeSubstance": "Atomoxetine",
+      "atcCode": "N06BA09",
+      "form": "Capsules",
+      "categoryName": "ADHD",
+      "lyforaCategory": "Mental and Cognitive",
+      "searchKeywords": [
+        "atomoxetine",
+        "atomoxetine"
+      ]
+    },
+    {
+      "brandName": "Nolpaza",
+      "activeSubstance": "Pantoprazole",
+      "atcCode": "A02BC02",
+      "form": "Tablets",
+      "categoryName": "Heartburn & stomach acid",
+      "lyforaCategory": "Nutrient and Drug Metabolism",
+      "searchKeywords": [
+        "nolpaza",
+        "pantoprazole"
+      ]
+    },
+    {
+      "brandName": "Controloc",
+      "activeSubstance": "Pantoprazole",
+      "atcCode": "A02BC02",
+      "form": "Tablets",
+      "categoryName": "Heartburn & stomach acid",
+      "lyforaCategory": "Nutrient and Drug Metabolism",
+      "searchKeywords": [
+        "controloc",
+        "pantoprazole"
+      ]
+    },
+    {
+      "brandName": "Omeprazole",
+      "activeSubstance": "Omeprazole",
+      "atcCode": "A02BC01",
+      "form": "Capsules",
+      "categoryName": "Heartburn & stomach acid",
+      "lyforaCategory": "Nutrient and Drug Metabolism",
+      "searchKeywords": [
+        "omeprazole",
+        "omeprazole"
+      ]
+    },
+    {
+      "brandName": "Losec",
+      "activeSubstance": "Omeprazole",
+      "atcCode": "A02BC01",
+      "form": "Capsules",
+      "categoryName": "Heartburn & stomach acid",
+      "lyforaCategory": "Nutrient and Drug Metabolism",
+      "searchKeywords": [
+        "losec",
+        "omeprazole"
+      ]
+    },
+    {
+      "brandName": "Emanera",
+      "activeSubstance": "Esomeprazole",
+      "atcCode": "A02BC05",
+      "form": "Capsules",
+      "categoryName": "Heartburn & stomach acid",
+      "lyforaCategory": "Nutrient and Drug Metabolism",
+      "searchKeywords": [
+        "emanera",
+        "esomeprazole"
+      ]
+    },
+    {
+      "brandName": "Nexium",
+      "activeSubstance": "Esomeprazole",
+      "atcCode": "A02BC05",
+      "form": "Capsules",
+      "categoryName": "Heartburn & stomach acid",
+      "lyforaCategory": "Nutrient and Drug Metabolism",
+      "searchKeywords": [
+        "nexium",
+        "esomeprazole"
+      ]
+    },
+    {
+      "brandName": "Lanzul",
+      "activeSubstance": "Lansoprazole",
+      "atcCode": "A02BC03",
+      "form": "Capsules",
+      "categoryName": "Heartburn & stomach acid",
+      "lyforaCategory": "Nutrient and Drug Metabolism",
+      "searchKeywords": [
+        "lanzul",
+        "lansoprazole"
+      ]
+    },
+    {
+      "brandName": "Zulbex",
+      "activeSubstance": "Rabeprazole",
+      "atcCode": "A02BC04",
+      "form": "Tablets",
+      "categoryName": "Heartburn & stomach acid",
+      "lyforaCategory": "Nutrient and Drug Metabolism",
+      "searchKeywords": [
+        "zulbex",
+        "rabeprazole"
+      ]
+    },
+    {
+      "brandName": "Pariet",
+      "activeSubstance": "Rabeprazole",
+      "atcCode": "A02BC04",
+      "form": "Tablets",
+      "categoryName": "Heartburn & stomach acid",
+      "lyforaCategory": "Nutrient and Drug Metabolism",
+      "searchKeywords": [
+        "pariet",
+        "rabeprazole"
+      ]
+    },
+    {
+      "brandName": "Famotidine",
+      "activeSubstance": "Famotidine",
+      "atcCode": "A02BA03",
+      "form": "Tablets",
+      "categoryName": "Heartburn & stomach acid",
+      "lyforaCategory": "Nutrient and Drug Metabolism",
+      "searchKeywords": [
+        "famotidine",
+        "famotidine"
+      ]
+    },
+    {
+      "brandName": "Ibuprofen",
+      "activeSubstance": "Ibuprofen",
+      "atcCode": "M01AE01",
+      "form": "Tablets",
+      "categoryName": "Regular painkillers & anti-inflammatories",
+      "lyforaCategory": "Physical and Functional",
+      "searchKeywords": [
+        "ibuprofen",
+        "ibuprofen"
+      ]
+    },
+    {
+      "brandName": "Ibumetin",
+      "activeSubstance": "Ibuprofen",
+      "atcCode": "M01AE01",
+      "form": "Tablets",
+      "categoryName": "Regular painkillers & anti-inflammatories",
+      "lyforaCategory": "Physical and Functional",
+      "searchKeywords": [
+        "ibumetin",
+        "ibuprofen"
+      ]
+    },
+    {
+      "brandName": "Nurofen",
+      "activeSubstance": "Ibuprofen",
+      "atcCode": "M01AE01",
+      "form": "Tablets",
+      "categoryName": "Regular painkillers & anti-inflammatories",
+      "lyforaCategory": "Physical and Functional",
+      "searchKeywords": [
+        "nurofen",
+        "ibuprofen"
+      ]
+    },
+    {
+      "brandName": "Voltaren",
+      "activeSubstance": "Diclofenac",
+      "atcCode": "M01AB05",
+      "form": "Tablets",
+      "categoryName": "Regular painkillers & anti-inflammatories",
+      "lyforaCategory": "Physical and Functional",
+      "searchKeywords": [
+        "voltaren",
+        "diclofenac"
+      ]
+    },
+    {
+      "brandName": "Dicloberl",
+      "activeSubstance": "Diclofenac",
+      "atcCode": "M01AB05",
+      "form": "Tablets",
+      "categoryName": "Regular painkillers & anti-inflammatories",
+      "lyforaCategory": "Physical and Functional",
+      "searchKeywords": [
+        "dicloberl",
+        "diclofenac"
+      ]
+    },
+    {
+      "brandName": "Nimesil",
+      "activeSubstance": "Nimesulide",
+      "atcCode": "M01AX17",
+      "form": "Powder",
+      "categoryName": "Regular painkillers & anti-inflammatories",
+      "lyforaCategory": "Physical and Functional",
+      "searchKeywords": [
+        "nimesil",
+        "nimesulide"
+      ]
+    },
+    {
+      "brandName": "Ketonal",
+      "activeSubstance": "Ketoprofen",
+      "atcCode": "M01AE03",
+      "form": "Capsules",
+      "categoryName": "Regular painkillers & anti-inflammatories",
+      "lyforaCategory": "Physical and Functional",
+      "searchKeywords": [
+        "ketonal",
+        "ketoprofen"
+      ]
+    },
+    {
+      "brandName": "Naproxen",
+      "activeSubstance": "Naproxen",
+      "atcCode": "M01AE02",
+      "form": "Tablets",
+      "categoryName": "Regular painkillers & anti-inflammatories",
+      "lyforaCategory": "Physical and Functional",
+      "searchKeywords": [
+        "naproxen",
+        "naproxen"
+      ]
+    },
+    {
+      "brandName": "Movalis",
+      "activeSubstance": "Meloxicam",
+      "atcCode": "M01AC06",
+      "form": "Tablets",
+      "categoryName": "Regular painkillers & anti-inflammatories",
+      "lyforaCategory": "Physical and Functional",
+      "searchKeywords": [
+        "movalis",
+        "meloxicam"
+      ]
+    },
+    {
+      "brandName": "Meloxicam",
+      "activeSubstance": "Meloxicam",
+      "atcCode": "M01AC06",
+      "form": "Tablets",
+      "categoryName": "Regular painkillers & anti-inflammatories",
+      "lyforaCategory": "Physical and Functional",
+      "searchKeywords": [
+        "meloxicam",
+        "meloxicam"
+      ]
+    },
+    {
+      "brandName": "Arcoxia",
+      "activeSubstance": "Etoricoxib",
+      "atcCode": "M01AH05",
+      "form": "Tablets",
+      "categoryName": "Regular painkillers & anti-inflammatories",
+      "lyforaCategory": "Physical and Functional",
+      "searchKeywords": [
+        "arcoxia",
+        "etoricoxib"
+      ]
+    },
+    {
+      "brandName": "Celebrex",
+      "activeSubstance": "Celecoxib",
+      "atcCode": "M01AH01",
+      "form": "Capsules",
+      "categoryName": "Regular painkillers & anti-inflammatories",
+      "lyforaCategory": "Physical and Functional",
+      "searchKeywords": [
+        "celebrex",
+        "celecoxib"
+      ]
+    },
+    {
+      "brandName": "Aertal",
+      "activeSubstance": "Aceclofenac",
+      "atcCode": "M01AB16",
+      "form": "Tablets",
+      "categoryName": "Regular painkillers & anti-inflammatories",
+      "lyforaCategory": "Physical and Functional",
+      "searchKeywords": [
+        "aertal",
+        "aceclofenac"
+      ]
+    },
+    {
+      "brandName": "Symbicort",
+      "activeSubstance": "Budesonide + formoterol",
+      "atcCode": "R03AK07",
+      "form": "Inhaler",
+      "categoryName": "Asthma & lung inhalers",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "symbicort",
+        "budesonide + formoterol",
+        "budesonide",
+        "formoterol"
+      ]
+    },
+    {
+      "brandName": "Seretide",
+      "activeSubstance": "Fluticasone + salmeterol",
+      "atcCode": "R03AK06",
+      "form": "Inhaler",
+      "categoryName": "Asthma & lung inhalers",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "seretide",
+        "fluticasone + salmeterol",
+        "fluticasone",
+        "salmeterol"
+      ]
+    },
+    {
+      "brandName": "Fostair",
+      "activeSubstance": "Beclometasone + formoterol",
+      "atcCode": "R03AK08",
+      "form": "Inhaler",
+      "categoryName": "Asthma & lung inhalers",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "fostair",
+        "beclometasone + formoterol",
+        "beclometasone",
+        "formoterol"
+      ]
+    },
+    {
+      "brandName": "Trelegy Ellipta",
+      "activeSubstance": "Fluticasone + umeclidinium + vilanterol",
+      "atcCode": "R03AL08",
+      "form": "Inhaler",
+      "categoryName": "Asthma & lung inhalers",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "trelegy ellipta",
+        "fluticasone + umeclidinium + vilanterol",
+        "fluticasone",
+        "umeclidinium",
+        "vilanterol"
+      ]
+    },
+    {
+      "brandName": "Ventolin",
+      "activeSubstance": "Salbutamol",
+      "atcCode": "R03AC02",
+      "form": "Inhaler",
+      "categoryName": "Asthma & lung inhalers",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "ventolin",
+        "salbutamol"
+      ]
+    },
+    {
+      "brandName": "Berodual",
+      "activeSubstance": "Fenoterol + ipratropium",
+      "atcCode": "R03AL01",
+      "form": "Inhaler",
+      "categoryName": "Asthma & lung inhalers",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "berodual",
+        "fenoterol + ipratropium",
+        "fenoterol",
+        "ipratropium"
+      ]
+    },
+    {
+      "brandName": "Spiriva",
+      "activeSubstance": "Tiotropium",
+      "atcCode": "R03BB04",
+      "form": "Inhaler",
+      "categoryName": "Asthma & lung inhalers",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "spiriva",
+        "tiotropium"
+      ]
+    },
+    {
+      "brandName": "Pulmicort",
+      "activeSubstance": "Budesonide",
+      "atcCode": "R03BA02",
+      "form": "Inhaler",
+      "categoryName": "Asthma & lung inhalers",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "pulmicort",
+        "budesonide"
+      ]
+    },
+    {
+      "brandName": "Flixotide",
+      "activeSubstance": "Fluticasone",
+      "atcCode": "R03BA05",
+      "form": "Inhaler",
+      "categoryName": "Asthma & lung inhalers",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "flixotide",
+        "fluticasone"
+      ]
+    },
+    {
+      "brandName": "Singulair",
+      "activeSubstance": "Montelukast",
+      "atcCode": "R03DC03",
+      "form": "Tablets",
+      "categoryName": "Asthma & lung inhalers",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "singulair",
+        "montelukast"
+      ]
+    },
+    {
+      "brandName": "Montelukast",
+      "activeSubstance": "Montelukast",
+      "atcCode": "R03DC03",
+      "form": "Tablets",
+      "categoryName": "Asthma & lung inhalers",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "montelukast",
+        "montelukast"
+      ]
+    },
+    {
+      "brandName": "Zyrtec",
+      "activeSubstance": "Cetirizine",
+      "atcCode": "R06AE07",
+      "form": "Tablets",
+      "categoryName": "Allergy tablets",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "zyrtec",
+        "cetirizine"
+      ]
+    },
+    {
+      "brandName": "Cetirizine",
+      "activeSubstance": "Cetirizine",
+      "atcCode": "R06AE07",
+      "form": "Tablets",
+      "categoryName": "Allergy tablets",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "cetirizine",
+        "cetirizine"
+      ]
+    },
+    {
+      "brandName": "Xyzal",
+      "activeSubstance": "Levocetirizine",
+      "atcCode": "R06AE09",
+      "form": "Tablets",
+      "categoryName": "Allergy tablets",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "xyzal",
+        "levocetirizine"
+      ]
+    },
+    {
+      "brandName": "Levocetirizine",
+      "activeSubstance": "Levocetirizine",
+      "atcCode": "R06AE09",
+      "form": "Tablets",
+      "categoryName": "Allergy tablets",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "levocetirizine",
+        "levocetirizine"
+      ]
+    },
+    {
+      "brandName": "Claritine",
+      "activeSubstance": "Loratadine",
+      "atcCode": "R06AX13",
+      "form": "Tablets",
+      "categoryName": "Allergy tablets",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "claritine",
+        "loratadine"
+      ]
+    },
+    {
+      "brandName": "Loratadine",
+      "activeSubstance": "Loratadine",
+      "atcCode": "R06AX13",
+      "form": "Tablets",
+      "categoryName": "Allergy tablets",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "loratadine",
+        "loratadine"
+      ]
+    },
+    {
+      "brandName": "Aerius",
+      "activeSubstance": "Desloratadine",
+      "atcCode": "R06AX27",
+      "form": "Tablets",
+      "categoryName": "Allergy tablets",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "aerius",
+        "desloratadine"
+      ]
+    },
+    {
+      "brandName": "Desloratadine",
+      "activeSubstance": "Desloratadine",
+      "atcCode": "R06AX27",
+      "form": "Tablets",
+      "categoryName": "Allergy tablets",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "desloratadine",
+        "desloratadine"
+      ]
+    },
+    {
+      "brandName": "Telfast",
+      "activeSubstance": "Fexofenadine",
+      "atcCode": "R06AX26",
+      "form": "Tablets",
+      "categoryName": "Allergy tablets",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "telfast",
+        "fexofenadine"
+      ]
+    },
+    {
+      "brandName": "Fexofenadine",
+      "activeSubstance": "Fexofenadine",
+      "atcCode": "R06AX26",
+      "form": "Tablets",
+      "categoryName": "Allergy tablets",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "fexofenadine",
+        "fexofenadine"
+      ]
+    },
+    {
+      "brandName": "Suprastin",
+      "activeSubstance": "Chloropyramine",
+      "atcCode": "R06AC03",
+      "form": "Tablets",
+      "categoryName": "Allergy tablets",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "suprastin",
+        "chloropyramine"
+      ]
+    },
+    {
+      "brandName": "Rupafin",
+      "activeSubstance": "Rupatadine",
+      "atcCode": "R06AX28",
+      "form": "Tablets",
+      "categoryName": "Allergy tablets",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "rupafin",
+        "rupatadine"
+      ]
+    },
+    {
+      "brandName": "Methotrexate",
+      "activeSubstance": "Methotrexate",
+      "atcCode": "L01BA01",
+      "form": "Tablets, injection",
+      "categoryName": "Immune-suppressing medication",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "methotrexate",
+        "methotrexate"
+      ]
+    },
+    {
+      "brandName": "Metoject",
+      "activeSubstance": "Methotrexate",
+      "atcCode": "L01BA01",
+      "form": "Tablets, injection",
+      "categoryName": "Immune-suppressing medication",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "metoject",
+        "methotrexate"
+      ]
+    },
+    {
+      "brandName": "Imuran",
+      "activeSubstance": "Azathioprine",
+      "atcCode": "L04AX01",
+      "form": "Tablets",
+      "categoryName": "Immune-suppressing medication",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "imuran",
+        "azathioprine"
+      ]
+    },
+    {
+      "brandName": "Azathioprine",
+      "activeSubstance": "Azathioprine",
+      "atcCode": "L04AX01",
+      "form": "Tablets",
+      "categoryName": "Immune-suppressing medication",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "azathioprine",
+        "azathioprine"
+      ]
+    },
+    {
+      "brandName": "Humira",
+      "activeSubstance": "Adalimumab",
+      "atcCode": "L04AB04",
+      "form": "Pen injector",
+      "categoryName": "Immune-suppressing medication",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "humira",
+        "adalimumab"
+      ]
+    },
+    {
+      "brandName": "Enbrel",
+      "activeSubstance": "Etanercept",
+      "atcCode": "L04AB01",
+      "form": "Pen injector",
+      "categoryName": "Immune-suppressing medication",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "enbrel",
+        "etanercept"
+      ]
+    },
+    {
+      "brandName": "Remicade",
+      "activeSubstance": "Infliximab",
+      "atcCode": "L04AB02",
+      "form": "Infusion",
+      "categoryName": "Immune-suppressing medication",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "remicade",
+        "infliximab"
+      ]
+    },
+    {
+      "brandName": "Stelara",
+      "activeSubstance": "Ustekinumab",
+      "atcCode": "L04AC05",
+      "form": "Injection",
+      "categoryName": "Immune-suppressing medication",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "stelara",
+        "ustekinumab"
+      ]
+    },
+    {
+      "brandName": "Cosentyx",
+      "activeSubstance": "Secukinumab",
+      "atcCode": "L04AC10",
+      "form": "Pen injector",
+      "categoryName": "Immune-suppressing medication",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "cosentyx",
+        "secukinumab"
+      ]
+    },
+    {
+      "brandName": "Sandimmun Neoral",
+      "activeSubstance": "Ciclosporin",
+      "atcCode": "L04AD01",
+      "form": "Capsules",
+      "categoryName": "Immune-suppressing medication",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "sandimmun neoral",
+        "ciclosporin"
+      ]
+    },
+    {
+      "brandName": "CellCept",
+      "activeSubstance": "Mycophenolate mofetil",
+      "atcCode": "L04AA06",
+      "form": "Capsules",
+      "categoryName": "Immune-suppressing medication",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "cellcept",
+        "mycophenolate mofetil"
+      ]
+    },
+    {
+      "brandName": "Salazopyrin",
+      "activeSubstance": "Sulfasalazine",
+      "atcCode": "A07EC01",
+      "form": "Tablets",
+      "categoryName": "Immune-suppressing medication",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "salazopyrin",
+        "sulfasalazine"
+      ]
+    },
+    {
+      "brandName": "Plaquenil",
+      "activeSubstance": "Hydroxychloroquine",
+      "atcCode": "P01BA02",
+      "form": "Tablets",
+      "categoryName": "Immune-suppressing medication",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "plaquenil",
+        "hydroxychloroquine"
+      ]
+    },
+    {
+      "brandName": "Ospamox",
+      "activeSubstance": "Amoxicillin",
+      "atcCode": "J01CA04",
+      "form": "Tablets",
+      "categoryName": "Antibiotics or antivirals right now",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "ospamox",
+        "amoxicillin"
+      ]
+    },
+    {
+      "brandName": "Amoxicillin",
+      "activeSubstance": "Amoxicillin",
+      "atcCode": "J01CA04",
+      "form": "Tablets",
+      "categoryName": "Antibiotics or antivirals right now",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "amoxicillin",
+        "amoxicillin"
+      ]
+    },
+    {
+      "brandName": "Augmentin",
+      "activeSubstance": "Amoxicillin + clavulanic acid",
+      "atcCode": "J01CR02",
+      "form": "Tablets",
+      "categoryName": "Antibiotics or antivirals right now",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "augmentin",
+        "amoxicillin + clavulanic acid",
+        "amoxicillin",
+        "clavulanic acid"
+      ]
+    },
+    {
+      "brandName": "Amoksiklav",
+      "activeSubstance": "Amoxicillin + clavulanic acid",
+      "atcCode": "J01CR02",
+      "form": "Tablets",
+      "categoryName": "Antibiotics or antivirals right now",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "amoksiklav",
+        "amoxicillin + clavulanic acid",
+        "amoxicillin",
+        "clavulanic acid"
+      ]
+    },
+    {
+      "brandName": "Sumamed",
+      "activeSubstance": "Azithromycin",
+      "atcCode": "J01FA10",
+      "form": "Tablets",
+      "categoryName": "Antibiotics or antivirals right now",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "sumamed",
+        "azithromycin"
+      ]
+    },
+    {
+      "brandName": "Azithromycin",
+      "activeSubstance": "Azithromycin",
+      "atcCode": "J01FA10",
+      "form": "Tablets",
+      "categoryName": "Antibiotics or antivirals right now",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "azithromycin",
+        "azithromycin"
+      ]
+    },
+    {
+      "brandName": "Klacid",
+      "activeSubstance": "Clarithromycin",
+      "atcCode": "J01FA09",
+      "form": "Tablets",
+      "categoryName": "Antibiotics or antivirals right now",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "klacid",
+        "clarithromycin"
+      ]
+    },
+    {
+      "brandName": "Fromilid",
+      "activeSubstance": "Clarithromycin",
+      "atcCode": "J01FA09",
+      "form": "Tablets",
+      "categoryName": "Antibiotics or antivirals right now",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "fromilid",
+        "clarithromycin"
+      ]
+    },
+    {
+      "brandName": "Zinnat",
+      "activeSubstance": "Cefuroxime",
+      "atcCode": "J01DC02",
+      "form": "Tablets",
+      "categoryName": "Antibiotics or antivirals right now",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "zinnat",
+        "cefuroxime"
+      ]
+    },
+    {
+      "brandName": "Ciprinol",
+      "activeSubstance": "Ciprofloxacin",
+      "atcCode": "J01MA02",
+      "form": "Tablets",
+      "categoryName": "Antibiotics or antivirals right now",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "ciprinol",
+        "ciprofloxacin"
+      ]
+    },
+    {
+      "brandName": "Ciprofloxacin",
+      "activeSubstance": "Ciprofloxacin",
+      "atcCode": "J01MA02",
+      "form": "Tablets",
+      "categoryName": "Antibiotics or antivirals right now",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "ciprofloxacin",
+        "ciprofloxacin"
+      ]
+    },
+    {
+      "brandName": "Levoxa",
+      "activeSubstance": "Levofloxacin",
+      "atcCode": "J01MA12",
+      "form": "Tablets",
+      "categoryName": "Antibiotics or antivirals right now",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "levoxa",
+        "levofloxacin"
+      ]
+    },
+    {
+      "brandName": "Levofloxacin",
+      "activeSubstance": "Levofloxacin",
+      "atcCode": "J01MA12",
+      "form": "Tablets",
+      "categoryName": "Antibiotics or antivirals right now",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "levofloxacin",
+        "levofloxacin"
+      ]
+    },
+    {
+      "brandName": "Unidox Solutab",
+      "activeSubstance": "Doxycycline",
+      "atcCode": "J01AA02",
+      "form": "Tablets",
+      "categoryName": "Antibiotics or antivirals right now",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "unidox solutab",
+        "doxycycline"
+      ]
+    },
+    {
+      "brandName": "Metronidazole",
+      "activeSubstance": "Metronidazole",
+      "atcCode": "J01XD01",
+      "form": "Tablets",
+      "categoryName": "Antibiotics or antivirals right now",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "metronidazole",
+        "metronidazole"
+      ]
+    },
+    {
+      "brandName": "Furadonin",
+      "activeSubstance": "Nitrofurantoin / furazidine",
+      "atcCode": "J01XE01",
+      "form": "Tablets",
+      "categoryName": "Antibiotics or antivirals right now",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "furadonin",
+        "nitrofurantoin / furazidine"
+      ]
+    },
+    {
+      "brandName": "Furagin",
+      "activeSubstance": "Nitrofurantoin / furazidine",
+      "atcCode": "J01XE01",
+      "form": "Tablets",
+      "categoryName": "Antibiotics or antivirals right now",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "furagin",
+        "nitrofurantoin / furazidine"
+      ]
+    },
+    {
+      "brandName": "Zovirax",
+      "activeSubstance": "Aciclovir",
+      "atcCode": "J05AB01",
+      "form": "Tablets",
+      "categoryName": "Antibiotics or antivirals right now",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "zovirax",
+        "aciclovir"
+      ]
+    },
+    {
+      "brandName": "Acyclovir",
+      "activeSubstance": "Aciclovir",
+      "atcCode": "J05AB01",
+      "form": "Tablets",
+      "categoryName": "Antibiotics or antivirals right now",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "acyclovir",
+        "aciclovir"
+      ]
+    },
+    {
+      "brandName": "Valtrex",
+      "activeSubstance": "Valaciclovir",
+      "atcCode": "J05AB11",
+      "form": "Tablets",
+      "categoryName": "Antibiotics or antivirals right now",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "valtrex",
+        "valaciclovir"
+      ]
+    },
+    {
+      "brandName": "Valaciclovir",
+      "activeSubstance": "Valaciclovir",
+      "atcCode": "J05AB11",
+      "form": "Tablets",
+      "categoryName": "Antibiotics or antivirals right now",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "valaciclovir",
+        "valaciclovir"
+      ]
+    },
+    {
+      "brandName": "Tamoxifen",
+      "activeSubstance": "Tamoxifen",
+      "atcCode": "L02BA01",
+      "form": "Tablets",
+      "categoryName": "Cancer treatment",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "tamoxifen",
+        "tamoxifen"
+      ]
+    },
+    {
+      "brandName": "Femara",
+      "activeSubstance": "Letrozole",
+      "atcCode": "L02BG04",
+      "form": "Tablets",
+      "categoryName": "Cancer treatment",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "femara",
+        "letrozole"
+      ]
+    },
+    {
+      "brandName": "Letrozole",
+      "activeSubstance": "Letrozole",
+      "atcCode": "L02BG04",
+      "form": "Tablets",
+      "categoryName": "Cancer treatment",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "letrozole",
+        "letrozole"
+      ]
+    },
+    {
+      "brandName": "Arimidex",
+      "activeSubstance": "Anastrozole",
+      "atcCode": "L02BG03",
+      "form": "Tablets",
+      "categoryName": "Cancer treatment",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "arimidex",
+        "anastrozole"
+      ]
+    },
+    {
+      "brandName": "Anastrozole",
+      "activeSubstance": "Anastrozole",
+      "atcCode": "L02BG03",
+      "form": "Tablets",
+      "categoryName": "Cancer treatment",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "anastrozole",
+        "anastrozole"
+      ]
+    },
+    {
+      "brandName": "Aromasin",
+      "activeSubstance": "Exemestane",
+      "atcCode": "L02BG06",
+      "form": "Tablets",
+      "categoryName": "Cancer treatment",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "aromasin",
+        "exemestane"
+      ]
+    },
+    {
+      "brandName": "Casodex",
+      "activeSubstance": "Bicalutamide",
+      "atcCode": "L02BB03",
+      "form": "Tablets",
+      "categoryName": "Cancer treatment",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "casodex",
+        "bicalutamide"
+      ]
+    },
+    {
+      "brandName": "Bicalutamide",
+      "activeSubstance": "Bicalutamide",
+      "atcCode": "L02BB03",
+      "form": "Tablets",
+      "categoryName": "Cancer treatment",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "bicalutamide",
+        "bicalutamide"
+      ]
+    },
+    {
+      "brandName": "Zoladex",
+      "activeSubstance": "Goserelin",
+      "atcCode": "L02AE03",
+      "form": "Implant",
+      "categoryName": "Cancer treatment",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "zoladex",
+        "goserelin"
+      ]
+    },
+    {
+      "brandName": "Xeloda",
+      "activeSubstance": "Capecitabine",
+      "atcCode": "L01BC06",
+      "form": "Tablets",
+      "categoryName": "Cancer treatment",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "xeloda",
+        "capecitabine"
+      ]
+    },
+    {
+      "brandName": "Capecitabine",
+      "activeSubstance": "Capecitabine",
+      "atcCode": "L01BC06",
+      "form": "Tablets",
+      "categoryName": "Cancer treatment",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "capecitabine",
+        "capecitabine"
+      ]
+    },
+    {
+      "brandName": "Glivec",
+      "activeSubstance": "Imatinib",
+      "atcCode": "L01EA01",
+      "form": "Tablets",
+      "categoryName": "Cancer treatment",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "glivec",
+        "imatinib"
+      ]
+    },
+    {
+      "brandName": "Imatinib",
+      "activeSubstance": "Imatinib",
+      "atcCode": "L01EA01",
+      "form": "Tablets",
+      "categoryName": "Cancer treatment",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "imatinib",
+        "imatinib"
+      ]
+    },
+    {
+      "brandName": "Keytruda",
+      "activeSubstance": "Pembrolizumab",
+      "atcCode": "L01FF02",
+      "form": "Infusion",
+      "categoryName": "Cancer treatment",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "keytruda",
+        "pembrolizumab"
+      ]
+    },
+    {
+      "brandName": "Herceptin",
+      "activeSubstance": "Trastuzumab",
+      "atcCode": "L01FD01",
+      "form": "Infusion",
+      "categoryName": "Cancer treatment",
+      "lyforaCategory": "Immune and Inflammation",
+      "searchKeywords": [
+        "herceptin",
+        "trastuzumab"
+      ]
+    }
+  ]
+}

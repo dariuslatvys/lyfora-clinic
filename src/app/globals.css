@@ -2544,3 +2544,81 @@ a.who.on {
   color: var(--r-red);
   font-size: 0.9rem;
 }
+
+/* ---------- Medication typeahead ---------- */
+.med-picker-field {
+  position: relative;
+  width: 100%;
+}
+
+.med-picker-field input {
+  width: 100%;
+  min-height: 42px;
+  border-radius: 9px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  padding: 10px 12px;
+  font-size: 0.95rem;
+}
+
+.med-suggest {
+  position: absolute;
+  z-index: 40;
+  left: 0;
+  right: 0;
+  top: calc(100% + 4px);
+  max-height: 280px;
+  overflow: auto;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--surface-raised);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+  padding: 4px;
+}
+
+.med-suggest button {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  padding: 9px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--ink);
+}
+
+.med-suggest button:hover,
+.med-suggest button.on {
+  background: var(--accent-soft);
+}
+
+.med-suggest-main {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  align-items: baseline;
+}
+
+.med-suggest-main b {
+  font-weight: 700;
+}
+
+.med-suggest-main em {
+  font-style: normal;
+  font-size: 0.84rem;
+  color: var(--ink-soft);
+}
+
+.med-suggest-meta {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.med-suggest-empty {
+  padding: 10px 12px;
+  font-size: 0.86rem;
+  color: var(--muted);
+}

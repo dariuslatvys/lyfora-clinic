@@ -10,14 +10,13 @@ import type { Dictionary } from "@/lib/i18n/dictionary";
 const items = [
   { href: "/patient/digital-twin", key: "navOverview" as const, icon: "home" },
   { href: "/patient/health-card", key: "healthCard" as const, icon: "card" },
-  { href: "/patient/uploads", key: "uploads" as const, icon: "upload" },
   { href: "/patient/labs", key: "labs" as const, icon: "flask" },
-  { href: "/patient/prescriptions", key: "prescriptions" as const, icon: "rx" },
-  { href: "/patient/integrations", key: "integrations" as const, icon: "plug" },
+  { href: "/patient/consultations", key: "consultations" as const, icon: "consult" },
   { href: "/patient/visits", key: "visits" as const, icon: "cal" },
-  { href: "/patient/questions", key: "questions" as const, icon: "chat" },
-  { href: "/patient/urgent", key: "urgentConsult" as const, icon: "alert" },
+  { href: "/patient/prescriptions", key: "prescriptions" as const, icon: "rx" },
   { href: "/patient/recommendations", key: "recommendations" as const, icon: "bulb" },
+  { href: "/patient/uploads", key: "uploads" as const, icon: "upload" },
+  { href: "/patient/integrations", key: "integrations" as const, icon: "plug" },
   { href: "/patient/marketplace", key: "marketplace" as const, icon: "cart" },
   { href: "/patient/analytics", key: "analytics" as const, icon: "chart" },
   { href: "/patient/privacy", key: "privacy" as const, icon: "shield" },
@@ -38,6 +37,12 @@ const ICONS: Record<string, ReactNode> = {
       <path d="M7.5 15h9" />
     </>
   ),
+  consult: (
+    <>
+      <path d="M4 5h16v11H9l-5 4z" />
+      <path d="M8 10h8M8 13h5" />
+    </>
+  ),
   rx: (
     <>
       <rect x="4" y="3" width="16" height="18" rx="2" />
@@ -54,13 +59,6 @@ const ICONS: Record<string, ReactNode> = {
     <>
       <rect x="3" y="5" width="18" height="16" rx="2" />
       <path d="M3 10h18M8 3v4M16 3v4" />
-    </>
-  ),
-  chat: <path d="M4 5h16v11H9l-5 4z" />,
-  alert: (
-    <>
-      <path d="M12 3l10 18H2L12 3z" />
-      <path d="M12 10v4M12 17h.01" />
     </>
   ),
   bulb: (
@@ -150,7 +148,11 @@ export function PatientRail({
         <div className="nav-label">Meniu</div>
         {items.map((item) => {
           const active =
-            pathname === item.href || pathname.startsWith(item.href + "/");
+            pathname === item.href ||
+            pathname.startsWith(item.href + "/") ||
+            (item.href === "/patient/consultations" &&
+              (pathname.startsWith("/patient/urgent") ||
+                pathname.startsWith("/patient/questions")));
           return (
             <Link
               key={item.href}

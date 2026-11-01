@@ -1804,3 +1804,67 @@ a {
   .marker-row-spark { grid-area: spark; justify-self: end; }
   .marker-row-status { grid-area: status; }
 }
+
+/* ---------- Consultations hub ---------- */
+.consult-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 900px) {
+  .consult-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.consult-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px 16px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  text-decoration: none;
+  color: inherit;
+  min-height: 150px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.consult-card:hover {
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--line));
+  box-shadow: var(--shadow);
+  transform: translateY(-1px);
+}
+
+.consult-card.primary {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--accent-soft) 70%, white),
+    white
+  );
+}
+
+.consult-card b {
+  font-family: var(--font-display), Manrope, sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.consult-card p {
+  margin: 0;
+  flex: 1;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+
+.consult-cta {
+  margin-top: 6px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--accent);
+}

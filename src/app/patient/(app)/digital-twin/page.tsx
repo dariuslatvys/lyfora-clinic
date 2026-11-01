@@ -88,9 +88,6 @@ export default async function DigitalTwinPage() {
             <Link href="/patient/questions" className="btn ghost">
               {labels.askDoctor247}
             </Link>
-            <Link href="/patient/uploads" className="btn ghost">
-              {labels.uploadLab}
-            </Link>
           </div>
         </div>
       </section>

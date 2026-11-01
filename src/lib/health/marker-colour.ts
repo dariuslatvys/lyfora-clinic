@@ -9,9 +9,9 @@ export function markerItemColour(m: {
   unit?: string | null;
   markerKey?: string;
 }): RiskColour {
-  let high =
+  const high =
     m.flag === "high" || (m.refHigh != null && m.value > m.refHigh);
-  let low = m.flag === "low" || (m.refLow != null && m.value < m.refLow);
+  const low = m.flag === "low" || (m.refLow != null && m.value < m.refLow);
 
   // Blood pressure: parse "132/79 mmHg" and grade by ESC-style bands.
   if (m.markerKey === "BLOOD_PRESSURE" || (m.unit && /\d+\s*\/\s*\d+/.test(m.unit))) {

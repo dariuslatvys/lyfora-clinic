@@ -104,6 +104,7 @@ export default async function DigitalTwinPage() {
             colour: c.colour,
             colourLabel: labels.colourLabels[c.colour],
             geneticBadge: c.geneticBadge || c.rare.length > 0,
+            geneticMark: labels.geneMarkShort,
           }))}
           geneHint={labels.geneMarkerHint}
           centerLabel={labels.brandShort}

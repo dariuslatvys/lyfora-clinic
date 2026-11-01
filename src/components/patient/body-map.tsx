@@ -9,6 +9,7 @@ export type BodyMapCategory = {
   colour: RiskColour;
   colourLabel: string;
   geneticBadge?: boolean;
+  geneticMark?: string;
 };
 
 /** Top arc first, then lower half — symmetric around the circle. */
@@ -169,7 +170,7 @@ export function BodyMap({
                 <b>{c.title}</b>
                 <em>
                   {c.colourLabel}
-                  {c.geneticBadge ? " (M)" : ""}
+                  {c.geneticBadge ? ` (${c.geneticMark || "DNR"})` : ""}
                 </em>
               </span>
             </Link>

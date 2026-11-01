@@ -16,6 +16,7 @@ export function CategoryCard({
   colour,
   colourLabel,
   geneticBadge,
+  geneticMark = "DNR",
 }: {
   id: string;
   title: string;
@@ -26,6 +27,7 @@ export function CategoryCard({
   markerCount?: number;
   snpMatches?: number;
   geneticBadge: boolean;
+  geneticMark?: string;
 }) {
   return (
     <Link
@@ -37,8 +39,8 @@ export function CategoryCard({
       <div className="st">
         <span>{colourLabel}</span>
         {geneticBadge ? (
-          <span className="gene-mark" title="Mutacija / Mutation">
-            (M)
+          <span className="gene-mark" title={geneticMark}>
+            ({geneticMark})
           </span>
         ) : null}
       </div>

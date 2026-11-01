@@ -119,11 +119,6 @@ const MARKER_COPY: Record<
   },
 };
 
-function complementary(allele: string) {
-  const map: Record<string, string> = { A: "T", T: "A", C: "G", G: "C" };
-  return map[allele] || "A";
-}
-
 function nonRiskAllele(effect1?: string | null, effect2?: string | null) {
   const effects = new Set(
     [effect1, effect2].filter(Boolean).map((a) => a!.toUpperCase())

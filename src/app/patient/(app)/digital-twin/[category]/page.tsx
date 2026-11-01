@@ -115,72 +115,63 @@ export default async function CategoryDetailPage({
       </Link>
 
       <section
-        className="panel"
+        className="panel cat-hero"
         style={{
           borderColor: COLOUR_HEX[cat.colour],
           background: `linear-gradient(160deg, ${COLOUR_SOFT[cat.colour]}, rgba(255,255,255,0.8))`,
         }}
       >
         <Pill colour={cat.colour} label={labels.colourLabels[cat.colour]} />
-        <h2 className="mt-3 font-[family-name:var(--font-display)] text-4xl">
+        <h2 className="mt-2 font-[family-name:var(--font-display)] text-3xl sm:text-4xl">
           {labels.categoryNames[cat.id as HealthCategoryId]}
         </h2>
-        <p className="mt-3 max-w-3xl text-sm leading-relaxed text-[var(--ink-soft)]">
+        <p className="mt-2 w-full text-sm leading-relaxed text-[var(--ink-soft)]">
           {cat.summary}
         </p>
       </section>
 
-      <section className="card">
-        <div className="card-head">
-          <div>
-            <span className="eyebrow">{labels.howCalculated}</span>
-            <h3 className="font-[family-name:var(--font-display)] text-[1.15rem] font-semibold">
-              {labels.colourLabels[cat.colour]}
-            </h3>
-          </div>
+      <section className="card colour-sources">
+        <div className="colour-sources-head">
+          <h3 className="font-[family-name:var(--font-display)] text-[1.05rem] font-semibold">
+            {labels.colourLabels[cat.colour]}
+          </h3>
           <Pill colour={cat.colour} label={labels.colourLabels[cat.colour]} />
         </div>
 
         <div
-          className={`grid gap-3 ${
+          className={`colour-source-grid ${
             [hasMarkers, hasSnps, hasRare].filter(Boolean).length > 1
-              ? "sm:grid-cols-2 lg:grid-cols-3"
+              ? "multi"
               : ""
           }`}
         >
           {hasMarkers && (
-            <div className="rounded-[var(--radius-s)] border border-[var(--line-2)] bg-[var(--surface-2)] p-3">
-              <p className="eyebrow">{labels.fromMarkers}</p>
-              <div className="mt-2">
-                <Pill
-                  colour={biomarkerColour}
-                  label={labels.colourLabels[biomarkerColour]}
-                />
-              </div>
-            </div>
+            <a href="#section-markers" className="colour-source">
+              <span className="colour-source-label">{labels.markers}</span>
+              <Pill
+                colour={biomarkerColour}
+                label={labels.colourLabels[biomarkerColour]}
+              />
+            </a>
           )}
           {hasSnps && (
-            <div className="rounded-[var(--radius-s)] border border-[var(--line-2)] bg-[var(--surface-2)] p-3">
-              <p className="eyebrow">{labels.fromGenetics}</p>
-              <div className="mt-2">
-                <Pill
-                  colour={geneticColour}
-                  label={
-                    cat.geneticColour
-                      ? labels.colourLabels[geneticColour]
-                      : labels.noRiskAlleles
-                  }
-                />
-              </div>
-            </div>
+            <a href="#section-genes" className="colour-source">
+              <span className="colour-source-label">{labels.genes}</span>
+              <Pill
+                colour={geneticColour}
+                label={
+                  cat.geneticColour
+                    ? labels.colourLabels[geneticColour]
+                    : labels.noRiskAlleles
+                }
+              />
+            </a>
           )}
           {hasRare && (
-            <div className="rounded-[var(--radius-s)] border border-[var(--line-2)] bg-[var(--surface-2)] p-3">
-              <p className="eyebrow">{labels.fromNgs}</p>
-              <div className="mt-2">
-                <Pill colour="red" label={labels.colourLabels.red} />
-              </div>
-            </div>
+            <a href="#section-rare" className="colour-source">
+              <span className="colour-source-label">{labels.rareShort}</span>
+              <Pill colour="red" label={labels.colourLabels.red} />
+            </a>
           )}
         </div>
 
@@ -255,7 +246,7 @@ export default async function CategoryDetailPage({
       </section>
 
       {hasRare && (
-        <section id="rare-mutations" className="panel space-y-3">
+        <section id="section-rare" className="panel space-y-3 scroll-mt-24">
           <h3 className="font-[family-name:var(--font-display)] text-2xl">
             {labels.rareMutations}
           </h3>
@@ -295,7 +286,7 @@ export default async function CategoryDetailPage({
       {(hasMarkers || hasSnps) && (
         <section className={columnsClass}>
           {hasMarkers && (
-            <div className="panel">
+            <div id="section-markers" className="panel scroll-mt-24">
               <div className="card-head" style={{ marginBottom: 0 }}>
                 <h3 className="font-[family-name:var(--font-display)] text-2xl">
                   {labels.markers}
@@ -397,7 +388,7 @@ export default async function CategoryDetailPage({
           )}
 
           {hasSnps && (
-            <div className="panel">
+            <div id="section-genes" className="panel scroll-mt-24">
               <div className="card-head" style={{ marginBottom: 0 }}>
                 <h3 className="font-[family-name:var(--font-display)] text-2xl">
                   {labels.genes}

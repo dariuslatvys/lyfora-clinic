@@ -83,6 +83,7 @@ export const dict = {
     markers: "Žymenys",
     genes: "Genai (SNP)",
     rareMutations: "Retos genetinės mutacijos",
+    rareShort: "Retos mutacijos",
     ngsTitle: "Išsamus genetinio kodo sekoskaitos tyrimas (NGS)",
     ngsBlurb:
       "Retų genų mutacijų ir paveldimų ligų rizikos paieška nuskaitant giliąją DNR seką. Šis tyrimas išsamiai nuskaito DNR kodo seką ir ieško retų mutacijų, susijusių su ligomis.",
@@ -209,6 +210,7 @@ export const dict = {
     markers: "Markers",
     genes: "Genes (SNP)",
     rareMutations: "Rare genetic mutations",
+    rareShort: "Rare mutations",
     ngsTitle: "Next-Generation Sequencing (NGS) Test",
     ngsBlurb:
       "Deep DNA sequencing to detect rare genetic mutations and hereditary disease risks.",

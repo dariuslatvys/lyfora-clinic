@@ -1661,3 +1661,62 @@ a {
   color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
+
+/* ---------- Category colour sources (compact) ---------- */
+.cat-hero {
+  padding: 16px 18px;
+}
+
+.colour-sources {
+  padding: 12px 14px !important;
+}
+
+.colour-sources-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.colour-source-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.colour-source-grid.multi {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 720px) {
+  .colour-source-grid.multi {
+    grid-template-columns: 1fr;
+  }
+}
+
+.colour-source {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--line-2);
+  background: var(--surface-2);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.colour-source:hover {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
+  background: color-mix(in srgb, var(--accent-soft) 40%, white);
+}
+
+.colour-source-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--muted);
+}

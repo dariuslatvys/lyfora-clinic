@@ -6,7 +6,7 @@ export default function HomePage() {
     <main className="landing">
       <div className="landing-dna" aria-hidden="true">
         <Image
-          src="/brand/molecule-rich.png"
+          src="/brand/dna-bg-wash.jpg"
           alt=""
           fill
           priority

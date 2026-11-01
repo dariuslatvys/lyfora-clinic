@@ -916,10 +916,21 @@ a {
 
 .landing-dna-img {
   object-fit: cover;
-  object-position: 72% 40%;
-  opacity: 0.78;
+  object-position: 58% 42%;
+  opacity: 0.55;
   mix-blend-mode: multiply;
-  animation: dna-drift 22s ease-in-out infinite alternate;
+  filter: saturate(0.75) brightness(1.05);
+  animation: dna-drift 28s ease-in-out infinite alternate;
+}
+
+.landing-dna::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(105deg, rgba(238, 242, 240, 0.82) 0%, rgba(238, 242, 240, 0.35) 42%, rgba(238, 242, 240, 0.55) 100%),
+    radial-gradient(900px 420px at 80% 20%, rgba(216, 245, 234, 0.35), transparent 65%);
+  pointer-events: none;
 }
 
 @keyframes dna-drift {

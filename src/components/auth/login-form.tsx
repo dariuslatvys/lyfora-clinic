@@ -6,22 +6,20 @@ import { Button } from "@/components/ui/button";
 export function LoginForm({
   role,
   title,
-  demoHint,
+  demoHint = "",
   labels,
 }: {
   role: "patient" | "doctor";
   title: string;
-  demoHint: string;
+  demoHint?: string;
   labels: {
     email: string;
     password: string;
     signIn: string;
   };
 }) {
-  const [email, setEmail] = useState(
-    role === "patient" ? "pacientas@lyfora.lt" : "gydytojas@lyfora.lt"
-  );
-  const [password, setPassword] = useState("lyfora2026");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -53,7 +51,9 @@ export function LoginForm({
   return (
     <form onSubmit={onSubmit} className="panel mx-auto w-full max-w-md space-y-4">
       <h1 className="font-[family-name:var(--font-display)] text-3xl">{title}</h1>
-      <p className="text-sm text-[var(--muted)]">{demoHint}</p>
+      {demoHint ? (
+        <p className="text-sm text-[var(--muted)]">{demoHint}</p>
+      ) : null}
       <label className="block text-sm">
         <span className="mb-1 block text-[var(--muted)]">{labels.email}</span>
         <input

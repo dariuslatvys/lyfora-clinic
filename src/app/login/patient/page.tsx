@@ -29,7 +29,7 @@ export default function PatientLoginPage() {
         <LoginForm
           role="patient"
           title="Prisijungimas"
-          demoHint="Demo: pacientas@lyfora.lt / lyfora2026 (Jonas Jonaitis / John Doe) · paciente@lyfora.lt (Rasa Rasaitė / Jane Smith)"
+          demoHint=""
           labels={{
             email: "El. paštas / Email",
             password: "Slaptažodis / Password",

@@ -44,6 +44,9 @@ next-env.d.ts
 /data/db/*.sqlite
 /data/db/*.sqlite-*
 
+# patient-uploaded files (local /tmp on Vercel)
+/data/uploads/
+
 # bulky raw uploads (parsed JSON is enough to seed)
 /data/lyfora-source/**/*.vcf
 /data/lyfora-source/**/*.pdf

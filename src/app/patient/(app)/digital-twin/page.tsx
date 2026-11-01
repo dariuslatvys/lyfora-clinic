@@ -7,6 +7,12 @@ import { patientDisplayName } from "@/lib/i18n/patient-name";
 import { OverviewPanels } from "@/components/patient/overview-panels";
 import { collectFlaggedLabs } from "@/lib/health/marker-colour";
 import type { RiskColour } from "@/lib/health/colours";
+import {
+  formatVisitWhen,
+  upcomingVisits,
+  visitDoctor,
+  visitTitle,
+} from "@/lib/health/demo-visits";
 
 const RANK: Record<RiskColour, number> = {
   grey: 0,
@@ -55,24 +61,13 @@ export default async function DigitalTwinPage() {
     href: `/patient/digital-twin/${c.id}`,
   }));
 
-  const visits =
-    locale === "en"
-      ? [
-          {
-            id: "v1",
-            when: "12 Nov · 10:30",
-            title: "Cardiology follow-up",
-            withWhom: "Dr. Lyfora",
-          },
-        ]
-      : [
-          {
-            id: "v1",
-            when: "11-12 · 10:30",
-            title: "Kardiologo kontrolė",
-            withWhom: "Dr. Lyfora",
-          },
-        ];
+  const visits = upcomingVisits(3).map((v) => ({
+    id: v.id,
+    when: formatVisitWhen(v, locale),
+    title: visitTitle(v, locale),
+    withWhom: visitDoctor(v, locale),
+    href: `/patient/visits/${v.id}`,
+  }));
 
   const goals =
     locale === "en"

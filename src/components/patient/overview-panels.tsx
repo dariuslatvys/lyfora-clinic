@@ -22,6 +22,7 @@ export type OverviewVisit = {
   when: string;
   title: string;
   withWhom: string;
+  href: string;
 };
 
 type Labels = {
@@ -160,13 +161,17 @@ export function OverviewPanels({
                 {visits.length ? (
                   <div className="list">
                     {visits.map((v) => (
-                      <div key={v.id} className="li">
+                      <Link
+                        key={v.id}
+                        href={v.href}
+                        className="li click"
+                      >
                         <div className="grow">
                           <b>{v.title}</b>
                           <span className="xs muted">{v.withWhom}</span>
                         </div>
                         <span className="small muted">{v.when}</span>
-                      </div>
+                      </Link>
                     ))}
                   </div>
                 ) : (

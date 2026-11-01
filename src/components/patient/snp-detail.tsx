@@ -4,7 +4,6 @@ import {
   COLOUR_HEX,
   COLOUR_SOFT,
   PILL_CLASS,
-  normalizeColour,
   type RiskColour,
 } from "@/lib/health/colours";
 import { explainSnp } from "@/lib/health/explain-snp";
@@ -71,23 +70,6 @@ export function SnpDetailPanel({
           {expl.subcategoryLine ? (
             <p className="mt-2 text-xs font-medium text-[var(--muted)]">
               {expl.subcategoryLine}
-            </p>
-          ) : null}
-          {snp.match1 ? (
-            <p className="mt-2 text-xs text-[var(--muted)]">
-              Match 1 →{" "}
-              {
-                labels.colourLabels[
-                  normalizeColour(snp.match1) || "grey"
-                ]
-              }
-              {snp.match2
-                ? ` · Match 2 → ${
-                    labels.colourLabels[
-                      normalizeColour(snp.match2) || "grey"
-                    ]
-                  }`
-                : ""}
             </p>
           ) : null}
         </div>

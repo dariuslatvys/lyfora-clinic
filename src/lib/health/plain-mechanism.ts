@@ -3,7 +3,11 @@
  * that a non-clinician can understand.
  */
 
+import { pharmaPersonalMeaning } from "./pharma-plain";
+
 const LT_TERMS: [RegExp, string][] = [
+  // Drug names for pharmacogenetics are explained in pharmaPersonalMeaning
+  // and in curated LT mechanism texts — avoid auto-expanding them here.
   [/\bSHBG\b/g, "SHBG (baltymas, kuris kraujyje „suriša“ hormonus, pvz. testosteroną)"],
   [/\bandrogen(?:ų|ams|ai|as|ą)?(?=[^a-ząčęėįšųūž]|$)/gi, "vyriškųjų hormonų (androgenų)"],
   [/\btestosterono\b/gi, "testosterono (pagrindinio vyriškojo hormono)"],
@@ -54,31 +58,41 @@ const EN_TERMS: [RegExp, string][] = [
 
 function stripStrandNote(text: string): string {
   return text
-    .replace(/\s*\(neigiama grandinė\s*[–-]\s*[A-Z]\)\s*/gi, " ")
+    .replace(/\s*\((?:neigiama|priešinga) grandinė\s*[–-]\s*[A-Z]\)\s*/gi, " ")
     .replace(/\s*\(negative strand\s*[–-]\s*[A-Z]\)\s*/gi, " ")
+    .replace(/\s*\(G on the opposite strand\)\s*/gi, " ")
+    .replace(/\s*\(A on the opposite strand\)\s*/gi, " ")
     .replace(/\s{2,}/g, " ")
     .trim();
 }
 
 function applyGlossary(text: string, terms: [RegExp, string][]): string {
+  const slots: string[] = [];
   let out = text;
   const used = new Set<string>();
   for (const [re, replacement] of terms) {
     out = out.replace(re, (match) => {
       const key = match.toLowerCase();
-      // Expand first hit more fully; later hits keep short form if already expanded nearby
-      if (used.has(key) && replacement.includes("(")) {
-        return match;
-      }
+      // Expand first hit fully; later hits keep the short original form
+      if (used.has(key)) return match;
       used.add(key);
-      return replacement;
+      const id = slots.length;
+      // Placeholder so later glossary rules cannot re-expand inside this text
+      slots.push(replacement.includes("(") ? replacement : replacement);
+      return `\uE000${id}\uE001`;
     });
   }
-  return out;
+  return out.replace(/\uE000(\d+)\uE001/g, (_, i) => slots[Number(i)]!);
 }
 
-function personalMeaningLt(raw: string): string {
-  const t = raw.toLowerCase();
+function personalMeaningLt(
+  raw: string,
+  ctx?: { gene?: string | null; subcategory?: string | null }
+): string {
+  const pharma = pharmaPersonalMeaning(raw, "lt", ctx);
+  if (pharma) return pharma;
+
+  const t = `${ctx?.gene || ""} ${ctx?.subcategory || ""} ${raw}`.toLowerCase();
   if (/shbg|testosteron|androgen/.test(t)) {
     return "Ką tai gali reikšti jums: dalis testosterono kraujyje gali būti „surišta“ ir mažiau prieinama raumenims, kaulams, nuotaikai ir libido — todėl kai kuriems žmonėms svarbu stebėti hormonų tyrimus ir savijautą, o ne tik bendrą testosterono skaičių.";
   }
@@ -103,8 +117,14 @@ function personalMeaningLt(raw: string): string {
   return "Ką tai gali reikšti jums: tai genetinis polinkio signalas, o ne liga. Jis padeda suprasti, ką stebėti tyrimuose ir gyvenimo būde; sprendimus dėl gydymo priima tik gydytojas.";
 }
 
-function personalMeaningEn(raw: string): string {
-  const t = raw.toLowerCase();
+function personalMeaningEn(
+  raw: string,
+  ctx?: { gene?: string | null; subcategory?: string | null }
+): string {
+  const pharma = pharmaPersonalMeaning(raw, "en", ctx);
+  if (pharma) return pharma;
+
+  const t = `${ctx?.gene || ""} ${ctx?.subcategory || ""} ${raw}`.toLowerCase();
   if (/shbg|testosterone|androgen/.test(t)) {
     return "What this may mean for you: more testosterone in blood may be “bound” and less available to tissues that need it (muscle, mood, libido). It is a reason to watch hormone labs with your clinician — not a diagnosis.";
   }
@@ -123,9 +143,15 @@ function personalMeaningEn(raw: string): string {
   return "What this may mean for you: this is a genetic predisposition signal, not a disease. Use it to guide what to watch in labs and lifestyle; treatment decisions belong with your clinician.";
 }
 
+export type MechanismContext = {
+  gene?: string | null;
+  subcategory?: string | null;
+};
+
 export function humanizeMechanism(
   raw: string | null | undefined,
-  locale: "lt" | "en"
+  locale: "lt" | "en",
+  ctx?: MechanismContext
 ): string {
   const source = (raw || "").trim();
   if (!source) {
@@ -145,19 +171,39 @@ export function humanizeMechanism(
     "This risk allele "
   );
 
+  // Soften “activity score” jargon for patients
+  if (locale === "lt") {
+    body = body
+      .replace(
+        /bendro DPYD aktyvumo balo pagal abi geno kopijas/gi,
+        "bendro abiejų geno kopijų įvertinimo (kiek gerai organizmas skaido tuos vaistus)"
+      )
+      .replace(
+        /DPYD aktyvumo bal(?:o|u|ą)?/gi,
+        "bendro genų įvertinimo, kiek gerai organizmas skaido tuos vaistus"
+      )
+      .replace(/klinikinės stebėsenos metu/gi, "gydytojui stebint savijautą ir tyrimus");
+  } else {
+    body = body.replace(
+      /combined DPYD activity score from both gene copies/gi,
+      "combined check of both gene copies (how well the body clears those medicines)"
+    );
+  }
+
   if (locale === "lt") {
     body = applyGlossary(body, LT_TERMS);
-    // Soften academic verbs
     body = body
       .replace(/\bsiejamas su\b/gi, "siejasi su")
       .replace(/\bgali veikti\b/gi, "gali turėti įtakos")
-      .replace(/\bveikiant bendrą\b/gi, "ir taip veikia bendrą");
-    const meaning = personalMeaningLt(source);
+      .replace(/\bveikiant bendrą\b/gi, "ir taip veikia bendrą")
+      .replace(/\bsunkaus toksiškumo riziką/gi, "sunkaus šalutinio poveikio riziką")
+      .replace(/\btoksiškumo riziką/gi, "sunkaus šalutinio poveikio riziką");
+    const meaning = personalMeaningLt(source, ctx);
     return `${body}\n\n${meaning}`;
   }
 
   body = applyGlossary(body, EN_TERMS);
-  const meaning = personalMeaningEn(source);
+  const meaning = personalMeaningEn(source, ctx);
   return `${body}\n\n${meaning}`;
 }
 

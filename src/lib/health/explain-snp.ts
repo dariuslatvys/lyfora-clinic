@@ -3,6 +3,7 @@ import type { RiskColour } from "./colours";
 import type { EvaluatedSnp } from "./evaluate";
 import mechanismLtMap from "./snp_mechanism_lt.json";
 import { humanizeMechanism } from "./plain-mechanism";
+import { pharmaSubcategoryLabel } from "./pharma-plain";
 
 const LT_MAP = mechanismLtMap as Record<string, string>;
 
@@ -146,6 +147,9 @@ export function explainSnp(snp: EvaluatedSnp, locale: Locale): SnpExplanation {
       ? LT_MAP[snp.snpId]?.trim() || snp.mechanism?.trim() || ""
       : snp.mechanism?.trim() || "";
 
+  const mechCtx = { gene: snp.gene, subcategory: snp.subcategory };
+  const focusLabel = pharmaSubcategoryLabel(snp.subcategory, locale);
+
   if (locale === "en") {
     return {
       title: `${snp.gene} · ${rsId}`,
@@ -153,10 +157,12 @@ export function explainSnp(snp: EvaluatedSnp, locale: Locale): SnpExplanation {
         ? `Your genotype: ${gt}`
         : "Genotype not available yet",
       whyColour: buildWhy(snp, "en"),
-      subcategoryLine: snp.subcategory
-        ? `Focus area: ${snp.subcategory}`
-        : null,
-      plainBody: humanizeMechanism(raw, "en"),
+      subcategoryLine: focusLabel
+        ? `About these medicines: ${focusLabel}`
+        : snp.subcategory
+          ? `Focus area: ${snp.subcategory}`
+          : null,
+      plainBody: humanizeMechanism(raw, "en", mechCtx),
       disclaimer:
         "Plain-language explanation based on gene, SNP, impact/evidence levels and the Mechanism notes — not a diagnosis or a prescription change. Discuss medicines and doses only with your clinician.",
     };
@@ -166,10 +172,12 @@ export function explainSnp(snp: EvaluatedSnp, locale: Locale): SnpExplanation {
     title: `${snp.gene} · ${rsId}`,
     genotypeLine: gt ? `Jūsų genotipas: ${gt}` : "Genotipas dar neprieinamas",
     whyColour: buildWhy(snp, "lt"),
-    subcategoryLine: snp.subcategory
-      ? `Sritis: ${snp.subcategory}`
-      : null,
-    plainBody: humanizeMechanism(raw, "lt"),
+    subcategoryLine: focusLabel
+      ? `Apie kokius vaistus: ${focusLabel}`
+      : snp.subcategory
+        ? `Sritis: ${snp.subcategory}`
+        : null,
+    plainBody: humanizeMechanism(raw, "lt", mechCtx),
     disclaimer:
       "Paaiškinimas paprasta kalba pagal geno, SNP, poveikio / įrodymų lygį ir Mechanism gaires. Tai nėra diagnozė ir ne vaisto skyrimo keitimas — dozes ir gydymą aptarkite tik su gydytoju.",
   };

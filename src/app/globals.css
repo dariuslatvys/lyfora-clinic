@@ -1395,10 +1395,10 @@ a {
 .ring-map-figure {
   position: absolute;
   left: 50%;
-  /* Lower than geometric center so head clears the heart node */
-  top: 58%;
-  transform: translate(-50%, -46%);
-  width: min(108px, 18%);
+  /* Lower so the twin clears the heart node and side icons */
+  top: 62%;
+  transform: translate(-50%, -42%);
+  width: min(100px, 17%);
   z-index: 1;
   pointer-events: none;
 }

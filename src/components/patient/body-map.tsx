@@ -13,7 +13,7 @@ export type BodyMapCategory = {
 };
 
 /**
- * Clockwise from heart at 12 o'clock, equal angular steps.
+ * Clockwise from heart at 12 o'clock.
  * hormones_women / hormones_men share one slot by sex.
  */
 const ORBIT_ORDER = [
@@ -83,29 +83,25 @@ type Slot = {
 };
 
 /**
- * Even orbit: heart (index 0) at top (-90° / 12 o'clock),
- * then equal 360°/n steps clockwise.
+ * Heart at 12 o'clock. Remaining categories fill equal 45° steps
+ * around an 8-slot ring, skipping the bottom (90°) slot so the
+ * DNR hint has room and each side gets three evenly spaced nodes.
+ *
+ * Slots (deg): -90, -45, 0, 45, [skip 90], 135, 180, 225
  */
-function slotFor(index: number, total: number): Slot {
+function slotFor(index: number): Slot {
   const iconR = 39;
-  const n = Math.max(total, 1);
-  const step = 360 / n;
-  const deg = -90 + step * index;
+  // 8 clock positions; index 4 (bottom) is reserved empty
+  const slotIndex = index < 4 ? index : index + 1;
+  const deg = -90 + slotIndex * 45;
   const rad = (deg * Math.PI) / 180;
   const x = 50 + iconR * Math.cos(rad);
   const y = 50 + iconR * Math.sin(rad);
 
-  const a = ((deg % 360) + 360) % 360;
-  let place: LabelPlace;
+  let place: LabelPlace = "right";
   if (index === 0) place = "top";
-  else if (a >= 45 && a < 135) place = "bottom";
-  else if (a >= 135 && a < 225) place = "left";
-  else if (a >= 225 && a < 315) place = "top";
-  else place = "right";
-
-  // Prefer side labels for near-horizontal upper slots (clear of heart title)
-  if (index !== 0 && a >= 225 && a < 315) place = "left";
-  if (index !== 0 && (a >= 315 || a < 45)) place = "right";
+  else if (deg > -90 && deg < 90) place = "right";
+  else place = "left";
 
   return { x, y, place, deg };
 }
@@ -118,7 +114,7 @@ export function BodyMap({
   geneHint: string;
   centerLabel?: string;
 }) {
-  const ordered = orderCategories(categories).slice(0, 8);
+  const ordered = orderCategories(categories).slice(0, 7);
 
   return (
     <div className="ring-map rise-in-delay">
@@ -147,7 +143,7 @@ export function BodyMap({
         </div>
 
         {ordered.map((c, i) => {
-          const s = slotFor(i, ordered.length);
+          const s = slotFor(i);
           return (
             <Link
               key={c.id}
@@ -158,7 +154,7 @@ export function BodyMap({
                 top: `${s.y}%`,
                 ["--cc" as string]: COLOUR_HEX[c.colour],
               }}
-              data-orbit-deg={s.deg.toFixed(1)}
+              data-orbit-deg={s.deg.toFixed(0)}
               data-orbit-i={i}
             >
               <span className="ring-dot">

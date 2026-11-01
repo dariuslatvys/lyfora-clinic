@@ -487,19 +487,137 @@ async function main() {
     );
   }
 
-  // Light marker set for female demo (synthetic)
-  const femaleMarkers = [
-    { key: "LDL", value: 2.4, unit: "mmol/L", low: 0, high: 2.59, flag: null, date: "2026-05-01" },
-    { key: "HDL", value: 1.55, unit: "mmol/L", low: 1.2, high: 2.5, flag: null, date: "2026-05-01" },
-    { key: "TOTAL_CHOLESTEROL", value: 4.6, unit: "mmol/L", low: null, high: 5.2, flag: null, date: "2026-05-01" },
-    { key: "HS_CRP", value: 1.2, unit: "mg/L", low: 0, high: 5, flag: null, date: "2026-05-01" },
-    { key: "GLUCOSE", value: 5.1, unit: "mmol/L", low: 4, high: 6, flag: null, date: "2026-05-01" },
-    { key: "TSH", value: 2.1, unit: "mU/L", low: 0.4, high: 4.0, flag: null, date: "2026-05-01" },
-    { key: "VITAMIN_D", value: 48, unit: "nmol/L", low: 75, high: 250, flag: "low", date: "2026-05-01" },
-    { key: "ESTROGEN", value: 220, unit: "pmol/L", low: 100, high: 600, flag: null, date: "2026-05-01" },
+  // Female demo: same lab breadth as male (adapted values) + women's hormones + wearables
+  for (const m of blood.markers) {
+    let value = m.value;
+    let low = m.refLow;
+    let high = m.refHigh;
+    let flag = m.flag;
+    // Female-appropriate CBC / iron ranges where keys are known
+    if (m.markerKey === "HEMOGLOBIN" || m.markerKey === "HGB") {
+      value = 128;
+      low = 120;
+      high = 150;
+      flag = null;
+    } else if (m.markerKey === "FERRITIN") {
+      value = 28;
+      low = 30;
+      high = 200;
+      flag = "low";
+    } else if (m.markerKey === "LDL" || m.markerKey === "LDL_C") {
+      value = 2.75;
+      flag = high != null && value > high ? "high" : null;
+    } else if (m.markerKey === "TESTOSTERONE") {
+      // skip male androgen as primary — women's panel added below
+      continue;
+    }
+    insertResult.run(
+      femaleId,
+      m.markerKey,
+      value,
+      m.unit,
+      low,
+      high,
+      flag,
+      m.date,
+      m.source || "demo-female"
+    );
+  }
+
+  const femaleHormonePanel: {
+    key: string;
+    value: number;
+    unit: string;
+    low: number | null;
+    high: number | null;
+    flag: string | null;
+    date: string;
+  }[] = [
+    { key: "ESTRADIOL", value: 310, unit: "pmol/L", low: 100, high: 600, flag: null, date: "2026-05-01" },
+    { key: "ESTRADIOL", value: 420, unit: "pmol/L", low: 100, high: 600, flag: null, date: "2026-09-12" },
+    { key: "PROGESTERONE", value: 18, unit: "nmol/L", low: 5, high: 70, flag: null, date: "2026-05-01" },
+    { key: "FSH", value: 6.2, unit: "U/L", low: 3, high: 10, flag: null, date: "2026-05-01" },
+    { key: "LH", value: 5.4, unit: "U/L", low: 2, high: 12, flag: null, date: "2026-05-01" },
+    { key: "PROLACTIN", value: 380, unit: "mU/L", low: 100, high: 500, flag: null, date: "2026-05-01" },
+    { key: "AMH", value: 2.1, unit: "ng/mL", low: 1.0, high: 4.0, flag: null, date: "2026-05-01" },
+    { key: "TSH", value: 3.8, unit: "mU/L", low: 0.4, high: 4.0, flag: null, date: "2026-05-01" },
+    { key: "FREE_T4", value: 14.2, unit: "pmol/L", low: 11, high: 22, flag: null, date: "2026-05-01" },
+    { key: "VITAMIN_D", value: 52, unit: "nmol/L", low: 75, high: 250, flag: "low", date: "2026-05-01" },
+    { key: "VITAMIN_D", value: 68, unit: "nmol/L", low: 75, high: 250, flag: "low", date: "2026-09-12" },
+    { key: "FOLATE", value: 9.5, unit: "nmol/L", low: 10, high: 40, flag: "low", date: "2026-05-01" },
   ];
-  for (const m of femaleMarkers) {
-    insertResult.run(femaleId, m.key, m.value, m.unit, m.low, m.high, m.flag, m.date, "demo");
+  for (const m of femaleHormonePanel) {
+    insertResult.run(
+      femaleId,
+      m.key,
+      m.value,
+      m.unit,
+      m.low,
+      m.high,
+      m.flag,
+      m.date,
+      "demo-female-hormones"
+    );
+  }
+
+  const physicalFemale: typeof physicalMale = [
+    {
+      key: "BLOOD_PRESSURE",
+      value: 128,
+      unit: "mmHg SYS",
+      low: 90,
+      high: 129,
+      flag: null,
+      date: "2026-09-20",
+      source: "physical-demo",
+    },
+    {
+      key: "RESTING_HR",
+      value: 72,
+      unit: "bpm",
+      low: 50,
+      high: 75,
+      flag: null,
+      date: "2026-09-20",
+      source: "physical-demo",
+    },
+    {
+      key: "BMI",
+      value: 24.1,
+      unit: "kg/m²",
+      low: 18.5,
+      high: 24.9,
+      flag: null,
+      date: "2026-09-20",
+      source: "physical-demo",
+    },
+    { key: "VO2MAX", value: 29, unit: "ml/kg/min", low: 30, high: 50, flag: "low", date: "2025-11-01", source: "apple-health" },
+    { key: "VO2MAX", value: 31, unit: "ml/kg/min", low: 30, high: 50, flag: null, date: "2026-02-01", source: "apple-health" },
+    { key: "VO2MAX", value: 33, unit: "ml/kg/min", low: 30, high: 50, flag: null, date: "2026-05-01", source: "apple-health" },
+    { key: "VO2MAX", value: 35, unit: "ml/kg/min", low: 30, high: 50, flag: null, date: "2026-08-01", source: "apple-health" },
+    { key: "VO2MAX", value: 36, unit: "ml/kg/min", low: 30, high: 50, flag: null, date: "2026-10-20", source: "apple-health" },
+    { key: "ACTIVITY_DATA", value: 6200, unit: "steps/day", low: 7000, high: 15000, flag: "low", date: "2026-06-01", source: "apple-health" },
+    { key: "ACTIVITY_DATA", value: 7100, unit: "steps/day", low: 7000, high: 15000, flag: null, date: "2026-08-01", source: "apple-health" },
+    { key: "ACTIVITY_DATA", value: 8800, unit: "steps/day", low: 7000, high: 15000, flag: null, date: "2026-10-28", source: "apple-health" },
+    { key: "HRV", value: 35, unit: "ms", low: 40, high: 120, flag: "low", date: "2026-07-01", source: "oura" },
+    { key: "HRV", value: 44, unit: "ms", low: 40, high: 120, flag: null, date: "2026-09-01", source: "oura" },
+    { key: "HRV", value: 51, unit: "ms", low: 40, high: 120, flag: null, date: "2026-10-28", source: "oura" },
+    { key: "SLEEP_DATA", value: 6.8, unit: "h", low: 7, high: 9, flag: "low", date: "2026-07-15", source: "oura" },
+    { key: "SLEEP_DATA", value: 7.3, unit: "h", low: 7, high: 9, flag: null, date: "2026-09-15", source: "oura" },
+    { key: "SLEEP_DATA", value: 7.5, unit: "h", low: 7, high: 9, flag: null, date: "2026-10-28", source: "oura" },
+  ];
+  for (const m of physicalFemale) {
+    insertResult.run(
+      femaleId,
+      m.key,
+      m.value,
+      m.unit,
+      m.low,
+      m.high,
+      m.flag,
+      m.date,
+      m.source
+    );
   }
 
   const insertGeno = sqlite.prepare(`
@@ -567,7 +685,7 @@ async function main() {
   insertRareFor(patientId, rareMale.variants);
   insertRareFor(femaleId, rareFemale.variants);
 
-  // Minimal questionnaire for male demo patient
+  // Minimal questionnaire for both demo patients
   const insertQ = sqlite.prepare(
     `INSERT INTO questionnaire (patient_id, key, value) VALUES (?, ?, ?)`
   );
@@ -575,6 +693,12 @@ async function main() {
   insertQ.run(patientId, "smoking", "ne");
   insertQ.run(patientId, "activity", "vidutinis");
   insertQ.run(patientId, "sleep_hours", "6-7");
+  insertQ.run(femaleId, "family_heart_disease", "taip — motina");
+  insertQ.run(femaleId, "smoking", "ne");
+  insertQ.run(femaleId, "activity", "aktyvus");
+  insertQ.run(femaleId, "sleep_hours", "7-8");
+  insertQ.run(femaleId, "family_breast_cancer", "močiutė");
+  insertQ.run(femaleId, "menstrual_regular", "taip");
 
   // Restore patient-entered questionnaire and push vitals into markers
   for (const row of preservedQ) {
@@ -601,13 +725,25 @@ async function main() {
     console.log("  restored questionnaire rows:", preservedQ.length);
   }
 
+  const femaleMarkerCount = (
+    sqlite
+      .prepare(`SELECT COUNT(*) AS c FROM marker_results WHERE patient_id = ?`)
+      .get(femaleId) as { c: number }
+  ).c;
+  const maleMarkerCount = (
+    sqlite
+      .prepare(`SELECT COUNT(*) AS c FROM marker_results WHERE patient_id = ?`)
+      .get(patientId) as { c: number }
+  ).c;
+
   console.log("Seeded Lyfora DB");
-  console.log("  patients: Jonas Jonaitis / John Doe (labs + SNP + NGS), Rasa Rasaitė / Jane Smith (AncestryDNA SNP + female VCF)");
+  console.log("  patients: Jonas Jonaitis / John Doe (labs + SNP + NGS), Rasa Rasaitė / Jane Smith (labs + hormones + SNP + NGS)");
   console.log("  SNPs:", snps.length);
   console.log(
-    "  marker results:",
-    blood.markers.length + physicalMale.length,
-    `(labs ${blood.markers.length} + physical ${physicalMale.length})`
+    "  marker results: male",
+    maleMarkerCount,
+    "female",
+    femaleMarkerCount
   );
   console.log("  male microarray genotypes:", maleGeno.genotypes.length);
   console.log("  female microarray genotypes:", femaleGeno.genotypes.length);

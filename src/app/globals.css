@@ -3487,3 +3487,92 @@ a.hc-kpi.clickable:hover {
   width: 100%;
   justify-content: center;
 }
+
+/* ---------- Prescriptions (e-Rx) ---------- */
+.rx-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.95fr) minmax(0, 1.45fr);
+  gap: 14px;
+  align-items: start;
+}
+
+@media (max-width: 960px) {
+  .rx-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.rx-list .rx-li {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line-2);
+  cursor: pointer;
+}
+
+.rx-list .rx-li.on {
+  background: color-mix(in srgb, var(--accent-soft) 70%, var(--surface));
+}
+
+.rx-detail-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.rx-detail-flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.rx-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+@media (max-width: 800px) {
+  .rx-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.rx-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--accent-soft) 40%, var(--surface));
+  border: 1px solid var(--line-2);
+}
+
+.rx-field b {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.rx-block {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--line-2);
+  background: var(--surface-2);
+}
+
+.rx-ds {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
+  background: color-mix(in srgb, var(--accent-soft) 55%, var(--surface));
+}
+
+.pill.c-orange {
+  background: color-mix(in srgb, #d97706 18%, var(--surface));
+  color: #9a3412;
+}

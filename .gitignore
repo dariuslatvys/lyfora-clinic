@@ -48,4 +48,6 @@ next-env.d.ts
 /data/lyfora-source/**/*.vcf
 /data/lyfora-source/**/*.pdf
 /data/lyfora-source/**/*.PDF
+/data/lyfora-source/dna/**
+!/data/lyfora-source/dna/.gitkeep
 /step*.webp

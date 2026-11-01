@@ -43,7 +43,7 @@ Atidarykite [http://127.0.0.1:43123](http://127.0.0.1:43123).
 
 Šaltiniai: `data/lyfora-source/` ir normalizuoti JSON `data/parsed/`.
 
-- Vyrų demo — laboratoriniai žymenys iš Blood tests PDF + NGS VCF (`MYBPC3`, `MSH2` demonstracinės pozicijos). SNP microarray failas dar neįkeltas.
+- Vyrų demo — laboratoriniai žymenys iš Blood tests PDF + bazinis SNP microarray (23andMe sample) + NGS VCF (`MYBPC3`, `MSH2` demonstracinės pozicijos).
 - Moterų demo — demonstraciniai SNP genotipai + sintetinis NGS VCF (PALB2, RYR1).
 
 ## Stack

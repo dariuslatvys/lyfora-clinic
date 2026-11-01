@@ -25,10 +25,13 @@ export default async function DigitalTwinPage() {
           {labels.categoriesHint}
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
-          {!twin.patient.hasSnpArray && (
+          {!Boolean(twin.patient.hasSnpArray) && (
             <p className="detail-chip">{labels.awaitingDna} · SNP</p>
           )}
-          {twin.patient.hasNgsVcf && (
+          {Boolean(twin.patient.hasSnpArray) && (
+            <p className="detail-chip">SNP · {labels.snpTestTitle}</p>
+          )}
+          {Boolean(twin.patient.hasNgsVcf) && (
             <p className="detail-chip">NGS · {labels.rareMutations}</p>
           )}
         </div>

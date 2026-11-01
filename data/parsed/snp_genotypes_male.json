@@ -1,0 +1,793 @@
+{
+  "source": "SNP_genome_sample_v5_Full_20260402230601.txt",
+  "format": "23andMe",
+  "matched": 131,
+  "genotypes": [
+    {
+      "snpId": "rs1006737",
+      "allele1": "G",
+      "allele2": "G",
+      "genotype": "GG"
+    },
+    {
+      "snpId": "rs10264272",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs1041983",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs10455872",
+      "allele1": "A",
+      "allele2": "A",
+      "genotype": "AA"
+    },
+    {
+      "snpId": "rs1056836",
+      "allele1": "G",
+      "allele2": "G",
+      "genotype": "GG"
+    },
+    {
+      "snpId": "rs1057910",
+      "allele1": "A",
+      "allele2": "C",
+      "genotype": "AC"
+    },
+    {
+      "snpId": "rs1061170",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs1061235",
+      "allele1": "A",
+      "allele2": "A",
+      "genotype": "AA"
+    },
+    {
+      "snpId": "rs10741657",
+      "allele1": "A",
+      "allele2": "A",
+      "genotype": "AA"
+    },
+    {
+      "snpId": "rs10757278",
+      "allele1": "A",
+      "allele2": "G",
+      "genotype": "AG"
+    },
+    {
+      "snpId": "rs10818854",
+      "allele1": "G",
+      "allele2": "G",
+      "genotype": "GG"
+    },
+    {
+      "snpId": "rs10830963",
+      "allele1": "G",
+      "allele2": "G",
+      "genotype": "GG"
+    },
+    {
+      "snpId": "rs10835638",
+      "allele1": "G",
+      "allele2": "G",
+      "genotype": "GG"
+    },
+    {
+      "snpId": "rs112766203",
+      "allele1": "G",
+      "allele2": "G",
+      "genotype": "GG"
+    },
+    {
+      "snpId": "rs1135840",
+      "allele1": "C",
+      "allele2": "G",
+      "genotype": "CG"
+    },
+    {
+      "snpId": "rs113994095",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs1142345",
+      "allele1": "T",
+      "allele2": "T",
+      "genotype": "TT"
+    },
+    {
+      "snpId": "rs115232898",
+      "allele1": "T",
+      "allele2": "T",
+      "genotype": "TT"
+    },
+    {
+      "snpId": "rs116855232",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs1172822",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs1208",
+      "allele1": "A",
+      "allele2": "A",
+      "genotype": "AA"
+    },
+    {
+      "snpId": "rs12248560",
+      "allele1": "C",
+      "allele2": "T",
+      "genotype": "CT"
+    },
+    {
+      "snpId": "rs1229984",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs1260326",
+      "allele1": "C",
+      "allele2": "T",
+      "genotype": "CT"
+    },
+    {
+      "snpId": "rs12722",
+      "allele1": "T",
+      "allele2": "T",
+      "genotype": "TT"
+    },
+    {
+      "snpId": "rs12769205",
+      "allele1": "A",
+      "allele2": "A",
+      "genotype": "AA"
+    },
+    {
+      "snpId": "rs12777823",
+      "allele1": "G",
+      "allele2": "G",
+      "genotype": "GG"
+    },
+    {
+      "snpId": "rs13266634",
+      "allele1": "T",
+      "allele2": "T",
+      "genotype": "TT"
+    },
+    {
+      "snpId": "rs1360780",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs146356975",
+      "allele1": "T",
+      "allele2": "T",
+      "genotype": "TT"
+    },
+    {
+      "snpId": "rs147390019",
+      "allele1": "G",
+      "allele2": "G",
+      "genotype": "GG"
+    },
+    {
+      "snpId": "rs1535",
+      "allele1": "A",
+      "allele2": "G",
+      "genotype": "AG"
+    },
+    {
+      "snpId": "rs16969968",
+      "allele1": "G",
+      "allele2": "G",
+      "genotype": "GG"
+    },
+    {
+      "snpId": "rs174547",
+      "allele1": "C",
+      "allele2": "T",
+      "genotype": "CT"
+    },
+    {
+      "snpId": "rs17602729",
+      "allele1": "A",
+      "allele2": "G",
+      "genotype": "AG"
+    },
+    {
+      "snpId": "rs17782313",
+      "allele1": "T",
+      "allele2": "T",
+      "genotype": "TT"
+    },
+    {
+      "snpId": "rs1799807",
+      "allele1": "T",
+      "allele2": "T",
+      "genotype": "TT"
+    },
+    {
+      "snpId": "rs1799853",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs1799929",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs1799930",
+      "allele1": "G",
+      "allele2": "G",
+      "genotype": "GG"
+    },
+    {
+      "snpId": "rs1799931",
+      "allele1": "G",
+      "allele2": "G",
+      "genotype": "GG"
+    },
+    {
+      "snpId": "rs1799941",
+      "allele1": "A",
+      "allele2": "G",
+      "genotype": "AG"
+    },
+    {
+      "snpId": "rs1800460",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs1800462",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs1800497",
+      "allele1": "G",
+      "allele2": "G",
+      "genotype": "GG"
+    },
+    {
+      "snpId": "rs1800562",
+      "allele1": "G",
+      "allele2": "G",
+      "genotype": "GG"
+    },
+    {
+      "snpId": "rs1800584",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs1801131",
+      "allele1": "G",
+      "allele2": "T",
+      "genotype": "GT"
+    },
+    {
+      "snpId": "rs1801133",
+      "allele1": "G",
+      "allele2": "G",
+      "genotype": "GG"
+    },
+    {
+      "snpId": "rs1801279",
+      "allele1": "G",
+      "allele2": "G",
+      "genotype": "GG"
+    },
+    {
+      "snpId": "rs1801280",
+      "allele1": "T",
+      "allele2": "T",
+      "genotype": "TT"
+    },
+    {
+      "snpId": "rs1801282",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs1803274",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs1805086",
+      "allele1": "T",
+      "allele2": "T",
+      "genotype": "TT"
+    },
+    {
+      "snpId": "rs1815739",
+      "allele1": "C",
+      "allele2": "T",
+      "genotype": "CT"
+    },
+    {
+      "snpId": "rs1990760",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs2066844",
+      "allele1": "C",
+      "allele2": "T",
+      "genotype": "CT"
+    },
+    {
+      "snpId": "rs2108622",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs2187668",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs2200733",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs2230926",
+      "allele1": "T",
+      "allele2": "T",
+      "genotype": "TT"
+    },
+    {
+      "snpId": "rs2231142",
+      "allele1": "G",
+      "allele2": "T",
+      "genotype": "GT"
+    },
+    {
+      "snpId": "rs2241880",
+      "allele1": "A",
+      "allele2": "A",
+      "genotype": "AA"
+    },
+    {
+      "snpId": "rs2282679",
+      "allele1": "G",
+      "allele2": "G",
+      "genotype": "GG"
+    },
+    {
+      "snpId": "rs2306283",
+      "allele1": "A",
+      "allele2": "A",
+      "genotype": "AA"
+    },
+    {
+      "snpId": "rs231775",
+      "allele1": "A",
+      "allele2": "A",
+      "genotype": "AA"
+    },
+    {
+      "snpId": "rs2395029",
+      "allele1": "T",
+      "allele2": "T",
+      "genotype": "TT"
+    },
+    {
+      "snpId": "rs28371685",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs28371686",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs28371706",
+      "allele1": "G",
+      "allele2": "G",
+      "genotype": "GG"
+    },
+    {
+      "snpId": "rs28399499",
+      "allele1": "T",
+      "allele2": "T",
+      "genotype": "TT"
+    },
+    {
+      "snpId": "rs28399504",
+      "allele1": "A",
+      "allele2": "A",
+      "genotype": "AA"
+    },
+    {
+      "snpId": "rs2943641",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs3135506",
+      "allele1": "G",
+      "allele2": "G",
+      "genotype": "GG"
+    },
+    {
+      "snpId": "rs3184504",
+      "allele1": "C",
+      "allele2": "T",
+      "genotype": "CT"
+    },
+    {
+      "snpId": "rs324420",
+      "allele1": "A",
+      "allele2": "C",
+      "genotype": "AC"
+    },
+    {
+      "snpId": "rs328",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs34223104",
+      "allele1": "T",
+      "allele2": "T",
+      "genotype": "TT"
+    },
+    {
+      "snpId": "rs34536443",
+      "allele1": "G",
+      "allele2": "G",
+      "genotype": "GG"
+    },
+    {
+      "snpId": "rs35599367",
+      "allele1": "G",
+      "allele2": "G",
+      "genotype": "GG"
+    },
+    {
+      "snpId": "rs3736228",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs3745274",
+      "allele1": "G",
+      "allele2": "G",
+      "genotype": "GG"
+    },
+    {
+      "snpId": "rs3798220",
+      "allele1": "T",
+      "allele2": "T",
+      "genotype": "TT"
+    },
+    {
+      "snpId": "rs3918290",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs41291556",
+      "allele1": "T",
+      "allele2": "T",
+      "genotype": "TT"
+    },
+    {
+      "snpId": "rs4148323",
+      "allele1": "G",
+      "allele2": "G",
+      "genotype": "GG"
+    },
+    {
+      "snpId": "rs4149056",
+      "allele1": "T",
+      "allele2": "T",
+      "genotype": "TT"
+    },
+    {
+      "snpId": "rs4244285",
+      "allele1": "G",
+      "allele2": "G",
+      "genotype": "GG"
+    },
+    {
+      "snpId": "rs429358",
+      "allele1": "C",
+      "allele2": "T",
+      "genotype": "CT"
+    },
+    {
+      "snpId": "rs4680",
+      "allele1": "A",
+      "allele2": "A",
+      "genotype": "AA"
+    },
+    {
+      "snpId": "rs4845625",
+      "allele1": "C",
+      "allele2": "T",
+      "genotype": "CT"
+    },
+    {
+      "snpId": "rs4961",
+      "allele1": "G",
+      "allele2": "T",
+      "genotype": "GT"
+    },
+    {
+      "snpId": "rs4986893",
+      "allele1": "G",
+      "allele2": "G",
+      "genotype": "GG"
+    },
+    {
+      "snpId": "rs505151",
+      "allele1": "A",
+      "allele2": "A",
+      "genotype": "AA"
+    },
+    {
+      "snpId": "rs5186",
+      "allele1": "A",
+      "allele2": "C",
+      "genotype": "AC"
+    },
+    {
+      "snpId": "rs5219",
+      "allele1": "C",
+      "allele2": "T",
+      "genotype": "CT"
+    },
+    {
+      "snpId": "rs523349",
+      "allele1": "G",
+      "allele2": "G",
+      "genotype": "GG"
+    },
+    {
+      "snpId": "rs55886062",
+      "allele1": "A",
+      "allele2": "A",
+      "genotype": "AA"
+    },
+    {
+      "snpId": "rs56038477",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs560887",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs58542926",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs59421388",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs6025",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs6166",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs6258",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs6265",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs6295",
+      "allele1": "C",
+      "allele2": "G",
+      "genotype": "CG"
+    },
+    {
+      "snpId": "rs641738",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs6548238",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs662799",
+      "allele1": "A",
+      "allele2": "A",
+      "genotype": "AA"
+    },
+    {
+      "snpId": "rs671",
+      "allele1": "G",
+      "allele2": "G",
+      "genotype": "GG"
+    },
+    {
+      "snpId": "rs67376798",
+      "allele1": "T",
+      "allele2": "T",
+      "genotype": "TT"
+    },
+    {
+      "snpId": "rs693",
+      "allele1": "A",
+      "allele2": "G",
+      "genotype": "AG"
+    },
+    {
+      "snpId": "rs699",
+      "allele1": "A",
+      "allele2": "A",
+      "genotype": "AA"
+    },
+    {
+      "snpId": "rs7193343",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs72552267",
+      "allele1": "G",
+      "allele2": "G",
+      "genotype": "GG"
+    },
+    {
+      "snpId": "rs738409",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs7412",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs7454108",
+      "allele1": "T",
+      "allele2": "T",
+      "genotype": "TT"
+    },
+    {
+      "snpId": "rs75017182",
+      "allele1": "G",
+      "allele2": "G",
+      "genotype": "GG"
+    },
+    {
+      "snpId": "rs7574865",
+      "allele1": "T",
+      "allele2": "T",
+      "genotype": "TT"
+    },
+    {
+      "snpId": "rs776746",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs780094",
+      "allele1": "C",
+      "allele2": "T",
+      "genotype": "CT"
+    },
+    {
+      "snpId": "rs7900194",
+      "allele1": "G",
+      "allele2": "G",
+      "genotype": "GG"
+    },
+    {
+      "snpId": "rs7903146",
+      "allele1": "C",
+      "allele2": "T",
+      "genotype": "CT"
+    },
+    {
+      "snpId": "rs855791",
+      "allele1": "G",
+      "allele2": "G",
+      "genotype": "GG"
+    },
+    {
+      "snpId": "rs887829",
+      "allele1": "C",
+      "allele2": "T",
+      "genotype": "CT"
+    },
+    {
+      "snpId": "rs9263726",
+      "allele1": "G",
+      "allele2": "G",
+      "genotype": "GG"
+    },
+    {
+      "snpId": "rs9349379",
+      "allele1": "G",
+      "allele2": "G",
+      "genotype": "GG"
+    },
+    {
+      "snpId": "rs9923231",
+      "allele1": "C",
+      "allele2": "T",
+      "genotype": "CT"
+    },
+    {
+      "snpId": "rs9939609",
+      "allele1": "A",
+      "allele2": "T",
+      "genotype": "AT"
+    }
+  ]
+}

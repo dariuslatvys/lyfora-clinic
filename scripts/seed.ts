@@ -217,8 +217,8 @@ function main() {
     blood.dob,
     null,
     1,
-    0,
-    "Demo vyrų paciento laboratoriniai žymenys + NGS VCF (sintetinės MYBPC3/MSH2 pozicijos). SNP microarray failas dar neįkeltas."
+    1,
+    "Demo vyrų paciento laboratoriniai žymenys + bazinis SNP microarray + NGS VCF (sintetinės MYBPC3/MSH2 pozicijos)."
   );
 
   sqlite.prepare(`
@@ -360,11 +360,27 @@ function main() {
     insertResult.run(femaleId, m.key, m.value, m.unit, m.low, m.high, m.flag, m.date, "demo");
   }
 
-  // Demo SNP genotypes for female patient — create 1-match / 2-match patterns
   const insertGeno = sqlite.prepare(`
     INSERT INTO snp_genotypes (patient_id, snp_id, allele_1, allele_2, source)
     VALUES (?, ?, ?, ?, ?)
   `);
+
+  // Real microarray genotypes for male demo patient (23andMe-format sample)
+  const maleGeno = readJson<{
+    genotypes: { snpId: string; allele1: string; allele2: string }[];
+    source?: string;
+  }>("snp_genotypes_male.json");
+  for (const g of maleGeno.genotypes) {
+    insertGeno.run(
+      patientId,
+      g.snpId,
+      g.allele1,
+      g.allele2,
+      maleGeno.source || "snp_microarray"
+    );
+  }
+
+  // Demo SNP genotypes for female patient — create 1-match / 2-match patterns
   const cardio = snps.filter((s) => s.primaryCategory === "Cardiovascular Health");
   const hormonesW = snps.filter((s) => s.primaryCategory === "Hormones (Women)");
   const mental = snps.filter((s) => s.primaryCategory === "Mental and Cognitive Health");
@@ -445,9 +461,10 @@ function main() {
   insertQ.run(patientId, "sleep_hours", "6-7");
 
   console.log("Seeded Lyfora DB");
-  console.log("  patients: Jonas Jonaitis / John Doe (labs + male NGS), Rasa Rasaitė / Jane Smith (demo SNP + female VCF)");
+  console.log("  patients: Jonas Jonaitis / John Doe (labs + SNP + NGS), Rasa Rasaitė / Jane Smith (demo SNP + female VCF)");
   console.log("  SNPs:", snps.length);
   console.log("  marker results:", blood.markers.length);
+  console.log("  male microarray genotypes:", maleGeno.genotypes.length);
   console.log("  male rare:", rareMale.variants.length, "female rare:", rareFemale.variants.length);
   console.log("  logins: pacientas@lyfora.lt / paciente@lyfora.lt / gydytojas@lyfora.lt  pass: lyfora2026");
 }

@@ -214,7 +214,15 @@ export default async function CategoryDetailPage({
                           NGS · {v.gene} · {v.hgvs}
                         </p>
                       </div>
-                      <AskAiButton question={ask} label={labels.askAi} />
+                      <div className="row" style={{ gap: 6 }}>
+                        <AskAiButton question={ask} label={labels.askAi} />
+                        <Link
+                          href={`/patient/rare/${encodeURIComponent(String(v.id ?? v.gene))}`}
+                          className="btn ghost sm"
+                        >
+                          {labels.openCategory}
+                        </Link>
+                      </div>
                     </div>
                     <p className="eyebrow mt-3">{labels.plainLanguage}</p>
                     <p className="mt-1 text-sm leading-relaxed text-[var(--ink)]">
@@ -254,7 +262,7 @@ export default async function CategoryDetailPage({
                       <div className="row" style={{ gap: 6 }}>
                         <AskAiButton question={ask} label={labels.askAi} />
                         <Link
-                          href={`/patient/digital-twin/${category}?marker=${m.markerKey}`}
+                          href={`/patient/marker/${encodeURIComponent(m.markerKey)}?cat=${category}`}
                           className="btn ghost sm"
                         >
                           {labels.openCategory}
@@ -300,7 +308,7 @@ export default async function CategoryDetailPage({
                       <div className="row" style={{ gap: 6 }}>
                         <AskAiButton question={ask} label={labels.askAi} />
                         <Link
-                          href={`/patient/digital-twin/${category}?snp=${s.snpId}#snp-detail`}
+                          href={`/patient/snp/${encodeURIComponent(s.snpId)}?cat=${category}`}
                           className="btn ghost sm"
                         >
                           {labels.mechanism}
@@ -330,9 +338,10 @@ export default async function CategoryDetailPage({
           </div>
           <div className="grid gap-3">
             {catRare.map((v) => (
-              <article
+              <Link
                 key={v.id ?? `${v.gene}-${v.hgvs}`}
-                className="rounded-lg border border-[var(--r-red)]/30 bg-[var(--r-red-bg)]/40 p-4"
+                href={`/patient/rare/${encodeURIComponent(String(v.id ?? v.gene))}`}
+                className="block rounded-lg border border-[var(--r-red)]/30 bg-[var(--r-red-bg)]/40 p-4 transition hover:border-[var(--r-red)]"
               >
                 <div className="flex flex-wrap items-center gap-2">
                   <Pill colour="red" label={labels.colourLabels.red} />
@@ -346,7 +355,7 @@ export default async function CategoryDetailPage({
                 <p className="mt-2 text-sm leading-relaxed text-[var(--ink-soft)]">
                   {locale === "lt" ? v.summaryLt : v.summaryEn}
                 </p>
-              </article>
+              </Link>
             ))}
           </div>
         </section>
@@ -371,7 +380,7 @@ export default async function CategoryDetailPage({
                   return (
                     <Link
                       key={m.markerKey}
-                      href={`/patient/digital-twin/${category}?marker=${m.markerKey}`}
+                      href={`/patient/marker/${encodeURIComponent(m.markerKey)}?cat=${category}`}
                       className={`block rounded-md border px-3 py-2 transition hover:border-[var(--accent)] ${
                         selectedMarkerKey === m.markerKey
                           ? "border-[var(--accent)] bg-[var(--accent-soft)]"
@@ -489,7 +498,7 @@ export default async function CategoryDetailPage({
                   return (
                     <Link
                       key={`${s.gene}-${s.snpId}`}
-                      href={`/patient/digital-twin/${category}?snp=${encodeURIComponent(s.snpId)}#snp-detail`}
+                      href={`/patient/snp/${encodeURIComponent(s.snpId)}?cat=${category}`}
                       className={`block rounded-md border px-3 py-2 transition hover:border-[var(--accent)] ${
                         selectedSnpId === s.snpId
                           ? "border-[var(--accent)] bg-[var(--accent-soft)]"

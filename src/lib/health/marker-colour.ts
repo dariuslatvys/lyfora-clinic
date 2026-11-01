@@ -1,8 +1,12 @@
 import type { RiskColour } from "./colours";
-import type { MarkerResult } from "./evaluate";
 
 /** Per-marker display colour for lists (not the whole-category algorithm). */
-export function markerItemColour(m: MarkerResult): RiskColour {
+export function markerItemColour(m: {
+  value: number;
+  refLow?: number | null;
+  refHigh?: number | null;
+  flag?: string | null;
+}): RiskColour {
   const high =
     m.flag === "high" || (m.refHigh != null && m.value > m.refHigh);
   const low = m.flag === "low" || (m.refLow != null && m.value < m.refLow);

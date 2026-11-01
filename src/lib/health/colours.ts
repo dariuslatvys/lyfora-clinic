@@ -60,19 +60,19 @@ export function combineCategoryColour(
 
 /** Risk colours from Lyfora Klinika.html example */
 export const COLOUR_HEX: Record<RiskColour, string> = {
-  grey: "#a2b0ab",
-  green: "#23885a",
-  yellow: "#c99700",
-  orange: "#dc6214",
-  red: "#c42f3a",
-  badge: "#6b55c9",
+  grey: "#8b9c96",
+  green: "#12b886",
+  yellow: "#e0a800",
+  orange: "#f06a1a",
+  red: "#e03131",
+  badge: "#7c5cbf",
 };
 
 export const COLOUR_SOFT: Record<RiskColour, string> = {
   grey: "#eef1f0",
-  green: "#e1f3ea",
-  yellow: "#fbf2d3",
-  orange: "#fde8da",
-  red: "#fbe1e3",
-  badge: "#ece8fa",
+  green: "#d3f9e8",
+  yellow: "#fff3bf",
+  orange: "#ffe8d6",
+  red: "#ffe3e3",
+  badge: "#ece4ff",
 };

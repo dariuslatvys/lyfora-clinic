@@ -6,17 +6,12 @@ export default function HomePage() {
     <main className="landing">
       <div className="landing-dna" aria-hidden="true">
         <Image
-          src="/brand/dna-soft.png"
+          src="/brand/molecule-rich.png"
           alt=""
           fill
           priority
           className="landing-dna-img"
           sizes="100vw"
-        />
-        <img
-          src="/brand/dna-helix.svg"
-          alt=""
-          className="landing-dna-svg"
         />
       </div>
 
@@ -30,7 +25,10 @@ export default function HomePage() {
             priority
             className="landing-logo"
           />
-          <span className="landing-pill">Klinika 24/7</span>
+          <span className="landing-pill">
+            <strong>24/7</strong>
+            <small>tavo individualus sveikatos dvynys</small>
+          </span>
         </div>
 
         <div className="landing-copy rise-in-delay">

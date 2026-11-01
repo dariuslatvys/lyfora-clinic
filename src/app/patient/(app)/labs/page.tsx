@@ -4,11 +4,35 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { ensureSchema, getDb } from "@/lib/db";
 import { markerResults, markerDefs } from "@/lib/db/schema";
 import { t } from "@/lib/i18n/dictionary";
+import { LabsView } from "@/components/patient/labs-view";
+import {
+  HEALTH_CATEGORIES,
+  type HealthCategoryId,
+} from "@/lib/health/categories";
+
+function guessCategory(categoriesJson: string): HealthCategoryId | null {
+  let cats: string[] = [];
+  try {
+    cats = JSON.parse(categoriesJson) as string[];
+  } catch {
+    return null;
+  }
+  for (const name of cats) {
+    const hit = HEALTH_CATEGORIES.find((c) =>
+      c.markerCategoryNames.some(
+        (n) => n.toLowerCase() === String(name).toLowerCase()
+      )
+    );
+    if (hit) return hit.id;
+  }
+  return null;
+}
 
 export default async function LabsPage() {
   const current = await getCurrentUser();
   if (!current?.patient) redirect("/login/patient");
-  const labels = t((current.user.locale as "lt" | "en") || "lt");
+  const locale = (current.user.locale as "lt" | "en") || "lt";
+  const labels = t(locale);
   ensureSchema();
   const db = getDb();
   const defs = new Map(
@@ -16,50 +40,30 @@ export default async function LabsPage() {
       .select()
       .from(markerDefs)
       .all()
-      .map((d) => [d.key, d.name])
+      .map((d) => [d.key, d])
   );
   const rows = db
     .select()
     .from(markerResults)
     .where(eq(markerResults.patientId, current.patient.id))
     .all()
-    .sort((a, b) => b.observedAt.localeCompare(a.observedAt));
+    .sort((a, b) => b.observedAt.localeCompare(a.observedAt))
+    .map((r) => {
+      const def = defs.get(r.markerKey);
+      return {
+        id: r.id,
+        markerKey: r.markerKey,
+        name: def?.name || r.markerKey,
+        value: r.value,
+        unit: r.unit,
+        refLow: r.refLow,
+        refHigh: r.refHigh,
+        flag: r.flag,
+        observedAt: r.observedAt,
+        source: r.source,
+        categoryId: def ? guessCategory(def.categoriesJson) : null,
+      };
+    });
 
-  return (
-    <div className="panel">
-      <h2 className="font-[family-name:var(--font-display)] text-3xl">
-        {labels.labs}
-      </h2>
-      <div className="mt-4 overflow-x-auto">
-        <table className="w-full min-w-[640px] text-left text-sm">
-          <thead className="text-[var(--muted)]">
-            <tr>
-              <th className="py-2">Data</th>
-              <th>Žymuo</th>
-              <th>Reikšmė</th>
-              <th>Norma</th>
-              <th>Šaltinis</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((r) => (
-              <tr key={r.id} className="border-t border-[var(--line)]">
-                <td className="py-2">{r.observedAt}</td>
-                <td>{defs.get(r.markerKey) || r.markerKey}</td>
-                <td>
-                  {r.value}
-                  {r.unit ? ` ${r.unit}` : ""}
-                  {r.flag ? ` (${r.flag})` : ""}
-                </td>
-                <td>
-                  {r.refLow ?? "—"} – {r.refHigh ?? "—"}
-                </td>
-                <td className="text-[var(--muted)]">{r.source}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
+  return <LabsView rows={rows} labels={labels} locale={locale} />;
 }

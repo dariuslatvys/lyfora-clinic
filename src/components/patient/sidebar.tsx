@@ -12,8 +12,10 @@ const items = [
   { href: "/patient/health-card", key: "healthCard" as const, icon: "card" },
   { href: "/patient/uploads", key: "uploads" as const, icon: "upload" },
   { href: "/patient/labs", key: "labs" as const, icon: "flask" },
+  { href: "/patient/prescriptions", key: "prescriptions" as const, icon: "rx" },
   { href: "/patient/visits", key: "visits" as const, icon: "cal" },
   { href: "/patient/questions", key: "questions" as const, icon: "chat" },
+  { href: "/patient/urgent", key: "urgentConsult" as const, icon: "alert" },
   { href: "/patient/recommendations", key: "recommendations" as const, icon: "bulb" },
   { href: "/patient/marketplace", key: "marketplace" as const, icon: "cart" },
   { href: "/patient/analytics", key: "analytics" as const, icon: "chart" },
@@ -35,6 +37,12 @@ const ICONS: Record<string, ReactNode> = {
       <path d="M7.5 15h9" />
     </>
   ),
+  rx: (
+    <>
+      <rect x="4" y="3" width="16" height="18" rx="2" />
+      <path d="M8 8h8M8 12h5M12 12v5M10 14l4 3" />
+    </>
+  ),
   cal: (
     <>
       <rect x="3" y="5" width="18" height="16" rx="2" />
@@ -42,6 +50,12 @@ const ICONS: Record<string, ReactNode> = {
     </>
   ),
   chat: <path d="M4 5h16v11H9l-5 4z" />,
+  alert: (
+    <>
+      <path d="M12 3l10 18H2L12 3z" />
+      <path d="M12 10v4M12 17h.01" />
+    </>
+  ),
   bulb: (
     <path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z" />
   ),

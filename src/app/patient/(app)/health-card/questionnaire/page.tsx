@@ -13,10 +13,15 @@ import { loadQuestionnaireDefinition } from "@/lib/health/questionnaire-loader";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-export default async function QuestionnairePage() {
+export default async function QuestionnairePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ step?: string }>;
+}) {
   const current = await getCurrentUser();
   if (!current?.patient) redirect("/login/patient");
   const locale = (current.user.locale as "lt" | "en") || "lt";
+  const sp = await searchParams;
 
   ensureSchema();
   const db = getDb();
@@ -40,11 +45,17 @@ export default async function QuestionnairePage() {
       current.patient.sex === "female" ? "Female" : "Male";
   }
 
+  // Deep-link: ?step=1 uses 1-based human step numbers from the health card.
+  const raw = Number(sp.step || "0");
+  const initialStep =
+    Number.isFinite(raw) && raw >= 1 ? Math.max(0, Math.floor(raw) - 1) : 0;
+
   return (
     <QuestionnaireForm
       locale={locale}
       initialDefinition={def}
       initialAnswers={answers}
+      initialStep={initialStep}
     />
   );
 }

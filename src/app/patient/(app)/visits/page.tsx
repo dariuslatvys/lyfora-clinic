@@ -12,11 +12,16 @@ import {
 } from "@/lib/health/demo-visits";
 import { VisitsTabs } from "@/components/patient/visits-tabs";
 
-export default async function VisitsPage() {
+export default async function VisitsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tab?: string }>;
+}) {
   const current = await getCurrentUser();
   if (!current?.patient) redirect("/login/patient");
   const locale = (current.user.locale as "lt" | "en") || "lt";
   const labels = t(locale);
+  const sp = await searchParams;
 
   const upcoming = upcomingVisits().map((v) => ({
     id: v.id,
@@ -42,6 +47,7 @@ export default async function VisitsPage() {
       upcoming={upcoming}
       past={past}
       bookLabel={labels.bookVisit}
+      initialTab={sp.tab === "history" ? "history" : "upcoming"}
     />
   );
 }

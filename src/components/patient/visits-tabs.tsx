@@ -17,13 +17,15 @@ export function VisitsTabs({
   upcoming,
   past,
   bookLabel,
+  initialTab = "upcoming",
 }: {
   locale: "lt" | "en";
   upcoming: VisitListItem[];
   past: VisitListItem[];
   bookLabel: string;
+  initialTab?: "upcoming" | "history";
 }) {
-  const [tab, setTab] = useState<"upcoming" | "history">("upcoming");
+  const [tab, setTab] = useState<"upcoming" | "history">(initialTab);
 
   const labels = useMemo(
     () =>

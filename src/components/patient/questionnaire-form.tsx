@@ -30,17 +30,21 @@ export function QuestionnaireForm({
   locale,
   initialDefinition,
   initialAnswers,
+  initialStep = 0,
 }: {
   locale: "lt" | "en";
   initialDefinition: QDefinition;
   initialAnswers: QuestionnaireAnswers;
+  initialStep?: number;
 }) {
   const router = useRouter();
   const def = initialDefinition;
   const [answers, setAnswers] = useState<QuestionnaireAnswers>(initialAnswers);
   const answersRef = useRef(answers);
   answersRef.current = answers;
-  const [stepIdx, setStepIdx] = useState(0);
+  const [stepIdx, setStepIdx] = useState(
+    Number.isFinite(initialStep) && initialStep >= 0 ? initialStep : 0
+  );
   // Open editable so chips/selects work; saved values are pre-filled from DB.
   const [mode, setMode] = useState<Mode>("edit");
   const [saving, setSaving] = useState(false);

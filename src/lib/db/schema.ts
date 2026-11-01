@@ -103,3 +103,15 @@ export const sessions = sqliteTable("sessions", {
   userId: text("user_id").notNull(),
   expiresAt: text("expires_at").notNull(),
 });
+
+export const patientUploads = sqliteTable("patient_uploads", {
+  id: text("id").primaryKey(),
+  patientId: text("patient_id").notNull(),
+  category: text("category").notNull(), // labs | vaccines | genetics | imaging | other
+  originalName: text("original_name").notNull(),
+  storedName: text("stored_name").notNull(),
+  mimeType: text("mime_type"),
+  sizeBytes: integer("size_bytes").notNull().default(0),
+  note: text("note"),
+  createdAt: text("created_at").notNull(),
+});

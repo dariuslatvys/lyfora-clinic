@@ -10,6 +10,12 @@ export type HealthCardTabId =
   | "hist"
   | "docs";
 
+export type HealthCardLink = {
+  href: string;
+  labelLt: string;
+  labelEn: string;
+};
+
 export type HealthCardCondition = {
   code: string;
   nameLt: string;
@@ -19,6 +25,8 @@ export type HealthCardCondition = {
   statusEn: string;
   byLt: string;
   byEn: string;
+  href?: string;
+  links?: HealthCardLink[];
 };
 
 export type HealthCardEpisode = {
@@ -29,6 +37,7 @@ export type HealthCardEpisode = {
   to: string;
   noteLt: string;
   noteEn: string;
+  href?: string;
 };
 
 export type HealthCardMed = {
@@ -41,19 +50,27 @@ export type HealthCardMed = {
   byLt: string;
   byEn: string;
   active: boolean;
-  stopReasonLt?: string;
-  stopReasonEn?: string;
+  href?: string;
+  links?: HealthCardLink[];
 };
 
 export type HealthCardVaccine = {
+  id: string;
   nameLt: string;
   nameEn: string;
   date: string | null;
   lot: string | null;
   next: string | null;
+  placeLt?: string;
+  placeEn?: string;
+  productLt?: string;
+  productEn?: string;
+  href?: string;
+  docHref?: string;
 };
 
 export type HealthCardProcedure = {
+  id: string;
   nameLt: string;
   nameEn: string;
   date: string;
@@ -63,6 +80,11 @@ export type HealthCardProcedure = {
   typeEn: string;
   resultLt?: string;
   resultEn?: string;
+  detailLt?: string;
+  detailEn?: string;
+  imageSrc?: string;
+  href?: string;
+  visitHref?: string;
 };
 
 export type HealthCardDoc = {
@@ -70,7 +92,7 @@ export type HealthCardDoc = {
   nameEn: string;
   date: string;
   size: string;
-  kind: "lab" | "report" | "note";
+  kind: "lab" | "report" | "note" | "vaccine";
   fresh?: boolean;
   href?: string;
 };
@@ -84,12 +106,13 @@ export type HealthCardModel = {
   bloodGroup: string;
   familyDoctorLt: string;
   familyDoctorEn: string;
-  allergies: { lt: string; en: string }[];
+  allergies: { lt: string; en: string; href?: string }[];
   vitals: {
     bp: string | null;
     weightKg: number | null;
     heightCm: number | null;
     bmi: number | null;
+    bpHref?: string;
   };
   lifestyle: {
     smokingLt: string;
@@ -100,15 +123,21 @@ export type HealthCardModel = {
     activityEn: string;
     sleepLt: string;
     sleepEn: string;
+    href: string;
   };
-  family: { lt: string; en: string }[];
+  family: { lt: string; en: string; href?: string }[];
+  familyHref: string;
   conditions: HealthCardCondition[];
+  conditionsHref: string;
   episodes: HealthCardEpisode[];
   meds: HealthCardMed[];
+  medsHref: string;
   vaccines: HealthCardVaccine[];
   procedures: HealthCardProcedure[];
   visits: DemoVisit[];
+  visitsHref: string;
   docs: HealthCardDoc[];
+  docsUploadHref: string;
 };
 
 function num(v: unknown): number | null {
@@ -174,7 +203,7 @@ const MED_META: Record<
 function mapSmoking(v: unknown): { lt: string; en: string } {
   const s = String(v || "");
   if (/former/i.test(s))
-    return { lt: "Metė rūkyti / buvęs rūkalius", en: "Former smoker" };
+    return { lt: "Metė rūkyti", en: "Former smoker" };
   if (/never|no/i.test(s)) return { lt: "Nerūko", en: "Does not smoke" };
   if (/current|yes/i.test(s)) return { lt: "Rūko", en: "Current smoker" };
   return { lt: "Nenurodyta", en: "Not specified" };
@@ -184,9 +213,43 @@ function mapAlcohol(v: unknown): { lt: string; en: string } {
   const s = String(v || "");
   if (/occas/i.test(s)) return { lt: "Retkarčiais", en: "Occasionally" };
   if (/never/i.test(s)) return { lt: "Nevartoja", en: "Never" };
-  if (/regular|week/i.test(s))
-    return { lt: "Reguliariai", en: "Regularly" };
+  if (/regular|week/i.test(s)) return { lt: "Reguliariai", en: "Regularly" };
   return { lt: s || "Nenurodyta", en: s || "Not specified" };
+}
+
+function mapActivityLt(freq: string, types: string[]): string {
+  const f = /regularly/i.test(freq)
+    ? "Kelis kartus per savaitę"
+    : /daily/i.test(freq)
+      ? "Kasdien"
+      : freq || "Vidutinis";
+  const map: Record<string, string> = {
+    Walking: "Ėjimas",
+    Cycling: "Dviračiai",
+    "Gym / Strength Training": "Sporto salė / jėga",
+  };
+  const t = types.map((x) => map[x] || x).join(", ");
+  return t ? `${f} · ${t}` : f;
+}
+
+function mapActivityEn(freq: string, types: string[]): string {
+  const f = /regularly/i.test(freq)
+    ? "Several times per week"
+    : freq || "Moderate";
+  return types.length ? `${f} · ${types.join(", ")}` : f;
+}
+
+function mapSleep(dur: string, qual: string, locale: "lt" | "en") {
+  const d = /6.?7/.test(dur) ? (locale === "en" ? "6–7 h" : "6–7 val.") : dur;
+  const qMap: Record<string, { lt: string; en: string }> = {
+    Average: { lt: "vidutinė kokybė", en: "average quality" },
+    Good: { lt: "gera kokybė", en: "good quality" },
+    Poor: { lt: "prasta kokybė", en: "poor quality" },
+  };
+  const q = qMap[qual] || { lt: qual, en: qual };
+  return locale === "en"
+    ? `${d}${qual ? ` · ${q.en}` : ""}`
+    : `${d}${qual ? ` · ${q.lt}` : ""}`;
 }
 
 export function buildHealthCard(input: {
@@ -206,24 +269,35 @@ export function buildHealthCard(input: {
   const bp =
     sys != null && dia != null ? `${Math.round(sys)}/${Math.round(dia)}` : null;
 
-  const allergyItems: { lt: string; en: string }[] = [];
+  const qLifestyle = "/patient/health-card/questionnaire?step=7";
+  const qFamily = "/patient/health-card/questionnaire?step=10";
+  const qConditions = "/patient/health-card/questionnaire?step=2";
+  const qMeds = "/patient/health-card/questionnaire?step=4";
+  const qAllergies = "/patient/health-card/questionnaire?step=3";
+
+  const allergyItems: { lt: string; en: string; href?: string }[] = [];
   const food = (v["3_allergies__food_allergies"] as string[]) || [];
   const env = (v["3_allergies__environmental_allergies"] as string[]) || [];
   const insect = (v["3_allergies__insect_allergies"] as string[]) || [];
   for (const a of food)
-    allergyItems.push({ lt: `Maistas: ${a}`, en: `Food: ${a}` });
+    allergyItems.push({ lt: `Maistas: ${a}`, en: `Food: ${a}`, href: qAllergies });
   for (const a of env)
     allergyItems.push({
       lt: `Aplinka: ${a}`,
       en: `Environmental: ${a}`,
+      href: qAllergies,
     });
   for (const a of insect)
-    allergyItems.push({ lt: `Vabzdžiai: ${a}`, en: `Insect: ${a}` });
-  // Demo clinical allergy often relevant with antibiotics history
+    allergyItems.push({
+      lt: `Vabzdžiai: ${a}`,
+      en: `Insect: ${a}`,
+      href: qAllergies,
+    });
   if (!allergyItems.some((x) => /penicilin/i.test(x.lt + x.en))) {
     allergyItems.push({
-      lt: "Penicilinas (bėrimas) — pagal klinikos įrašą",
-      en: "Penicillin (rash) — per clinic record",
+      lt: "Penicilinas (bėrimas)",
+      en: "Penicillin (rash)",
+      href: qAllergies,
     });
   }
 
@@ -237,6 +311,12 @@ export function buildHealthCard(input: {
       nameLt: name,
       nameEn: name,
     };
+    const href =
+      m.code === "I10"
+        ? "/patient/marker/BLOOD_PRESSURE?cat=cardiovascular"
+        : m.code.startsWith("K21")
+          ? "/patient/visits/v-2025-08-07"
+          : qConditions;
     return {
       code: m.code,
       nameLt: m.nameLt,
@@ -246,9 +326,21 @@ export function buildHealthCard(input: {
       statusEn: "chronic",
       byLt: "Dr. Rūta Petrauskienė",
       byEn: "Dr. Ruta Petrauskienė",
+      href,
+      links: [
+        { href: qConditions, labelLt: "Klausimynas", labelEn: "Questionnaire" },
+        ...(m.code === "I10"
+          ? [
+              {
+                href: "/patient/visits/v-2026-09-22",
+                labelLt: "Metinė apžiūra",
+                labelEn: "Annual review",
+              },
+            ]
+          : []),
+      ],
     };
   });
-  // Dyslipidaemia inferred from statin + labs
   if (!conditions.some((c) => c.code.startsWith("E78"))) {
     conditions.push({
       code: "E78.0",
@@ -259,6 +351,19 @@ export function buildHealthCard(input: {
       statusEn: "chronic",
       byLt: "Dr. Andrius Kazlauskas",
       byEn: "Dr. Andrius Kazlauskas",
+      href: "/patient/marker/LDL?cat=cardiovascular",
+      links: [
+        {
+          href: "/patient/visits/v-2024-05-14",
+          labelLt: "Kardiologo vizitas",
+          labelEn: "Cardiology visit",
+        },
+        {
+          href: "/patient/prescriptions",
+          labelLt: "Receptai",
+          labelEn: "Prescriptions",
+        },
+      ],
     });
   }
   conditions.push({
@@ -270,6 +375,14 @@ export function buildHealthCard(input: {
     statusEn: "active",
     byLt: "Dr. Eglė Navickaitė",
     byEn: "Dr. Eglė Navickaitė",
+    href: "/patient/digital-twin/cardiovascular#section-rare",
+    links: [
+      {
+        href: "/patient/visits/v-2025-12-16",
+        labelLt: "Genetiko vizitas",
+        labelEn: "Genetics visit",
+      },
+    ],
   });
 
   const episodes: HealthCardEpisode[] = [
@@ -281,6 +394,7 @@ export function buildHealthCard(input: {
       to: "2025-09-16",
       noteLt: "Dėl alergijos penicilinui skirtas klaritromicinas 7 d.",
       noteEn: "Clarithromycin 7 days due to penicillin allergy.",
+      href: qAllergies,
     },
     {
       code: "U07.1",
@@ -299,6 +413,7 @@ export function buildHealthCard(input: {
       to: "2025-04-15",
       noteLt: "KT + fizioterapija; dešinės C5–C6 foraminalinė stenozė.",
       noteEn: "CT + physiotherapy; right C5–C6 foraminal stenosis.",
+      href: "/patient/visits/v-2025-03-18",
     },
     {
       code: "K29.70",
@@ -308,6 +423,7 @@ export function buildHealthCard(input: {
       to: "2025-09-20",
       noteLt: "Po EGD — antralinis erozinis gastritas; PPI kursas.",
       noteEn: "After EGD — antral erosive gastritis; PPI course.",
+      href: "/patient/visits/v-2025-08-07",
     },
   ];
 
@@ -332,9 +448,17 @@ export function buildHealthCard(input: {
       byLt: meta.byLt,
       byEn: meta.byEn,
       active: true,
+      href: "/patient/prescriptions",
+      links: [
+        { href: qMeds, labelLt: "Klausimynas", labelEn: "Questionnaire" },
+        {
+          href: "/patient/prescriptions",
+          labelLt: "Receptai",
+          labelEn: "Prescriptions",
+        },
+      ],
     };
   });
-  // Supplement placeholder from questionnaire yes
   if (
     v["4_current_medications_supplements__are_you_currently_taking_any_supplements"] ===
     "Yes"
@@ -348,42 +472,97 @@ export function buildHealthCard(input: {
       byLt: "Dr. Rūta Petrauskienė",
       byEn: "Dr. Ruta Petrauskienė",
       active: true,
+      href: qMeds,
+      links: [
+        { href: qMeds, labelLt: "Klausimynas", labelEn: "Questionnaire" },
+      ],
     });
   }
 
+  // Vaccines from uploaded PDFs / invoices
   const vaccines: HealthCardVaccine[] = [
     {
-      nameLt: "Gripo vakcina (sezoninė)",
-      nameEn: "Seasonal influenza vaccine",
-      date: "2025-10-15",
-      lot: "FL2025-118",
-      next: "2026-10-01",
+      id: "vacc-flu-2026",
+      nameLt: "Gripo vakcina (sezoninė) — Influvac",
+      nameEn: "Seasonal influenza — Influvac",
+      date: "2026-10-28",
+      lot: "p34",
+      next: "2027-10-01",
+      placeLt: "Eurovaistinė, Vilnius",
+      placeEn: "Eurovaistine, Vilnius",
+      productLt: "Influvac 0,5 ml · dozė 1",
+      productEn: "Influvac 0.5 ml · dose 1",
+      docHref: "/docs/vaccines/gripas-2026-10-28.pdf",
     },
     {
-      nameLt: "COVID-19 (pritaikyta XBB/JN.1)",
-      nameEn: "COVID-19 (XBB/JN.1 adapted)",
-      date: "2025-09-20",
-      lot: "CV-JN1-77",
+      id: "vacc-flu-2025",
+      nameLt: "Gripo vakcina (sezoninė) — Influvac",
+      nameEn: "Seasonal influenza — Influvac",
+      date: "2025-12-08",
+      lot: "L47A",
       next: null,
+      placeLt: "Eurovaistinė, Vilnius",
+      placeEn: "Eurovaistine, Vilnius",
+      productLt: "Influvac 0,5 ml · dozė 1",
+      productEn: "Influvac 0.5 ml · dose 1",
+      docHref: "/docs/vaccines/gripas-2025-12-08.pdf",
     },
     {
+      id: "vacc-tbe-2024",
+      nameLt: "Erkinis encefalitas — TicoVac (4 dozė)",
+      nameEn: "Tick-borne encephalitis — TicoVac (dose 4)",
+      date: "2024-04-29",
+      lot: "HJ1684",
+      next: "2027-04-29",
+      placeLt: "Affidea Lietuva, Kaunas",
+      placeEn: "Affidea Lithuania, Kaunas",
+      productLt: "TicoVac 2,4 µg / 0,5 ml",
+      productEn: "TicoVac 2.4 µg / 0.5 ml",
+      docHref: "/docs/vaccines/ticovac-2024-04-29.pdf",
+    },
+    {
+      id: "vacc-tbe-2021",
+      nameLt: "Erkinis encefalitas — TicoVac (pirkimas / skiepas)",
+      nameEn: "Tick-borne encephalitis — TicoVac (purchase / dose)",
+      date: "2021-09-17",
+      lot: null,
+      next: null,
+      placeLt: "Diagnostikos laboratorija (Antėja)",
+      placeEn: "Diagnostic laboratory (Anteja)",
+      productLt: "Ticovac 2,4 mcg 0,5 ml",
+      productEn: "Ticovac 2.4 mcg 0.5 ml",
+      docHref: "/docs/vaccines/invoice-ticovac-2021-09-17.pdf",
+    },
+    {
+      id: "vacc-tbe-prevenar-2020",
+      nameLt: "TicoVac + Prevenar 13 (sąskaita)",
+      nameEn: "TicoVac + Prevenar 13 (invoice)",
+      date: "2020-10-26",
+      lot: null,
+      next: null,
+      placeLt: "Diagnostikos laboratorija (Antėja)",
+      placeEn: "Diagnostic laboratory (Anteja)",
+      productLt: "Ticovac + Prevenar 13",
+      productEn: "Ticovac + Prevenar 13",
+      docHref: "/docs/vaccines/invoice-ticovac-prevenar-2020-10-26.pdf",
+    },
+    {
+      id: "vacc-td",
       nameLt: "Stabligė, difterija (Td)",
       nameEn: "Tetanus, diphtheria (Td)",
       date: "2017-06-20",
       lot: "TD-4471",
       next: "2027-06-20",
-    },
-    {
-      nameLt: "Erkinis encefalitas (3 dozė)",
-      nameEn: "Tick-borne encephalitis (3rd dose)",
-      date: "2020-04-10",
-      lot: "TBE-0921",
-      next: "2026-12-10",
+      placeLt: "Poliklinika / šeimos gydytoja",
+      placeEn: "Clinic / family doctor",
+      productLt: "Td stiprinamoji dozė",
+      productEn: "Td booster",
     },
   ];
 
   const procedures: HealthCardProcedure[] = [
     {
+      id: "proc-egd",
       nameLt: "Fibroezofagogastroduodenoskopija (EGD)",
       nameEn: "Upper endoscopy (EGD)",
       date: "2025-08-07",
@@ -393,8 +572,15 @@ export function buildHealthCard(input: {
       typeEn: "procedure",
       resultLt: "Antralinis erozinis gastritas; biopsijos H. pylori.",
       resultEn: "Antral erosive gastritis; biopsies for H. pylori.",
+      detailLt:
+        "Diagnostinė EGD vietinėje anestezijoje. Pacientas ryjo lanksčią endoskopinę slangą; apžiūrėta stemplė, skrandis ir dvylikapirštė žarna iki D2. Antrume erozijos, paimtos biopsijos.",
+      detailEn:
+        "Diagnostic EGD under topical anaesthesia. Flexible endoscope swallowed; oesophagus, stomach and duodenum to D2 inspected. Antral erosions with biopsies taken.",
+      href: "/patient/health-card/procedures/proc-egd",
+      visitHref: "/patient/visits/v-2025-08-07",
     },
     {
+      id: "proc-neck-ct",
       nameLt: "Kaklo stuburo kompiuterinė tomografija (KT)",
       nameEn: "Cervical spine CT",
       date: "2025-03-25",
@@ -404,8 +590,16 @@ export function buildHealthCard(input: {
       typeEn: "imaging",
       resultLt: "C5–C6 dešinė foraminalinė stenozė, osteochondrozė.",
       resultEn: "Right C5–C6 foraminal stenosis, osteochondrosis.",
+      detailLt:
+        "Spiralinė KT be kontrasto, C2–Th1. Dešinėje C5–C6 neuroforameninė stenozė dėl uncinatinių ataugų hipertrofijos; stuburo kanalas pakankamas.",
+      detailEn:
+        "Helical CT without contrast, C2–Th1. Right C5–C6 foraminal stenosis from uncovertebral hypertrophy; canal calibre preserved.",
+      imageSrc: "/docs/neck-ct-c5c6.png",
+      href: "/patient/health-card/procedures/proc-neck-ct",
+      visitHref: "/patient/visits/v-2025-03-18",
     },
     {
+      id: "proc-echo",
       nameLt: "Echokardiografija",
       nameEn: "Echocardiography",
       date: "2025-06-02",
@@ -415,8 +609,15 @@ export function buildHealthCard(input: {
       typeEn: "imaging",
       resultLt: "KS sienelės nežymiai sustorėjusios (11 mm), IF 60 %.",
       resultEn: "Mild LV wall thickening (11 mm), EF 60%.",
+      detailLt:
+        "Transtorakalinė echo: kairiojo skilvelio sienelės 11 mm, išstūmimo frakcija ~60 %, vožtuvai be reikšmingos regurgitacijos. Stebėti MYBPC3 kontekste.",
+      detailEn:
+        "Transthoracic echo: LV walls 11 mm, EF ~60%, no significant valvular regurgitation. Monitor in MYBPC3 context.",
+      href: "/patient/health-card/procedures/proc-echo",
+      visitHref: "/patient/visits/v-2024-05-14",
     },
     {
+      id: "proc-knee",
       nameLt: "Kairio kelio artroskopija (menisko rezekcija)",
       nameEn: "Left knee arthroscopy (meniscus resection)",
       date: "2019-11-18",
@@ -426,69 +627,97 @@ export function buildHealthCard(input: {
       typeEn: "surgery",
       resultLt: "Be komplikacijų; reabilitacija 6 sav.",
       resultEn: "Uneventful; 6-week rehab.",
+      detailLt:
+        "Artroskopinė dalinė medialinio menisko rezekcija. Pooperacinė eiga be komplikacijų, kineziterapija 6 savaites.",
+      detailEn:
+        "Arthroscopic partial medial meniscus resection. Uneventful recovery; physiotherapy 6 weeks.",
+      href: "/patient/health-card/procedures/proc-knee",
     },
   ];
 
-  const exercise = (
-    (v["7_lifestyle__type_of_exercise_sport"] as string[]) || []
-  ).join(", ");
+  const types =
+    (v["7_lifestyle__type_of_exercise_sport"] as string[]) || [];
   const freq = String(v["7_lifestyle__exercise_frequency"] || "");
-  const activityLt = exercise
-    ? `${freq || "Aktyvus"} · ${exercise}`
-    : "Vidutinis";
-  const activityEn = exercise
-    ? `${freq || "Active"} · ${exercise}`
-    : "Moderate";
-
   const sleepDur = String(
     v["7_lifestyle__average_sleep_duration"] || "6–7 hours"
   );
   const sleepQual = String(v["7_lifestyle__sleep_quality"] || "");
 
-  const family: { lt: string; en: string }[] = [];
-  const members = (input.answers as { familyMembers?: { relative?: string; conditions?: string[]; notes?: string }[] }).familyMembers || [];
+  const family: { lt: string; en: string; href?: string }[] = [];
+  const members =
+    (
+      input.answers as {
+        familyMembers?: {
+          relative?: string;
+          conditions?: string[];
+          notes?: string;
+        }[];
+      }
+    ).familyMembers || [];
   for (const m of members) {
     const conds = (m.conditions || []).join(", ");
     if (!conds) continue;
     family.push({
-      lt: `${m.relative || "Šeimos narys"} — ${conds}${m.notes ? ` (${m.notes})` : ""}`,
-      en: `${m.relative || "Family member"} — ${conds}${m.notes ? ` (${m.notes})` : ""}`,
+      lt: `${m.relative || "Šeimos narys"} — ${conds}`,
+      en: `${m.relative || "Family member"} — ${conds}`,
+      href: qFamily,
     });
   }
-  // From seed questionnaire key
   family.push({
     lt: "Tėvas — miokardo infarktas (~58 m.)",
     en: "Father — myocardial infarction (~age 58)",
+    href: qFamily,
   });
   if (!family.some((f) => /hipertenz/i.test(f.lt))) {
     family.push({
       lt: "Motina — hipertenzija",
       en: "Mother — hypertension",
+      href: qFamily,
     });
   }
 
   const docs: HealthCardDoc[] = [
     {
-      nameLt: "Helicobacter pylori IgG protokolas",
-      nameEn: "Helicobacter pylori IgG protocol",
+      nameLt: "Helicobacter pylori IgG (2026-09-15)",
+      nameEn: "Helicobacter pylori IgG (2026-09-15)",
       date: "2026-09-15",
-      size: "84 KB",
+      size: "58 KB",
       kind: "lab",
       fresh: true,
+      href: "/docs/labs/helicobacter-2026-09-15.pdf",
     },
     {
-      nameLt: "Lipidų / ApoB panelė",
-      nameEn: "Lipid / ApoB panel",
-      date: "2026-06-03",
-      size: "120 KB",
+      nameLt: "Helicobacter pylori IgG (2023-12-01)",
+      nameEn: "Helicobacter pylori IgG (2023-12-01)",
+      date: "2023-12-01",
+      size: "423 KB",
       kind: "lab",
+      href: "/docs/labs/helicobacter-2023-12-01.pdf",
     },
     {
-      nameLt: "Laboratoriniai tyrimai (2025-12-08)",
-      nameEn: "Laboratory results (2025-12-08)",
+      nameLt: "Gripo skiepo įrašas (Influvac) 2026-10-28",
+      nameEn: "Influenza vaccination record 2026-10-28",
+      date: "2026-10-28",
+      size: "58 KB",
+      kind: "vaccine",
+      fresh: true,
+      href: "/docs/vaccines/gripas-2026-10-28.pdf",
+    },
+    {
+      nameLt: "Gripo skiepo įrašas 2025-12-08",
+      nameEn: "Influenza vaccination record 2025-12-08",
       date: "2025-12-08",
-      size: "1.0 MB",
-      kind: "lab",
+      size: "57 KB",
+      kind: "vaccine",
+      href: "/docs/vaccines/gripas-2025-12-08.pdf",
+    },
+    {
+      nameLt: "TicoVac vakcinacijos įrašas 2024-04-29",
+      nameEn: "TicoVac vaccination record 2024-04-29",
+      date: "2024-04-29",
+      size: "87 KB",
+      kind: "vaccine",
+      href: "/docs/vaccines/ticovac-2024-04-29.pdf",
     },
     {
       nameLt: "Kaklo stuburo KT aprašymas (Affidea)",
@@ -505,14 +734,6 @@ export function buildHealthCard(input: {
       size: "—",
       kind: "report",
       href: "/patient/visits/v-2025-08-07",
-    },
-    {
-      nameLt: "NGS / genetikos konsultacijos pastabos",
-      nameEn: "NGS / genetics consult notes",
-      date: "2025-12-16",
-      size: "—",
-      kind: "note",
-      href: "/patient/visits/v-2025-12-16",
     },
     {
       nameLt: "Priešvizitinė kraujo panelė (kaklas)",
@@ -544,24 +765,38 @@ export function buildHealthCard(input: {
       weightKg: weight,
       heightCm: height,
       bmi: bmiOf(height, weight),
+      bpHref: "/patient/marker/BLOOD_PRESSURE?cat=cardiovascular",
     },
     lifestyle: {
       smokingLt: smoking.lt,
       smokingEn: smoking.en,
       alcoholLt: alcohol.lt,
       alcoholEn: alcohol.en,
-      activityLt,
-      activityEn,
-      sleepLt: `${sleepDur}${sleepQual ? ` · ${sleepQual}` : ""}`,
-      sleepEn: `${sleepDur}${sleepQual ? ` · ${sleepQual}` : ""}`,
+      activityLt: mapActivityLt(freq, types),
+      activityEn: mapActivityEn(freq, types),
+      sleepLt: mapSleep(sleepDur, sleepQual, "lt"),
+      sleepEn: mapSleep(sleepDur, sleepQual, "en"),
+      href: qLifestyle,
     },
     family,
+    familyHref: qFamily,
     conditions,
+    conditionsHref: qConditions,
     episodes,
     meds,
+    medsHref: qMeds,
     vaccines,
     procedures,
     visits: pastVisits(),
+    visitsHref: "/patient/visits?tab=history",
     docs,
+    docsUploadHref: "/patient/uploads",
   };
+}
+
+export function getHealthCardProcedure(
+  id: string,
+  input: Parameters<typeof buildHealthCard>[0]
+) {
+  return buildHealthCard(input).procedures.find((p) => p.id === id) || null;
 }

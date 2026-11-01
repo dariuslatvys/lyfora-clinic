@@ -143,8 +143,20 @@ export function ensureSchema() {
       user_id TEXT NOT NULL,
       expires_at TEXT NOT NULL
     );
+    CREATE TABLE IF NOT EXISTS patient_uploads (
+      id TEXT PRIMARY KEY,
+      patient_id TEXT NOT NULL,
+      category TEXT NOT NULL,
+      original_name TEXT NOT NULL,
+      stored_name TEXT NOT NULL,
+      mime_type TEXT,
+      size_bytes INTEGER NOT NULL DEFAULT 0,
+      note TEXT,
+      created_at TEXT NOT NULL
+    );
     CREATE INDEX IF NOT EXISTS idx_marker_results_patient ON marker_results(patient_id);
     CREATE INDEX IF NOT EXISTS idx_snp_geno_patient ON snp_genotypes(patient_id);
     CREATE INDEX IF NOT EXISTS idx_gene_snp_cat ON gene_snp_risk(primary_category);
+    CREATE INDEX IF NOT EXISTS idx_uploads_patient ON patient_uploads(patient_id);
   `);
 }

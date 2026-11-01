@@ -114,6 +114,25 @@ function SummaryPane({
   locale: "lt" | "en";
   card: HealthCardModel;
 }) {
+  const lifestyleRows = [
+    [
+      locale === "en" ? "Smoking" : "Rūkymas",
+      locale === "en" ? card.lifestyle.smokingEn : card.lifestyle.smokingLt,
+    ],
+    [
+      locale === "en" ? "Alcohol" : "Alkoholis",
+      locale === "en" ? card.lifestyle.alcoholEn : card.lifestyle.alcoholLt,
+    ],
+    [
+      locale === "en" ? "Activity" : "Aktyvumas",
+      locale === "en" ? card.lifestyle.activityEn : card.lifestyle.activityLt,
+    ],
+    [
+      locale === "en" ? "Sleep" : "Miegas",
+      locale === "en" ? card.lifestyle.sleepEn : card.lifestyle.sleepLt,
+    ],
+  ] as [string, string][];
+
   return (
     <div className="stack" style={{ gap: 12 }}>
       <div className="hc-grid-3">
@@ -122,16 +141,16 @@ function SummaryPane({
             {locale === "en" ? "Allergies" : "Alergijos"}
           </h3>
           <div className="stack mt-3" style={{ gap: 8 }}>
-            {card.allergies.length ? (
-              card.allergies.map((a) => (
+            {card.allergies.map((a) =>
+              a.href ? (
+                <Link key={a.lt} href={a.href} className="hc-alert clickable">
+                  <b>{locale === "en" ? a.en : a.lt}</b>
+                </Link>
+              ) : (
                 <div key={a.lt} className="hc-alert">
                   <b>{locale === "en" ? a.en : a.lt}</b>
                 </div>
-              ))
-            ) : (
-              <span className="muted small">
-                {locale === "en" ? "Unknown" : "Nežinomos"}
-              </span>
+              )
             )}
           </div>
         </section>
@@ -141,10 +160,13 @@ function SummaryPane({
             {locale === "en" ? "Measurements" : "Matavimai"}
           </h3>
           <div className="hc-kpi-grid mt-3">
-            <div className="hc-kpi">
+            <Link
+              href={card.vitals.bpHref || "#"}
+              className="hc-kpi clickable"
+            >
               <b className="num">{card.vitals.bp || "—"}</b>
               <span>AKS, mmHg</span>
-            </div>
+            </Link>
             <div className="hc-kpi">
               <b className="num">
                 {card.vitals.weightKg != null
@@ -169,34 +191,24 @@ function SummaryPane({
         </section>
 
         <section className="card">
-          <h3 className="hc-h3">
-            {locale === "en" ? "Lifestyle" : "Gyvensena"}
-          </h3>
-          <div className="list small mt-2">
-            {(
-              [
-                [
-                  locale === "en" ? "Smoking" : "Rūkymas",
-                  locale === "en" ? card.lifestyle.smokingEn : card.lifestyle.smokingLt,
-                ],
-                [
-                  locale === "en" ? "Alcohol" : "Alkoholis",
-                  locale === "en" ? card.lifestyle.alcoholEn : card.lifestyle.alcoholLt,
-                ],
-                [
-                  locale === "en" ? "Activity" : "Aktyvumas",
-                  locale === "en" ? card.lifestyle.activityEn : card.lifestyle.activityLt,
-                ],
-                [
-                  locale === "en" ? "Sleep" : "Miegas",
-                  locale === "en" ? card.lifestyle.sleepEn : card.lifestyle.sleepLt,
-                ],
-              ] as [string, string][]
-            ).map(([k, val]) => (
-              <div key={k} className="li">
-                <span className="grow muted">{k}</span>
-                <span>{val}</span>
-              </div>
+          <div className="card-head" style={{ marginBottom: 0 }}>
+            <h3 className="hc-h3 m-0">
+              {locale === "en" ? "Lifestyle" : "Gyvensena"}
+            </h3>
+            <Link href={card.lifestyle.href} className="btn ghost sm">
+              {locale === "en" ? "Edit" : "Keisti"}
+            </Link>
+          </div>
+          <div className="hc-life-list mt-3">
+            {lifestyleRows.map(([k, val]) => (
+              <Link
+                key={k}
+                href={card.lifestyle.href}
+                className="hc-life-row"
+              >
+                <span className="hc-life-k">{k}</span>
+                <span className="hc-life-v">{val}</span>
+              </Link>
             ))}
           </div>
         </section>
@@ -204,42 +216,74 @@ function SummaryPane({
 
       <div className="hc-grid-2">
         <section className="card">
-          <h3 className="hc-h3">
-            {locale === "en" ? "Family history" : "Šeimos anamnezė"}
-          </h3>
+          <div className="card-head" style={{ marginBottom: 0 }}>
+            <h3 className="hc-h3 m-0">
+              {locale === "en" ? "Family history" : "Šeimos anamnezė"}
+            </h3>
+            <Link href={card.familyHref} className="btn ghost sm">
+              {locale === "en" ? "Questionnaire" : "Klausimynas"}
+            </Link>
+          </div>
           <ul className="hc-ul">
             {card.family.map((f) => (
-              <li key={f.lt}>{locale === "en" ? f.en : f.lt}</li>
+              <li key={f.lt}>
+                {f.href ? (
+                  <Link href={f.href} className="hc-inline-link">
+                    {locale === "en" ? f.en : f.lt}
+                  </Link>
+                ) : locale === "en" ? (
+                  f.en
+                ) : (
+                  f.lt
+                )}
+              </li>
             ))}
           </ul>
         </section>
         <section className="card">
-          <h3 className="hc-h3">
-            {locale === "en"
-              ? "Chronic & active conditions"
-              : "Lėtinės ir aktyvios būklės"}
-          </h3>
+          <div className="card-head" style={{ marginBottom: 0 }}>
+            <h3 className="hc-h3 m-0">
+              {locale === "en"
+                ? "Chronic & active conditions"
+                : "Lėtinės ir aktyvios būklės"}
+            </h3>
+            <Link href={card.conditionsHref} className="btn ghost sm">
+              {locale === "en" ? "Questionnaire" : "Klausimynas"}
+            </Link>
+          </div>
           <div className="list mt-2">
-            {card.conditions.map((c) => (
-              <div key={c.code + c.since} className="li">
-                <span className="mono small" style={{ width: 56 }}>
-                  {c.code}
-                </span>
-                <span className="grow small">
-                  {locale === "en" ? c.nameEn : c.nameLt}
-                </span>
-                <span
-                  className={`pill ${
-                    (locale === "en" ? c.statusEn : c.statusLt).includes("aktyv") ||
-                    c.statusEn === "active"
-                      ? "c-yellow"
-                      : "c-none"
-                  }`}
+            {card.conditions.map((c) => {
+              const body = (
+                <>
+                  <span className="mono small" style={{ width: 56 }}>
+                    {c.code}
+                  </span>
+                  <span className="grow small">
+                    {locale === "en" ? c.nameEn : c.nameLt}
+                  </span>
+                  <span
+                    className={`pill ${
+                      c.statusEn === "active" ? "c-yellow" : "c-none"
+                    }`}
+                  >
+                    {locale === "en" ? c.statusEn : c.statusLt}
+                  </span>
+                </>
+              );
+              return c.href ? (
+                <Link
+                  key={c.code + c.since}
+                  href={c.href}
+                  className="li click"
                 >
-                  {locale === "en" ? c.statusEn : c.statusLt}
-                </span>
-              </div>
-            ))}
+                  {body}
+                </Link>
+              ) : (
+                <div key={c.code + c.since} className="li">
+                  {body}
+                </div>
+              );
+            })}
           </div>
         </section>
       </div>
@@ -265,14 +309,24 @@ function DiagnosesPane({
                 <th>{locale === "en" ? "Diagnosis" : "Diagnozė"}</th>
                 <th>{locale === "en" ? "Since" : "Nuo"}</th>
                 <th>{locale === "en" ? "Status" : "Būsena"}</th>
-                <th>{locale === "en" ? "Recorded by" : "Nustatė"}</th>
+                <th>{locale === "en" ? "Links" : "Nuorodos"}</th>
               </tr>
             </thead>
             <tbody>
               {card.conditions.map((c) => (
                 <tr key={c.code + c.since}>
                   <td className="mono">{c.code}</td>
-                  <td>{locale === "en" ? c.nameEn : c.nameLt}</td>
+                  <td>
+                    {c.href ? (
+                      <Link href={c.href} className="hc-inline-link">
+                        {locale === "en" ? c.nameEn : c.nameLt}
+                      </Link>
+                    ) : locale === "en" ? (
+                      c.nameEn
+                    ) : (
+                      c.nameLt
+                    )}
+                  </td>
                   <td className="num">{c.since}</td>
                   <td>
                     <span
@@ -284,7 +338,13 @@ function DiagnosesPane({
                     </span>
                   </td>
                   <td className="small">
-                    {locale === "en" ? c.byEn : c.byLt}
+                    <div className="hc-link-row">
+                      {(c.links || []).map((l) => (
+                        <Link key={l.href} href={l.href} className="hc-chip-link">
+                          {locale === "en" ? l.labelEn : l.labelLt}
+                        </Link>
+                      ))}
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -300,23 +360,43 @@ function DiagnosesPane({
             : "Persirgtos ligos (epizodai)"}
         </h3>
         <div className="list mt-2">
-          {card.episodes.map((e) => (
-            <div key={e.code + e.from} className="li" style={{ alignItems: "flex-start" }}>
-              <span className="mono small" style={{ width: 56 }}>
-                {e.code}
-              </span>
-              <div className="grow">
-                <b className="small">
-                  {locale === "en" ? e.nameEn : e.nameLt}
-                </b>
-                <span className="xs muted">
-                  {e.from} – {e.to}
-                  {" · "}
-                  {locale === "en" ? e.noteEn : e.noteLt}
+          {card.episodes.map((e) => {
+            const inner = (
+              <>
+                <span className="mono small" style={{ width: 56 }}>
+                  {e.code}
                 </span>
+                <div className="grow">
+                  <b className="small">
+                    {locale === "en" ? e.nameEn : e.nameLt}
+                  </b>
+                  <span className="xs muted">
+                    {e.from} – {e.to}
+                    {" · "}
+                    {locale === "en" ? e.noteEn : e.noteLt}
+                  </span>
+                </div>
+              </>
+            );
+            return e.href ? (
+              <Link
+                key={e.code + e.from}
+                href={e.href}
+                className="li click"
+                style={{ alignItems: "flex-start" }}
+              >
+                {inner}
+              </Link>
+            ) : (
+              <div
+                key={e.code + e.from}
+                className="li"
+                style={{ alignItems: "flex-start" }}
+              >
+                {inner}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
     </div>
@@ -332,7 +412,20 @@ function MedsPane({
 }) {
   return (
     <section className="card">
-      <div className="overflow-x-auto">
+      <div className="card-head">
+        <h3 className="hc-h3 m-0">
+          {locale === "en" ? "Medications" : "Vaistai"}
+        </h3>
+        <div className="row" style={{ gap: 8 }}>
+          <Link href={card.medsHref} className="btn ghost sm">
+            {locale === "en" ? "Questionnaire" : "Klausimynas"}
+          </Link>
+          <Link href="/patient/prescriptions" className="btn sm">
+            {locale === "en" ? "Prescriptions" : "Receptai"}
+          </Link>
+        </div>
+      </div>
+      <div className="overflow-x-auto mt-2">
         <table className="labs-table">
           <thead>
             <tr>
@@ -340,8 +433,8 @@ function MedsPane({
               <th>ATC</th>
               <th>{locale === "en" ? "Use" : "Vartojimas"}</th>
               <th>{locale === "en" ? "From" : "Nuo"}</th>
-              <th>{locale === "en" ? "Prescribed by" : "Paskyrė"}</th>
               <th>{locale === "en" ? "Status" : "Būsena"}</th>
+              <th>{locale === "en" ? "Links" : "Nuorodos"}</th>
             </tr>
           </thead>
           <tbody>
@@ -349,18 +442,15 @@ function MedsPane({
               <tr key={m.name + m.from}>
                 <td>
                   <b>{m.name}</b>
+                  <div className="xs muted">
+                    {locale === "en" ? m.byEn : m.byLt}
+                  </div>
                 </td>
                 <td className="mono">{m.atc}</td>
                 <td className="small">
                   {locale === "en" ? m.doseEn : m.doseLt}
                 </td>
-                <td className="num small">
-                  {m.from}
-                  {m.to ? ` – ${m.to}` : ""}
-                </td>
-                <td className="small">
-                  {locale === "en" ? m.byEn : m.byLt}
-                </td>
+                <td className="num small">{m.from}</td>
                 <td>
                   <span className={`pill ${m.active ? "c-green" : "c-none"}`}>
                     {m.active
@@ -372,16 +462,20 @@ function MedsPane({
                         : "Nutraukta"}
                   </span>
                 </td>
+                <td>
+                  <div className="hc-link-row">
+                    {(m.links || []).map((l) => (
+                      <Link key={l.href} href={l.href} className="hc-chip-link">
+                        {locale === "en" ? l.labelEn : l.labelLt}
+                      </Link>
+                    ))}
+                  </div>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      <p className="small muted mt-3 mb-0">
-        {locale === "en"
-          ? "Doses are changed only by a clinician. Questions? Ask doctor 24/7."
-          : "Vaistų dozes keičia tik gydytojas. Klausimų? Klausti gydytojo 24/7."}
-      </p>
     </section>
   );
 }
@@ -402,43 +496,60 @@ function VaccinesPane({
               <th>{locale === "en" ? "Vaccine" : "Vakcina"}</th>
               <th>{locale === "en" ? "Done" : "Atlikta"}</th>
               <th>{locale === "en" ? "Lot" : "Serija"}</th>
-              <th>{locale === "en" ? "Next dose" : "Kitas skiepas"}</th>
+              <th>{locale === "en" ? "Place / product" : "Vieta / preparatas"}</th>
+              <th>{locale === "en" ? "Next / document" : "Kitas / dokumentas"}</th>
             </tr>
           </thead>
           <tbody>
             {card.vaccines.map((v) => {
               const due = daysUntil(v.next);
               const overdue = due != null && due < 0;
-              const soon = due != null && due <= 40;
+              const soon = due != null && due <= 45;
               return (
-                <tr key={v.nameLt}>
+                <tr key={v.id}>
                   <td>
                     <b>{locale === "en" ? v.nameEn : v.nameLt}</b>
                   </td>
-                  <td className="num">
-                    {v.date || (
-                      <span className="muted">
-                        {locale === "en" ? "Not done" : "Neatlikta"}
-                      </span>
-                    )}
-                  </td>
+                  <td className="num">{v.date || "—"}</td>
                   <td className="mono small">{v.lot || "—"}</td>
+                  <td className="small">
+                    {locale === "en" ? v.placeEn : v.placeLt}
+                    {(locale === "en" ? v.productEn : v.productLt) ? (
+                      <div className="xs muted">
+                        {locale === "en" ? v.productEn : v.productLt}
+                      </div>
+                    ) : null}
+                  </td>
                   <td>
-                    {!v.next ? (
-                      <span className="muted">—</span>
-                    ) : soon ? (
-                      <span className={`pill ${overdue ? "c-orange" : "c-yellow"}`}>
-                        {overdue
-                          ? locale === "en"
-                            ? `Overdue since ${v.next}`
-                            : `Vėluoja nuo ${v.next}`
-                          : locale === "en"
-                            ? `Due by ${v.next}`
-                            : `Iki ${v.next}`}
-                      </span>
-                    ) : (
-                      <span className="num">{v.next}</span>
-                    )}
+                    <div className="hc-link-row">
+                      {v.next ? (
+                        soon ? (
+                          <span
+                            className={`pill ${overdue ? "c-orange" : "c-yellow"}`}
+                          >
+                            {overdue
+                              ? locale === "en"
+                                ? `Overdue ${v.next}`
+                                : `Vėluoja ${v.next}`
+                              : locale === "en"
+                                ? `Due ${v.next}`
+                                : `Iki ${v.next}`}
+                          </span>
+                        ) : (
+                          <span className="num small">{v.next}</span>
+                        )
+                      ) : null}
+                      {v.docHref ? (
+                        <a
+                          href={v.docHref}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="hc-chip-link"
+                        >
+                          {locale === "en" ? "PDF" : "PDF"}
+                        </a>
+                      ) : null}
+                    </div>
                   </td>
                 </tr>
               );
@@ -464,7 +575,12 @@ function ProceduresPane({
     <section className="card">
       <div className="list">
         {rows.map((p) => (
-          <div key={p.nameLt + p.date} className="li" style={{ alignItems: "flex-start" }}>
+          <Link
+            key={p.id}
+            href={p.href || "#"}
+            className="li click"
+            style={{ alignItems: "flex-start" }}
+          >
             <div className="grow">
               <b>{locale === "en" ? p.nameEn : p.nameLt}</b>
               <span className="small muted">
@@ -481,7 +597,7 @@ function ProceduresPane({
             <span className="pill c-none">
               {locale === "en" ? p.typeEn : p.typeLt}
             </span>
-          </div>
+          </Link>
         ))}
       </div>
     </section>
@@ -497,7 +613,15 @@ function HistoryPane({
 }) {
   return (
     <section className="card">
-      <div className="list">
+      <div className="card-head">
+        <h3 className="hc-h3 m-0">
+          {locale === "en" ? "Visit history" : "Vizitų istorija"}
+        </h3>
+        <Link href={card.visitsHref} className="btn ghost sm">
+          {locale === "en" ? "All visits" : "Visi vizitai"}
+        </Link>
+      </div>
+      <div className="list mt-2">
         {card.visits.map((v) => (
           <Link
             key={v.id}
@@ -540,12 +664,28 @@ function DocsPane({
         <h3 className="hc-h3 m-0">
           {locale === "en" ? "Documents" : "Dokumentai"}
         </h3>
-        <Link href="/patient/uploads" className="btn sm">
+        <Link href={card.docsUploadHref} className="btn sm">
           {locale === "en" ? "Upload" : "Įkelti"}
         </Link>
       </div>
       <div className="list mt-2">
         {card.docs.map((d) => {
+          const kindLabel =
+            d.kind === "lab"
+              ? locale === "en"
+                ? "Lab"
+                : "Tyrimas"
+              : d.kind === "report"
+                ? locale === "en"
+                  ? "Report"
+                  : "Aprašymas"
+                : d.kind === "vaccine"
+                  ? locale === "en"
+                    ? "Vaccine"
+                    : "Skiepas"
+                  : locale === "en"
+                    ? "Note"
+                    : "Pastaba";
           const inner = (
             <>
               <div className="grow">
@@ -556,29 +696,29 @@ function DocsPane({
               </div>
               {d.fresh ? (
                 <span className="pill plain c-acc">
-                  {locale === "en" ? "Uploaded" : "Įkelta"}
+                  {locale === "en" ? "New" : "Naujas"}
                 </span>
               ) : (
-                <span className="pill c-none">
-                  {d.kind === "lab"
-                    ? locale === "en"
-                      ? "Lab"
-                      : "Tyrimas"
-                    : d.kind === "report"
-                      ? locale === "en"
-                        ? "Report"
-                        : "Aprašymas"
-                      : locale === "en"
-                        ? "Note"
-                        : "Pastaba"}
-                </span>
+                <span className="pill c-none">{kindLabel}</span>
               )}
             </>
           );
           return d.href ? (
-            <Link key={d.nameLt + d.date} href={d.href} className="li click">
-              {inner}
-            </Link>
+            d.href.startsWith("/docs/") ? (
+              <a
+                key={d.nameLt + d.date}
+                href={d.href}
+                target="_blank"
+                rel="noreferrer"
+                className="li click"
+              >
+                {inner}
+              </a>
+            ) : (
+              <Link key={d.nameLt + d.date} href={d.href} className="li click">
+                {inner}
+              </Link>
+            )
           ) : (
             <div key={d.nameLt + d.date} className="li">
               {inner}
@@ -586,11 +726,6 @@ function DocsPane({
           );
         })}
       </div>
-      <p className="xs muted mt-3 mb-0">
-        {locale === "en"
-          ? "Upload a photo or PDF of a lab report — AI can suggest markers to add to your twin."
-          : "Nuotrauką ar PDF galima įkelti principu „nufotografuok → įkelk“. Nuotraukose AI atpažįsta rodiklius ir pasiūlo juos įtraukti į dvynį."}
-      </p>
     </section>
   );
 }

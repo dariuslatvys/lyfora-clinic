@@ -1509,6 +1509,34 @@ a {
   color: var(--accent);
 }
 
+.labs-spark {
+  min-width: 118px;
+  vertical-align: middle;
+}
+
+.spark-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sparkline {
+  display: block;
+  flex-shrink: 0;
+}
+
+.spark-delta {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+.spark-empty {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
 .btn.sm {
   padding: 6px 10px;
   font-size: 0.8rem;

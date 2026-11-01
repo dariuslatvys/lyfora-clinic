@@ -6,6 +6,7 @@ import type { Dictionary } from "@/lib/i18n/dictionary";
 import { markerItemColour } from "@/lib/health/marker-colour";
 import { PILL_CLASS, type RiskColour } from "@/lib/health/colours";
 import { NormBar } from "@/components/patient/norm-bar";
+import { Sparkline } from "@/components/patient/sparkline";
 
 export type LabRow = {
   id: number;
@@ -46,6 +47,12 @@ function statusLabel(colour: RiskColour, labels: Dictionary) {
   return labels.colourLabels[colour];
 }
 
+function markerHref(r: LabRow) {
+  return r.categoryId
+    ? `/patient/marker/${encodeURIComponent(r.markerKey)}?cat=${r.categoryId}`
+    : `/patient/marker/${encodeURIComponent(r.markerKey)}`;
+}
+
 export function LabsView({
   rows,
   labels,
@@ -58,6 +65,19 @@ export function LabsView({
   const [tab, setTab] = useState<"markers" | "packages">("markers");
   const [q, setQ] = useState("");
   const [openPkg, setOpenPkg] = useState<string | null>(null);
+
+  const historyByKey = useMemo(() => {
+    const map = new Map<string, number[]>();
+    const sorted = [...rows].sort((a, b) =>
+      a.observedAt.localeCompare(b.observedAt)
+    );
+    for (const r of sorted) {
+      const cur = map.get(r.markerKey) || [];
+      cur.push(r.value);
+      map.set(r.markerKey, cur);
+    }
+    return map;
+  }, [rows]);
 
   const latestByKey = useMemo(() => {
     const map = new Map<string, LabRow>();
@@ -105,12 +125,64 @@ export function LabsView({
 
   const openPackage = packages.find((p) => p.key === openPkg) || null;
 
+  function renderRow(r: LabRow, key: string) {
+    const colour = markerItemColour(r);
+    const series = historyByKey.get(r.markerKey) || [r.value];
+    return (
+      <tr key={key}>
+        <td>
+          <Link href={markerHref(r)} className="labs-name">
+            {r.name}
+          </Link>
+          <div className="labs-meta">
+            {fmtDate(r.observedAt, locale)} · {r.markerKey}
+          </div>
+        </td>
+        <td className="labs-val">
+          {r.value}
+          {r.unit ? ` ${r.unit}` : ""}
+        </td>
+        <td className="labs-ref">
+          {r.refLow != null || r.refHigh != null
+            ? `${r.refLow ?? "—"} – ${r.refHigh ?? "—"}`
+            : "—"}
+        </td>
+        <td>
+          <NormBar value={r.value} refLow={r.refLow} refHigh={r.refHigh} />
+        </td>
+        <td className="labs-spark">
+          <Sparkline values={series} />
+        </td>
+        <td>
+          <span className={`pill ${PILL_CLASS[colour]}`}>
+            {statusLabel(colour, labels)}
+          </span>
+        </td>
+      </tr>
+    );
+  }
+
+  const head = (
+    <thead>
+      <tr>
+        <th>{labels.labsIndicator}</th>
+        <th>{labels.labsResult}</th>
+        <th>{labels.labsNorm}</th>
+        <th>{labels.labsPosition}</th>
+        <th>{labels.labsChange}</th>
+        <th>{labels.labsStatus}</th>
+      </tr>
+    </thead>
+  );
+
   return (
     <div className="labs-wrap">
       <div className="labs-head">
         <div>
           <p className="eyebrow">
-            {locale === "en" ? "Laboratory results (LOINC)" : "Laboratoriniai tyrimai (LOINC)"}
+            {locale === "en"
+              ? "Laboratory results (LOINC)"
+              : "Laboratoriniai tyrimai (LOINC)"}
           </p>
           <h2 className="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-[-0.02em]">
             {labels.labs}
@@ -168,58 +240,15 @@ export function LabsView({
           </div>
           <div className="labs-table-wrap">
             <table className="labs-table">
-              <thead>
-                <tr>
-                  <th>{labels.labsIndicator}</th>
-                  <th>{labels.labsResult}</th>
-                  <th>{labels.labsNorm}</th>
-                  <th>{labels.labsPosition}</th>
-                  <th>{labels.labsStatus}</th>
-                </tr>
-              </thead>
+              {head}
               <tbody>
-                {filtered.map((r) => {
-                  const colour = markerItemColour(r);
-                  const href = r.categoryId
-                    ? `/patient/marker/${encodeURIComponent(r.markerKey)}?cat=${r.categoryId}`
-                    : `/patient/marker/${encodeURIComponent(r.markerKey)}`;
-                  return (
-                    <tr key={r.markerKey}>
-                      <td>
-                        <Link href={href} className="labs-name">
-                          {r.name}
-                        </Link>
-                        <div className="labs-meta">
-                          {fmtDate(r.observedAt, locale)} · {r.markerKey}
-                        </div>
-                      </td>
-                      <td className="labs-val">
-                        {r.value}
-                        {r.unit ? ` ${r.unit}` : ""}
-                      </td>
-                      <td className="labs-ref">
-                        {r.refLow != null || r.refHigh != null
-                          ? `${r.refLow ?? "—"} – ${r.refHigh ?? "—"}`
-                          : "—"}
-                      </td>
-                      <td>
-                        <NormBar
-                          value={r.value}
-                          refLow={r.refLow}
-                          refHigh={r.refHigh}
-                        />
-                      </td>
-                      <td>
-                        <span className={`pill ${PILL_CLASS[colour]}`}>
-                          {statusLabel(colour, labels)}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
+                {filtered.map((r) => renderRow(r, r.markerKey))}
                 {filtered.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="py-8 text-center text-[var(--muted)]">
+                    <td
+                      colSpan={6}
+                      className="py-8 text-center text-[var(--muted)]"
+                    >
                       {labels.noData}
                     </td>
                   </tr>
@@ -272,52 +301,11 @@ export function LabsView({
           </div>
           <div className="labs-table-wrap">
             <table className="labs-table">
-              <thead>
-                <tr>
-                  <th>{labels.labsIndicator}</th>
-                  <th>{labels.labsResult}</th>
-                  <th>{labels.labsNorm}</th>
-                  <th>{labels.labsPosition}</th>
-                  <th>{labels.labsStatus}</th>
-                </tr>
-              </thead>
+              {head}
               <tbody>
-                {openPackage.items.map((r) => {
-                  const colour = markerItemColour(r);
-                  const href = r.categoryId
-                    ? `/patient/marker/${encodeURIComponent(r.markerKey)}?cat=${r.categoryId}`
-                    : `/patient/marker/${encodeURIComponent(r.markerKey)}`;
-                  return (
-                    <tr key={`${r.id}-${r.markerKey}`}>
-                      <td>
-                        <Link href={href} className="labs-name">
-                          {r.name}
-                        </Link>
-                      </td>
-                      <td className="labs-val">
-                        {r.value}
-                        {r.unit ? ` ${r.unit}` : ""}
-                      </td>
-                      <td className="labs-ref">
-                        {r.refLow != null || r.refHigh != null
-                          ? `${r.refLow ?? "—"} – ${r.refHigh ?? "—"}`
-                          : "—"}
-                      </td>
-                      <td>
-                        <NormBar
-                          value={r.value}
-                          refLow={r.refLow}
-                          refHigh={r.refHigh}
-                        />
-                      </td>
-                      <td>
-                        <span className={`pill ${PILL_CLASS[colour]}`}>
-                          {statusLabel(colour, labels)}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
+                {openPackage.items.map((r) =>
+                  renderRow(r, `${r.id}-${r.markerKey}`)
+                )}
               </tbody>
             </table>
           </div>

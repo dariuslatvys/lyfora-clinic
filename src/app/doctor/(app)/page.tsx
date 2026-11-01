@@ -1,9 +1,19 @@
 import { ensureSchema, getDb } from "@/lib/db";
-import { patients, markerResults, snpGenotypes, rareMutations } from "@/lib/db/schema";
+import {
+  patients,
+  markerResults,
+  snpGenotypes,
+  rareMutations,
+} from "@/lib/db/schema";
 import { eq, sql } from "drizzle-orm";
+import { getCurrentUser } from "@/lib/auth/session";
+import { patientDisplayName } from "@/lib/i18n/patient-name";
+import type { Locale } from "@/lib/i18n/dictionary";
 
 export default async function DoctorHomePage() {
   ensureSchema();
+  const current = await getCurrentUser();
+  const locale = ((current?.user.locale as Locale) || "lt") as Locale;
   const db = getDb();
   const list = db.select().from(patients).all();
 
@@ -33,17 +43,19 @@ export default async function DoctorHomePage() {
           Pacientai
         </h2>
         <p className="mt-2 text-sm text-[var(--ink-soft)]">
-          Pirmoji gydytojo darbo vietos versija — pacientų duomenų santrauka.
-          Detalesnės klinikinės funkcijos bus kitame etape.
+          Pirmoji gydytojo darbo vietos versija — anonimizuotų demo pacientų
+          santrauka. Detalesnės klinikinės funkcijos bus kitame etape.
         </p>
       </section>
       <div className="grid gap-3">
         {enriched.map((p) => (
           <article key={p.id} className="panel">
-            <h3 className="text-xl font-semibold">{p.fullName}</h3>
+            <h3 className="text-xl font-semibold">
+              {patientDisplayName(p.sex, locale)}
+            </h3>
             <p className="text-sm text-[var(--muted)]">
-              {p.sex} · {p.dob}
-              {p.nationalId ? ` · a.k. ${p.nationalId}` : ""}
+              {p.sex === "male" ? (locale === "en" ? "Male" : "Vyras") : locale === "en" ? "Female" : "Moteris"}{" "}
+              · {p.dob}
             </p>
             <p className="mt-2 text-sm text-[var(--ink-soft)]">{p.notes}</p>
             <div className="mt-3 flex flex-wrap gap-2 text-xs">

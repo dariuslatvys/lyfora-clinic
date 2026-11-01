@@ -1,5 +1,5 @@
 {
-  "patient": "DARIUS LATVYS",
+  "patient": "MALE_DEMO",
   "sex": "male",
   "dob": "1972-04-17",
   "markers": [
@@ -664,6 +664,18 @@
       "raw": "NV 43583-4 Lipoproteinas (a) (Lp(a)) nmol/l Mažiau nei 75,0 24,2 2026-04-10 13:27 BT001347"
     },
     {
+      "markerKey": "TRIGLYCERIDES",
+      "name": "Trigliceridai",
+      "value": 1.4,
+      "unit": "mmol/L",
+      "refLow": 0.0,
+      "refHigh": 1.7,
+      "flag": null,
+      "date": "2026-04-10",
+      "source": "Triglecerinai_-_Atliktu__tyrimu__rezultatai.pdf",
+      "raw": "Trig mmol/L 0 - 1.7 1,40"
+    },
+    {
       "markerKey": "CREATININE",
       "name": "Kreatininas",
       "value": 94.0,
@@ -783,5 +795,6 @@
       "source": "Helicobacteri_2026.pdf",
       "raw": "HP IgG kiekybinis 1.329 Teigiamas"
     }
-  ]
+  ],
+  "nationalId": null
 }

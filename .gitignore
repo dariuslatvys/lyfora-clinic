@@ -45,6 +45,7 @@ next-env.d.ts
 /data/db/*.sqlite-*
 
 # bulky raw uploads (parsed JSON is enough to seed)
-/data/lyfora-source/*.vcf
-/data/lyfora-source/*.pdf
-/data/lyfora-source/*.PDF
+/data/lyfora-source/**/*.vcf
+/data/lyfora-source/**/*.pdf
+/data/lyfora-source/**/*.PDF
+/step*.webp

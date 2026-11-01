@@ -192,18 +192,18 @@ function main() {
   const hash = bcrypt.hashSync("lyfora2026", 10);
   const now = new Date().toISOString();
 
-  const patientUserId = "user_patient_darius";
-  const femaleUserId = "user_patient_ona";
+  const patientUserId = "user_patient_male";
+  const femaleUserId = "user_patient_female";
   const doctorUserId = "user_doctor";
-  const patientId = "patient_darius";
-  const femaleId = "patient_ona";
+  const patientId = "patient_male";
+  const femaleId = "patient_female";
 
   const insertUser = sqlite.prepare(`
     INSERT INTO users (id, email, password_hash, role, display_name, locale, created_at)
     VALUES (?, ?, ?, ?, ?, ?, ?)
   `);
-  insertUser.run(patientUserId, "pacientas@lyfora.lt", hash, "patient", "Darius Latvys", "lt", now);
-  insertUser.run(femaleUserId, "paciente@lyfora.lt", hash, "patient", "Ona Pavyzdinė", "lt", now);
+  insertUser.run(patientUserId, "pacientas@lyfora.lt", hash, "patient", "Jonas Jonaitis", "lt", now);
+  insertUser.run(femaleUserId, "paciente@lyfora.lt", hash, "patient", "Rasa Rasaitė", "lt", now);
   insertUser.run(doctorUserId, "gydytojas@lyfora.lt", hash, "doctor", "Dr. Lyfora", "lt", now);
 
   sqlite.prepare(`
@@ -212,13 +212,13 @@ function main() {
   `).run(
     patientId,
     patientUserId,
-    "Darius Latvys",
+    "Jonas Jonaitis",
     "male",
     blood.dob,
-    "37204170958",
+    null,
     1,
     0,
-    "Realūs laboratoriniai tyrimai iš PDF + vyrų NGS VCF (sintetinės MYBPC3/MSH2 demonstracinės pozicijos). SNP microarray failas dar neįkeltas."
+    "Demo vyrų paciento laboratoriniai žymenys + NGS VCF (sintetinės MYBPC3/MSH2 pozicijos). SNP microarray failas dar neįkeltas."
   );
 
   sqlite.prepare(`
@@ -227,13 +227,13 @@ function main() {
   `).run(
     femaleId,
     femaleUserId,
-    "Ona Pavyzdinė",
+    "Rasa Rasaitė",
     "female",
     "1988-03-12",
     null,
     1,
     1,
-    "Demo pacientė su sintetiniu NGS VCF ir demonstraciniais SNP genotipais."
+    "Demo moters pacientė su sintetiniu NGS VCF ir demonstraciniais SNP genotipais."
   );
 
   const insertSnp = sqlite.prepare(`
@@ -435,7 +435,7 @@ function main() {
   insertRareFor(patientId, rareMale.variants);
   insertRareFor(femaleId, rareFemale.variants);
 
-  // Minimal questionnaire for Darius
+  // Minimal questionnaire for male demo patient
   const insertQ = sqlite.prepare(
     `INSERT INTO questionnaire (patient_id, key, value) VALUES (?, ?, ?)`
   );
@@ -445,7 +445,7 @@ function main() {
   insertQ.run(patientId, "sleep_hours", "6-7");
 
   console.log("Seeded Lyfora DB");
-  console.log("  patients: Darius Latvys (labs + male NGS VCF), Ona Pavyzdinė (demo SNP + female VCF)");
+  console.log("  patients: Jonas Jonaitis / John Doe (labs + male NGS), Rasa Rasaitė / Jane Smith (demo SNP + female VCF)");
   console.log("  SNPs:", snps.length);
   console.log("  marker results:", blood.markers.length);
   console.log("  male rare:", rareMale.variants.length, "female rare:", rareFemale.variants.length);

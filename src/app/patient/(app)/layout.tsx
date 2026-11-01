@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser, destroySession } from "@/lib/auth/session";
 import { t } from "@/lib/i18n/dictionary";
+import { patientDisplayName } from "@/lib/i18n/patient-name";
 import { PatientSidebar } from "@/components/patient/sidebar";
 import { LocaleSwitch } from "@/components/layout/locale-switch";
 import { Button } from "@/components/ui/button";
@@ -35,7 +36,7 @@ export default async function PatientLayout({
               {labels.brandPatient}
             </h1>
             <p className="text-sm text-[var(--ink-soft)]">
-              {current.patient.fullName} ·{" "}
+              {patientDisplayName(current.patient.sex, locale)} ·{" "}
               {current.patient.sex === "male" ? labels.sexMale : labels.sexFemale}
             </p>
           </div>

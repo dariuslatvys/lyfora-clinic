@@ -19,6 +19,7 @@ export const dict = {
     healthCard: "Sveikatos kortelė",
     uploads: "Duomenų įkėlimas",
     labs: "Tyrimai",
+    myDna: "Mano DNR",
     visits: "Vizitai",
     referrals: "Siuntimai",
     referralsBlurb:
@@ -154,6 +155,7 @@ export const dict = {
     healthCard: "Health record",
     uploads: "Data upload",
     labs: "Labs",
+    myDna: "My DNA",
     visits: "Visits",
     referrals: "Referrals",
     referralsBlurb:

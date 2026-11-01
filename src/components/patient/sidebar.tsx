@@ -11,6 +11,7 @@ const items = [
   { href: "/patient/digital-twin", key: "navOverview" as const, icon: "home" },
   { href: "/patient/health-card", key: "healthCard" as const, icon: "card" },
   { href: "/patient/labs", key: "labs" as const, icon: "flask" },
+  { href: "/patient/dna", key: "myDna" as const, icon: "dna" },
   { href: "/patient/consultations", key: "consultations" as const, icon: "consult" },
   { href: "/patient/visits", key: "visits" as const, icon: "cal" },
   { href: "/patient/referrals", key: "referrals" as const, icon: "send" },
@@ -79,6 +80,13 @@ const ICONS: Record<string, ReactNode> = {
     </g>
   ),
   chart: <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />,
+  dna: (
+    <g>
+      <path d="M7 4c4 4 6 8 10 16" />
+      <path d="M17 4c-4 4-6 8-10 16" />
+      <path d="M8.5 8.5h7M7.5 12h9M8.5 15.5h7" />
+    </g>
+  ),
   shield: (
     <g>
       <path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z" />

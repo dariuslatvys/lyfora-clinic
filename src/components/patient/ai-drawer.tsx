@@ -186,8 +186,8 @@ export function AiDrawer({
         </form>
         <div className="disclaim">
           {locale === "en"
-            ? "Assistant does not give diagnoses or change treatment. For urgent symptoms call emergency services."
-            : "Asistentas neteikia diagnozių ir nekeičia gydymo. Esant skubiems simptomams skambinkite 112."}
+            ? "Assistant does not give diagnoses or change treatment. For concerns, contact your clinician or book a consult; emergency services only in life-threatening situations."
+            : "Asistentas neteikia diagnozių ir nekeičia gydymo. Kilus abejonėms kreipkitės į gydytoją ar konsultaciją; 112 — tik gyvybei pavojingais atvejais."}
         </div>
       </div>
     </aside>

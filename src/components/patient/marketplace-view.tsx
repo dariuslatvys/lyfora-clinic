@@ -17,6 +17,10 @@ function itemHasDetail(it: MarketItem) {
     it.kind === "package" ||
     !!it.detailLt ||
     !!it.detailEn ||
+    !!it.venueLt ||
+    !!it.venueEn ||
+    !!it.specialistLt ||
+    !!it.specialistEn ||
     (it.includes && it.includes.length > 0) ||
     (it.genes && it.genes.length > 0)
   );
@@ -58,6 +62,8 @@ export function MarketplaceView({ locale }: { locale: "lt" | "en" }) {
             geneList: "Genes included",
             markerList: "Tests included",
             about: "Description",
+            venue: "Clinic / SPA centre",
+            specialist: "Specialists",
           }
         : {
             eyebrow: "Klinikos parduotuvė",
@@ -84,6 +90,8 @@ export function MarketplaceView({ locale }: { locale: "lt" | "en" }) {
             geneList: "Įtraukti genai",
             markerList: "Įtraukti tyrimai",
             about: "Aprašymas",
+            venue: "Klinika / SPA centras",
+            specialist: "Specialistai",
           },
     [locale]
   );
@@ -105,6 +113,10 @@ export function MarketplaceView({ locale }: { locale: "lt" | "en" }) {
         it.detailEn || "",
         it.code || "",
         it.groupLt || "",
+        it.venueLt || "",
+        it.venueEn || "",
+        it.specialistLt || "",
+        it.specialistEn || "",
         ...(it.includes || []),
         ...(it.genes || []),
       ]
@@ -222,6 +234,18 @@ export function MarketplaceView({ locale }: { locale: "lt" | "en" }) {
             {name}
           </h3>
           <p className="small muted mt-2 mb-0">{summary}</p>
+          {(locale === "en" ? it.venueEn : it.venueLt) ? (
+            <p className="small market-venue mt-2 mb-0">
+              <span className="market-includes-label">{copy.venue}: </span>
+              {locale === "en" ? it.venueEn : it.venueLt}
+            </p>
+          ) : null}
+          {(locale === "en" ? it.specialistEn : it.specialistLt) ? (
+            <p className="small muted mt-1 mb-0">
+              <span className="market-includes-label">{copy.specialist}: </span>
+              {locale === "en" ? it.specialistEn : it.specialistLt}
+            </p>
+          ) : null}
           {it.geneCount != null ? (
             <p className="small mt-2 mb-0">
               <b>{it.geneCount}</b> {copy.genes}
@@ -394,6 +418,30 @@ export function MarketplaceView({ locale }: { locale: "lt" | "en" }) {
                 <p className="market-detail-prose">
                   {locale === "en" ? detail.detailEn : detail.detailLt}
                 </p>
+              </section>
+            ) : null}
+
+            {(locale === "en" ? detail.venueEn : detail.venueLt) ||
+            (locale === "en" ? detail.specialistEn : detail.specialistLt) ? (
+              <section className="market-detail-section market-provider-block">
+                {(locale === "en" ? detail.venueEn : detail.venueLt) ? (
+                  <div className="market-provider-row">
+                    <h3 className="market-detail-h">{copy.venue}</h3>
+                    <p className="market-detail-prose mb-0">
+                      {locale === "en" ? detail.venueEn : detail.venueLt}
+                    </p>
+                  </div>
+                ) : null}
+                {(locale === "en" ? detail.specialistEn : detail.specialistLt) ? (
+                  <div className="market-provider-row">
+                    <h3 className="market-detail-h">{copy.specialist}</h3>
+                    <p className="market-detail-prose mb-0">
+                      {locale === "en"
+                        ? detail.specialistEn
+                        : detail.specialistLt}
+                    </p>
+                  </div>
+                ) : null}
               </section>
             ) : null}
 

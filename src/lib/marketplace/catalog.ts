@@ -33,6 +33,12 @@ export type MarketItem = {
   code?: string;
   /** Lab group label for singles. */
   groupLt?: string;
+  /** Where the service is delivered (clinic / SPA centre / partner). */
+  venueLt?: string;
+  venueEn?: string;
+  /** Who delivers it (specialists, therapists, dietitians…). */
+  specialistLt?: string;
+  specialistEn?: string;
 };
 
 const labSingles: MarketItem[] = (
@@ -616,10 +622,18 @@ const wellness: MarketItem[] = [
     nameEn: "Classic massage",
     summaryLt: "Viso kūno atpalaiduojantis masažas su šiltais aliejais.",
     summaryEn: "Full-body relaxation massage with warm oils.",
+    detailLt:
+      "Atpalaiduojantis klasikinis masažas Lyfora klinikos sveikatingumo kabinete. Tinka po streso, sėdimo darbo ar prieš SPA dieną.",
+    detailEn:
+      "Relaxing classic massage in the Lyfora clinic wellness room. Suits stress, desk work or before a SPA day.",
     priceEur: 69,
     durationMin: 60,
     badgeLt: "60 min",
     badgeEn: "60 min",
+    venueLt: "Lyfora klinika · sveikatingumo kabinetas · Gedimino pr. 1, Vilnius",
+    venueEn: "Lyfora clinic · wellness room · Gediminas Ave 1, Vilnius",
+    specialistLt: "Licencijuotas masažuotojas (klinikos komanda)",
+    specialistEn: "Licensed massage therapist (clinic team)",
   },
   {
     id: "wel-massage-sport",
@@ -629,10 +643,18 @@ const wellness: MarketItem[] = [
     nameEn: "Sports / deep-tissue massage",
     summaryLt: "Raumenų įtampai, po treniruočių ar sėdimo darbo.",
     summaryEn: "For muscle tension after training or desk work.",
+    detailLt:
+      "Gilusis / sportinis masažas Lyfora klinikoje — raumenų įtampai, po treniruočių ar ilgo sėdėjimo. Galima derinti su kineziterapeuto rekomendacijomis.",
+    detailEn:
+      "Deep-tissue / sports massage at Lyfora clinic — for muscle tension after training or long sitting. Can be combined with physiotherapist advice.",
     priceEur: 79,
     durationMin: 60,
     badgeLt: "60 min",
     badgeEn: "60 min",
+    venueLt: "Lyfora klinika · sveikatingumo kabinetas · Gedimino pr. 1, Vilnius",
+    venueEn: "Lyfora clinic · wellness room · Gediminas Ave 1, Vilnius",
+    specialistLt: "Sportinio masažo specialistas · klinikos kineziterapijos komanda",
+    specialistEn: "Sports-massage specialist · clinic physiotherapy team",
   },
   {
     id: "wel-massage-pkg5",
@@ -642,13 +664,19 @@ const wellness: MarketItem[] = [
     nameEn: "5-massage pass",
     summaryLt: "5× 60 min klasikinis arba sportinis masažas per 3 mėn.",
     summaryEn: "5× 60 min classic or sports massage within 3 months.",
-    detailLt: "Penki 60 min masažai (klasikinis arba sportinis) per 3 mėnesius.",
-    detailEn: "Five 60 min massages (classic or sports) within 3 months.",
+    detailLt:
+      "Penki 60 min masažai (klasikinis arba sportinis) per 3 mėnesius Lyfora klinikos sveikatingumo kabinete. Terminą derinate su registratūra.",
+    detailEn:
+      "Five 60 min massages (classic or sports) within 3 months in the Lyfora clinic wellness room. Book slots with the front desk.",
     priceEur: 310,
     badgeLt: "Paketas",
     badgeEn: "Package",
     metaLt: "Sutaupote ~35 €",
     metaEn: "Save ~€35",
+    venueLt: "Lyfora klinika · sveikatingumo kabinetas · Gedimino pr. 1, Vilnius",
+    venueEn: "Lyfora clinic · wellness room · Gediminas Ave 1, Vilnius",
+    specialistLt: "Licencijuoti masažuotojai (klinikos komanda)",
+    specialistEn: "Licensed massage therapists (clinic team)",
   },
   {
     id: "wel-spa-day",
@@ -658,10 +686,18 @@ const wellness: MarketItem[] = [
     nameEn: "Clinic SPA day",
     summaryLt: "Pirtis, kūno šveitimas, 45 min masažas ir arbatos ritualas.",
     summaryEn: "Sauna, body scrub, 45 min massage and tea ritual.",
+    detailLt:
+      "Visą dieną trunkanti programa Lyfora klinikos SPA zonoje: infraraudonųjų spindulių pirtis, kūno šveitimas, 45 min masažas ir arbatos / hidracijos ritualas. Registracija per klinikos registratūrą.",
+    detailEn:
+      "A half-day programme in the Lyfora clinic SPA zone: infrared sauna, body scrub, 45 min massage and a tea / hydration ritual. Book via the clinic desk.",
     priceEur: 149,
     durationMin: 180,
     badgeLt: "~3 val.",
     badgeEn: "~3 hrs",
+    venueLt: "Lyfora klinikos SPA zona · Gedimino pr. 1, Vilnius",
+    venueEn: "Lyfora clinic SPA zone · Gediminas Ave 1, Vilnius",
+    specialistLt: "SPA terapeutai ir masažuotojai · Lyfora sveikatingumo komanda",
+    specialistEn: "SPA therapists and massage staff · Lyfora wellness team",
   },
   {
     id: "wel-spa-couple",
@@ -671,11 +707,25 @@ const wellness: MarketItem[] = [
     nameEn: "Couples SPA evening",
     summaryLt: "Dviem: SPA zona, sinchroninis masažas ir lengvi užkandžiai.",
     summaryEn: "For two: SPA zone, synchronised massage and light snacks.",
-    detailLt: "Poroms: SPA zona, sinchroninis masažas ir lengvi užkandžiai.",
-    detailEn: "For couples: SPA zone, synchronised massage and light snacks.",
+    detailLt:
+      "Porų vakaras partnerių SPA centre „SPA Vilnius Tauras“ (su Lyfora rezervacija): bendra SPA zona, sinchroninis masažas dviem ir lengvi užkandžiai. Transferas neįtrauktas — atvykimą derinate patys arba per registratūrą.",
+    detailEn:
+      "Couples evening at partner SPA centre “SPA Vilnius Tauras” (Lyfora booking): shared SPA zone, synchronised massage for two and light snacks. Transfer not included — arrive yourselves or arrange via the desk.",
     priceEur: 279,
     badgeLt: "Paketas",
     badgeEn: "Package",
+    includes: [
+      "SPA zona dviem",
+      "Sinchroninis masažas",
+      "Lengvi užkandžiai",
+      "Lyfora rezervacija",
+    ],
+    venueLt:
+      "Partnerių SPA centras · SPA Vilnius Tauras (Vilnius) · rezervacija per Lyfora",
+    venueEn:
+      "Partner SPA centre · SPA Vilnius Tauras (Vilnius) · booked via Lyfora",
+    specialistLt: "SPA Vilnius terapeutų pora · Lyfora koordinuoja vizitą",
+    specialistEn: "SPA Vilnius therapist pair · Lyfora coordinates the visit",
   },
   {
     id: "wel-spa-detox",
@@ -686,13 +736,26 @@ const wellness: MarketItem[] = [
     summaryLt: "2 dienos: SPA, 2 masažai, kvėpavimo sesija ir miego higienos planas.",
     summaryEn: "2 days: SPA, 2 massages, breathwork and a sleep-hygiene plan.",
     detailLt:
-      "Savaitgalio atstatymas: SPA, du masažai, kvėpavimo sesija ir miego higienos planas.",
+      "Savaitgalio atstatymas partnerių kurorte „Grand SPA Lietuva“ (Druskininkai) su Lyfora programa: SPA prieiga, du masažai, kvėpavimo sesija ir miego higienos planas iš Lyfora miego specialisto. Nakvynė ir kelionė derinamos atskirai.",
     detailEn:
-      "Weekend recovery: SPA, two massages, breathwork and a sleep-hygiene plan.",
+      "Weekend recovery at partner resort “Grand SPA Lietuva” (Druskininkai) with a Lyfora programme: SPA access, two massages, breathwork and a sleep-hygiene plan from a Lyfora sleep specialist. Stay and travel arranged separately.",
     priceEur: 420,
     badgeLt: "Paketas",
     badgeEn: "Package",
-    includes: ["SPA", "2× masažas", "Kvėpavimo sesija", "Miego planas"],
+    includes: [
+      "SPA prieiga (2 d.)",
+      "2× masažas",
+      "Kvėpavimo sesija",
+      "Miego higienos planas",
+    ],
+    venueLt:
+      "Partnerių SPA kurortas · Grand SPA Lietuva, Druskininkai · programa per Lyfora",
+    venueEn:
+      "Partner SPA resort · Grand SPA Lietuva, Druskininkai · programme via Lyfora",
+    specialistLt:
+      "Grand SPA terapeutai · Lyfora kvėpavimo treneris ir miego specialistas",
+    specialistEn:
+      "Grand SPA therapists · Lyfora breathwork coach and sleep specialist",
   },
   {
     id: "wel-diet-intro",
@@ -702,10 +765,18 @@ const wellness: MarketItem[] = [
     nameEn: "Dietitian consultation",
     summaryLt: "Mitybos anamnezė, tikslai ir pirmasis savaitės planas.",
     summaryEn: "Nutrition history, goals and a first weekly plan.",
+    detailLt:
+      "Pirminė dietologo konsultacija Lyfora klinikoje arba online: mitybos anamnezė, tikslai ir pirmasis savaitės planas. Galima derinti su laboratoriniais tyrimais.",
+    detailEn:
+      "Initial dietitian consult at Lyfora clinic or online: nutrition history, goals and a first weekly plan. Can be combined with lab tests.",
     priceEur: 85,
     durationMin: 50,
     badgeLt: "50 min",
     badgeEn: "50 min",
+    venueLt: "Lyfora klinika arba online · Gedimino pr. 1, Vilnius",
+    venueEn: "Lyfora clinic or online · Gediminas Ave 1, Vilnius",
+    specialistLt: "Klinikinė dietologė Rūta Kazlauskė · Lyfora mitybos komanda",
+    specialistEn: "Clinical dietitian Rūta Kazlauskė · Lyfora nutrition team",
   },
   {
     id: "wel-diet-follow",
@@ -715,10 +786,18 @@ const wellness: MarketItem[] = [
     nameEn: "Dietitian follow-up",
     summaryLt: "Plano korekcija pagal tyrimus ir savijautą.",
     summaryEn: "Plan adjustment based on labs and how you feel.",
+    detailLt:
+      "Pakartotinis dietologo vizitas Lyfora klinikoje arba online — plano korekcija pagal tyrimus, savijautą ir skaitmeninio dvynio signalus.",
+    detailEn:
+      "Dietitian follow-up at Lyfora clinic or online — plan adjustment based on labs, how you feel and digital-twin signals.",
     priceEur: 55,
     durationMin: 30,
     badgeLt: "30 min",
     badgeEn: "30 min",
+    venueLt: "Lyfora klinika arba online · Gedimino pr. 1, Vilnius",
+    venueEn: "Lyfora clinic or online · Gediminas Ave 1, Vilnius",
+    specialistLt: "Klinikinė dietologė Rūta Kazlauskė · Lyfora mitybos komanda",
+    specialistEn: "Clinical dietitian Rūta Kazlauskė · Lyfora nutrition team",
   },
   {
     id: "wel-diet-pkg",
@@ -731,13 +810,17 @@ const wellness: MarketItem[] = [
     summaryEn:
       "Intro + 3 check-ins + weekly menus + chat support.",
     detailLt:
-      "Aštuonių savaičių mentorystė: įvadinė konsultacija, trys kontrolės, savaitiniai meniu ir chat palaikymas.",
+      "Aštuonių savaičių mentorystė su Lyfora dietologe: įvadinė konsultacija klinikoje arba online, trys kontrolės, savaitiniai meniu ir chat palaikymas.",
     detailEn:
-      "Eight-week mentorship: intro consult, three check-ins, weekly menus and chat support.",
+      "Eight-week mentorship with a Lyfora dietitian: intro consult in clinic or online, three check-ins, weekly menus and chat support.",
     priceEur: 320,
     badgeLt: "Paketas",
     badgeEn: "Package",
     includes: ["Įžanga", "3× kontrolė", "Savaitiniai meniu", "Chat"],
+    venueLt: "Lyfora klinika + online chat · Gedimino pr. 1, Vilnius",
+    venueEn: "Lyfora clinic + online chat · Gediminas Ave 1, Vilnius",
+    specialistLt: "Klinikinė dietologė Rūta Kazlauskė · Lyfora mitybos komanda",
+    specialistEn: "Clinical dietitian Rūta Kazlauskė · Lyfora nutrition team",
   },
   {
     id: "wel-recovery-pkg",
@@ -747,12 +830,22 @@ const wellness: MarketItem[] = [
     nameEn: "Post-stress recovery package",
     summaryLt: "Dietologas + 3 masažai + 1 SPA diena.",
     summaryEn: "Dietitian + 3 massages + 1 SPA day.",
-    detailLt: "Po streso: dietologo konsultacija, trys masažai ir SPA diena.",
-    detailEn: "After stress: dietitian consult, three massages and a SPA day.",
+    detailLt:
+      "Po streso: dietologo konsultacija Lyfora klinikoje, trys masažai sveikatingumo kabinete ir viena SPA diena Lyfora SPA zonoje. Visą paketą koordinuoja klinikos registratūra.",
+    detailEn:
+      "After stress: dietitian consult at Lyfora clinic, three massages in the wellness room and one SPA day in the Lyfora SPA zone. The clinic desk coordinates the whole package.",
     priceEur: 399,
     badgeLt: "Paketas",
     badgeEn: "Package",
     includes: ["1× dietologas", "3× masažas", "1× SPA diena"],
+    venueLt:
+      "Lyfora klinika + SPA zona · Gedimino pr. 1, Vilnius",
+    venueEn:
+      "Lyfora clinic + SPA zone · Gediminas Ave 1, Vilnius",
+    specialistLt:
+      "Dietologė Rūta Kazlauskė · masažuotojai · SPA terapeutai",
+    specialistEn:
+      "Dietitian Rūta Kazlauskė · massage therapists · SPA therapists",
   },
 ];
 

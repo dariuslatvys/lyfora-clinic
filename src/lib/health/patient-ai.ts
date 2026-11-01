@@ -5,9 +5,9 @@ import { explainSnp } from "./explain-snp";
 import { colourRank } from "./colours";
 
 const DISCLAIMER_LT =
-  "Asistentas neteikia diagnozių ir nekeičia gydymo. Informacija paremta jūsų įkeltais duomenimis. Esant skubiems simptomams skambinkite 112.";
+  "Asistentas neteikia diagnozių ir nekeičia gydymo. Informacija paremta jūsų įkeltais duomenimis. Kilus abejonėms kreipkitės į gydytoją ar nuotolinę konsultaciją; 112 — tik gyvybei pavojingais atvejais.";
 const DISCLAIMER_EN =
-  "This assistant does not give diagnoses or change treatment. Answers are based on your uploaded data. For urgent symptoms call emergency services.";
+  "This assistant does not give diagnoses or change treatment. Answers are based on your uploaded data. If you have concerns, contact your clinician or book a consult; call emergency services only in life-threatening situations.";
 
 export function buildPatientAiReply(input: {
   patientId: string;
@@ -144,8 +144,109 @@ export function buildPatientAiReply(input: {
     };
   }
 
-  // Labs / markers
-  if (/žymen|zymen|marker|tyrim|lab|krauj|ldl|cholesterol/.test(ql)) {
+  // Specific lipid / cholesterol panel (answer the question asked — not all OOR labs)
+  const wantsLipids =
+    /cholesterol|cholester|lipid|ldl|hdl|mtl|dtl|triglicer|triglycer|apo[_\s-]?b|apo[_\s-]?a/.test(
+      ql
+    );
+  if (wantsLipids) {
+    const matchLipid = (key: string, name: string) => {
+      const k = key.toUpperCase();
+      const n = (name || "").toLowerCase();
+      const isLdl = k === "LDL" || k === "LDL_C" || /\bldl\b/.test(n);
+      const isHdl = k === "HDL" || k === "HDL_C" || /\bhdl\b/.test(n);
+      const isTotal =
+        k.includes("TOTAL_CHOL") ||
+        k === "CHOL" ||
+        k === "TC" ||
+        /total cholesterol|bendras cholesterol/.test(n);
+      const isTg = k.includes("TRIGLYC") || k === "TG" || /triglicer|triglycer/.test(n);
+      const isApoB = k.includes("APO_B") || k === "APOB" || /apolipoprotein b|apo[-\s]?b/.test(n);
+      const isLipidFamily = isLdl || isHdl || isTotal || isTg || isApoB;
+
+      if (/total|bendr/.test(ql) && !/ldl|hdl|mtl|dtl/.test(ql)) return isTotal;
+      if (/\bldl\b|mtl|blogojo/.test(ql)) return isLdl;
+      if (/\bhdl\b|dtl|gerojo/.test(ql)) return isHdl;
+      if (/triglicer|triglycer|\btg\b/.test(ql)) return isTg;
+      if (/apo[_\s-]?b/.test(ql)) return isApoB;
+      return isLipidFamily;
+    };
+
+    const byKey = new Map<string, (typeof twin.markers)[number]>();
+    for (const m of [...twin.markers].sort((a, b) =>
+      a.observedAt.localeCompare(b.observedAt)
+    )) {
+      if (matchLipid(m.markerKey, m.name || "")) byKey.set(m.markerKey, m);
+    }
+    const rows = [...byKey.values()].sort((a, b) =>
+      a.markerKey.localeCompare(b.markerKey)
+    );
+
+    if (!rows.length) {
+      return {
+        reply:
+          locale === "en"
+            ? "I do not see a cholesterol / lipid panel in your loaded lab results yet."
+            : "Įkeltuose tyrimuose kol kas nematau cholesterolio / lipidų panelės.",
+        disclaimer,
+      };
+    }
+
+    const formatRow = (m: (typeof rows)[number]) => {
+      const high =
+        m.flag === "high" || (m.refHigh != null && m.value > m.refHigh);
+      const low =
+        m.flag === "low" || (m.refLow != null && m.value < m.refLow);
+      const status =
+        high || low
+          ? locale === "en"
+            ? high
+              ? "above usual range"
+              : "below usual range"
+            : high
+              ? "virš įprastos ribos"
+              : "žemiau įprastos ribos"
+          : locale === "en"
+            ? "within usual range"
+            : "įprastose ribose";
+      const ref =
+        m.refLow != null || m.refHigh != null
+          ? ` · ${locale === "en" ? "ref" : "norma"} ${m.refLow ?? "—"}–${m.refHigh ?? "—"}`
+          : "";
+      return `- **${m.name || m.markerKey}**: ${m.value}${m.unit ? " " + m.unit : ""} (${m.observedAt.slice(0, 10)}; ${status}${ref})`;
+    };
+
+    const latestDate = rows
+      .map((m) => m.observedAt.slice(0, 10))
+      .sort()
+      .at(-1);
+
+    if (locale === "en") {
+      return {
+        reply: [
+          `Your latest cholesterol / lipid results${latestDate ? ` (as of ${latestDate})` : ""}:`,
+          "",
+          ...rows.map(formatRow),
+          "",
+          "This is your recorded lab data — not a new diagnosis. For interpretation or treatment changes, talk with your clinician or book a consult.",
+        ].join("\n"),
+        disclaimer,
+      };
+    }
+    return {
+      reply: [
+        `Paskutiniai cholesterolio / lipidų tyrimai${latestDate ? ` (iki ${latestDate})` : ""}:`,
+        "",
+        ...rows.map(formatRow),
+        "",
+        "Tai jūsų kortelėje įrašyti laboratoriniai duomenys — ne nauja diagnozė. Interpretacijai ar gydymo keitimui kreipkitės į gydytoją ar nuotolinę konsultaciją.",
+      ].join("\n"),
+      disclaimer,
+    };
+  }
+
+  // Labs / markers (general OOR overview — only when user asks broadly)
+  if (/žymen|zymen|marker|tyrim|lab|krauj|už norm|out of range|oor/.test(ql)) {
     const lines: string[] = [];
     for (const c of twin.categories) {
       const latest = new Map<string, (typeof c.markers)[number]>();

@@ -53,15 +53,81 @@ const DEFAULT_PREFS: Record<PrefKey, boolean> = Object.fromEntries(
   PREF_META.map((p) => [p.key, p.defaultOn])
 ) as Record<PrefKey, boolean>;
 
-function prefsStorageKey(patientHint: string) {
-  return `lyfora-privacy-prefs:v2:${patientHint}`;
-}
-
-type LocaleCopy = {
-  t: string;
-  d: string;
-  basis: string;
+type ClinicDoctor = {
+  id: string;
+  nameLt: string;
+  nameEn: string;
+  specLt: string;
+  specEn: string;
+  initials: string;
+  defaultOn: boolean;
 };
+
+const CLINIC_DOCTORS: ClinicDoctor[] = [
+  {
+    id: "d1",
+    nameLt: "Dr. Laura Mockutė",
+    nameEn: "Dr Laura Mockutė",
+    specLt: "Šeimos gydytoja",
+    specEn: "Family physician",
+    initials: "LM",
+    defaultOn: true,
+  },
+  {
+    id: "d2",
+    nameLt: "Dr. Andrius Stankevičius",
+    nameEn: "Dr Andrius Stankevičius",
+    specLt: "Kardiologas",
+    specEn: "Cardiologist",
+    initials: "AS",
+    defaultOn: true,
+  },
+  {
+    id: "d3",
+    nameLt: "Dr. Ieva Grigaitė",
+    nameEn: "Dr Ieva Grigaitė",
+    specLt: "Endokrinologė",
+    specEn: "Endocrinologist",
+    initials: "IG",
+    defaultOn: false,
+  },
+  {
+    id: "d4",
+    nameLt: "Dr. Paulius Rimkus",
+    nameEn: "Dr Paulius Rimkus",
+    specLt: "Klinikinis genetikas",
+    specEn: "Clinical geneticist",
+    initials: "PR",
+    defaultOn: true,
+  },
+  {
+    id: "d5",
+    nameLt: "Neringa Bielskė",
+    nameEn: "Neringa Bielskė",
+    specLt: "Dietologė",
+    specEn: "Dietitian",
+    initials: "NB",
+    defaultOn: true,
+  },
+  {
+    id: "d6",
+    nameLt: "Dr. Vytautas Lukoševičius",
+    nameEn: "Dr Vytautas Lukoševičius",
+    specLt: "Budintis gydytojas 24/7",
+    specEn: "On-call doctor 24/7",
+    initials: "VL",
+    defaultOn: true,
+  },
+  {
+    id: "d7",
+    nameLt: "Simona Adomaitė",
+    nameEn: "Simona Adomaitė",
+    specLt: "Kineziterapeutė",
+    specEn: "Physiotherapist",
+    initials: "SA",
+    defaultOn: true,
+  },
+];
 
 type PendingConsent = {
   id: string;
@@ -121,6 +187,53 @@ const DEMO_PENDING: PendingConsent[] = [
   },
 ];
 
+type LocaleCopy = { t: string; d: string; basis: string };
+
+type GeneticsShare = "me" | "doctors";
+
+function prefsStorageKey(patientHint: string) {
+  return `lyfora-privacy-prefs:v3:${patientHint}`;
+}
+
+function doctorsStorageKey(patientHint: string) {
+  return `lyfora-privacy-doctors:v1:${patientHint}`;
+}
+
+function geneticsStorageKey(patientHint: string) {
+  return `lyfora-privacy-genetics:v1:${patientHint}`;
+}
+
+function Switch({
+  on,
+  locked,
+  label,
+  onLabel,
+  offLabel,
+  onClick,
+}: {
+  on: boolean;
+  locked?: boolean;
+  label: string;
+  onLabel: string;
+  offLabel: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      className={`privacy-switch${on ? " on" : ""}${locked ? " locked" : ""}`}
+      role="switch"
+      aria-checked={on}
+      aria-label={label}
+      disabled={locked}
+      onClick={onClick}
+    >
+      <span className="privacy-switch-knob" />
+      <span className="privacy-switch-text">{on ? onLabel : offLabel}</span>
+    </button>
+  );
+}
+
 export function PrivacyView({
   locale,
   patientHint = "demo",
@@ -128,18 +241,39 @@ export function PrivacyView({
   locale: "lt" | "en";
   patientHint?: string;
 }) {
+  type PrivacyTab =
+    | "pending"
+    | "doctors"
+    | "granted"
+    | "data"
+    | "policies";
+
+  const [tab, setTab] = useState<PrivacyTab>("pending");
   const [active, setActive] = useState<PolicyId>("privacy");
   const [prefs, setPrefs] = useState(DEFAULT_PREFS);
   const [savedFlash, setSavedFlash] = useState(false);
   const [pending, setPending] = useState<PendingConsent[]>(DEMO_PENDING);
   const [pendingFlash, setPendingFlash] = useState<string | null>(null);
+  const [doctorAccess, setDoctorAccess] = useState<Record<string, boolean>>(
+    () =>
+      Object.fromEntries(CLINIC_DOCTORS.map((d) => [d.id, d.defaultOn]))
+  );
+  const [geneticsShare, setGeneticsShare] = useState<GeneticsShare>("doctors");
 
   useEffect(() => {
     try {
       const raw = localStorage.getItem(prefsStorageKey(patientHint));
-      if (!raw) return;
-      const parsed = JSON.parse(raw) as Partial<Record<PrefKey, boolean>>;
-      setPrefs((prev) => ({ ...prev, ...parsed }));
+      if (raw) {
+        const parsed = JSON.parse(raw) as Partial<Record<PrefKey, boolean>>;
+        setPrefs((prev) => ({ ...prev, ...parsed }));
+      }
+      const docs = localStorage.getItem(doctorsStorageKey(patientHint));
+      if (docs) {
+        const parsed = JSON.parse(docs) as Record<string, boolean>;
+        setDoctorAccess((prev) => ({ ...prev, ...parsed }));
+      }
+      const gen = localStorage.getItem(geneticsStorageKey(patientHint));
+      if (gen === "me" || gen === "doctors") setGeneticsShare(gen);
     } catch {
       /* ignore */
     }
@@ -368,23 +502,40 @@ export function PrivacyView({
             eyebrow: "Legal & GDPR",
             title: "Privacy",
             blurb:
-              "Manage clear consents under the GDPR (BDAR), then open the full policy texts.",
-            docs: "Policies",
+              "Switch between pending requests, clinician access, granted consents, enabled data and full policy texts.",
+            tabPending: "Pending",
+            tabDoctors: "Clinicians",
+            tabGranted: "Granted",
+            tabData: "Enabled data",
+            tabPolicies: "Policies",
+            docs: "Policy documents",
             updated: "Updated",
-            prefsTitle: "Your consents",
-            prefsBlurb:
-              "Each row shows what we do, the legal basis, and On / Off. Required items stay on for care.",
-            save: "Save consents",
-            saved: "Consents saved",
+            dataTitle: "Enabled data",
+            dataBlurb:
+              "Turn optional data uses on or off. Required items stay on for care.",
+            grantedTitle: "Granted consents",
+            grantedBlurb:
+              "What is currently allowed. Turn any optional item off here or in Enabled data.",
+            grantedEmpty: "No optional consents are on yet.",
+            doctorsTitle: "Consents for specific clinicians",
+            doctorsBlurb:
+              "Choose which Lyfora specialists may open your health record. Genetics has a separate visibility setting below.",
+            geneticsTitle: "Genetic data visibility",
+            geneticsBlurb:
+              "DNA results sit in a separate store. Choose who can see them.",
+            geneticsMe: "Only me",
+            geneticsDoctors: "Me and my clinicians",
+            save: "Save settings",
+            saved: "Settings saved",
             contact: "Contact DPO",
             on: "On",
             off: "Off",
             required: "Required",
-            optional: "Optional",
             granted: "granted",
             of: "of",
             acceptOptional: "Accept all optional",
             rejectOptional: "Reject optional",
+            revoke: "Revoke",
             pendingTitle: "Consents awaiting approval",
             pendingBlurb:
               "Partners or clinicians asked for extra access. Approve or decline each request.",
@@ -395,28 +546,46 @@ export function PrivacyView({
             pendingDeclined: "Declined",
             pendingRequested: "Requested",
             pendingFrom: "From",
+            doctorsOn: "with access",
           }
         : {
             eyebrow: "Teisinė info ir BDAR",
             title: "Privatumas",
             blurb:
-              "Aiškiai valdykite sutikimus pagal BDAR (GDPR), tada skaitykite pilnus politikų tekstus.",
+              "Perjunkite tarp laukiančių prašymų, gydytojų prieigos, suteiktų sutikimų, įjungtų duomenų ir politikų tekstų.",
+            tabPending: "Laukiantys",
+            tabDoctors: "Gydytojai",
+            tabGranted: "Suteikti",
+            tabData: "Įjungti duomenys",
+            tabPolicies: "Politikos",
             docs: "Politikų dokumentai",
             updated: "Atnaujinta",
-            prefsTitle: "Jūsų sutikimai",
-            prefsBlurb:
-              "Kiekvienoje eilutėje — ką darome, teisinis pagrindas ir Įjungta / Išjungta. Būtini lieka įjungti gydymui.",
-            save: "Išsaugoti sutikimus",
-            saved: "Sutikimai išsaugoti",
+            dataTitle: "Įjungti duomenys",
+            dataBlurb:
+              "Įjunkite arba išjunkite neprivalomus duomenų naudojimus. Būtini lieka įjungti gydymui.",
+            grantedTitle: "Suteikti sutikimai",
+            grantedBlurb:
+              "Kas šiuo metu leidžiama. Bet kurį neprivalomą galite atšaukti čia arba skirtuke „Įjungti duomenys“.",
+            grantedEmpty: "Kol kas nėra įjungtų neprivalomų sutikimų.",
+            doctorsTitle: "Sutikimai konkretiems gydytojams",
+            doctorsBlurb:
+              "Pasirinkite, kurie Lyfora specialistai gali atidaryti jūsų sveikatos kortelę. Genetikai — atskiras matomumas žemiau.",
+            geneticsTitle: "Genetinių duomenų matomumas",
+            geneticsBlurb:
+              "DNR rezultatai laikomi atskiroje saugykloje. Pasirinkite, kas juos mato.",
+            geneticsMe: "Tik aš",
+            geneticsDoctors: "Aš ir mano gydytojai",
+            save: "Išsaugoti nustatymus",
+            saved: "Nustatymai išsaugoti",
             contact: "Rašyti DAP",
             on: "Įjungta",
             off: "Išjungta",
             required: "Būtina",
-            optional: "Neprivaloma",
             granted: "suteikta",
             of: "iš",
             acceptOptional: "Sutikti su visais neprivalomais",
             rejectOptional: "Atmesti neprivalomus",
+            revoke: "Atšaukti",
             pendingTitle: "Laukiančių patvirtinimo sutikimai",
             pendingBlurb:
               "Partneriai ar gydytojai paprašė papildomos prieigos. Kiekvieną užklausą patvirtinkite arba atmeskite.",
@@ -427,14 +596,15 @@ export function PrivacyView({
             pendingDeclined: "Atmesta",
             pendingRequested: "Prašyta",
             pendingFrom: "Kas prašo",
+            doctorsOn: "su prieiga",
           },
     [locale]
   );
 
   const doc = PRIVACY_POLICIES.find((p) => p.id === active) || PRIVACY_POLICIES[0];
-
   const optionalKeys = PREF_META.filter((p) => !p.required).map((p) => p.key);
-  const grantedOptional = optionalKeys.filter((k) => prefs[k]).length;
+  const grantedOptional = optionalKeys.filter((k) => prefs[k]);
+  const doctorsOnCount = CLINIC_DOCTORS.filter((d) => doctorAccess[d.id]).length;
 
   function setPref(key: PrefKey, value: boolean) {
     const meta = PREF_META.find((p) => p.key === key);
@@ -442,10 +612,20 @@ export function PrivacyView({
     setPrefs((p) => ({ ...p, [key]: value }));
   }
 
-  function savePrefs() {
-    localStorage.setItem(prefsStorageKey(patientHint), JSON.stringify(prefs));
+  function persistAll(
+    nextPrefs = prefs,
+    nextDocs = doctorAccess,
+    nextGen = geneticsShare
+  ) {
+    localStorage.setItem(prefsStorageKey(patientHint), JSON.stringify(nextPrefs));
+    localStorage.setItem(doctorsStorageKey(patientHint), JSON.stringify(nextDocs));
+    localStorage.setItem(geneticsStorageKey(patientHint), nextGen);
     setSavedFlash(true);
     window.setTimeout(() => setSavedFlash(false), 2200);
+  }
+
+  function saveAll() {
+    persistAll();
   }
 
   function setAllOptional(on: boolean) {
@@ -461,6 +641,22 @@ export function PrivacyView({
     setPendingFlash(approved ? copy.pendingApproved : copy.pendingDeclined);
     window.setTimeout(() => setPendingFlash(null), 2200);
   }
+
+  function toggleDoctor(id: string) {
+    setDoctorAccess((prev) => ({ ...prev, [id]: !prev[id] }));
+  }
+
+  const privacyTabs: { id: PrivacyTab; label: string; count?: number }[] = [
+    { id: "pending", label: copy.tabPending, count: pending.length },
+    { id: "doctors", label: copy.tabDoctors, count: doctorsOnCount },
+    {
+      id: "granted",
+      label: copy.tabGranted,
+      count: grantedOptional.length,
+    },
+    { id: "data", label: copy.tabData },
+    { id: "policies", label: copy.tabPolicies, count: PRIVACY_POLICIES.length },
+  ];
 
   return (
     <div className="stack privacy-page" style={{ gap: 16 }}>
@@ -481,239 +677,397 @@ export function PrivacyView({
         </p>
       </header>
 
-      <section className="card privacy-pending">
-        <div className="card-head" style={{ alignItems: "flex-start" }}>
-          <div>
-            <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold m-0">
-              {copy.pendingTitle}
-            </h2>
-            <p className="small muted mt-1 mb-0">{copy.pendingBlurb}</p>
-          </div>
-          <div className="privacy-pref-summary">
-            {pendingFlash ? (
-              <span className="pill c-green">{pendingFlash}</span>
-            ) : (
-              <span className="pill plain c-yellow">{pending.length}</span>
-            )}
-          </div>
-        </div>
+      <div
+        className="tabs visits-tabs privacy-tabs"
+        role="tablist"
+        aria-label={copy.title}
+      >
+        {privacyTabs.map((t) => (
+          <button
+            key={t.id}
+            type="button"
+            role="tab"
+            className={tab === t.id ? "on" : undefined}
+            aria-selected={tab === t.id}
+            onClick={() => setTab(t.id)}
+          >
+            {t.label}
+            {typeof t.count === "number" ? (
+              <span className="visits-tab-count">{t.count}</span>
+            ) : null}
+          </button>
+        ))}
+      </div>
 
-        {pending.length === 0 ? (
-          <p className="small muted m-0">{copy.pendingEmpty}</p>
-        ) : (
-          <div className="privacy-pending-list">
-            {pending.map((item) => (
-              <article key={item.id} className="privacy-pending-item">
-                <div className="privacy-pending-copy">
-                  <div className="privacy-pending-title">
-                    <b>{locale === "en" ? item.titleEn : item.titleLt}</b>
-                    <span className="pill plain c-yellow">
-                      {locale === "en" ? item.scopeEn : item.scopeLt}
+      {tab === "pending" ? (
+        <section className="card privacy-block privacy-pending">
+          <div className="card-head" style={{ alignItems: "flex-start" }}>
+            <div>
+              <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold m-0">
+                {copy.pendingTitle}
+              </h2>
+              <p className="small muted mt-1 mb-0">{copy.pendingBlurb}</p>
+            </div>
+            <div className="privacy-pref-summary">
+              {pendingFlash ? (
+                <span className="pill c-green">{pendingFlash}</span>
+              ) : (
+                <span className="pill plain c-yellow">{pending.length}</span>
+              )}
+            </div>
+          </div>
+          {pending.length === 0 ? (
+            <p className="small muted m-0">{copy.pendingEmpty}</p>
+          ) : (
+            <div className="privacy-pending-list">
+              {pending.map((item) => (
+                <article key={item.id} className="privacy-pending-item">
+                  <div className="privacy-pending-copy">
+                    <div className="privacy-pending-title">
+                      <b>{locale === "en" ? item.titleEn : item.titleLt}</b>
+                      <span className="pill plain c-yellow">
+                        {locale === "en" ? item.scopeEn : item.scopeLt}
+                      </span>
+                    </div>
+                    <p className="privacy-pref-desc">
+                      {locale === "en" ? item.detailEn : item.detailLt}
+                    </p>
+                    <p className="privacy-pref-basis">
+                      {copy.pendingFrom}:{" "}
+                      {locale === "en" ? item.fromEn : item.fromLt} ·{" "}
+                      {copy.pendingRequested} {item.requestedAt}
+                    </p>
+                  </div>
+                  <div className="privacy-pending-actions">
+                    <button
+                      type="button"
+                      className="btn sm"
+                      onClick={() => resolvePending(item.id, true)}
+                    >
+                      {copy.pendingApprove}
+                    </button>
+                    <button
+                      type="button"
+                      className="btn ghost sm"
+                      onClick={() => resolvePending(item.id, false)}
+                    >
+                      {copy.pendingDecline}
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
+      ) : null}
+
+      {tab === "doctors" ? (
+        <section className="card privacy-block privacy-doctors">
+          <div className="card-head" style={{ alignItems: "flex-start" }}>
+            <div>
+              <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold m-0">
+                {copy.doctorsTitle}
+              </h2>
+              <p className="small muted mt-1 mb-0">{copy.doctorsBlurb}</p>
+            </div>
+            <span className="pill plain c-acc">
+              {doctorsOnCount} {copy.of} {CLINIC_DOCTORS.length}{" "}
+              {copy.doctorsOn}
+            </span>
+          </div>
+          <div className="privacy-doctor-list">
+            {CLINIC_DOCTORS.map((d) => {
+              const on = !!doctorAccess[d.id];
+              return (
+                <div
+                  key={d.id}
+                  className={`privacy-doctor-row${on ? " on" : ""}`}
+                >
+                  <div className="privacy-doctor-av" aria-hidden>
+                    {d.initials}
+                  </div>
+                  <div className="privacy-doctor-copy">
+                    <b>{locale === "en" ? d.nameEn : d.nameLt}</b>
+                    <span className="small muted">
+                      {locale === "en" ? d.specEn : d.specLt}
                     </span>
                   </div>
-                  <p className="privacy-pref-desc">
-                    {locale === "en" ? item.detailEn : item.detailLt}
-                  </p>
-                  <p className="privacy-pref-basis">
-                    {copy.pendingFrom}:{" "}
-                    {locale === "en" ? item.fromEn : item.fromLt} ·{" "}
-                    {copy.pendingRequested} {item.requestedAt}
-                  </p>
+                  <Switch
+                    on={on}
+                    label={locale === "en" ? d.nameEn : d.nameLt}
+                    onLabel={copy.on}
+                    offLabel={copy.off}
+                    onClick={() => toggleDoctor(d.id)}
+                  />
                 </div>
-                <div className="privacy-pending-actions">
-                  <button
-                    type="button"
-                    className="btn sm"
-                    onClick={() => resolvePending(item.id, true)}
-                  >
-                    {copy.pendingApprove}
-                  </button>
-                  <button
-                    type="button"
-                    className="btn ghost sm"
-                    onClick={() => resolvePending(item.id, false)}
-                  >
-                    {copy.pendingDecline}
-                  </button>
-                </div>
-              </article>
-            ))}
+              );
+            })}
           </div>
-        )}
-      </section>
 
-      <section className="card privacy-prefs">
-        <div className="card-head" style={{ alignItems: "flex-start" }}>
-          <div>
-            <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold m-0">
-              {copy.prefsTitle}
-            </h2>
-            <p className="small muted mt-1 mb-0">{copy.prefsBlurb}</p>
-          </div>
-          <div className="privacy-pref-summary">
-            {savedFlash ? (
-              <span className="pill c-green">{copy.saved}</span>
-            ) : (
-              <span className="pill plain c-acc">
-                {grantedOptional} {copy.of} {optionalKeys.length} {copy.granted}
-              </span>
-            )}
-          </div>
-        </div>
-
-        <div className="privacy-pref-actions">
-          <button
-            type="button"
-            className="btn ghost sm"
-            onClick={() => setAllOptional(true)}
-          >
-            {copy.acceptOptional}
-          </button>
-          <button
-            type="button"
-            className="btn ghost sm"
-            onClick={() => setAllOptional(false)}
-          >
-            {copy.rejectOptional}
-          </button>
-        </div>
-
-        <div className="privacy-pref-groups">
-          {groups.map((g) => (
-            <div key={g.id} className="privacy-pref-group">
-              <div className="privacy-pref-group-head">
-                <h3 className="font-[family-name:var(--font-display)] text-base font-semibold m-0">
-                  {g.title}
-                </h3>
-                <p className="small muted m-0">{g.blurb}</p>
-              </div>
-              <div
-                className={`privacy-pref-list${
-                  g.id === "required" ? " privacy-pref-list-split" : ""
-                }`}
+          <div className="privacy-genetics">
+            <div className="privacy-pref-group-head">
+              <h3 className="font-[family-name:var(--font-display)] text-base font-semibold m-0">
+                {copy.geneticsTitle}
+              </h3>
+              <p className="small muted m-0">{copy.geneticsBlurb}</p>
+            </div>
+            <div
+              className="privacy-seg"
+              role="group"
+              aria-label={copy.geneticsTitle}
+            >
+              <button
+                type="button"
+                className={geneticsShare === "me" ? "on" : undefined}
+                onClick={() => setGeneticsShare("me")}
               >
-                {g.items.map((meta) => {
-                  const lab = labels[meta.key];
-                  const on = prefs[meta.key];
-                  return (
-                    <div
-                      key={meta.key}
-                      className={`privacy-pref${meta.required ? " required" : ""}${
-                        on ? " on" : ""
-                      }`}
-                    >
-                      <div className="privacy-pref-title-row">
-                        <div className="privacy-pref-title-main">
-                          <b>{lab.t}</b>
-                          <span
-                            className={`pill plain ${
-                              meta.required ? "c-acc" : on ? "c-green" : "c-none"
-                            }`}
-                          >
-                            {meta.required
-                              ? copy.required
-                              : on
-                                ? copy.on
-                                : copy.off}
-                          </span>
-                        </div>
-                        <button
-                          type="button"
-                          className={`privacy-switch${on ? " on" : ""}${
-                            meta.required ? " locked" : ""
-                          }`}
-                          role="switch"
-                          aria-checked={on}
-                          aria-label={lab.t}
-                          disabled={meta.required}
-                          onClick={() => setPref(meta.key, !on)}
-                        >
-                          <span className="privacy-switch-knob" />
-                          <span className="privacy-switch-text">
-                            {on ? copy.on : copy.off}
-                          </span>
-                        </button>
+                {copy.geneticsMe}
+              </button>
+              <button
+                type="button"
+                className={geneticsShare === "doctors" ? "on" : undefined}
+                onClick={() => setGeneticsShare("doctors")}
+              >
+                {copy.geneticsDoctors}
+              </button>
+            </div>
+          </div>
+
+          <div className="row mt-3" style={{ gap: 8, flexWrap: "wrap" }}>
+            <button type="button" className="btn" onClick={saveAll}>
+              {copy.save}
+            </button>
+          </div>
+        </section>
+      ) : null}
+
+      {tab === "granted" ? (
+        <section className="card privacy-block privacy-granted">
+          <div className="card-head" style={{ alignItems: "flex-start" }}>
+            <div>
+              <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold m-0">
+                {copy.grantedTitle}
+              </h2>
+              <p className="small muted mt-1 mb-0">{copy.grantedBlurb}</p>
+            </div>
+            <span className="pill plain c-green">
+              {grantedOptional.length} {copy.of} {optionalKeys.length}{" "}
+              {copy.granted}
+            </span>
+          </div>
+          {grantedOptional.length === 0 ? (
+            <p className="small muted m-0">{copy.grantedEmpty}</p>
+          ) : (
+            <div className="privacy-granted-list">
+              {grantedOptional.map((key) => {
+                const lab = labels[key];
+                const meta = PREF_META.find((p) => p.key === key)!;
+                return (
+                  <div key={key} className="privacy-granted-item">
+                    <div className="privacy-pending-copy">
+                      <div className="privacy-pending-title">
+                        <b>{lab.t}</b>
+                        <span className="pill plain c-green">{copy.on}</span>
                       </div>
                       <p className="privacy-pref-desc">{lab.d}</p>
                       <p className="privacy-pref-basis">{lab.basis}</p>
                     </div>
-                  );
-                })}
-              </div>
+                    {!meta.required ? (
+                      <button
+                        type="button"
+                        className="btn ghost sm"
+                        onClick={() => setPref(key, false)}
+                      >
+                        {copy.revoke}
+                      </button>
+                    ) : null}
+                  </div>
+                );
+              })}
             </div>
-          ))}
-        </div>
+          )}
+        </section>
+      ) : null}
 
-        <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
-          <button type="button" className="btn" onClick={savePrefs}>
-            {copy.save}
-          </button>
-          <a
-            className="btn ghost"
-            href={`mailto:${PRIVACY_CONTROLLER.dpoEmail}`}
-          >
-            {copy.contact}
-          </a>
-        </div>
-      </section>
-
-      <div className="privacy-layout">
-        <nav className="card privacy-nav" aria-label={copy.docs}>
-          <p className="eyebrow m-0 mb-2">{copy.docs}</p>
-          <div className="privacy-nav-list">
-            {PRIVACY_POLICIES.map((p) => (
-              <button
-                key={p.id}
-                type="button"
-                className={`privacy-nav-item${active === p.id ? " on" : ""}`}
-                onClick={() => setActive(p.id)}
-              >
-                <b>{locale === "en" ? p.titleEn : p.titleLt}</b>
-                <span className="small muted">
-                  {locale === "en" ? p.summaryEn : p.summaryLt}
-                </span>
-              </button>
-            ))}
-          </div>
-        </nav>
-
-        <article className="card privacy-doc surface-raised-card">
+      {tab === "data" ? (
+        <section className="card privacy-block privacy-prefs">
           <div className="card-head" style={{ alignItems: "flex-start" }}>
             <div>
-              <h2 className="font-[family-name:var(--font-display)] text-2xl font-semibold m-0">
-                {locale === "en" ? doc.titleEn : doc.titleLt}
+              <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold m-0">
+                {copy.dataTitle}
               </h2>
-              <p className="small muted mt-2 mb-0">
-                {locale === "en" ? doc.summaryEn : doc.summaryLt}
-              </p>
+              <p className="small muted mt-1 mb-0">{copy.dataBlurb}</p>
             </div>
-            <span className="pill plain c-acc">
-              {copy.updated} {doc.updated}
-            </span>
+            <div className="privacy-pref-summary">
+              {savedFlash ? (
+                <span className="pill c-green">{copy.saved}</span>
+              ) : (
+                <span className="pill plain c-acc">
+                  {grantedOptional.length} {copy.of} {optionalKeys.length}{" "}
+                  {copy.granted}
+                </span>
+              )}
+            </div>
           </div>
 
-          <div className="privacy-sections">
-            {doc.sections.map((s) => (
-              <section key={s.headingLt} className="privacy-section">
-                <h3 className="font-[family-name:var(--font-display)] text-lg font-semibold m-0">
-                  {locale === "en" ? s.headingEn : s.headingLt}
-                </h3>
-                {(locale === "en" ? s.bodyEn : s.bodyLt).map((para) => (
-                  <p key={para.slice(0, 48)} className="privacy-para">
-                    {para}
-                  </p>
-                ))}
-              </section>
+          <div className="privacy-pref-actions">
+            <button
+              type="button"
+              className="btn ghost sm"
+              onClick={() => setAllOptional(true)}
+            >
+              {copy.acceptOptional}
+            </button>
+            <button
+              type="button"
+              className="btn ghost sm"
+              onClick={() => setAllOptional(false)}
+            >
+              {copy.rejectOptional}
+            </button>
+          </div>
+
+          <div className="privacy-pref-groups">
+            {groups.map((g) => (
+              <div key={g.id} className="privacy-pref-group">
+                <div className="privacy-pref-group-head">
+                  <h3 className="font-[family-name:var(--font-display)] text-base font-semibold m-0">
+                    {g.title}
+                  </h3>
+                  <p className="small muted m-0">{g.blurb}</p>
+                </div>
+                <div
+                  className={`privacy-pref-list${
+                    g.id === "required" ? " privacy-pref-list-split" : ""
+                  }`}
+                >
+                  {g.items.map((meta) => {
+                    const lab = labels[meta.key];
+                    const on = prefs[meta.key];
+                    return (
+                      <div
+                        key={meta.key}
+                        className={`privacy-pref${
+                          meta.required ? " required" : ""
+                        }${on ? " on" : ""}`}
+                      >
+                        <div className="privacy-pref-title-row">
+                          <div className="privacy-pref-title-main">
+                            <b>{lab.t}</b>
+                            <span
+                              className={`pill plain ${
+                                meta.required
+                                  ? "c-acc"
+                                  : on
+                                    ? "c-green"
+                                    : "c-none"
+                              }`}
+                            >
+                              {meta.required
+                                ? copy.required
+                                : on
+                                  ? copy.on
+                                  : copy.off}
+                            </span>
+                          </div>
+                          <Switch
+                            on={on}
+                            locked={meta.required}
+                            label={lab.t}
+                            onLabel={copy.on}
+                            offLabel={copy.off}
+                            onClick={() => setPref(meta.key, !on)}
+                          />
+                        </div>
+                        <p className="privacy-pref-desc">{lab.d}</p>
+                        <p className="privacy-pref-basis">{lab.basis}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             ))}
           </div>
 
-          <p className="disclaim mt-4 mb-0">
-            {locale === "en"
-              ? "This text is provided for the Lyfora clinic platform demo and should be reviewed by legal counsel before production use."
-              : "Šis tekstas skirtas Lyfora klinikos platformos demo ir prieš gamybinį naudojimą turi būti peržiūrėtas teisininko."}
-          </p>
-        </article>
-      </div>
+          <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
+            <button type="button" className="btn" onClick={saveAll}>
+              {copy.save}
+            </button>
+            <a
+              className="btn ghost"
+              href={`mailto:${PRIVACY_CONTROLLER.dpoEmail}`}
+            >
+              {copy.contact}
+            </a>
+          </div>
+        </section>
+      ) : null}
+
+      {tab === "policies" ? (
+        <section className="privacy-docs-block">
+          <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold m-0 mb-3">
+            {copy.docs}
+          </h2>
+          <div className="privacy-layout">
+            <nav className="card privacy-nav" aria-label={copy.docs}>
+              <div className="privacy-nav-list">
+                {PRIVACY_POLICIES.map((p) => (
+                  <button
+                    key={p.id}
+                    type="button"
+                    className={`privacy-nav-item${
+                      active === p.id ? " on" : ""
+                    }`}
+                    onClick={() => setActive(p.id)}
+                  >
+                    <b>{locale === "en" ? p.titleEn : p.titleLt}</b>
+                    <span className="small muted">
+                      {locale === "en" ? p.summaryEn : p.summaryLt}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </nav>
+
+            <article className="card privacy-doc surface-raised-card">
+              <div className="card-head" style={{ alignItems: "flex-start" }}>
+                <div>
+                  <h3 className="font-[family-name:var(--font-display)] text-2xl font-semibold m-0">
+                    {locale === "en" ? doc.titleEn : doc.titleLt}
+                  </h3>
+                  <p className="small muted mt-2 mb-0">
+                    {locale === "en" ? doc.summaryEn : doc.summaryLt}
+                  </p>
+                </div>
+                <span className="pill plain c-acc">
+                  {copy.updated} {doc.updated}
+                </span>
+              </div>
+
+              <div className="privacy-sections">
+                {doc.sections.map((s) => (
+                  <section key={s.headingLt} className="privacy-section">
+                    <h4 className="font-[family-name:var(--font-display)] text-lg font-semibold m-0">
+                      {locale === "en" ? s.headingEn : s.headingLt}
+                    </h4>
+                    {(locale === "en" ? s.bodyEn : s.bodyLt).map((para) => (
+                      <p key={para.slice(0, 48)} className="privacy-para">
+                        {para}
+                      </p>
+                    ))}
+                  </section>
+                ))}
+              </div>
+
+              <p className="disclaim mt-4 mb-0">
+                {locale === "en"
+                  ? "This text is provided for the Lyfora clinic platform demo and should be reviewed by legal counsel before production use."
+                  : "Šis tekstas skirtas Lyfora klinikos platformos demo ir prieš gamybinį naudojimą turi būti peržiūrėtas teisininko."}
+              </p>
+            </article>
+          </div>
+        </section>
+      ) : null}
     </div>
   );
 }

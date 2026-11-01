@@ -182,7 +182,14 @@ const CONDITION_MAP: Record<
 
 const MED_META: Record<
   string,
-  { atc: string; doseLt: string; doseEn: string; byLt: string; byEn: string }
+  {
+    atc: string;
+    doseLt: string;
+    doseEn: string;
+    byLt: string;
+    byEn: string;
+    from?: string;
+  }
 > = {
   "Tezeo (Telmisartan)": {
     atc: "C09CA07",
@@ -190,15 +197,102 @@ const MED_META: Record<
     doseEn: "40 mg once daily in the morning",
     byLt: "Dr. Rūta Petrauskienė",
     byEn: "Dr. Ruta Petrauskienė",
+    from: "2021-05-12",
   },
   "Roswera (Rosuvastatin)": {
     atc: "C10AA07",
-    doseLt: "10 mg 1 k./d. vakare",
-    doseEn: "10 mg once daily in the evening",
+    doseLt: "5 mg 1 k./d. vakare",
+    doseEn: "5 mg once daily in the evening",
     byLt: "Dr. Andrius Kazlauskas",
     byEn: "Dr. Andrius Kazlauskas",
+    from: "2024-05-20",
+  },
+  "Simvacor (Simvastatin)": {
+    atc: "C10AA01",
+    doseLt: "20 mg 1 k./d. vakare",
+    doseEn: "20 mg once daily in the evening",
+    byLt: "Dr. Andrius Kazlauskas",
+    byEn: "Dr. Andrius Kazlauskas",
+    from: "2026-09-29",
+  },
+  "Plavix (Clopidogrel)": {
+    atc: "B01AC04",
+    doseLt: "75 mg 1 k./d.",
+    doseEn: "75 mg once daily",
+    byLt: "Dr. Paulius Rimkevičius",
+    byEn: "Dr. Paulius Rimkevicius",
+    from: "2026-10-02",
+  },
+  "Orfarin (Warfarin)": {
+    atc: "B01AA03",
+    doseLt: "5 mg 1 k./d. pagal INR",
+    doseEn: "5 mg once daily per INR",
+    byLt: "Dr. Paulius Rimkevičius",
+    byEn: "Dr. Paulius Rimkevicius",
+    from: "2026-10-08",
+  },
+  "Milurit (Allopurinol)": {
+    atc: "M04AA01",
+    doseLt: "100 mg 1 k./d.",
+    doseEn: "100 mg once daily",
+    byLt: "Dr. Miglė Vaitkevičienė",
+    byEn: "Dr. Migle Vaitkeviciene",
+    from: "2026-09-15",
+  },
+  "Imuran (Azathioprine)": {
+    atc: "L04AX01",
+    doseLt: "50 mg 1 k./d.",
+    doseEn: "50 mg once daily",
+    byLt: "Dr. Laura Šimkutė",
+    byEn: "Dr. Laura Simkute",
+    from: "2026-08-20",
   },
 };
+
+/** Demo medicines that exercise pharmacogenetic risk colouring for both sexes. */
+const DEMO_GENE_RISK_MED_NAMES = [
+  "Tezeo (Telmisartan)",
+  "Roswera (Rosuvastatin)",
+  "Simvacor (Simvastatin)",
+  "Plavix (Clopidogrel)",
+  "Orfarin (Warfarin)",
+  "Milurit (Allopurinol)",
+  "Imuran (Azathioprine)",
+];
+
+function medFromName(name: string, qMeds: string): HealthCardMed {
+  const meta = MED_META[name] || {
+    atc: "—",
+    doseLt: "Pagal paskyrimą",
+    doseEn: "As prescribed",
+    byLt: "Dr. Rūta Petrauskienė",
+    byEn: "Dr. Ruta Petrauskienė",
+  };
+  return {
+    name,
+    atc: meta.atc,
+    doseLt: meta.doseLt,
+    doseEn: meta.doseEn,
+    from: meta.from || (name.includes("Roswera") ? "2024-05-20" : "2021-05-12"),
+    byLt: meta.byLt,
+    byEn: meta.byEn,
+    active: true,
+    href: "/patient/prescriptions",
+    links: [
+      { href: qMeds, labelLt: "Klausimynas", labelEn: "Questionnaire" },
+      {
+        href: "/patient/prescriptions",
+        labelLt: "Receptai",
+        labelEn: "Prescriptions",
+      },
+      {
+        href: "/patient/digital-twin/pharmacogenetics",
+        labelLt: "Farmakogenetika",
+        labelEn: "Pharmacogenetics",
+      },
+    ],
+  };
+}
 
 function mapSmoking(v: unknown): { lt: string; en: string } {
   const s = String(v || "");
@@ -427,38 +521,20 @@ export function buildHealthCard(input: {
     },
   ];
 
-  const medNames =
-    (v[
+  const medNames = [
+    ...DEMO_GENE_RISK_MED_NAMES,
+    ...((v[
       "4_current_medications_supplements__current_medications"
-    ] as string[]) || [];
-  const meds: HealthCardMed[] = medNames.map((name) => {
-    const meta = MED_META[name] || {
-      atc: "—",
-      doseLt: "Pagal paskyrimą",
-      doseEn: "As prescribed",
-      byLt: "Dr. Rūta Petrauskienė",
-      byEn: "Dr. Ruta Petrauskienė",
-    };
-    return {
-      name,
-      atc: meta.atc,
-      doseLt: meta.doseLt,
-      doseEn: meta.doseEn,
-      from: name.includes("Roswera") ? "2024-05-20" : "2021-05-12",
-      byLt: meta.byLt,
-      byEn: meta.byEn,
-      active: true,
-      href: "/patient/prescriptions",
-      links: [
-        { href: qMeds, labelLt: "Klausimynas", labelEn: "Questionnaire" },
-        {
-          href: "/patient/prescriptions",
-          labelLt: "Receptai",
-          labelEn: "Prescriptions",
-        },
-      ],
-    };
-  });
+    ] as string[]) || []),
+  ];
+  const seenMed = new Set<string>();
+  const meds: HealthCardMed[] = [];
+  for (const name of medNames) {
+    const key = name.trim().toLowerCase();
+    if (!key || seenMed.has(key)) continue;
+    seenMed.add(key);
+    meds.push(medFromName(name, qMeds));
+  }
   if (
     v["4_current_medications_supplements__are_you_currently_taking_any_supplements"] ===
     "Yes"

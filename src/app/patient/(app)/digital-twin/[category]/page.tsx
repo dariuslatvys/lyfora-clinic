@@ -21,6 +21,7 @@ import { Sparkline } from "@/components/patient/sparkline";
 import { SnpDetailPanel } from "@/components/patient/snp-detail";
 import { PharmaGenesTabs } from "@/components/patient/pharma-genes-tabs";
 import type { HealthCategoryId } from "@/lib/health/categories";
+import { explainRareVariant } from "@/lib/health/explain-rare";
 
 function Pill({
   colour,
@@ -47,6 +48,10 @@ export default async function CategoryDetailPage({
   const labels = t(locale);
   const twin = loadDigitalTwin(current.patient.id, locale);
   if (!twin) redirect("/login/patient");
+  const patientSex =
+    (current.patient.sex as "male" | "female") ||
+    (twin.patient.sex as "male" | "female") ||
+    "male";
 
   const cat = twin.categories.find((c) => c.id === category);
   if (!cat) notFound();
@@ -215,6 +220,9 @@ export default async function CategoryDetailPage({
           <div className="grid gap-3">
             {catRare.map((v) => {
               const anchor = `rare-${encodeURIComponent(String(v.id ?? v.gene))}`;
+              const expl = explainRareVariant(v, locale, patientSex);
+              const cancerChip =
+                locale === "lt" ? expl.cancersLt : expl.cancersEn;
               return (
                 <Link
                   key={v.id ?? `${v.gene}-${v.hgvs}`}
@@ -228,14 +236,22 @@ export default async function CategoryDetailPage({
                       className="text-lg font-semibold"
                       style={{ color: COLOUR_HEX.red }}
                     >
-                      {(locale === "lt" ? v.titleLt : v.titleEn) || v.gene}
+                      {expl.title}
                     </h4>
                   </div>
                   <p className="mt-1 text-xs text-[var(--muted)]">
                     {v.gene} · {v.hgvs} · {v.chrom}:{v.pos} · GT {v.gt}
                   </p>
+                  {cancerChip ? (
+                    <p className="mt-2 mb-0 text-xs">
+                      <span className="pill c-red">
+                        {locale === "en" ? "Linked cancers" : "Susiję vėžiai"}:{" "}
+                        {cancerChip}
+                      </span>
+                    </p>
+                  ) : null}
                   <p className="mt-2 text-sm leading-relaxed text-[var(--ink-soft)]">
-                    {locale === "lt" ? v.summaryLt : v.summaryEn}
+                    {expl.plainBody}
                   </p>
                 </Link>
               );

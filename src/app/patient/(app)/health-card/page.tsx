@@ -13,6 +13,7 @@ import {
 import { loadQuestionnaireDefinition } from "@/lib/health/questionnaire-loader";
 import { buildHealthCard } from "@/lib/health/health-card-data";
 import { HealthCardTabs } from "@/components/patient/health-card-tabs";
+import { loadDigitalTwin } from "@/lib/health/load-twin";
 
 export default async function HealthCardPage() {
   const current = await getCurrentUser();
@@ -43,6 +44,21 @@ export default async function HealthCardPage() {
     dob: current.patient.dob,
     answers,
   });
+
+  const twin = loadDigitalTwin(current.patient.id, locale);
+  const pharmaSnps =
+    twin?.categories
+      .find((c) => c.id === "pharmacogenetics")
+      ?.snps.map((s) => ({
+        gene: s.gene,
+        snpId: s.snpId,
+        allele1: s.allele1,
+        allele2: s.allele2,
+        matchCount: s.matchCount,
+        colour: s.colour,
+        genotypeAvailable: s.genotypeAvailable,
+        subcategory: s.subcategory,
+      })) || [];
 
   return (
     <div className="stack" style={{ gap: 16 }}>
@@ -101,7 +117,12 @@ export default async function HealthCardPage() {
         </div>
       </section>
 
-      <HealthCardTabs locale={locale} labels={labels} card={card} />
+      <HealthCardTabs
+        locale={locale}
+        labels={labels}
+        card={card}
+        pharmaSnps={pharmaSnps}
+      />
     </div>
   );
 }

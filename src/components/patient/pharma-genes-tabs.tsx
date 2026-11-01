@@ -10,6 +10,7 @@ import {
   type RiskColour,
 } from "@/lib/health/colours";
 import { pharmaSubcategoryLabel } from "@/lib/health/pharma-plain";
+import { MedToleranceCheck } from "@/components/patient/med-tolerance-check";
 
 export type PharmaSnpRow = {
   gene: string;
@@ -209,7 +210,7 @@ export function PharmaGenesTabs({
   colourLabels: Record<RiskColour, string>;
   awaitingDna: string;
 }) {
-  const [tab, setTab] = useState<"risk" | "purpose">("risk");
+  const [tab, setTab] = useState<"risk" | "purpose" | "tolerance">("risk");
 
   const copy = useMemo(
     () =>
@@ -217,20 +218,26 @@ export function PharmaGenesTabs({
         ? {
             risk: "By risk",
             purpose: "By medicine use",
+            tolerance: "Medicine tolerance check",
             riskBlurb:
               "Genes sorted by your personal risk colour — highest first.",
             purposeBlurb:
               "Same genes grouped by what the related medicines are typically taken for.",
+            toleranceBlurb:
+              "Enter a prescribed medicine — see whether your sample has risk alleles for that drug.",
             focus: "Focus",
             empty: "No genes in this group.",
           }
         : {
             risk: "Pagal riziką",
             purpose: "Pagal vaistų paskirtį",
+            tolerance: "Vaistų toleravimo tikrinimas",
             riskBlurb:
               "Genai surikiuoti pagal jūsų rizikos spalvą — didžiausia rizika pirmiausia.",
             purposeBlurb:
               "Tie patys genai sugrupuoti pagal tai, nuo ko paprastai geriami susiję vaistai.",
+            toleranceBlurb:
+              "Įveskite paskirtą vaistą — sistema parodys, ar jūsų mėginyje yra rizikos alelių tam vaistui.",
             focus: "Sritis",
             empty: "Šioje grupėje genų nėra.",
           },
@@ -322,10 +329,23 @@ export function PharmaGenesTabs({
           {copy.purpose}
           <span className="visits-tab-count">{byPurpose.length}</span>
         </button>
+        <button
+          type="button"
+          role="tab"
+          className={tab === "tolerance" ? "on" : undefined}
+          aria-selected={tab === "tolerance"}
+          onClick={() => setTab("tolerance")}
+        >
+          {copy.tolerance}
+        </button>
       </div>
 
       <p className="small muted mt-2 mb-3">
-        {tab === "risk" ? copy.riskBlurb : copy.purposeBlurb}
+        {tab === "risk"
+          ? copy.riskBlurb
+          : tab === "purpose"
+            ? copy.purposeBlurb
+            : copy.toleranceBlurb}
       </p>
 
       {tab === "risk" ? (
@@ -342,7 +362,7 @@ export function PharmaGenesTabs({
             />
           ))}
         </div>
-      ) : (
+      ) : tab === "purpose" ? (
         <div className="stack" style={{ gap: 16 }}>
           {byPurpose.map(({ purpose, groups }) => {
             const total = [...groups.values()].reduce(
@@ -391,6 +411,14 @@ export function PharmaGenesTabs({
             <div className="empty">{copy.empty}</div>
           ) : null}
         </div>
+      ) : (
+        <MedToleranceCheck
+          locale={locale}
+          snps={snps}
+          colourLabels={colourLabels}
+          awaitingDna={awaitingDna}
+          categoryHref={`/patient/digital-twin/${category}`}
+        />
       )}
     </div>
   );

@@ -9,12 +9,40 @@ import {
   visitTitle,
   formatVisitWhen,
 } from "@/lib/health/demo-visits";
+import {
+  assessDrugGeneRisk,
+  geneRiskDisclaimer,
+  type GeneRiskSnp,
+} from "@/lib/health/assess-drug-gene-risk";
+import {
+  COLOUR_HEX,
+  COLOUR_SOFT,
+  PILL_CLASS,
+  type RiskColour,
+} from "@/lib/health/colours";
 
 function statusPill(status: DemoPrescription["status"]) {
   if (status === "active") return "c-green";
   if (status === "dispensed") return "c-acc";
   if (status === "cancelled") return "c-red";
   return "c-none";
+}
+
+function rxGeneRisk(
+  r: DemoPrescription,
+  snps: GeneRiskSnp[],
+  locale: "lt" | "en"
+) {
+  return assessDrugGeneRisk(
+    {
+      brandName: r.inn,
+      activeSubstance: r.inn,
+      atcCode: r.atc,
+      label: `${r.substanceEn} ${r.substanceLt} ${r.inn}`,
+    },
+    snps,
+    locale
+  );
 }
 
 function findRxTab(
@@ -39,16 +67,28 @@ export function PrescriptionsView({
   active,
   history,
   initialRxId = null,
+  pharmaSnps = [],
+  colourLabels,
 }: {
   locale: "lt" | "en";
   active: DemoPrescription[];
   history: DemoPrescription[];
   /** Deep-link from a visit: /patient/prescriptions?rx=… */
   initialRxId?: string | null;
+  pharmaSnps?: GeneRiskSnp[];
+  colourLabels?: Record<RiskColour, string>;
 }) {
   const initial = findRxTab(initialRxId, active, history);
   const [tab, setTab] = useState<"active" | "history">(initial.tab);
   const [openId, setOpenId] = useState<string | null>(initial.openId);
+  const labels: Record<RiskColour, string> = colourLabels || {
+    green: locale === "en" ? "Good" : "Gerai",
+    yellow: locale === "en" ? "Early signal" : "Ankstyvas",
+    orange: locale === "en" ? "Moderate" : "Vidutinė",
+    red: locale === "en" ? "Critical" : "Kritiška",
+    grey: locale === "en" ? "No data" : "Nėra duomenų",
+    badge: locale === "en" ? "Genetic marker" : "Genetinis žymuo",
+  };
 
   const copy = useMemo(
     () =>
@@ -178,12 +218,24 @@ export function PrescriptionsView({
               {list.map((r) => {
                 const name = locale === "en" ? r.substanceEn : r.substanceLt;
                 const on = selected?.id === r.id;
+                const risk = rxGeneRisk(r, pharmaSnps, locale);
+                const c = risk.worstColour;
                 return (
                   <button
                     key={r.id}
                     type="button"
                     className={`li click rx-li${on ? " on" : ""}`}
                     onClick={() => setOpenId(r.id)}
+                    style={
+                      risk.hasRisk && c
+                        ? {
+                            boxShadow: `inset 4px 0 0 ${COLOUR_HEX[c]}`,
+                            background: on
+                              ? undefined
+                              : `linear-gradient(90deg, ${COLOUR_SOFT[c]}, transparent 65%)`,
+                          }
+                        : undefined
+                    }
                   >
                     <div className="grow">
                       <b>
@@ -195,6 +247,11 @@ export function PrescriptionsView({
                       <span className="small muted">
                         {locale === "en" ? r.clinicEn : r.clinicLt}
                       </span>
+                      {risk.hasRisk && c ? (
+                        <span className={`pill ${PILL_CLASS[c]}`} style={{ marginTop: 4 }}>
+                          {labels[c]} · {risk.hits[0]?.gene}
+                        </span>
+                      ) : null}
                     </div>
                     <span className={`pill ${statusPill(r.status)}`}>
                       {rxStatusLabel(r.status, locale)}
@@ -238,8 +295,54 @@ export function PrescriptionsView({
                   {selected.psychotropic ? (
                     <span className="pill c-orange">{copy.psychotropic}</span>
                   ) : null}
+                  {(() => {
+                    const risk = rxGeneRisk(selected, pharmaSnps, locale);
+                    if (!risk.hasRisk || !risk.worstColour) return null;
+                    return (
+                      <span className={`pill ${PILL_CLASS[risk.worstColour]}`}>
+                        {labels[risk.worstColour]} · DNR
+                      </span>
+                    );
+                  })()}
                 </div>
               </div>
+
+              {(() => {
+                const risk = rxGeneRisk(selected, pharmaSnps, locale);
+                if (!risk.hasRisk) return null;
+                const c = risk.worstColour!;
+                return (
+                  <div
+                    className="rx-block rounded-md border border-[var(--line)] p-3"
+                    style={{
+                      borderLeft: `4px solid ${COLOUR_HEX[c]}`,
+                      background: COLOUR_SOFT[c],
+                    }}
+                  >
+                    <span className="eyebrow">
+                      {locale === "en"
+                        ? "Genetic tolerance signal"
+                        : "Genetinio toleravimo signalas"}
+                    </span>
+                    <p className="small m-0 mt-1">{risk.focusLabels[0]}</p>
+                    <div className="stack mt-2" style={{ gap: 6 }}>
+                      {risk.hits.map((h) => (
+                        <Link
+                          key={`${h.gene}-${h.snpId}`}
+                          href={h.href}
+                          className="small text-[var(--ink)]"
+                        >
+                          <b>{h.gene}</b> {h.snpId.split("__")[0]} ·{" "}
+                          {h.allele1}/{h.allele2} · {labels[h.colour]}
+                        </Link>
+                      ))}
+                    </div>
+                    <p className="small m-0 mt-2 text-[var(--ink-soft)]">
+                      <b>{geneRiskDisclaimer(locale)}</b>
+                    </p>
+                  </div>
+                );
+              })()}
 
               <div className="rx-grid">
                 <div className="rx-field">

@@ -2,6 +2,7 @@ import type { Locale } from "@/lib/i18n/dictionary";
 import { t } from "@/lib/i18n/dictionary";
 import { loadDigitalTwin } from "./load-twin";
 import { explainSnp } from "./explain-snp";
+import { explainRareVariant } from "./explain-rare";
 import { colourRank } from "./colours";
 
 const DISCLAIMER_LT =
@@ -39,14 +40,22 @@ export function buildPatientAiReply(input: {
   // Focus: specific gene / SNP / rare mutation
   const geneHit = twin.categories
     .flatMap((c) => [
-      ...c.rare.map((r) => ({
-        kind: "rare" as const,
-        cat: c,
-        gene: r.gene,
-        text: locale === "lt" ? r.summaryLt : r.summaryEn,
-        title: locale === "lt" ? r.titleLt : r.titleEn,
-        meta: `${r.gene} · ${r.hgvs}`,
-      })),
+      ...c.rare.map((r) => {
+        const expl = explainRareVariant(
+          r,
+          locale,
+          twin.patient.sex as "male" | "female"
+        );
+        const cancers = locale === "lt" ? expl.cancersLt : expl.cancersEn;
+        return {
+          kind: "rare" as const,
+          cat: c,
+          gene: r.gene,
+          text: expl.plainBody,
+          title: expl.title,
+          meta: `${r.gene} · ${r.hgvs}${cancers ? ` · ${cancers}` : ""}`,
+        };
+      }),
       ...c.snps
         .filter((s) => s.matchCount > 0 || s.colour)
         .map((s) => ({
@@ -99,8 +108,13 @@ export function buildPatientAiReply(input: {
   // DNA / genetics overview
   if (/dnr|dna|gen|snp|ngs|mutac/.test(ql)) {
     const rareLines = twin.rare.map((r) => {
-      const summary = locale === "lt" ? r.summaryLt : r.summaryEn;
-      return `- **${r.gene}** (${r.hgvs}): ${summary}`;
+      const expl = explainRareVariant(
+        r,
+        locale,
+        twin.patient.sex as "male" | "female"
+      );
+      const cancers = locale === "lt" ? expl.cancersLt : expl.cancersEn;
+      return `- **${r.gene}** (${r.hgvs}${cancers ? `; ${cancers}` : ""}): ${expl.plainBody}`;
     });
     const snpDrivers = twin.categories.flatMap((c) =>
       c.snps

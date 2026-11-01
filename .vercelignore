@@ -3,7 +3,6 @@ node_modules
 data/db
 data/uploads
 data/lyfora-source
-data/parsed
 *.webp
 test_*.py
 .git

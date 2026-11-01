@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import type { Dictionary } from "@/lib/i18n/dictionary";
 import {
   formatVisitWhen,
@@ -13,6 +13,19 @@ import type {
   HealthCardModel,
   HealthCardTabId,
 } from "@/lib/health/health-card-data";
+import { buildVaccineCalendar } from "@/lib/health/vaccine-calendar";
+import {
+  assessLabelGeneRisk,
+  geneRiskDisclaimer,
+} from "@/lib/health/assess-drug-gene-risk";
+import {
+  COLOUR_HEX,
+  COLOUR_SOFT,
+  PILL_CLASS,
+  type RiskColour,
+} from "@/lib/health/colours";
+import { MedToleranceCheck } from "@/components/patient/med-tolerance-check";
+import type { PharmaSnpRow } from "@/components/patient/pharma-genes-tabs";
 
 const TAB_ORDER: { id: HealthCardTabId; labelKey: keyof Dictionary }[] = [
   { id: "sum", labelKey: "cardSummary" },
@@ -36,10 +49,12 @@ export function HealthCardTabs({
   locale,
   labels,
   card,
+  pharmaSnps = [],
 }: {
   locale: "lt" | "en";
   labels: Dictionary;
   card: HealthCardModel;
+  pharmaSnps?: PharmaSnpRow[];
 }) {
   const [tab, setTab] = useState<HealthCardTabId>("sum");
 
@@ -98,7 +113,15 @@ export function HealthCardTabs({
 
       {tab === "sum" ? <SummaryPane locale={locale} card={card} /> : null}
       {tab === "dx" ? <DiagnosesPane locale={locale} card={card} /> : null}
-      {tab === "meds" ? <MedsPane locale={locale} card={card} /> : null}
+      {tab === "meds" ? (
+        <MedsPane
+          locale={locale}
+          card={card}
+          pharmaSnps={pharmaSnps}
+          colourLabels={labels.colourLabels}
+          awaitingDna={labels.awaitingDna}
+        />
+      ) : null}
       {tab === "vacc" ? <VaccinesPane locale={locale} card={card} /> : null}
       {tab === "proc" ? <ProceduresPane locale={locale} card={card} /> : null}
       {tab === "hist" ? <HistoryPane locale={locale} card={card} /> : null}
@@ -406,10 +429,32 @@ function DiagnosesPane({
 function MedsPane({
   locale,
   card,
+  pharmaSnps,
+  colourLabels,
+  awaitingDna,
 }: {
   locale: "lt" | "en";
   card: HealthCardModel;
+  pharmaSnps: PharmaSnpRow[];
+  colourLabels: Record<RiskColour, string>;
+  awaitingDna: string;
 }) {
+  const [sub, setSub] = useState<"list" | "tolerance">("list");
+  const [openRisk, setOpenRisk] = useState<string | null>(null);
+  const presetLabels = useMemo(
+    () => card.meds.filter((m) => m.active).map((m) => m.name),
+    [card.meds]
+  );
+  const riskCount = useMemo(
+    () =>
+      card.meds.filter(
+        (m) =>
+          assessLabelGeneRisk(m.name, pharmaSnps, locale, { atcCode: m.atc })
+            .hasRisk
+      ).length,
+    [card.meds, pharmaSnps, locale]
+  );
+
   return (
     <section className="card">
       <div className="card-head">
@@ -425,57 +470,240 @@ function MedsPane({
           </Link>
         </div>
       </div>
-      <div className="overflow-x-auto mt-2">
-        <table className="labs-table">
-          <thead>
-            <tr>
-              <th>{locale === "en" ? "Medicine" : "Vaistas"}</th>
-              <th>ATC</th>
-              <th>{locale === "en" ? "Use" : "Vartojimas"}</th>
-              <th>{locale === "en" ? "From" : "Nuo"}</th>
-              <th>{locale === "en" ? "Status" : "Būsena"}</th>
-              <th>{locale === "en" ? "Links" : "Nuorodos"}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {card.meds.map((m) => (
-              <tr key={m.name + m.from}>
-                <td>
-                  <b>{m.name}</b>
-                  <div className="xs muted">
-                    {locale === "en" ? m.byEn : m.byLt}
-                  </div>
-                </td>
-                <td className="mono">{m.atc}</td>
-                <td className="small">
-                  {locale === "en" ? m.doseEn : m.doseLt}
-                </td>
-                <td className="num small">{m.from}</td>
-                <td>
-                  <span className={`pill ${m.active ? "c-green" : "c-none"}`}>
-                    {m.active
-                      ? locale === "en"
-                        ? "Taking"
-                        : "Vartoja"
-                      : locale === "en"
-                        ? "Stopped"
-                        : "Nutraukta"}
-                  </span>
-                </td>
-                <td>
-                  <div className="hc-link-row">
-                    {(m.links || []).map((l) => (
-                      <Link key={l.href} href={l.href} className="hc-chip-link">
-                        {locale === "en" ? l.labelEn : l.labelLt}
-                      </Link>
-                    ))}
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+
+      <div
+        className="tabs visits-tabs mt-2"
+        role="tablist"
+        aria-label={locale === "en" ? "Medications views" : "Vaistų vaizdai"}
+      >
+        <button
+          type="button"
+          role="tab"
+          className={sub === "list" ? "on" : undefined}
+          aria-selected={sub === "list"}
+          onClick={() => setSub("list")}
+        >
+          {locale === "en" ? "Current list" : "Sąrašas"}
+          <span className="visits-tab-count">{card.meds.length}</span>
+        </button>
+        <button
+          type="button"
+          role="tab"
+          className={sub === "tolerance" ? "on" : undefined}
+          aria-selected={sub === "tolerance"}
+          onClick={() => setSub("tolerance")}
+        >
+          {locale === "en"
+            ? "Medicine tolerance check"
+            : "Vaistų toleravimo tikrinimas"}
+        </button>
       </div>
+
+      {sub === "list" ? (
+        <div className="mt-3 stack" style={{ gap: 10 }}>
+          {riskCount > 0 ? (
+            <p className="small m-0 rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 py-2 text-[var(--ink-soft)]">
+              {locale === "en"
+                ? `${riskCount} medicine(s) match risk alleles in your DNA — tap the coloured badge to see which gene. `
+                : `${riskCount} vaistas(-ai) sutampa su rizikos aleliais jūsų DNR — spauskite spalvotą žymą, kad pamatytumėte geną. `}
+              <b>{geneRiskDisclaimer(locale)}</b>
+            </p>
+          ) : null}
+
+          <div className="overflow-x-auto">
+            <table className="labs-table">
+              <thead>
+                <tr>
+                  <th>{locale === "en" ? "Medicine" : "Vaistas"}</th>
+                  <th>ATC</th>
+                  <th>{locale === "en" ? "Use" : "Vartojimas"}</th>
+                  <th>{locale === "en" ? "From" : "Nuo"}</th>
+                  <th>{locale === "en" ? "Genetics" : "Genetika"}</th>
+                  <th>{locale === "en" ? "Status" : "Būsena"}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {card.meds.map((m) => {
+                  const risk = assessLabelGeneRisk(m.name, pharmaSnps, locale, {
+                    atcCode: m.atc,
+                  });
+                  const key = m.name + m.from;
+                  const open = openRisk === key;
+                  const c = risk.worstColour;
+                  return (
+                    <Fragment key={key}>
+                      <tr
+                        style={
+                          risk.hasRisk && c
+                            ? {
+                                background: `linear-gradient(90deg, ${COLOUR_SOFT[c]}, transparent 70%)`,
+                                boxShadow: `inset 4px 0 0 ${COLOUR_HEX[c]}`,
+                              }
+                            : undefined
+                        }
+                      >
+                        <td>
+                          <b>{m.name}</b>
+                          <div className="xs muted">
+                            {locale === "en" ? m.byEn : m.byLt}
+                          </div>
+                        </td>
+                        <td className="mono">{m.atc}</td>
+                        <td className="small">
+                          {locale === "en" ? m.doseEn : m.doseLt}
+                        </td>
+                        <td className="num small">{m.from}</td>
+                        <td>
+                          {risk.hasRisk && c ? (
+                            <button
+                              type="button"
+                              className={`pill ${PILL_CLASS[c]}`}
+                              style={{ cursor: "pointer" }}
+                              aria-expanded={open}
+                              onClick={() =>
+                                setOpenRisk(open ? null : key)
+                              }
+                            >
+                              {colourLabels[c]}
+                              {" · "}
+                              {risk.hits[0]?.gene || "DNR"}
+                            </button>
+                          ) : risk.hasPanelLink ? (
+                            <span className="pill c-green">
+                              {locale === "en" ? "No risk alleles" : "Be rizikos alelių"}
+                            </span>
+                          ) : (
+                            <span className="xs muted">—</span>
+                          )}
+                        </td>
+                        <td>
+                          <span
+                            className={`pill ${m.active ? "c-green" : "c-none"}`}
+                          >
+                            {m.active
+                              ? locale === "en"
+                                ? "Taking"
+                                : "Vartoja"
+                              : locale === "en"
+                                ? "Stopped"
+                                : "Nutraukta"}
+                          </span>
+                        </td>
+                      </tr>
+                      {open && risk.hasRisk ? (
+                        <tr>
+                          <td colSpan={6}>
+                            <div
+                              className="rounded-md border border-[var(--line)] p-3 my-1"
+                              style={{
+                                borderLeft: c
+                                  ? `4px solid ${COLOUR_HEX[c]}`
+                                  : undefined,
+                              }}
+                            >
+                              <p className="eyebrow m-0 mb-2">
+                                {locale === "en"
+                                  ? "Why this medicine is flagged"
+                                  : "Kodėl šis vaistas pažymėtas"}
+                              </p>
+                              <p className="small muted m-0 mb-2">
+                                {risk.focusLabels[0]}
+                              </p>
+                              <div className="stack" style={{ gap: 8 }}>
+                                {risk.hits.map((h) => (
+                                  <Link
+                                    key={`${h.gene}-${h.snpId}`}
+                                    href={h.href}
+                                    className="block rounded-md border border-[var(--line)] px-3 py-2 text-[var(--ink)] no-underline hover:border-[var(--accent)]"
+                                    style={{
+                                      borderLeft: `4px solid ${COLOUR_HEX[h.colour]}`,
+                                      background: COLOUR_SOFT[h.colour],
+                                    }}
+                                  >
+                                    <div className="flex items-center justify-between gap-2">
+                                      <div>
+                                        <b>
+                                          {h.gene}{" "}
+                                          <span className="font-normal text-[var(--ink-soft)]">
+                                            {h.snpId.split("__")[0]}
+                                          </span>
+                                        </b>
+                                        <div className="xs muted">
+                                          {h.allele1}/{h.allele2} ·{" "}
+                                          {h.matchCount}{" "}
+                                          {locale === "en"
+                                            ? "risk allele(s)"
+                                            : "rizikos alelis(-iai)"}
+                                          {" · "}
+                                          {h.focusLabel}
+                                        </div>
+                                      </div>
+                                      <span className={`pill ${PILL_CLASS[h.colour]}`}>
+                                        {colourLabels[h.colour]}
+                                      </span>
+                                    </div>
+                                  </Link>
+                                ))}
+                              </div>
+                              <p className="small m-0 mt-3 text-[var(--ink-soft)]">
+                                <b>{geneRiskDisclaimer(locale)}</b>
+                              </p>
+                              <div className="hc-link-row mt-2">
+                                <Link
+                                  href="/patient/digital-twin/pharmacogenetics"
+                                  className="hc-chip-link"
+                                >
+                                  {locale === "en"
+                                    ? "Pharmacogenetics"
+                                    : "Farmakogenetika"}
+                                </Link>
+                                <Link
+                                  href="/patient/prescriptions"
+                                  className="hc-chip-link"
+                                >
+                                  {locale === "en" ? "Prescriptions" : "Receptai"}
+                                </Link>
+                                <Link
+                                  href="/patient/questions"
+                                  className="hc-chip-link"
+                                >
+                                  {locale === "en"
+                                    ? "Ask doctor 24/7"
+                                    : "Klausti gydytojo 24/7"}
+                                </Link>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      ) : null}
+                    </Fragment>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ) : (
+        <div className="mt-3">
+          <MedToleranceCheck
+            locale={locale}
+            snps={pharmaSnps}
+            colourLabels={colourLabels}
+            awaitingDna={awaitingDna}
+            presetLabels={presetLabels}
+          />
+          <p className="small muted mt-3 mb-0">
+            <b>{geneRiskDisclaimer(locale)}</b>
+          </p>
+          <p className="small muted mt-2 mb-0">
+            <Link href="/patient/digital-twin/pharmacogenetics">
+              {locale === "en"
+                ? "Open full pharmacogenetics"
+                : "Atidaryti farmakogenetiką"}
+            </Link>
+          </p>
+        </div>
+      )}
     </section>
   );
 }
@@ -487,76 +715,197 @@ function VaccinesPane({
   locale: "lt" | "en";
   card: HealthCardModel;
 }) {
+  const [sub, setSub] = useState<"history" | "calendar">("history");
+  const calendar = useMemo(
+    () => buildVaccineCalendar(card.vaccines),
+    [card.vaccines]
+  );
+
   return (
     <section className="card">
-      <div className="overflow-x-auto">
-        <table className="labs-table">
-          <thead>
-            <tr>
-              <th>{locale === "en" ? "Vaccine" : "Vakcina"}</th>
-              <th>{locale === "en" ? "Done" : "Atlikta"}</th>
-              <th>{locale === "en" ? "Lot" : "Serija"}</th>
-              <th>{locale === "en" ? "Place / product" : "Vieta / preparatas"}</th>
-              <th>{locale === "en" ? "Next / document" : "Kitas / dokumentas"}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {card.vaccines.map((v) => {
-              const due = daysUntil(v.next);
-              const overdue = due != null && due < 0;
-              const soon = due != null && due <= 45;
-              return (
-                <tr key={v.id}>
-                  <td>
-                    <b>{locale === "en" ? v.nameEn : v.nameLt}</b>
-                  </td>
-                  <td className="num">{v.date || "—"}</td>
-                  <td className="mono small">{v.lot || "—"}</td>
-                  <td className="small">
-                    {locale === "en" ? v.placeEn : v.placeLt}
-                    {(locale === "en" ? v.productEn : v.productLt) ? (
-                      <div className="xs muted">
-                        {locale === "en" ? v.productEn : v.productLt}
-                      </div>
-                    ) : null}
-                  </td>
-                  <td>
-                    <div className="hc-link-row">
-                      {v.next ? (
-                        soon ? (
-                          <span
-                            className={`pill ${overdue ? "c-orange" : "c-yellow"}`}
-                          >
-                            {overdue
-                              ? locale === "en"
-                                ? `Overdue ${v.next}`
-                                : `Vėluoja ${v.next}`
-                              : locale === "en"
-                                ? `Due ${v.next}`
-                                : `Iki ${v.next}`}
-                          </span>
-                        ) : (
-                          <span className="num small">{v.next}</span>
-                        )
-                      ) : null}
-                      {v.docHref ? (
-                        <a
-                          href={v.docHref}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="hc-chip-link"
-                        >
-                          {locale === "en" ? "PDF" : "PDF"}
-                        </a>
-                      ) : null}
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+      <div
+        className="tabs visits-tabs"
+        role="tablist"
+        aria-label={locale === "en" ? "Vaccines views" : "Skiepų vaizdai"}
+      >
+        <button
+          type="button"
+          role="tab"
+          className={sub === "history" ? "on" : undefined}
+          aria-selected={sub === "history"}
+          onClick={() => setSub("history")}
+        >
+          {locale === "en" ? "History" : "Istorija"}
+          <span className="visits-tab-count">{card.vaccines.length}</span>
+        </button>
+        <button
+          type="button"
+          role="tab"
+          className={sub === "calendar" ? "on" : undefined}
+          aria-selected={sub === "calendar"}
+          onClick={() => setSub("calendar")}
+        >
+          {locale === "en" ? "Vaccine calendar" : "Skiepų kalendorius"}
+          <span className="visits-tab-count">{calendar.length}</span>
+        </button>
       </div>
+
+      {sub === "history" ? (
+        <div className="overflow-x-auto mt-3">
+          <table className="labs-table">
+            <thead>
+              <tr>
+                <th>{locale === "en" ? "Vaccine" : "Vakcina"}</th>
+                <th>{locale === "en" ? "Done" : "Atlikta"}</th>
+                <th>{locale === "en" ? "Lot" : "Serija"}</th>
+                <th>
+                  {locale === "en" ? "Place / product" : "Vieta / preparatas"}
+                </th>
+                <th>
+                  {locale === "en" ? "Next / document" : "Kitas / dokumentas"}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {card.vaccines.map((v) => {
+                const due = daysUntil(v.next);
+                const overdue = due != null && due < 0;
+                const soon = due != null && due <= 45;
+                return (
+                  <tr key={v.id}>
+                    <td>
+                      <b>{locale === "en" ? v.nameEn : v.nameLt}</b>
+                    </td>
+                    <td className="num">{v.date || "—"}</td>
+                    <td className="mono small">{v.lot || "—"}</td>
+                    <td className="small">
+                      {locale === "en" ? v.placeEn : v.placeLt}
+                      {(locale === "en" ? v.productEn : v.productLt) ? (
+                        <div className="xs muted">
+                          {locale === "en" ? v.productEn : v.productLt}
+                        </div>
+                      ) : null}
+                    </td>
+                    <td>
+                      <div className="hc-link-row">
+                        {v.next ? (
+                          soon ? (
+                            <span
+                              className={`pill ${overdue ? "c-orange" : "c-yellow"}`}
+                            >
+                              {overdue
+                                ? locale === "en"
+                                  ? `Overdue ${v.next}`
+                                  : `Vėluoja ${v.next}`
+                                : locale === "en"
+                                  ? `Due ${v.next}`
+                                  : `Iki ${v.next}`}
+                            </span>
+                          ) : (
+                            <span className="num small">{v.next}</span>
+                          )
+                        ) : null}
+                        {v.docHref ? (
+                          <a
+                            href={v.docHref}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="hc-chip-link"
+                          >
+                            PDF
+                          </a>
+                        ) : null}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="mt-3">
+          <p className="small muted mt-0 mb-3">
+            {locale === "en"
+              ? "Upcoming doses from your records, plus computed boosters (e.g. TBE ≈ 3 years after the last TicoVac, flu each season)."
+              : "Būsimi skiepai pagal įrašus ir apskaičiuoti kontroliniai (pvz. erkinis encefalitas ≈ 3 m. po paskutinio TicoVac, gripas kas sezoną)."}
+          </p>
+          {!calendar.length ? (
+            <div className="empty">
+              {locale === "en"
+                ? "No upcoming vaccinations calculated yet."
+                : "Kol kas nėra apskaičiuotų būsimų skiepų."}
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="labs-table">
+                <thead>
+                  <tr>
+                    <th>{locale === "en" ? "Vaccine" : "Vakcina"}</th>
+                    <th>{locale === "en" ? "Due" : "Data"}</th>
+                    <th>{locale === "en" ? "In" : "Po"}</th>
+                    <th>{locale === "en" ? "Note" : "Pastaba"}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {calendar.map((item) => {
+                    const overdue = item.daysFromNow < 0;
+                    const soon =
+                      item.daysFromNow >= 0 && item.daysFromNow <= 60;
+                    const when =
+                      item.daysFromNow === 0
+                        ? locale === "en"
+                          ? "Today"
+                          : "Šiandien"
+                        : overdue
+                          ? locale === "en"
+                            ? `${Math.abs(item.daysFromNow)} d overdue`
+                            : `vėluoja ${Math.abs(item.daysFromNow)} d.`
+                          : locale === "en"
+                            ? `${item.daysFromNow} d`
+                            : `${item.daysFromNow} d.`;
+                    return (
+                      <tr key={item.id}>
+                        <td>
+                          <b>
+                            {locale === "en" ? item.nameEn : item.nameLt}
+                          </b>
+                          <div className="xs muted">
+                            {item.kind === "computed"
+                              ? locale === "en"
+                                ? "Computed schedule"
+                                : "Apskaičiuota"
+                              : locale === "en"
+                                ? "From record"
+                                : "Iš įrašo"}
+                          </div>
+                        </td>
+                        <td className="num">{item.due}</td>
+                        <td>
+                          <span
+                            className={`pill ${
+                              overdue
+                                ? "c-orange"
+                                : soon
+                                  ? "c-yellow"
+                                  : "c-none"
+                            }`}
+                          >
+                            {when}
+                          </span>
+                        </td>
+                        <td className="small">
+                          {locale === "en" ? item.noteEn : item.noteLt}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
     </section>
   );
 }

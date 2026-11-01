@@ -18,8 +18,8 @@
       "categoryId": "cardiovascular",
       "titleLt": "MYBPC3 geno pokytis",
       "titleEn": "MYBPC3 gene variant",
-      "summaryLt": "Rasta reta MYBPC3 geno atmaina (heterozigotinė). Šis genas koduoja širdies raumens baltymą, svarbų širdies susitraukimui. Tokie pokyčiai siejami su padidėjusia hipertrofinės kardiomiopatijos rizika šeimoje. Tai nėra diagnozė — tai signalas aptarti rezultatą su kardiologu ar gydytoju genetiku ir, jei reikia, papildomai stebėti širdį.",
-      "summaryEn": "A rare heterozygous MYBPC3 variant was found. This gene encodes a heart-muscle protein important for contraction. Such changes are linked with higher familial hypertrophic cardiomyopathy risk. This is not a diagnosis — it is a signal to discuss with a cardiologist or clinical geneticist and consider heart follow-up if advised.",
+      "summaryLt": "Rasta reta MYBPC3 geno atmaina (heterozigotinė). Šis genas koduoja širdies raumens baltymą, svarbų širdies susitraukimui. Tokie pokyčiai siejami su padidėjusia hipertrofinės kardiomiopatijos (širdies raumens sustorėjimo) rizika šeimoje — ne vėžiu. Tai nėra diagnozė: aptarkite su kardiologu ar genetiku EKG / Echo ir šeimos narių patikrą, jei gydytojas rekomenduoja.",
+      "summaryEn": "A rare heterozygous MYBPC3 variant was found. This gene encodes a heart-muscle protein important for contraction. Such changes are linked with higher familial hypertrophic cardiomyopathy (thickened heart muscle) risk — not cancer. This is not a diagnosis: discuss ECG / Echo and relatives’ screening with a cardiologist or geneticist if advised.",
       "synthetic": true
     },
     {
@@ -35,8 +35,8 @@
       "categoryId": "oncology",
       "titleLt": "MSH2 geno pokytis",
       "titleEn": "MSH2 gene variant",
-      "summaryLt": "Rasta reta MSH2 geno atmaina (heterozigotinė). Šis genas dalyvauja DNR klaidų taisymo sistemoje. Pokyčiai šiame gene siejami su padidėjusia paveldimo vėžio rizika (Lynch sindromo spektras). Tai nėra vėžio diagnozė — verta aptarti su gydytoju genetiku dėl šeimos rizikos ir prevencinės priežiūros plano.",
-      "summaryEn": "A rare heterozygous MSH2 variant was found. This gene helps the DNA mismatch-repair system. Changes here are linked with higher hereditary cancer risk (Lynch syndrome spectrum). This is not a cancer diagnosis — discuss with a clinical geneticist about family risk and a prevention plan.",
+      "summaryLt": "Rasta reta MSH2 geno atmaina (heterozigotinė). Šis genas dalyvauja DNR klaidų taisymo sistemoje (mismatch repair) ir siejamas su Lynch sindromo spektru. Vyrams Lynch spektras dažniausiai siejamas su storosios / tiesiosios žarnos vėžio rizika; taip pat gali didėti skrandžio, plonosios žarnos ir šlapimo takų vėžių rizika. Tai nėra vėžio diagnozė — aptarkite su genetiku kolonoskopijų ir kitų prevencijos žingsnių grafiką.",
+      "summaryEn": "A rare heterozygous MSH2 variant was found. This gene helps DNA mismatch repair and is linked with the Lynch syndrome spectrum. In men this most often raises colorectal cancer risk; stomach, small-bowel and urinary-tract cancers may also be more likely. This is not a cancer diagnosis — discuss colonoscopy timing and other prevention steps with a geneticist.",
       "synthetic": true
     }
   ]

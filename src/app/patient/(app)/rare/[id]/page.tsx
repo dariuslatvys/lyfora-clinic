@@ -6,6 +6,7 @@ import { t } from "@/lib/i18n/dictionary";
 import { COLOUR_HEX, PILL_CLASS } from "@/lib/health/colours";
 import { AskAiButton } from "@/components/patient/ask-ai-button";
 import { rareGeneCategory } from "@/lib/health/rare-genes";
+import { explainRareVariant } from "@/lib/health/explain-rare";
 
 export default async function RareDetailPage({
   params,
@@ -31,15 +32,17 @@ export default async function RareDetailPage({
 
   if (!variant) notFound();
 
+  const sex = (current.patient.sex as "male" | "female") || "male";
+  const expl = explainRareVariant(variant, locale, sex);
   const catId = rareGeneCategory(variant.gene);
-  const title =
-    (locale === "lt" ? variant.titleLt : variant.titleEn) || variant.gene;
-  const summary =
-    (locale === "lt" ? variant.summaryLt : variant.summaryEn) || "";
+  const cancerChip =
+    locale === "lt" ? expl.cancersLt : expl.cancersEn;
   const ask =
     locale === "en"
-      ? `Explain my NGS finding ${variant.gene} (${variant.hgvs}) in plain language using my data`
-      : `Paaiškink mano NGS radinį ${variant.gene} (${variant.hgvs}) paprasta kalba pagal mano duomenis`;
+      ? `Explain my NGS finding ${variant.gene} (${variant.hgvs}) in plain language for a ${sex} patient, including which cancers or conditions it is linked with`
+      : `Paaiškink mano NGS radinį ${variant.gene} (${variant.hgvs}) paprasta kalba ${
+          sex === "female" ? "moters" : "vyro"
+        } atveju — įskaitant, su kokiais vėžiais ar ligomis tai siejama`;
 
   return (
     <div className="stack" style={{ gap: 16 }}>
@@ -66,12 +69,20 @@ export default async function RareDetailPage({
               className="mt-1 font-[family-name:var(--font-display)] text-3xl font-semibold"
               style={{ color: COLOUR_HEX.red }}
             >
-              {title}
+              {expl.title}
             </h1>
             <p className="mt-1 text-xs text-[var(--muted)]">
               {variant.gene} · {variant.hgvs} · {variant.chrom}:{variant.pos} ·
               GT {variant.gt}
             </p>
+            {cancerChip ? (
+              <p className="mt-3 mb-0">
+                <span className="pill c-red">
+                  {locale === "en" ? "Linked cancers" : "Susiję vėžiai"}:{" "}
+                  {cancerChip}
+                </span>
+              </p>
+            ) : null}
           </div>
           <div className="row" style={{ gap: 8 }}>
             <span className={`pill ${PILL_CLASS.red}`}>
@@ -89,12 +100,12 @@ export default async function RareDetailPage({
         </div>
         <p className="eyebrow mt-5">{labels.plainLanguage}</p>
         <p className="mt-2 text-[0.98rem] leading-relaxed text-[var(--ink)]">
-          {summary || labels.noData}
+          {expl.plainBody || labels.noData}
         </p>
         <p className="disclaim mt-3">
           {locale === "en"
-            ? "NGS findings are for clinical discussion — not a diagnosis or prescription change on their own."
-            : "NGS radiniai skirti aptarti su gydytoju — patys savaime nėra diagnozė ar gydymo keitimas."}
+            ? "NGS findings are for clinical discussion — not a diagnosis or prescription change on their own. Always consult a doctor / clinical geneticist."
+            : "NGS radiniai skirti aptarti su gydytoju — patys savaime nėra diagnozė ar gydymo keitimas. Būtinai pasikonsultuokite su gydytoju / genetiku."}
         </p>
       </section>
     </div>

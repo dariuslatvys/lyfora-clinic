@@ -16,8 +16,8 @@
       "categoryId": "oncology",
       "titleLt": "PALB2 geno pokytis",
       "titleEn": "PALB2 gene variant",
-      "summaryLt": "Rasta reta PALB2 geno atmaina. Šis genas padeda taisyti DNR pažeidimus. Toks pokytis gali didinti paveldimos vėžio rizikos tikimybę šeimoje — tai ne diagnozė, o signalas aptarti su gydytoju genetiku.",
-      "summaryEn": "A rare PALB2 variant was found. This gene helps repair DNA damage. Such a change can raise hereditary cancer risk in a family — not a diagnosis, but a signal to discuss with a clinical geneticist.",
+      "summaryLt": "Rasta reta PALB2 geno atmaina. Šis genas padeda taisyti DNR pažeidimus (dirba kartu su BRCA keliais). Moterims toks pokytis dažniausiai siejamas su padidėjusia paveldimos krūties ir kiaušidžių vėžio rizika; taip pat gali didėti kasos vėžio rizika. Tai ne reiškia, kad vėžys jau yra — tai signalas aptarti su gydytoju genetiku prevencinę priežiūrą ir šeimos rizikos planą. NGS radinys pats savaime nėra diagnozė ir nekeičia gydymo be gydytojo.",
+      "summaryEn": "A rare PALB2 variant was found. This gene helps repair DNA damage (it works with the BRCA pathways). In women this change is most often linked with higher hereditary breast and ovarian cancer risk; pancreatic cancer risk may also rise. It does not mean cancer is already present — it is a signal to discuss prevention and a family-risk plan with a clinical geneticist. An NGS finding alone is not a diagnosis and does not change treatment without a clinician.",
       "synthetic": true
     },
     {
@@ -33,8 +33,8 @@
       "categoryId": "pharmacogenetics",
       "titleLt": "RYR1 geno pokytis",
       "titleEn": "RYR1 gene variant",
-      "summaryLt": "Rasta RYR1 geno atmaina, siejama su padidėjusiu jautrumu kai kurioms anestezijos medžiagoms (piktybinė hipertermija). Prieš operacijas svarbu apie tai informuoti anesteziologą.",
-      "summaryEn": "An RYR1 variant linked to increased sensitivity to certain anesthetics (malignant hyperthermia risk) was found. Tell your anesthesiologist before surgery.",
+      "summaryLt": "Rasta RYR1 geno atmaina, siejama su padidėjusiu jautrumu kai kurioms anestezijos medžiagoms (piktybinės hipertermijos rizika). Prieš operacijas ar sedaciją būtinai informuokite anesteziologą. Tai ne vėžio genas — tai saugumo signalas procedūroms.",
+      "summaryEn": "An RYR1 variant linked to increased sensitivity to certain anaesthetics (malignant hyperthermia risk) was found. Tell your anaesthesiologist before surgery or sedation. This is not a cancer gene — it is a safety signal for procedures.",
       "synthetic": true
     }
   ],

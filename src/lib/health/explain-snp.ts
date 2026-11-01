@@ -35,8 +35,13 @@ function colourWord(locale: Locale, colour: RiskColour | null): string {
   return locale === "en" ? en[colour] : lt[colour];
 }
 
+function displaySnpId(snpId: string): string {
+  return snpId.split("__")[0] ?? snpId;
+}
+
 export function explainSnp(snp: EvaluatedSnp, locale: Locale): SnpExplanation {
   const colour = snp.colour;
+  const rsId = displaySnpId(snp.snpId);
   const gt = snp.genotypeAvailable
     ? `${snp.allele1}/${snp.allele2}`
     : null;
@@ -52,7 +57,7 @@ export function explainSnp(snp: EvaluatedSnp, locale: Locale): SnpExplanation {
             : `Your genotype ${gt} carries 2 risk alleles. In the risk matrix that maps to “${colourWord("en", colour)}” (Match 2) — the stronger of the two match levels.`;
 
     return {
-      title: `${snp.gene} · ${snp.snpId}`,
+      title: `${snp.gene} · ${rsId}`,
       genotypeLine: gt
         ? `Your result: ${gt} · ${snp.matchCount} risk allele(s)`
         : "Genotype not available yet",
@@ -84,7 +89,7 @@ export function explainSnp(snp: EvaluatedSnp, locale: Locale): SnpExplanation {
       : "Šiam SNP Mechanism paaiškinimas lentelėje dar nepateiktas.");
 
   return {
-    title: `${snp.gene} · ${snp.snpId}`,
+    title: `${snp.gene} · ${rsId}`,
     genotypeLine: gt
       ? `Jūsų rezultatas: ${gt} · ${snp.matchCount} rizikos aleliai (-ių)`
       : "Genotipas dar neprieinamas",

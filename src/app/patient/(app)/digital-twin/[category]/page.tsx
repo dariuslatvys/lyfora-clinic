@@ -224,14 +224,14 @@ export default async function CategoryDetailPage({
               {driverSnps.map((s) => (
                 <Link
                   key={`drv-s-${s.snpId}`}
-                  href={`/patient/digital-twin/${category}?snp=${s.snpId}#snp-detail`}
+                  href={`/patient/digital-twin/${category}?snp=${encodeURIComponent(s.snpId)}#snp-detail`}
                   className="row between rounded-[var(--radius-s)] border border-[var(--line)] bg-[var(--surface)] px-3 py-2 no-underline text-inherit"
                 >
                   <div>
                     <b className="text-sm">
                       {s.gene}{" "}
                       <span className="font-normal text-[var(--muted)]">
-                        {s.snpId}
+                        {s.snpId.split("__")[0]}
                       </span>
                     </b>
                     <span className="ml-2 text-xs text-[var(--muted)]">
@@ -420,7 +420,7 @@ export default async function CategoryDetailPage({
                   return (
                     <Link
                       key={`${s.gene}-${s.snpId}`}
-                      href={`/patient/digital-twin/${category}?snp=${s.snpId}#snp-detail`}
+                      href={`/patient/digital-twin/${category}?snp=${encodeURIComponent(s.snpId)}#snp-detail`}
                       className={`block rounded-md border px-3 py-2 transition hover:border-[var(--accent)] ${
                         selectedSnpId === s.snpId
                           ? "border-[var(--accent)] bg-[var(--accent-soft)]"
@@ -438,7 +438,7 @@ export default async function CategoryDetailPage({
                           <span className="font-medium">
                             {s.gene}{" "}
                             <span className="text-[var(--muted)] font-normal">
-                              {s.snpId}
+                              {s.snpId.split("__")[0]}
                             </span>
                           </span>
                           <p className="text-xs text-[var(--muted)]">

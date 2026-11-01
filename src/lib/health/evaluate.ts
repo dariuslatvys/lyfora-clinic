@@ -195,12 +195,19 @@ export function evaluateDigitalTwin(input: {
   const genoMap = new Map(input.genotypes.map((g) => [g.snpId.toLowerCase(), g]));
   const cats = categoriesForSex(input.sex);
   const rare = input.rare ?? [];
+  /** Base rsID when risk rows disambiguate duplicate SNPs as rsID__tag. */
+  const baseSnpId = (snpId: string) => snpId.split("__")[0]!.toLowerCase();
 
   return cats.map((cat) => {
     const snps = input.snpRows
       .filter((r) => matchPrimaryCategory(r.primaryCategory, cat))
       .map((r) =>
-        evaluateSnp(r, genoMap.get(r.snpId.toLowerCase()) ?? null)
+        evaluateSnp(
+          r,
+          genoMap.get(r.snpId.toLowerCase()) ??
+            genoMap.get(baseSnpId(r.snpId)) ??
+            null
+        )
       );
 
     const markers = input.markers.filter((m) =>

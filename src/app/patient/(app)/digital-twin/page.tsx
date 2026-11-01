@@ -36,14 +36,6 @@ export default async function DigitalTwinPage() {
     day: "numeric",
   });
 
-  const counts = {
-    red: twin.categories.filter((c) => c.colour === "red").length,
-    orange: twin.categories.filter((c) => c.colour === "orange").length,
-    yellow: twin.categories.filter((c) => c.colour === "yellow").length,
-    green: twin.categories.filter((c) => c.colour === "green" || c.colour === "badge").length,
-    grey: twin.categories.filter((c) => c.colour === "grey").length,
-  };
-
   return (
     <div className="stack" style={{ gap: 22 }}>
       <section className="hero hero-plain rise-in">
@@ -73,7 +65,10 @@ export default async function DigitalTwinPage() {
                     <Link
                       href={`/patient/digital-twin/${c.id}`}
                       className="diag-link"
-                      style={{ color: c.colour === "red" ? "var(--r-red)" : "var(--r-orange)" }}
+                      style={{
+                        color:
+                          c.colour === "red" ? "var(--r-red)" : "var(--r-orange)",
+                      }}
                     >
                       {(labels.categoryNames[c.id] || c.id).toLowerCase()}
                     </Link>
@@ -98,28 +93,9 @@ export default async function DigitalTwinPage() {
       </section>
 
       <section className="stack" style={{ gap: 12 }}>
-        <div className="row between" style={{ flexWrap: "wrap", gap: 10 }}>
-          <h2 className="font-[family-name:var(--font-display)] text-[1.25rem] font-semibold">
-            {labels.healthMapTitle}
-          </h2>
-          <div className="filter-bar" aria-label="Filtrai">
-            <span className="filter-chip c-red">
-              {labels.filterHigh} ({counts.red})
-            </span>
-            <span className="filter-chip c-orange">
-              {labels.filterModerate} ({counts.orange})
-            </span>
-            <span className="filter-chip c-yellow">
-              {labels.filterEarly} ({counts.yellow})
-            </span>
-            <span className="filter-chip c-green">
-              {labels.filterGood} ({counts.green})
-            </span>
-            <span className="filter-chip c-none">
-              {labels.filterNone} ({counts.grey})
-            </span>
-          </div>
-        </div>
+        <h2 className="font-[family-name:var(--font-display)] text-[1.25rem] font-semibold">
+          {labels.healthMapTitle}
+        </h2>
 
         <BodyMap
           categories={twin.categories.map((c) => ({

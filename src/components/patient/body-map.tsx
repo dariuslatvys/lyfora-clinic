@@ -11,40 +11,16 @@ export type BodyMapCategory = {
   geneticBadge?: boolean;
 };
 
-/** Orbit slots around the silhouette (percent of map box). */
-const ORBIT: { left: string; top: string; side: "left" | "right" }[] = [
-  { left: "1%", top: "6%", side: "left" },
-  { left: "0%", top: "30%", side: "left" },
-  { left: "1%", top: "54%", side: "left" },
-  { left: "4%", top: "76%", side: "left" },
-  { left: "70%", top: "6%", side: "right" },
-  { left: "71%", top: "30%", side: "right" },
-  { left: "70%", top: "54%", side: "right" },
-  { left: "66%", top: "76%", side: "right" },
-];
-
-/** Preferred anatomical order around the figure. */
+/** Preferred clockwise order starting near top-left. */
 const ORBIT_ORDER = [
   "mental",
   "cardiovascular",
   "metabolic",
   "immune",
-  "hormones_men",
-  "hormones_women",
-  "oncology",
   "pharmacogenetics",
-];
-
-/** Anchor dots on the body image (percent of figure box). */
-const ANCHORS = [
-  { x: 50, y: 10 },
-  { x: 48, y: 28 },
-  { x: 50, y: 44 },
-  { x: 46, y: 58 },
-  { x: 52, y: 12 },
-  { x: 54, y: 30 },
-  { x: 50, y: 46 },
-  { x: 54, y: 60 },
+  "oncology",
+  "hormones_women",
+  "hormones_men",
 ];
 
 const ICON_PATH: Record<string, string> = {
@@ -86,6 +62,25 @@ function orderCategories(categories: BodyMapCategory[]) {
   );
 }
 
+/** Evenly spaced points on an ellipse around the body (percent of stage). */
+function orbitPoint(index: number, total: number) {
+  const n = Math.max(total, 1);
+  // Start at ~200° (upper-left) and go clockwise so left column then bottom then right then top
+  const startDeg = -140;
+  const step = 360 / n;
+  const deg = startDeg + index * step;
+  const rad = (deg * Math.PI) / 180;
+  const rx = 42; // horizontal radius %
+  const ry = 40; // vertical radius %
+  const cx = 50 + rx * Math.cos(rad);
+  const cy = 50 + ry * Math.sin(rad);
+  const side: "left" | "right" = cx < 50 ? "left" : "right";
+  // Body hotspot roughly toward center from card
+  const ax = 50 + 14 * Math.cos(rad);
+  const ay = 48 + 18 * Math.sin(rad);
+  return { left: cx, top: cy, side, ax, ay, deg };
+}
+
 export function BodyMap({
   categories,
   geneHint,
@@ -94,10 +89,13 @@ export function BodyMap({
   geneHint: string;
 }) {
   const ordered = orderCategories(categories).slice(0, 8);
+  const slots = ordered.map((_, i) => orbitPoint(i, ordered.length));
 
   return (
     <div className="body-map rise-in-delay">
       <div className="body-map-stage">
+        <div className="body-map-orbit" aria-hidden="true" />
+
         <div className="body-map-figure" aria-hidden="true">
           <Image
             src="/brand/health-body-anatomy.png"
@@ -107,52 +105,51 @@ export function BodyMap({
             className="body-map-photo"
             priority
           />
-          <svg
-            className="body-map-lines"
-            viewBox="0 0 100 100"
-            preserveAspectRatio="none"
-          >
-            {ordered.map((c, i) => {
-              const a = ANCHORS[i];
-              const slot = ORBIT[i];
-              const endX = slot.side === "left" ? 16 : 84;
-              const endY = parseFloat(slot.top) + 7;
-              return (
-                <g key={c.id}>
-                  <line
-                    x1={a.x}
-                    y1={a.y}
-                    x2={endX}
-                    y2={endY}
-                    stroke={COLOUR_HEX[c.colour]}
-                    strokeWidth="0.28"
-                    strokeDasharray="1.1 1.2"
-                    opacity="0.45"
-                  />
-                  <circle
-                    cx={a.x}
-                    cy={a.y}
-                    r="1.1"
-                    fill="#fff"
-                    stroke={COLOUR_HEX[c.colour]}
-                    strokeWidth="0.35"
-                  />
-                </g>
-              );
-            })}
-          </svg>
         </div>
 
+        <svg
+          className="body-map-lines"
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+        >
+          {ordered.map((c, i) => {
+            const s = slots[i];
+            return (
+              <g key={c.id}>
+                <line
+                  x1={s.ax}
+                  y1={s.ay}
+                  x2={s.left}
+                  y2={s.top}
+                  stroke={COLOUR_HEX[c.colour]}
+                  strokeWidth="0.28"
+                  strokeDasharray="1.05 1.15"
+                  opacity="0.5"
+                />
+                <circle
+                  cx={s.ax}
+                  cy={s.ay}
+                  r="1.05"
+                  fill="#fff"
+                  stroke={COLOUR_HEX[c.colour]}
+                  strokeWidth="0.35"
+                />
+              </g>
+            );
+          })}
+        </svg>
+
         {ordered.map((c, i) => {
-          const slot = ORBIT[i] || ORBIT[ORBIT.length - 1];
+          const s = slots[i];
           return (
             <Link
               key={c.id}
               href={`/patient/digital-twin/${c.id}`}
-              className={`body-cat body-cat-${slot.side}`}
+              className={`body-cat body-cat-${s.side}`}
               style={{
-                left: slot.left,
-                top: slot.top,
+                left: `${s.left}%`,
+                top: `${s.top}%`,
                 ["--cc" as string]: COLOUR_HEX[c.colour],
               }}
             >

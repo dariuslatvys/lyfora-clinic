@@ -21,11 +21,11 @@ export function markerItemColour(m: {
       const dia = Number(match[2]);
       if (sys < 90 || dia < 60) return "orange"; // too low
       if (sys >= 160 || dia >= 100) return "red";
-      if (sys >= 140 || dia >= 90) return "orange";
-      // High-normal / elevated — not green optimal (e.g. 132/79)
-      if (sys >= 130 || dia >= 85) return "yellow";
+      if (sys >= 140 || dia >= 90) return "red";
+      // High-normal / elevated — not green optimal (e.g. 132/79) → rose/alert
+      if (sys >= 130 || dia >= 85) return "orange";
       if (sys >= 120 && sys <= 129 && dia < 85) return "green";
-      return "green"; // optimal <120/<80 and normal band
+      return "green"; // optimal <120/<80
     }
   }
 

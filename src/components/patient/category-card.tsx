@@ -1,6 +1,5 @@
 import Link from "next/link";
 import type { RiskColour } from "@/lib/health/colours";
-import { DnaMark } from "@/components/patient/dna-mark";
 
 const CSS_VAR: Record<RiskColour, string> = {
   green: "var(--r-green)",
@@ -37,7 +36,11 @@ export function CategoryCard({
       <b>{title}</b>
       <div className="st">
         <span>{colourLabel}</span>
-        {geneticBadge ? <DnaMark /> : null}
+        {geneticBadge ? (
+          <span className="gene-mark" title="Mutacija / Mutation">
+            (M)
+          </span>
+        ) : null}
       </div>
     </Link>
   );

@@ -136,13 +136,21 @@ export function PatientRail({
         <span>{labels.patientPortal}</span>
       </div>
 
-      <div className="who">
+      <Link
+        href="/patient/health-card/questionnaire"
+        className={cn(
+          "who",
+          pathname.startsWith("/patient/health-card/questionnaire") && "on"
+        )}
+        aria-label={`Sveikatos klausimynas — ${patientName}`}
+        title="Sveikatos klausimynas"
+      >
         <div className="av">{initials(patientName)}</div>
         <div style={{ minWidth: 0 }}>
           <b>{patientName}</b>
           <span>{sexLabel}</span>
         </div>
-      </div>
+      </Link>
 
       <nav className="nav" aria-label="Pagrindinis meniu">
         <div className="nav-label">Meniu</div>

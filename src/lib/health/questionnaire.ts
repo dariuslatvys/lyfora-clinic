@@ -5,6 +5,7 @@ export type QFieldType =
   | "multiselect"
   | "number"
   | "year"
+  | "date"
   | "text"
   | "tags"
   | "calculated"
@@ -151,6 +152,59 @@ export function computeBmi(answers: QuestionnaireAnswers, def: QDefinition) {
   if (!h || !w || h < 50 || h > 260 || w < 20 || w > 400) return null;
   const m = h / 100;
   return Math.round((w / (m * m)) * 10) / 10;
+}
+
+/** Whole years from an ISO date string (YYYY-MM-DD). */
+export function ageFromDob(dob: string | null | undefined): number | null {
+  if (!dob || !/^\d{4}-\d{2}-\d{2}$/.test(dob)) return null;
+  const born = new Date(`${dob}T12:00:00`);
+  if (Number.isNaN(born.getTime())) return null;
+  const now = new Date();
+  let age = now.getFullYear() - born.getFullYear();
+  const m = now.getMonth() - born.getMonth();
+  if (m < 0 || (m === 0 && now.getDate() < born.getDate())) age -= 1;
+  if (age < 0 || age > 120) return null;
+  return age;
+}
+
+export function computeAge(answers: QuestionnaireAnswers, def: QDefinition) {
+  const dob = findFieldValue(
+    answers,
+    def,
+    (f) => f.label === "Date of Birth"
+  );
+  return typeof dob === "string" ? ageFromDob(dob) : null;
+}
+
+/** LT display labels for common English questionnaire fields. */
+export const FIELD_LABEL_LT: Record<string, string> = {
+  "Biological Sex": "Lytis",
+  "Date of Birth": "Gimimo data",
+  Age: "Amžius",
+  Height: "Ūgis",
+  Weight: "Svoris",
+  BMI: "KMI",
+  "Waist Circumference": "Juosmens apimtis",
+  "Known Blood Pressure": "Kraujo spaudimas",
+  "Resting Heart Rate": "Ramybės pulsas",
+  "HRV (30-Day Average)": "HRV (30 d. vidurkis)",
+  "VO₂max": "VO₂ max",
+  "How would you rate your overall health?": "Kaip vertinate bendrą sveikatą?",
+};
+
+export const OPTION_LABEL_LT: Record<string, string> = {
+  Male: "Vyras",
+  Female: "Moteris",
+};
+
+export function fieldLabel(field: QField, locale: "lt" | "en") {
+  if (locale === "lt") return FIELD_LABEL_LT[field.label] || field.label;
+  return field.label;
+}
+
+export function optionLabel(value: string, locale: "lt" | "en") {
+  if (locale === "lt") return OPTION_LABEL_LT[value] || value;
+  return value;
 }
 
 /** Filter medical-condition options by sex. */

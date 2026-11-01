@@ -8,6 +8,7 @@
       "title": "1. Basic Profile & Health Metrics",
       "fields": [
         "1_basic_profile_health_metrics__biological_sex",
+        "1_basic_profile_health_metrics__date_of_birth",
         "1_basic_profile_health_metrics__age",
         "1_basic_profile_health_metrics__height",
         "1_basic_profile_health_metrics__weight",
@@ -157,8 +158,8 @@
       "auto": false,
       "type": "select",
       "options": [
-        "Female",
-        "Male"
+        "Male",
+        "Female"
       ],
       "listRef": null,
       "showWhen": "Visada",
@@ -168,17 +169,33 @@
     },
     {
       "nr": 2,
+      "id": "1_basic_profile_health_metrics__date_of_birth",
+      "step": "1. Basic Profile & Health Metrics",
+      "section": null,
+      "label": "Date of Birth",
+      "required": true,
+      "auto": false,
+      "type": "date",
+      "options": null,
+      "listRef": null,
+      "showWhen": "Visada",
+      "notes": "Used to calculate age automatically",
+      "repeatOf": null,
+      "unit": null
+    },
+    {
+      "nr": 2,
       "id": "1_basic_profile_health_metrics__age",
       "step": "1. Basic Profile & Health Metrics",
       "section": null,
       "label": "Age",
-      "required": true,
-      "auto": false,
-      "type": "number",
+      "required": false,
+      "auto": true,
+      "type": "calculated",
       "options": null,
       "listRef": null,
       "showWhen": "Visada",
-      "notes": "Risk stratification",
+      "notes": "Automatically calculated from date of birth",
       "repeatOf": null,
       "unit": "Years"
     },

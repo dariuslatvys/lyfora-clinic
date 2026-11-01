@@ -5,7 +5,10 @@ import Link from "next/link";
 import {
   STEP_TITLE_LT,
   computeBmi,
+  computeAge,
   conditionsForSex,
+  fieldLabel,
+  optionLabel,
   type QDefinition,
   type QField,
   type QuestionnaireAnswers,
@@ -67,13 +70,23 @@ export function QuestionnaireForm({
     }));
   }, []);
 
-  // Keep BMI in sync
+  // Keep BMI and age (from DOB) in sync
   useEffect(() => {
     const bmiField = def.fields.find((f) => f.label === "BMI");
-    if (!bmiField) return;
-    const bmi = computeBmi(answers, def);
-    if (bmi != null && answers.values[bmiField.id] !== bmi) {
-      setValue(bmiField.id, bmi);
+    if (bmiField) {
+      const bmi = computeBmi(answers, def);
+      if (bmi != null && answers.values[bmiField.id] !== bmi) {
+        setValue(bmiField.id, bmi);
+      }
+    }
+    const ageField = def.fields.find((f) => f.label === "Age" && f.auto);
+    if (ageField) {
+      const age = computeAge(answers, def);
+      if (age != null && answers.values[ageField.id] !== age) {
+        setValue(ageField.id, age);
+      } else if (age == null && answers.values[ageField.id] != null) {
+        setValue(ageField.id, null);
+      }
     }
   }, [answers, def, setValue]);
 
@@ -299,17 +312,45 @@ function FieldRenderer({
     );
   }
 
-  return (
-    <label className="q-field">
-      <span className="q-label">
-        {field.label}
-        {field.required ? <em>*</em> : null}
-        {field.unit ? <span className="q-unit">{field.unit}</span> : null}
-      </span>
-      {field.notes ? <span className="q-hint">{field.notes}</span> : null}
+  const title = fieldLabel(field, locale);
+  const notesLt: Record<string, string> = {
+    "Controls questionnaire branching": "Nustato klausimyno šakas",
+    "Used to calculate age automatically":
+      "Pagal ją automatiškai skaičiuojamas amžius",
+    "Automatically calculated from date of birth":
+      "Automatiškai skaičiuojama iš gimimo datos",
+    "Used for BMI calculation": "Naudojama KMI skaičiavimui",
+    "Automatically calculated": "Skaičiuojama automatiškai",
+    "Cardiometabolic risk indicator": "Kardiometabolinės rizikos rodiklis",
+    "Cardiovascular assessment": "Širdies ir kraujagyslių vertinimas",
+    "Cardiovascular fitness marker": "Širdies ir kraujagyslių fizinės būklės žymuo",
+    "Recovery and autonomic nervous system marker":
+      "Atsigavimo ir autonominės nervų sistemos žymuo",
+  };
+  const hint =
+    field.notes && locale === "lt"
+      ? notesLt[field.notes] || field.notes
+      : field.notes;
 
+  return (
+    <div className="q-field">
+      <div className="q-field-head">
+        <label className="q-label" htmlFor={`q-${field.id}`}>
+          {title}
+          {field.required ? <em aria-hidden="true">*</em> : null}
+          {field.auto ? (
+            <span className="q-auto">
+              {locale === "en" ? "auto" : "auto"}
+            </span>
+          ) : null}
+        </label>
+        {hint ? <p className="q-hint">{hint}</p> : null}
+      </div>
+
+      <div className="q-control">
       {field.type === "select" || field.type === "select_list" ? (
         <select
+          id={`q-${field.id}`}
           disabled={readOnly}
           value={typeof value === "string" ? value : ""}
           onChange={(e) => onChange(field.id, e.target.value || null)}
@@ -324,30 +365,54 @@ function FieldRenderer({
             : field.options || []
           ).map((o) => (
             <option key={o} value={o}>
-              {o}
+              {optionLabel(o, locale)}
             </option>
           ))}
         </select>
       ) : null}
 
       {field.type === "number" || field.type === "year" ? (
+        <>
+          <input
+            id={`q-${field.id}`}
+            type="number"
+            disabled={readOnly}
+            value={value == null ? "" : String(value)}
+            min={field.type === "year" ? 1920 : undefined}
+            max={field.type === "year" ? new Date().getFullYear() : undefined}
+            onChange={(e) =>
+              onChange(
+                field.id,
+                e.target.value === "" ? null : Number(e.target.value)
+              )
+            }
+          />
+          {field.unit ? <span className="q-unit">{field.unit}</span> : null}
+        </>
+      ) : null}
+
+      {field.type === "date" ? (
         <input
-          type="number"
+          id={`q-${field.id}`}
+          type="date"
           disabled={readOnly}
-          value={value == null ? "" : String(value)}
-          min={field.type === "year" ? 1920 : undefined}
-          max={field.type === "year" ? new Date().getFullYear() : undefined}
-          onChange={(e) =>
-            onChange(
-              field.id,
-              e.target.value === "" ? null : Number(e.target.value)
-            )
-          }
+          value={typeof value === "string" ? value : ""}
+          max={new Date().toISOString().slice(0, 10)}
+          min="1920-01-01"
+          onChange={(e) => onChange(field.id, e.target.value || null)}
         />
       ) : null}
 
       {field.type === "calculated" ? (
-        <input type="text" disabled value={value == null ? "—" : String(value)} />
+        <>
+          <input
+            id={`q-${field.id}`}
+            type="text"
+            disabled
+            value={value == null ? "—" : String(value)}
+          />
+          {field.unit ? <span className="q-unit">{field.unit}</span> : null}
+        </>
       ) : null}
 
       {field.type === "text" || field.type === "yes_no_details" ? (
@@ -443,7 +508,8 @@ function FieldRenderer({
           onChange={(next) => onChange(field.id, next)}
         />
       ) : null}
-    </label>
+      </div>
+    </div>
   );
 }
 

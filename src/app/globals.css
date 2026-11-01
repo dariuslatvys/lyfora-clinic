@@ -130,6 +130,15 @@ a {
   background: var(--surface-2);
   border: 1px solid var(--line-2);
   margin-bottom: 8px;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+a.who:hover,
+a.who.on {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+  background: color-mix(in srgb, var(--accent-soft) 55%, var(--surface-2));
 }
 
 .who .av {
@@ -2126,4 +2135,142 @@ a {
   font-size: 0.84rem;
   font-weight: 700;
   color: var(--accent);
+}
+
+/* ---------- Health questionnaire ---------- */
+.q-wrap {
+  max-width: 860px;
+}
+
+.q-progress {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--line-2);
+  overflow: hidden;
+}
+
+.q-progress > i {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  border-radius: inherit;
+}
+
+.q-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 14px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--surface-raised);
+}
+
+.q-field-head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.q-label {
+  font-family: var(--font-display), Manrope, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.3;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.q-label em {
+  color: var(--accent);
+  font-style: normal;
+  font-weight: 700;
+}
+
+.q-auto {
+  font-size: 0.68rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 1px 7px;
+}
+
+.q-hint {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+.q-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.q-control input[type="text"],
+.q-control input[type="number"],
+.q-control input[type="date"],
+.q-control select,
+.q-control textarea,
+.q-field textarea,
+.q-field select,
+.q-field > .q-control input {
+  flex: 1 1 180px;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  border-radius: 9px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  padding: 10px 12px;
+  font-size: 0.95rem;
+}
+
+.q-control input[type="date"] {
+  max-width: 240px;
+  flex: 0 1 240px;
+}
+
+.q-control input[type="number"] {
+  max-width: 160px;
+  flex: 0 1 160px;
+}
+
+.q-unit {
+  font-size: 0.85rem;
+  font-weight: 650;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.q-multi {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.q-multi-group {
+  border: 1px solid var(--line-2);
+  border-radius: 10px;
+  padding: 10px;
+  background: var(--surface);
+}
+
+.q-multi-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }

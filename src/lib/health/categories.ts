@@ -57,11 +57,7 @@ export const HEALTH_CATEGORIES: {
   {
     id: "oncology",
     primaryKeys: ["Oncology", "Cancer Risk", "Oncology / Cancer Risk"],
-    markerCategoryNames: [
-      "Oncology",
-      "Cancer Risk",
-      "Cancer RiskHormonal Health",
-    ],
+    markerCategoryNames: ["Oncology", "Cancer Risk"],
   },
 ];
 

@@ -180,10 +180,10 @@ function markerBelongs(
   markerCats: string[],
   categoryNames: string[]
 ) {
-  const normalized = markerCats.map((c) => c.toLowerCase());
-  return categoryNames.some((n) =>
-    normalized.some((c) => c.includes(n.toLowerCase()) || n.toLowerCase().includes(c))
-  );
+  // Exact match only — substring matching wrongly pulled Hormonal Health
+  // markers (e.g. Cortisol) into Oncology via a corrupted "Cancer RiskHormonal Health" label.
+  const normalized = new Set(markerCats.map((c) => c.trim().toLowerCase()));
+  return categoryNames.some((n) => normalized.has(n.trim().toLowerCase()));
 }
 
 export function evaluateDigitalTwin(input: {

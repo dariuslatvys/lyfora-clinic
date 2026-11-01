@@ -16,7 +16,8 @@ const body = Manrope({
 
 export const metadata: Metadata = {
   title: "Lyfora | Tavo personalinė klinika",
-  description: "Lyfora clinic patient and clinician platform",
+  description: "Lyfora — paciento ir gydytojo sveikatos platforma",
+  icons: { icon: "/brand/lyfora-logo.png" },
 };
 
 export default function RootLayout({

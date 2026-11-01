@@ -278,9 +278,6 @@ export default async function CategoryDetailPage({
                     <h4 className="text-lg font-semibold">
                       {(locale === "lt" ? v.titleLt : v.titleEn) || v.gene}
                     </h4>
-                    <span className="text-sm font-semibold text-[var(--ink)]">
-                      {v.gene}
-                    </span>
                   </div>
                   <p className="mt-1 text-xs text-[var(--muted)]">
                     {v.gene} · {v.hgvs} · {v.chrom}:{v.pos} · GT {v.gt}

@@ -33,6 +33,7 @@ export function LoginForm({
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
         body: JSON.stringify({ email, password, role }),
       });
       if (!res.ok) {
@@ -40,9 +41,9 @@ export function LoginForm({
         setLoading(false);
         return;
       }
-      const data = await res.json();
+      const data = (await res.json()) as { redirect?: string };
       // Full navigation so the session cookie is reliably picked up
-      window.location.assign(data.redirect || "/");
+      window.location.href = data.redirect || "/patient/digital-twin";
     } catch {
       setError("Nepavyko prisijungti / Sign-in failed");
       setLoading(false);

@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
-import { loginWithPassword } from "@/lib/auth/session";
+import {
+  loginWithPassword,
+  sessionCookieName,
+  buildSessionToken,
+  sessionCookieOptions,
+} from "@/lib/auth/session";
 
 export async function POST(req: Request) {
   const body = await req.json();
@@ -10,8 +15,12 @@ export async function POST(req: Request) {
   if (!result.ok) {
     return NextResponse.json({ error: result.error }, { status: 401 });
   }
-  return NextResponse.json({
+
+  const { token, expiresAtMs } = buildSessionToken(result.user.id);
+  const res = NextResponse.json({
     role: result.user.role,
     redirect: result.user.role === "doctor" ? "/doctor" : "/patient/digital-twin",
   });
+  res.cookies.set(sessionCookieName, token, sessionCookieOptions(expiresAtMs));
+  return res;
 }

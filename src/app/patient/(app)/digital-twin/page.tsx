@@ -24,9 +24,14 @@ export default async function DigitalTwinPage() {
         <p className="mt-2 max-w-3xl text-sm leading-relaxed text-[var(--ink-soft)]">
           {labels.categoriesHint}
         </p>
-        {!twin.patient.hasSnpArray && (
-          <p className="mt-3 detail-chip">{labels.awaitingDna} · SNP</p>
-        )}
+        <div className="mt-3 flex flex-wrap gap-2">
+          {!twin.patient.hasSnpArray && (
+            <p className="detail-chip">{labels.awaitingDna} · SNP</p>
+          )}
+          {twin.patient.hasNgsVcf && (
+            <p className="detail-chip">NGS · {labels.rareMutations}</p>
+          )}
+        </div>
       </section>
 
       <section className="grid gap-4 md:grid-cols-2">

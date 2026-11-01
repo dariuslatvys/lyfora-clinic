@@ -158,7 +158,7 @@ function main() {
       source: string;
     }[];
   }>("blood_markers.json");
-  const rare = readJson<{
+  type RareFile = {
     variants: {
       gene: string;
       transcript: string;
@@ -175,7 +175,9 @@ function main() {
       summaryEn: string;
       synthetic: boolean;
     }[];
-  }>("vcf_rare_mutations_female.json");
+  };
+  const rareFemale = readJson<RareFile>("vcf_rare_mutations_female.json");
+  const rareMale = readJson<RareFile>("vcf_rare_mutations_male.json");
 
   const hash = bcrypt.hashSync("lyfora2026", 10);
   const now = new Date().toISOString();
@@ -204,9 +206,9 @@ function main() {
     "male",
     blood.dob,
     "37204170958",
+    1,
     0,
-    0,
-    "Realūs laboratoriniai tyrimai iš įkeltų PDF. SNP/VCF DNR failai dar neįkelti."
+    "Realūs laboratoriniai tyrimai iš PDF + vyrų NGS VCF (sintetinės MYBPC3/MSH2 demonstracinės pozicijos). SNP microarray failas dar neįkeltas."
   );
 
   sqlite.prepare(`
@@ -354,25 +356,29 @@ function main() {
       title_lt, title_en, summary_lt, summary_en, synthetic
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
-  for (const v of rare.variants) {
-    insertRare.run(
-      femaleId,
-      v.gene,
-      v.transcript,
-      v.hgvs,
-      v.chrom,
-      v.pos,
-      v.ref,
-      v.alt,
-      v.gt,
-      v.significance,
-      v.titleLt,
-      v.titleEn,
-      v.summaryLt,
-      v.summaryEn,
-      v.synthetic ? 1 : 0
-    );
+  function insertRareFor(patient: string, variants: RareFile["variants"]) {
+    for (const v of variants) {
+      insertRare.run(
+        patient,
+        v.gene,
+        v.transcript,
+        v.hgvs,
+        v.chrom,
+        v.pos,
+        v.ref,
+        v.alt,
+        v.gt,
+        v.significance,
+        v.titleLt,
+        v.titleEn,
+        v.summaryLt,
+        v.summaryEn,
+        v.synthetic ? 1 : 0
+      );
+    }
   }
+  insertRareFor(patientId, rareMale.variants);
+  insertRareFor(femaleId, rareFemale.variants);
 
   // Minimal questionnaire for Darius
   const insertQ = sqlite.prepare(
@@ -384,9 +390,10 @@ function main() {
   insertQ.run(patientId, "sleep_hours", "6-7");
 
   console.log("Seeded Lyfora DB");
-  console.log("  patients: Darius Latvys (real labs), Ona Pavyzdinė (demo genetics/VCF)");
+  console.log("  patients: Darius Latvys (labs + male NGS VCF), Ona Pavyzdinė (demo SNP + female VCF)");
   console.log("  SNPs:", snps.length);
   console.log("  marker results:", blood.markers.length);
+  console.log("  male rare:", rareMale.variants.length, "female rare:", rareFemale.variants.length);
   console.log("  logins: pacientas@lyfora.lt / paciente@lyfora.lt / gydytojas@lyfora.lt  pass: lyfora2026");
 }
 

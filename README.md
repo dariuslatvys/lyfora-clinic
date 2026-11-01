@@ -34,8 +34,8 @@ Atidarykite [http://127.0.0.1:43123](http://127.0.0.1:43123).
 
 Šaltiniai: `data/lyfora-source/` ir normalizuoti JSON `data/parsed/`.
 
-- Darius Latvys — importuoti PDF laboratoriniai tyrimai (2024–2026). SNP mikro matricų ir vyrų VCF failai dar neįkelti, todėl genetikos sluoksnis jam laukia DNR failo; kategorijų spalvos skaičiuojamos iš žymenų.
-- Ona Pavyzdinė — demonstraciniai SNP genotipai + sintetinis moterų NGS VCF (PALB2, RYR1), kad būtų matomas pilnas genetikos UI.
+- Darius Latvys — importuoti PDF laboratoriniai tyrimai (2024–2026) + vyrų NGS VCF (`MYBPC3`, `MSH2` demonstracinės pozicijos). SNP microarray failas dar neįkeltas — bazinio SNP sluoksnio spalvos jam skaičiuojamos iš žymenų.
+- Ona Pavyzdinė — demonstraciniai SNP genotipai + sintetinis moterų NGS VCF (PALB2, RYR1).
 
 ## Stack
 

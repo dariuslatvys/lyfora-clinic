@@ -182,9 +182,14 @@ export function PatientRail({
               href={item.href}
               className={cn(active && "on")}
               aria-current={active ? "page" : undefined}
+              title={String(labels[item.key] ?? "")}
             >
               <NavIcon name={item.icon} />
-              <span>{labels[item.key]}</span>
+              <span className="nav-text">
+                {item.key === "myDna"
+                  ? labels.myDna || "Mano DNR"
+                  : labels[item.key]}
+              </span>
             </Link>
           );
         })}

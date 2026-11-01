@@ -8,6 +8,7 @@ import {
   PatientShell,
   AiToggleButton,
 } from "@/components/patient/patient-shell";
+import { TopbarCrumb } from "@/components/patient/topbar-crumb";
 
 export default async function PatientLayout({
   children,
@@ -47,10 +48,7 @@ export default async function PatientLayout({
       main={
         <div className="main">
           <header className="topbar">
-            <div className="crumb">
-              <b>{labels.patientPortal}</b>
-              <span> · {labels.overview}</span>
-            </div>
+            <TopbarCrumb labels={labels} />
             <div className="sp" />
             <LocaleSwitch locale={locale} />
             <AiToggleButton label={labels.askAi} />

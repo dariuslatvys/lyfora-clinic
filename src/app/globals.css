@@ -194,6 +194,13 @@ a.who.on {
   text-decoration: none;
 }
 
+.nav a .nav-text {
+  color: inherit;
+  font-size: inherit;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
 .nav a:hover {
   background: var(--surface-2);
 }

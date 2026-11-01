@@ -55,9 +55,9 @@ const PHYSICAL_COPY: Record<
     nameLt: "Kraujospūdis",
     nameEn: "Blood pressure",
     blurbLt:
-      "Kraujospūdis rodo, koks spaudimas kraujagyslėse širdžiai pumpuojant kraują. Paprastai užrašomas kaip sistolinis / diastolinis (pvz. 127/77).",
+      "Kraujospūdis rodo, koks spaudimas kraujagyslėse širdžiai pumpuojant kraują. Paprastai užrašomas kaip sistolinis / diastolinis (pvz. 120/80).",
     blurbEn:
-      "Blood pressure shows how hard blood pushes on your arteries. It is usually written as systolic / diastolic (e.g. 127/77).",
+      "Blood pressure shows how hard blood pushes on your arteries. It is usually written as systolic / diastolic (e.g. 120/80).",
     highLt:
       "Jūsų matavimas yra aukščiau įprastos ribos. Vertinga aptarti su gydytoju — ypač jei kartojasi ar jaučiate simptomus.",
     highEn:

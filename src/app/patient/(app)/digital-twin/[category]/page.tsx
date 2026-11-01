@@ -11,10 +11,8 @@ import {
   type RiskColour,
 } from "@/lib/health/colours";
 import { markerItemColour } from "@/lib/health/marker-colour";
-import { explainSnp } from "@/lib/health/explain-snp";
 import { MarkerChart } from "@/components/patient/marker-chart";
 import { SnpDetailPanel } from "@/components/patient/snp-detail";
-import { AskAiButton } from "@/components/patient/ask-ai-button";
 import type { HealthCategoryId } from "@/lib/health/categories";
 
 function Pill({
@@ -189,143 +187,66 @@ export default async function CategoryDetailPage({
         {hasDrivers && (
           <div className="mt-4">
             <p className="eyebrow mb-2">{labels.colourDrivers}</p>
-            <div className="flex flex-col gap-3">
+            <div className="driver-chips">
               {catRare.map((v) => {
                 const title =
-                  (locale === "lt" ? v.titleLt : v.titleEn) || v.gene;
-                const summary =
-                  (locale === "lt" ? v.summaryLt : v.summaryEn) || "";
-                const ask =
-                  locale === "en"
-                    ? `Explain my NGS finding ${v.gene} (${v.hgvs}) in plain language using my data`
-                    : `Paaiškink mano NGS radinį ${v.gene} (${v.hgvs}) paprasta kalba pagal mano duomenis`;
+                  (locale === "lt" ? v.titleLt : v.titleEn) ||
+                  (locale === "en"
+                    ? `${v.gene} gene change`
+                    : `${v.gene} geno pokytis`);
+                const anchor = `rare-${encodeURIComponent(String(v.id ?? v.gene))}`;
                 return (
-                  <article
+                  <a
                     key={v.id ?? `${v.gene}-rare`}
-                    className="rounded-[var(--radius)] border border-[var(--r-red)]/30 bg-[var(--r-red-bg)]/35 p-4"
+                    href={`#${anchor}`}
+                    className="driver-chip driver-chip-red"
                   >
-                    <div className="row between" style={{ alignItems: "flex-start" }}>
-                      <div>
-                        <div className="row" style={{ gap: 8 }}>
-                          <Pill colour="red" label={labels.colourLabels.red} />
-                          <b className="text-sm">{title}</b>
-                        </div>
-                        <p className="mt-1 text-xs text-[var(--muted)]">
-                          NGS · {v.gene} · {v.hgvs}
-                        </p>
-                      </div>
-                      <div className="row" style={{ gap: 6 }}>
-                        <AskAiButton question={ask} label={labels.askAi} />
-                        <Link
-                          href={`/patient/rare/${encodeURIComponent(String(v.id ?? v.gene))}`}
-                          className="btn ghost sm"
-                        >
-                          {labels.openCategory}
-                        </Link>
-                      </div>
-                    </div>
-                    <p className="eyebrow mt-3">{labels.plainLanguage}</p>
-                    <p className="mt-1 text-sm leading-relaxed text-[var(--ink)]">
-                      {summary}
-                    </p>
-                  </article>
+                    <Pill colour="red" label={labels.colourLabels.red} />
+                    <span className="driver-chip-text">
+                      <b>{title}</b>
+                      <em>
+                        {v.gene}
+                        {v.hgvs ? ` · ${v.hgvs}` : ""}
+                      </em>
+                    </span>
+                  </a>
                 );
               })}
               {driverMarkers.map((m) => {
                 const c = markerItemColour(m);
-                const desc =
-                  (locale === "lt" ? m.descriptionLt : m.descriptionEn) ||
-                  (locale === "en"
-                    ? `Your latest value is ${m.value}${m.unit ? " " + m.unit : ""}. Reference: ${m.refLow ?? "—"}–${m.refHigh ?? "—"}.`
-                    : `Jūsų paskutinė reikšmė: ${m.value}${m.unit ? " " + m.unit : ""}. Norma: ${m.refLow ?? "—"}–${m.refHigh ?? "—"}.`);
-                const ask =
-                  locale === "en"
-                    ? `Explain my marker ${m.name || m.markerKey} (${m.value}${m.unit ? " " + m.unit : ""}) in plain language`
-                    : `Paaiškink mano žymenį ${m.name || m.markerKey} (${m.value}${m.unit ? " " + m.unit : ""}) paprasta kalba`;
                 return (
-                  <article
+                  <Link
                     key={`drv-m-${m.markerKey}`}
-                    className="rounded-[var(--radius)] border border-[var(--line)] bg-[var(--surface)] p-4"
-                    style={{ borderLeft: `4px solid ${COLOUR_HEX[c]}` }}
+                    href={`/patient/marker/${encodeURIComponent(m.markerKey)}?cat=${category}`}
+                    className="driver-chip"
+                    style={{ borderColor: COLOUR_HEX[c] }}
                   >
-                    <div className="row between" style={{ alignItems: "flex-start" }}>
-                      <div>
-                        <div className="row" style={{ gap: 8 }}>
-                          <Pill colour={c} label={labels.colourLabels[c]} />
-                          <b className="text-sm">{m.name || m.markerKey}</b>
-                        </div>
-                        <p className="mt-1 text-xs text-[var(--muted)]">
-                          {labels.markers} · {m.value}
-                          {m.unit ? ` ${m.unit}` : ""}
-                        </p>
-                      </div>
-                      <div className="row" style={{ gap: 6 }}>
-                        <AskAiButton question={ask} label={labels.askAi} />
-                        <Link
-                          href={`/patient/marker/${encodeURIComponent(m.markerKey)}?cat=${category}`}
-                          className="btn ghost sm"
-                        >
-                          {labels.openCategory}
-                        </Link>
-                      </div>
-                    </div>
-                    <p className="eyebrow mt-3">{labels.plainLanguage}</p>
-                    <p className="mt-1 text-sm leading-relaxed text-[var(--ink)]">
-                      {desc}
-                    </p>
-                  </article>
+                    <Pill colour={c} label={labels.colourLabels[c]} />
+                    <span className="driver-chip-text">
+                      <b>{m.name || m.markerKey}</b>
+                      <em>
+                        {m.value}
+                        {m.unit ? ` ${m.unit}` : ""}
+                      </em>
+                    </span>
+                  </Link>
                 );
               })}
               {driverSnps.map((s) => {
-                const expl = explainSnp(s, locale);
                 const c = s.colour || "grey";
-                const ask =
-                  locale === "en"
-                    ? `Explain ${s.gene} ${s.snpId} (${s.allele1}/${s.allele2}) from my SNP data in plain language`
-                    : `Paaiškink ${s.gene} ${s.snpId} (${s.allele1}/${s.allele2}) pagal mano SNP duomenis paprasta kalba`;
                 return (
-                  <article
+                  <Link
                     key={`drv-s-${s.snpId}`}
-                    className="rounded-[var(--radius)] border border-[var(--line)] bg-[var(--surface)] p-4"
-                    style={{ borderLeft: `4px solid ${COLOUR_HEX[c]}` }}
+                    href={`/patient/snp/${encodeURIComponent(s.snpId)}?cat=${category}`}
+                    className="driver-chip"
+                    style={{ borderColor: COLOUR_HEX[c] }}
                   >
-                    <div className="row between" style={{ alignItems: "flex-start" }}>
-                      <div>
-                        <div className="row" style={{ gap: 8 }}>
-                          <Pill colour={c} label={labels.colourLabels[c]} />
-                          <b className="text-sm">
-                            {s.gene}{" "}
-                            <span className="font-normal text-[var(--muted)]">
-                              {s.snpId}
-                            </span>
-                          </b>
-                        </div>
-                        <p className="mt-1 text-xs text-[var(--muted)]">
-                          {s.allele1}/{s.allele2} · {s.matchCount}{" "}
-                          {s.matchCount === 1
-                            ? locale === "en"
-                              ? "risk allele"
-                              : "rizikos alelis"
-                            : locale === "en"
-                              ? "risk alleles"
-                              : "rizikos aleliai"}
-                        </p>
-                      </div>
-                      <div className="row" style={{ gap: 6 }}>
-                        <AskAiButton question={ask} label={labels.askAi} />
-                        <Link
-                          href={`/patient/snp/${encodeURIComponent(s.snpId)}?cat=${category}`}
-                          className="btn ghost sm"
-                        >
-                          {labels.mechanism}
-                        </Link>
-                      </div>
-                    </div>
-                    <p className="eyebrow mt-3">{labels.plainLanguage}</p>
-                    <p className="mt-1 text-sm leading-relaxed text-[var(--ink)]">
-                      {expl.whyColour} {expl.plainBody}
-                    </p>
-                  </article>
+                    <Pill colour={c} label={labels.colourLabels[c]} />
+                    <span className="driver-chip-text">
+                      <b>{s.gene}</b>
+                      <em>{s.snpId.split("__")[0]}</em>
+                    </span>
+                  </Link>
                 );
               })}
             </div>
@@ -334,7 +255,7 @@ export default async function CategoryDetailPage({
       </section>
 
       {hasRare && (
-        <section className="panel space-y-3">
+        <section id="rare-mutations" className="panel space-y-3">
           <h3 className="font-[family-name:var(--font-display)] text-2xl">
             {labels.rareMutations}
           </h3>
@@ -343,26 +264,33 @@ export default async function CategoryDetailPage({
             <p className="mt-1 text-sm text-[var(--ink-soft)]">{labels.ngsBlurb}</p>
           </div>
           <div className="grid gap-3">
-            {catRare.map((v) => (
-              <Link
-                key={v.id ?? `${v.gene}-${v.hgvs}`}
-                href={`/patient/rare/${encodeURIComponent(String(v.id ?? v.gene))}`}
-                className="block rounded-lg border border-[var(--r-red)]/30 bg-[var(--r-red-bg)]/40 p-4 transition hover:border-[var(--r-red)]"
-              >
-                <div className="flex flex-wrap items-center gap-2">
-                  <Pill colour="red" label={labels.colourLabels.red} />
-                  <h4 className="text-lg font-semibold">
-                    {locale === "lt" ? v.titleLt : v.titleEn}
-                  </h4>
-                </div>
-                <p className="mt-1 text-xs text-[var(--muted)]">
-                  {v.gene} · {v.hgvs} · {v.chrom}:{v.pos} · GT {v.gt}
-                </p>
-                <p className="mt-2 text-sm leading-relaxed text-[var(--ink-soft)]">
-                  {locale === "lt" ? v.summaryLt : v.summaryEn}
-                </p>
-              </Link>
-            ))}
+            {catRare.map((v) => {
+              const anchor = `rare-${encodeURIComponent(String(v.id ?? v.gene))}`;
+              return (
+                <Link
+                  key={v.id ?? `${v.gene}-${v.hgvs}`}
+                  id={anchor}
+                  href={`/patient/rare/${encodeURIComponent(String(v.id ?? v.gene))}`}
+                  className="block scroll-mt-24 rounded-lg border border-[var(--r-red)]/30 bg-[var(--r-red-bg)]/40 p-4 transition hover:border-[var(--r-red)]"
+                >
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Pill colour="red" label={labels.colourLabels.red} />
+                    <h4 className="text-lg font-semibold">
+                      {(locale === "lt" ? v.titleLt : v.titleEn) || v.gene}
+                    </h4>
+                    <span className="text-sm font-semibold text-[var(--ink)]">
+                      {v.gene}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-xs text-[var(--muted)]">
+                    {v.gene} · {v.hgvs} · {v.chrom}:{v.pos} · GT {v.gt}
+                  </p>
+                  <p className="mt-2 text-sm leading-relaxed text-[var(--ink-soft)]">
+                    {locale === "lt" ? v.summaryLt : v.summaryEn}
+                  </p>
+                </Link>
+              );
+            })}
           </div>
         </section>
       )}

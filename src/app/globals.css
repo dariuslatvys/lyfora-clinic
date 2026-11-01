@@ -1128,15 +1128,16 @@ a {
   background: #ffffff;
   border: 1px solid var(--line);
   border-radius: 20px;
-  padding: 18px 12px 16px;
-  overflow: hidden;
+  padding: 22px 18px 16px;
+  overflow: visible;
 }
 
 .ring-map-stage {
   position: relative;
-  width: min(100%, 820px);
+  width: min(100%, 720px);
   aspect-ratio: 1 / 1;
   margin: 0 auto;
+  max-width: 100%;
 }
 
 .ring-map-svg {
@@ -1153,7 +1154,7 @@ a {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: min(200px, 28%);
+  width: min(188px, 26%);
   z-index: 1;
   pointer-events: none;
 }
@@ -1182,60 +1183,61 @@ a {
   position: absolute;
   left: 0;
   top: 0;
-  width: 48px;
-  height: 48px;
-  margin: -24px 0 0 -24px;
+  width: 70px;
+  height: 70px;
+  margin: -35px 0 0 -35px;
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: color-mix(in srgb, var(--cc, var(--accent)) 16%, #fff);
+  background: color-mix(in srgb, var(--cc, var(--accent)) 14%, #fff);
   color: var(--cc, var(--accent));
-  border: 2.5px solid color-mix(in srgb, var(--cc, var(--accent)) 70%, #fff);
-  box-shadow: 0 8px 18px rgba(20, 40, 60, 0.1);
+  border: 2.5px solid color-mix(in srgb, var(--cc, var(--accent)) 72%, #fff);
+  box-shadow:
+    0 0 0 6px color-mix(in srgb, var(--cc, var(--accent)) 8%, #fff),
+    0 10px 22px rgba(20, 40, 60, 0.12);
   transition: transform 0.18s ease, box-shadow 0.18s ease;
+  z-index: 2;
 }
 
 .ring-node:hover .ring-dot {
-  transform: scale(1.1);
-  box-shadow: 0 12px 24px rgba(20, 40, 60, 0.16);
+  transform: scale(1.08);
+  box-shadow:
+    0 0 0 7px color-mix(in srgb, var(--cc, var(--accent)) 12%, #fff),
+    0 14px 26px rgba(20, 40, 60, 0.16);
 }
 
 .ring-label {
   position: absolute;
-  left: calc(var(--lx) - var(--nx));
-  top: calc(var(--ly) - var(--ny));
-  width: 132px;
+  left: 0;
+  top: 0;
+  width: 148px;
   display: flex;
   flex-direction: column;
   gap: 2px;
   pointer-events: none;
+  z-index: 3;
 }
 
+/* Titles sit beside the icon disc — outside the dashed ring. */
 .ring-place-right .ring-label {
-  transform: translate(18px, -50%);
+  transform: translate(42px, -50%);
   text-align: left;
 }
 
 .ring-place-left .ring-label {
-  transform: translate(calc(-100% - 18px), -50%);
+  transform: translate(calc(-100% - 42px), -50%);
   text-align: right;
 }
 
 .ring-place-top .ring-label {
-  transform: translate(-50%, calc(-100% - 10px));
+  transform: translate(-50%, calc(-100% - 44px));
   text-align: center;
-  width: 150px;
-}
-
-.ring-place-bottom .ring-label {
-  transform: translate(-50%, 12px);
-  text-align: center;
-  width: 150px;
+  width: 176px;
 }
 
 .ring-label b {
   font-family: var(--font-display), Manrope, sans-serif;
-  font-size: 0.76rem;
+  font-size: 0.8rem;
   font-weight: 700;
   line-height: 1.2;
   color: var(--ink);
@@ -1243,6 +1245,10 @@ a {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  text-shadow:
+    0 0 8px #fff,
+    0 0 12px #fff,
+    0 1px 0 #fff;
 }
 
 .ring-label em {
@@ -1600,4 +1606,58 @@ a {
   font-weight: 650;
   font-size: 0.95rem;
   color: var(--ink);
+}
+
+/* ---------- Colour driver chips ---------- */
+.driver-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.driver-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 100%;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.driver-chip:hover {
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--line));
+  box-shadow: var(--shadow);
+  transform: translateY(-1px);
+}
+
+.driver-chip-red {
+  border-color: color-mix(in srgb, var(--r-red) 35%, var(--line));
+  background: color-mix(in srgb, var(--r-red-bg) 55%, white);
+}
+
+.driver-chip-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.driver-chip-text b {
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--ink);
+}
+
+.driver-chip-text em {
+  font-style: normal;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
 }

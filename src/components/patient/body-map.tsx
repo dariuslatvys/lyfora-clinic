@@ -11,28 +11,63 @@ export type BodyMapCategory = {
   geneticBadge?: boolean;
 };
 
+/** Top arc first, then lower half — symmetric around the circle. */
 const ORBIT_ORDER = [
-  "mental",
-  "cardiovascular",
-  "metabolic",
-  "immune",
   "pharmacogenetics",
-  "oncology",
+  "cardiovascular",
   "hormones_women",
   "hormones_men",
+  "mental",
+  "immune",
+  "oncology",
+  "metabolic",
 ];
 
+/**
+ * Fixed degrees (0 = right, -90 = top).
+ * Top trio: pharma · heart · hormones. Lower four mirrored L/R.
+ */
+const ANGLE_BY_ID: Record<string, number> = {
+  pharmacogenetics: -152,
+  cardiovascular: -90,
+  hormones_men: -28,
+  hormones_women: -28,
+  mental: 180,
+  immune: 142,
+  oncology: 38,
+  metabolic: 0,
+};
+
+/** Side the title sits on — always beside the icon, clear of the ring. */
+const LABEL_SIDE: Record<string, "left" | "right" | "top"> = {
+  pharmacogenetics: "left",
+  cardiovascular: "top",
+  hormones_men: "right",
+  hormones_women: "right",
+  mental: "left",
+  immune: "left",
+  oncology: "right",
+  metabolic: "right",
+};
+
+/** Polished outline icons for each health domain. */
 const ICON_PATH: Record<string, string> = {
-  mental: "M12 3a7 7 0 0 0-4 12.7V18h8v-2.3A7 7 0 0 0 12 3zM9 21h6",
   cardiovascular:
-    "M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.6-7 10-7 10z",
-  metabolic: "M7 8c0-3 2-5 5-5s5 2 5 5c0 4-5 6-5 10H7c0-4 0-6 0-10zM9 21h6",
-  immune: "M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z",
-  hormones_men: "M12 8a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM6 22v-4a6 6 0 0 1 12 0v4",
-  hormones_women: "M12 8a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM6 22v-4a6 6 0 0 1 12 0v4",
-  pharmacogenetics: "M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3",
+    "M19.6 12.55c1.85-2.15 1.55-5.45-.75-7.2-2.05-1.55-5-.95-6.55.85L12 6.55l-.3-.35C10.15 4.4 7.2 3.8 5.15 5.35c-2.3 1.75-2.6 5.05-.75 7.2L12 20.4l7.6-7.85z",
+  pharmacogenetics:
+    "M9.2 3.2h5.6M12 3.2v5.4L7 17.2a2.55 2.55 0 0 0 2.2 3.7h5.6a2.55 2.55 0 0 0 2.2-3.7L12 8.6V3.2M9.8 14.8h4.4",
+  hormones_men:
+    "M10.6 12.8a3.9 3.9 0 1 0 0-7.8 3.9 3.9 0 0 0 0 7.8zM7.2 21v-2.8a3.4 3.4 0 0 1 6.8 0V21M15.4 4.2l4-4M19.4 1.2h-3.4V4.6",
+  hormones_women:
+    "M12 12.6a3.9 3.9 0 1 0 0-7.8 3.9 3.9 0 0 0 0 7.8zM12 12.6V21M9.2 18.2h5.6",
+  mental:
+    "M9 18.4c-3.15-.75-5.3-3.45-5.3-6.7A6.2 6.2 0 0 1 12 5.6a6.2 6.2 0 0 1 8.3 6.1c0 3.25-2.15 5.95-5.3 6.7L12 21.2 9 18.4zM9.3 11h.02M12 11h.02M14.7 11h.02",
+  metabolic:
+    "M8 4.3s1.35 4 1.35 6.4S7.7 15 7.7 17.05 9.6 21 12 21s4.3-1.9 4.3-3.95-1.65-4.35-1.65-6.35S16 4.3 16 4.3M10 21.5h4",
+  immune:
+    "M12 2.6l7.4 2.7v5.5c0 5-3.2 8.6-7.4 9.9-4.2-1.3-7.4-4.9-7.4-9.9V5.3L12 2.6zM12 8v5.4M9.3 10.7h5.4",
   oncology:
-    "M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8",
+    "M12 3v3.4M12 17.6V21M4.7 4.7l2.4 2.4M16.9 16.9l2.4 2.4M3 12h3.4M17.6 12H21M4.7 19.3l2.4-2.4M16.9 7.1l2.4-2.4M12 12.1m-2 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0",
 };
 
 function CatIcon({ id }: { id: string }) {
@@ -40,11 +75,11 @@ function CatIcon({ id }: { id: string }) {
   return (
     <svg
       viewBox="0 0 24 24"
-      width="20"
-      height="20"
+      width="28"
+      height="28"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.8"
+      strokeWidth="1.7"
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
@@ -64,34 +99,18 @@ function orderCategories(categories: BodyMapCategory[]) {
 type Slot = {
   x: number;
   y: number;
-  labelX: number;
-  labelY: number;
-  place: "top" | "bottom" | "left" | "right";
+  place: "top" | "left" | "right";
 };
 
-/** Icons on the ring; labels farther out so they never collide. */
-function orbitSlots(total: number): Slot[] {
-  const n = Math.max(total, 1);
-  const ring = 32;
-  const labelR = 44.5;
-  const slots: Slot[] = [];
-  for (let i = 0; i < n; i++) {
-    const deg = -90 + (360 / n) * i;
-    const rad = (deg * Math.PI) / 180;
-    const cos = Math.cos(rad);
-    const sin = Math.sin(rad);
-    const x = 50 + ring * cos;
-    const y = 50 + ring * sin;
-    const labelX = 50 + labelR * cos;
-    const labelY = 50 + labelR * sin;
-    let place: Slot["place"] = "right";
-    if (sin < -0.55) place = "top";
-    else if (sin > 0.55) place = "bottom";
-    else if (cos < 0) place = "left";
-    else place = "right";
-    slots.push({ x, y, labelX, labelY, place });
-  }
-  return slots;
+function slotFor(id: string, index: number, total: number): Slot {
+  const iconR = 32;
+  const fallbackDeg = -90 + (360 / Math.max(total, 1)) * index;
+  const deg = ANGLE_BY_ID[id] ?? fallbackDeg;
+  const rad = (deg * Math.PI) / 180;
+  const x = 50 + iconR * Math.cos(rad);
+  const y = 50 + iconR * Math.sin(rad);
+  const place = LABEL_SIDE[id] ?? (x < 50 ? "left" : "right");
+  return { x, y, place };
 }
 
 export function BodyMap({
@@ -103,7 +122,6 @@ export function BodyMap({
   centerLabel?: string;
 }) {
   const ordered = orderCategories(categories).slice(0, 8);
-  const slots = orbitSlots(ordered.length);
 
   return (
     <div className="ring-map rise-in-delay">
@@ -114,8 +132,9 @@ export function BodyMap({
             cy="50"
             r="32"
             fill="none"
-            stroke="#d5e0e8"
-            strokeWidth="0.4"
+            stroke="#d0dbe4"
+            strokeWidth="0.32"
+            strokeDasharray="1.15 1.05"
           />
         </svg>
 
@@ -131,7 +150,7 @@ export function BodyMap({
         </div>
 
         {ordered.map((c, i) => {
-          const s = slots[i];
+          const s = slotFor(c.id, i, ordered.length);
           return (
             <Link
               key={c.id}
@@ -140,8 +159,6 @@ export function BodyMap({
               style={{
                 ["--nx" as string]: `${s.x}%`,
                 ["--ny" as string]: `${s.y}%`,
-                ["--lx" as string]: `${s.labelX}%`,
-                ["--ly" as string]: `${s.labelY}%`,
                 ["--cc" as string]: COLOUR_HEX[c.colour],
               }}
             >

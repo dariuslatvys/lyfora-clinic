@@ -2042,15 +2042,15 @@ a.who.on {
   border-radius: 10px;
   border: 1px solid var(--line);
   border-left-width: 4px;
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--surface-raised);
   text-decoration: none;
-  color: inherit;
+  color: var(--ink);
   transition: border-color 0.15s ease, background 0.15s ease;
 }
 
 .marker-row:hover {
   border-color: var(--accent);
-  background: var(--accent-soft);
+  background: color-mix(in srgb, var(--accent-soft) 70%, var(--surface-raised));
 }
 
 .marker-row.on {

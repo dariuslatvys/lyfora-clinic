@@ -115,7 +115,7 @@ export const dict = {
       metabolic: "Metabolinė sveikata",
       hormones_men: "Hormonai (vyrams)",
       hormones_women: "Hormonai (moterims)",
-      mental: "Psichikos ir pažinimo sveikata",
+      mental: "Protinė ir emocinė sveikata",
       immune: "Imunitetas ir uždegimas",
       oncology: "Onkologija",
     } as Record<string, string>,

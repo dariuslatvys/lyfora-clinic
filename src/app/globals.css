@@ -3373,3 +3373,117 @@ a.hc-kpi.clickable:hover {
   display: block;
   margin-top: 2px;
 }
+
+/* ---------- Marketplace ---------- */
+.market-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.market-search {
+  flex: 1;
+  min-width: 200px;
+  max-width: 360px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  padding: 9px 12px;
+  font-size: 0.92rem;
+  color: var(--ink);
+}
+
+.market-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 300px);
+  gap: 14px;
+  align-items: start;
+}
+
+@media (max-width: 980px) {
+  .market-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.market-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 720px) {
+  .market-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.market-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.market-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.market-card-foot {
+  margin-top: auto;
+  padding-top: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.market-price {
+  font-family: var(--font-display), Manrope, sans-serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+}
+
+.market-includes-label {
+  color: var(--ink-soft);
+  font-weight: 650;
+}
+
+.market-cart {
+  position: sticky;
+  top: 16px;
+}
+
+.market-cart-line {
+  align-items: flex-start;
+}
+
+.market-cart-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line-2);
+  font-size: 0.95rem;
+}
+
+.market-cart-total b {
+  font-family: var(--font-display), Manrope, sans-serif;
+  font-size: 1.25rem;
+}
+
+.market-cats {
+  flex-wrap: wrap;
+}
+
+.btn.w-full {
+  width: 100%;
+  justify-content: center;
+}

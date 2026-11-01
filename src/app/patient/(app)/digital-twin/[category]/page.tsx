@@ -140,17 +140,15 @@ export default async function CategoryDetailPage({
               }
         }
       >
-        {!genesOnly && (
-          <Pill colour={cat.colour} label={labels.colourLabels[cat.colour]} />
-        )}
-        <h2
-          className={`font-[family-name:var(--font-display)] text-2xl sm:text-[1.75rem] font-semibold tracking-[-0.02em] ${
-            genesOnly ? "" : "mt-2"
-          }`}
-        >
-          {labels.categoryNames[cat.id as HealthCategoryId]}
-        </h2>
-        <p className="mt-2 w-full text-sm leading-relaxed text-[var(--ink-soft)]">
+        <div className={`cat-hero-top ${genesOnly ? "genes-only" : ""}`}>
+          <h2 className="cat-hero-title">
+            {labels.categoryNames[cat.id as HealthCategoryId]}
+          </h2>
+          {!genesOnly ? (
+            <Pill colour={cat.colour} label={labels.colourLabels[cat.colour]} />
+          ) : null}
+        </div>
+        <p className="cat-hero-summary">
           {genesOnly
             ? locale === "en"
               ? "SNP results that can affect how your body responds to medicines. Open a gene for the plain-language explanation."

@@ -915,16 +915,14 @@ a {
 }
 
 .landing-dna-img {
-  object-fit: contain;
-  object-position: 100% 55%;
-  width: 58% !important;
-  left: auto !important;
-  right: -2%;
-  height: 78% !important;
-  top: 12% !important;
-  opacity: 0.88;
+  object-fit: cover;
+  object-position: 55% 45%;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  opacity: 0.42;
   mix-blend-mode: multiply;
-  filter: saturate(1.15) brightness(1.02) contrast(1.05);
+  filter: saturate(0.7) brightness(1.08) contrast(0.92);
   animation: dna-drift 28s ease-in-out infinite alternate;
 }
 
@@ -933,7 +931,12 @@ a {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(100deg, rgba(238, 242, 240, 0.72) 0%, rgba(238, 242, 240, 0.18) 48%, rgba(238, 242, 240, 0.28) 100%);
+    linear-gradient(
+      180deg,
+      rgba(238, 242, 240, 0.55) 0%,
+      rgba(238, 242, 240, 0.35) 45%,
+      rgba(238, 242, 240, 0.5) 100%
+    );
   pointer-events: none;
 }
 
@@ -967,16 +970,17 @@ a {
   margin: 0;
   font-family: var(--font-display), Manrope, sans-serif;
   font-size: clamp(0.95rem, 1.7vw, 1.25rem);
-  font-weight: 700;
+  font-weight: 750;
   letter-spacing: -0.02em;
-  line-height: 1.2;
-  color: var(--ink);
+  line-height: 1.25;
+  color: #0a5c45;
   text-align: right;
   white-space: nowrap;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
 }
 
 .landing-tagline strong {
-  color: var(--accent);
+  color: #067556;
   font-weight: 800;
 }
 
@@ -1083,8 +1087,7 @@ a {
     max-width: 22ch;
   }
   .landing-dna-img {
-    width: 70% !important;
-    opacity: 0.7;
+    opacity: 0.36;
   }
 }
 

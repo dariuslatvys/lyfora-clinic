@@ -2065,9 +2065,77 @@ a.who.on {
   font-family: var(--font-display), Manrope, sans-serif;
 }
 
+.integ-name-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
 .integ-name {
   font-weight: 650;
   font-size: 0.95rem;
+  color: var(--ink);
+}
+
+.integ-sync {
+  font-size: 0.72rem;
+  color: var(--muted);
+  line-height: 1.3;
+}
+
+.integ-sync-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--line-2);
+  background: color-mix(in srgb, var(--accent-soft) 55%, var(--surface));
+}
+
+.integ-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+@media (max-width: 900px) {
+  .integ-metric-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .integ-metric-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.integ-metric {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--line-2);
+  background: color-mix(in srgb, var(--panel) 90%, var(--accent) 10%);
+}
+
+a.integ-metric.clickable {
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+a.integ-metric.clickable:hover {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+  transform: translateY(-1px);
+}
+
+.integ-metric-value {
+  font-family: var(--font-display), Manrope, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   color: var(--ink);
 }
 
@@ -2314,6 +2382,15 @@ a.who.on {
   font-size: 0.92rem;
   line-height: 1.25;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.marker-import-src {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--muted);
 }
 
 .marker-row-val {
@@ -2391,6 +2468,54 @@ a.who.on {
   );
 }
 
+.consult-li,
+.chat-li {
+  align-items: flex-start;
+}
+
+.chat-thread .chat-msgs {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chat-bubble {
+  max-width: min(560px, 92%);
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--line-2);
+}
+
+.chat-bubble.mine {
+  align-self: flex-end;
+  background: color-mix(in srgb, var(--accent-soft) 65%, var(--surface));
+  border-color: color-mix(in srgb, var(--accent) 30%, var(--line));
+}
+
+.chat-bubble.theirs {
+  align-self: flex-start;
+  background: var(--surface-2);
+}
+
+.chat-bubble-meta {
+  font-size: 0.72rem;
+  color: var(--muted);
+  margin-bottom: 4px !important;
+}
+
+.chat-bubble-text {
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 .consult-card b {
   font-family: var(--font-display), Manrope, sans-serif;
   font-size: 1.05rem;
@@ -2423,6 +2548,33 @@ a.who.on {
   .visit-meta {
     grid-template-columns: 1fr;
   }
+}
+
+.visit-report {
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--line-2);
+  background: color-mix(in srgb, var(--panel) 88%, var(--accent) 12%);
+}
+
+.visit-report-clinic {
+  font-size: 0.82rem;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.visit-report-body {
+  margin-top: 12px;
+  display: grid;
+  gap: 8px;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  white-space: pre-wrap;
+}
+
+.referral-li {
+  align-items: flex-start;
 }
 
 /* ---------- Health questionnaire ---------- */

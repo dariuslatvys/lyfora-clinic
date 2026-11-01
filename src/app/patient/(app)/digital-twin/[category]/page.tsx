@@ -11,6 +11,7 @@ import {
   type RiskColour,
 } from "@/lib/health/colours";
 import { markerItemColour } from "@/lib/health/marker-colour";
+import { importSourceLabel } from "@/lib/health/integrations-demo";
 import {
   formatMarkerReading,
   physicalMarkerName,
@@ -279,6 +280,11 @@ export default async function CategoryDetailPage({
                     {physicalMarkerName(m.markerKey, locale) ||
                       m.name ||
                       m.markerKey}
+                    {importSourceLabel(m.source, locale) ? (
+                      <span className="marker-import-src">
+                        {importSourceLabel(m.source, locale)}
+                      </span>
+                    ) : null}
                   </span>
                   <span className="marker-row-val">
                     {formatMarkerReading(m.value, m.unit, m.markerKey)}

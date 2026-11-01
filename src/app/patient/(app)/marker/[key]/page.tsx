@@ -16,6 +16,7 @@ import {
   type HealthCategoryId,
 } from "@/lib/health/categories";
 import { isPhysicalMarkerKey } from "@/lib/health/physical-metrics";
+import { importSourceLabel } from "@/lib/health/integrations-demo";
 import {
   explainMarkerPlain,
   formatMarkerReading,
@@ -269,6 +270,9 @@ export default async function MarkerDetailPage({
               </p>
               <p className="mt-1 text-xs text-[var(--muted)]">
                 {latest.observedAt}
+                {importSourceLabel(latest.source, locale)
+                  ? ` ${importSourceLabel(latest.source, locale)}`
+                  : ""}
               </p>
             </div>
             <div>
@@ -332,6 +336,7 @@ export default async function MarkerDetailPage({
                   <th>{locale === "en" ? "Date" : "Data"}</th>
                   <th>{labels.labsResult}</th>
                   <th>{labels.labsStatus}</th>
+                  <th>{locale === "en" ? "Source" : "Šaltinis"}</th>
                 </tr>
               </thead>
               <tbody>
@@ -344,6 +349,7 @@ export default async function MarkerDetailPage({
                     unit: h.unit,
                     markerKey,
                   });
+                  const src = importSourceLabel(h.source, locale);
                   return (
                     <tr key={h.id}>
                       <td>{h.observedAt}</td>
@@ -354,6 +360,10 @@ export default async function MarkerDetailPage({
                         <span className={`pill ${PILL_CLASS[c]}`}>
                           {labels.colourLabels[c]}
                         </span>
+                      </td>
+                      <td className="small muted">
+                        {src ||
+                          (locale === "en" ? "Clinic / profile" : "Klinika / profilis")}
                       </td>
                     </tr>
                   );

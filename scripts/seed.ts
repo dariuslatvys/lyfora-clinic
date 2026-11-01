@@ -373,8 +373,47 @@ async function main() {
     );
   }
 
+  // Pre-visit blood panel for neck consult (2025-03-18)
+  const neckPanelLabs: {
+    key: string;
+    value: number;
+    unit: string;
+    low: number | null;
+    high: number | null;
+    flag: string | null;
+  }[] = [
+    { key: "HS_CRP", value: 2.8, unit: "mg/L", low: 0, high: 5, flag: null },
+    { key: "WBC", value: 6.9, unit: "10^9/L", low: 3.6, high: 10.5, flag: null },
+    { key: "HEMOGLOBIN", value: 148, unit: "g/L", low: 135, high: 172, flag: null },
+    { key: "CREATININE", value: 88, unit: "µmol/L", low: 59, high: 104, flag: null },
+    { key: "eGFR", value: 86, unit: "ml/min/1.73m²", low: 90, high: null, flag: "low" },
+    { key: "GLUCOSE", value: 5.4, unit: "mmol/L", low: 4, high: 6, flag: null },
+  ];
+  for (const m of neckPanelLabs) {
+    insertResult.run(
+      patientId,
+      m.key,
+      m.value,
+      m.unit,
+      m.low,
+      m.high,
+      m.flag,
+      "2025-03-17",
+      "neck-previsit-panel"
+    );
+  }
+
   // Physical / functional metrics (wearable + clinic vitals) for male demo
-  const physicalMale = [
+  const physicalMale: {
+    key: string;
+    value: number;
+    unit: string;
+    low: number | null;
+    high: number | null;
+    flag: string | null;
+    date: string;
+    source: string;
+  }[] = [
     {
       key: "BLOOD_PRESSURE",
       value: 142,
@@ -383,6 +422,7 @@ async function main() {
       high: 129,
       flag: "high",
       date: "2026-09-15",
+      source: "physical-demo",
     },
     {
       key: "RESTING_HR",
@@ -392,33 +432,7 @@ async function main() {
       high: 75,
       flag: "high",
       date: "2026-09-15",
-    },
-    {
-      key: "HRV",
-      value: 28,
-      unit: "ms",
-      low: 40,
-      high: 120,
-      flag: "low",
-      date: "2026-09-14",
-    },
-    {
-      key: "VO2MAX",
-      value: 34,
-      unit: "ml/kg/min",
-      low: 35,
-      high: 55,
-      flag: "low",
-      date: "2026-06-03",
-    },
-    {
-      key: "ACTIVITY_DATA",
-      value: 5200,
-      unit: "steps/day",
-      low: 7000,
-      high: 15000,
-      flag: "low",
-      date: "2026-09-15",
+      source: "physical-demo",
     },
     {
       key: "BMI",
@@ -428,7 +442,36 @@ async function main() {
       high: 24.9,
       flag: "high",
       date: "2026-09-15",
+      source: "physical-demo",
     },
+    // Apple Health — VO₂max rising over time
+    { key: "VO2MAX", value: 31, unit: "ml/kg/min", low: 35, high: 55, flag: "low", date: "2025-11-01", source: "apple-health" },
+    { key: "VO2MAX", value: 33, unit: "ml/kg/min", low: 35, high: 55, flag: "low", date: "2026-01-15", source: "apple-health" },
+    { key: "VO2MAX", value: 35, unit: "ml/kg/min", low: 35, high: 55, flag: null, date: "2026-03-20", source: "apple-health" },
+    { key: "VO2MAX", value: 37, unit: "ml/kg/min", low: 35, high: 55, flag: null, date: "2026-06-03", source: "apple-health" },
+    { key: "VO2MAX", value: 39, unit: "ml/kg/min", low: 35, high: 55, flag: null, date: "2026-08-12", source: "apple-health" },
+    { key: "VO2MAX", value: 41, unit: "ml/kg/min", low: 35, high: 55, flag: null, date: "2026-10-20", source: "apple-health" },
+    // Apple Health — daily steps
+    { key: "ACTIVITY_DATA", value: 4800, unit: "steps/day", low: 7000, high: 15000, flag: "low", date: "2026-06-01", source: "apple-health" },
+    { key: "ACTIVITY_DATA", value: 5600, unit: "steps/day", low: 7000, high: 15000, flag: "low", date: "2026-07-01", source: "apple-health" },
+    { key: "ACTIVITY_DATA", value: 6400, unit: "steps/day", low: 7000, high: 15000, flag: "low", date: "2026-08-01", source: "apple-health" },
+    { key: "ACTIVITY_DATA", value: 7200, unit: "steps/day", low: 7000, high: 15000, flag: null, date: "2026-09-01", source: "apple-health" },
+    { key: "ACTIVITY_DATA", value: 7900, unit: "steps/day", low: 7000, high: 15000, flag: null, date: "2026-10-01", source: "apple-health" },
+    { key: "ACTIVITY_DATA", value: 8420, unit: "steps/day", low: 7000, high: 15000, flag: null, date: "2026-10-28", source: "apple-health" },
+    // Oura — HRV improving
+    { key: "HRV", value: 28, unit: "ms", low: 40, high: 120, flag: "low", date: "2026-07-01", source: "oura" },
+    { key: "HRV", value: 32, unit: "ms", low: 40, high: 120, flag: "low", date: "2026-08-01", source: "oura" },
+    { key: "HRV", value: 38, unit: "ms", low: 40, high: 120, flag: "low", date: "2026-09-01", source: "oura" },
+    { key: "HRV", value: 42, unit: "ms", low: 40, high: 120, flag: null, date: "2026-09-14", source: "oura" },
+    { key: "HRV", value: 48, unit: "ms", low: 40, high: 120, flag: null, date: "2026-10-15", source: "oura" },
+    { key: "HRV", value: 52, unit: "ms", low: 40, high: 120, flag: null, date: "2026-10-28", source: "oura" },
+    // Oura — sleep duration (hours)
+    { key: "SLEEP_DATA", value: 6.2, unit: "h", low: 7, high: 9, flag: "low", date: "2026-07-15", source: "oura" },
+    { key: "SLEEP_DATA", value: 6.6, unit: "h", low: 7, high: 9, flag: "low", date: "2026-08-15", source: "oura" },
+    { key: "SLEEP_DATA", value: 7.0, unit: "h", low: 7, high: 9, flag: null, date: "2026-09-15", source: "oura" },
+    { key: "SLEEP_DATA", value: 7.2, unit: "h", low: 7, high: 9, flag: null, date: "2026-10-01", source: "oura" },
+    { key: "SLEEP_DATA", value: 7.3, unit: "h", low: 7, high: 9, flag: null, date: "2026-10-15", source: "oura" },
+    { key: "SLEEP_DATA", value: 7.4, unit: "h", low: 7, high: 9, flag: null, date: "2026-10-28", source: "oura" },
   ];
   for (const m of physicalMale) {
     insertResult.run(
@@ -440,7 +483,7 @@ async function main() {
       m.high,
       m.flag,
       m.date,
-      "physical-demo"
+      m.source
     );
   }
 
@@ -546,6 +589,15 @@ async function main() {
         row.patient_id === "patient_female" ? femaleId : patientId;
       syncQuestionnaireMetrics(pid, parseStoredAnswers(row.value), def);
     }
+    // Keep wearable-imported series (Apple Health / Oura) as the latest
+    // for those keys — questionnaire restore must not overwrite them.
+    sqlite
+      .prepare(
+        `DELETE FROM marker_results
+         WHERE source = 'questionnaire'
+           AND marker_key IN ('VO2MAX','HRV','ACTIVITY_DATA','SLEEP_DATA')`
+      )
+      .run();
     console.log("  restored questionnaire rows:", preservedQ.length);
   }
 

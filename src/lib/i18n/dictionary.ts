@@ -20,6 +20,9 @@ export const dict = {
     uploads: "Duomenų įkėlimas",
     labs: "Tyrimai",
     visits: "Vizitai",
+    referrals: "Siuntimai",
+    referralsBlurb:
+      "Siuntimai tyrimams ir specialistams — išduoti, atlikti ir planuojami.",
     consultations: "Konsultacijos",
     questions: "Klausti gydytojo 24/7",
     prescriptions: "Receptai",
@@ -152,6 +155,9 @@ export const dict = {
     uploads: "Data upload",
     labs: "Labs",
     visits: "Visits",
+    referrals: "Referrals",
+    referralsBlurb:
+      "Referrals for tests and specialists — issued, completed and scheduled.",
     consultations: "Consultations",
     questions: "Ask doctor 24/7",
     prescriptions: "Prescriptions",

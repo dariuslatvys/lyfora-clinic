@@ -157,6 +157,20 @@ const PHYSICAL_COPY: Record<
     lowLt: "Apimtis žemiau tipinės zonos — jei nėra simptomų, dažnai tai nėra problema.",
     lowEn: "Below typical range — often fine if you feel well.",
   },
+  SLEEP_DATA: {
+    nameLt: "Miegas",
+    nameEn: "Sleep",
+    blurbLt:
+      "Miego trukmė ir kokybė iš dėvimo įrenginio (pvz. Oura) — fizinis / gyvenimo būdo rodiklis, ne laboratorinis tyrimas.",
+    blurbEn:
+      "Sleep duration and quality from a wearable (e.g. Oura) — a lifestyle metric, not a lab test.",
+    highLt: "Miegate daugiau nei tipinis tikslas — jei jaučiatės pailsėję, tai gerai.",
+    highEn: "Sleep is above the usual target — fine if you feel rested.",
+    lowLt:
+      "Miego mažiau nei 7 val. — stenkitės ilginti naktinį poilsį; jei nuovargis išlieka, pasitarkite su gydytoju.",
+    lowEn:
+      "Under 7 hours of sleep — try to lengthen night rest; see a clinician if fatigue persists.",
+  },
 };
 
 export function physicalMarkerName(markerKey: string, locale: Locale) {

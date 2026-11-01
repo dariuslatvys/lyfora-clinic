@@ -1,5 +1,42 @@
 export type VisitStatus = "past" | "upcoming";
 
+export type VisitReportKind =
+  | "ambulatory"
+  | "procedure"
+  | "imaging_order"
+  | "imaging_report";
+
+export type VisitReport = {
+  id: string;
+  kind: VisitReportKind;
+  titleLt: string;
+  titleEn: string;
+  /** ISO date YYYY-MM-DD */
+  date: string;
+  /** Clinic / centre where the study or note was produced */
+  clinicLt?: string;
+  clinicEn?: string;
+  bodyLt: string;
+  bodyEn: string;
+};
+
+export type VisitReferralStatus = "issued" | "completed" | "scheduled";
+
+export type VisitReferral = {
+  id: string;
+  /** ISO date YYYY-MM-DD when the referral was issued */
+  date: string;
+  titleLt: string;
+  titleEn: string;
+  toSpecialtyLt: string;
+  toSpecialtyEn: string;
+  toPlaceLt: string;
+  toPlaceEn: string;
+  status: VisitReferralStatus;
+  notesLt: string;
+  notesEn: string;
+};
+
 export type DemoVisit = {
   id: string;
   /** ISO date YYYY-MM-DD */
@@ -18,6 +55,10 @@ export type DemoVisit = {
   relatedLabDates?: string[];
   notesLt: string;
   notesEn: string;
+  /** Structured clinical / procedure write-ups linked to the visit */
+  reports?: VisitReport[];
+  /** Referrals (siuntimai) issued from this visit */
+  referrals?: VisitReferral[];
 };
 
 /**
@@ -62,6 +103,21 @@ export const DEMO_VISITS: DemoVisit[] = [
       "Po 2024-05-07 lipidų / ApoB rezultatų. Aptarta MTL rizika ir statinų farmakogenetika.",
     notesEn:
       "After 2024-05-07 lipid / ApoB results. Discussed LDL risk and statin pharmacogenetics.",
+    referrals: [
+      {
+        id: "ref-cardio-echo",
+        date: "2024-05-14",
+        titleLt: "Siuntimas širdies echoskopijai",
+        titleEn: "Referral for echocardiography",
+        toSpecialtyLt: "Kardiologinė diagnostika",
+        toSpecialtyEn: "Cardiac diagnostics",
+        toPlaceLt: "Lyfora Heart Center",
+        toPlaceEn: "Lyfora Heart Center",
+        status: "completed",
+        notesLt: "Įvertinti miokardo storį ir vožtuvus atsižvelgiant į lipidų riziką.",
+        notesEn: "Assess wall thickness and valves given lipid risk.",
+      },
+    ],
   },
   {
     id: "v-2024-09-03",
@@ -83,6 +139,130 @@ export const DEMO_VISITS: DemoVisit[] = [
       "Cortisol and hormone panel (2024-08-29). Monitor adrenal axis and sleep hygiene.",
   },
   {
+    id: "v-2025-03-18",
+    date: "2025-03-18",
+    time: "10:40",
+    titleLt: "Kaklo skausmo konsultacija",
+    titleEn: "Neck pain consultation",
+    doctorLt: "Dr. Martynas Gedvilas",
+    doctorEn: "Dr. Martynas Gedvilas",
+    specialtyLt: "Ortopedija–traumatologija",
+    specialtyEn: "Orthopaedics–traumatology",
+    placeLt: "Lyfora Spine Desk",
+    placeEn: "Lyfora Spine Desk",
+    status: "past",
+    relatedLabDates: ["2025-03-17"],
+    notesLt:
+      "Ilgalaikis kaklo skausmas ir tirpimas į dešinę ranką. Prieš vizitą atlikti kraujo tyrimai (2025-03-17). Paskirtas kaklo stuburo KT ir siuntimai tolimesnei priežiūrai.",
+    notesEn:
+      "Long-standing neck pain with tingling into the right arm. Pre-visit blood panel (2025-03-17). Cervical spine CT and follow-up referrals ordered.",
+    reports: [
+      {
+        id: "r-neck-ct-order",
+        kind: "imaging_order",
+        titleLt: "Paskyrimas: kaklo stuburo kompiuterinė tomografija (KT)",
+        titleEn: "Order: cervical spine computed tomography (CT)",
+        date: "2025-03-18",
+        clinicLt: "Lyfora Spine Desk → siuntimas į Affidea Diagnostikos centrą (Vilnius)",
+        clinicEn: "Lyfora Spine Desk → referral to Affidea Diagnostic Centre (Vilnius)",
+        bodyLt: [
+          "Klinika / tyrimo vieta: Affidea Diagnostikos centras, Vilnius (pagal siuntimą iš Lyfora Spine Desk).",
+          "Tyrimo tipas: kaklo stuburo KT be intraveninio kontrasto.",
+          "Indikacija: chroninis kaklo skausmas, parestezijos dešinėje viršutinėje galūnėje, įtariama stuburo kanalo / neuroforamenų stenozė.",
+          "Segmentai: C2–Th1.",
+          "Papildomai: įvertinti osteofitus, disko aukščio mažėjimą, facetinių sąnarių artrozę.",
+          "Pasiruošimas: metalinių papuošalų nuėmimas; informuoti apie nėštumo galimybę.",
+          "Planuojama data: 2025-03-25.",
+        ].join("\n"),
+        bodyEn: [
+          "Clinic / study site: Affidea Diagnostic Centre, Vilnius (via referral from Lyfora Spine Desk).",
+          "Study: cervical spine CT without IV contrast.",
+          "Indication: chronic neck pain, right-arm paresthesia; suspected canal / foraminal stenosis.",
+          "Levels: C2–Th1.",
+          "Also assess osteophytes, disc-height loss, and facet arthropathy.",
+          "Prep: remove metal jewellery; screen for pregnancy.",
+          "Scheduled: 2025-03-25.",
+        ].join("\n"),
+      },
+      {
+        id: "r-neck-ct-report",
+        kind: "imaging_report",
+        titleLt: "Kaklo stuburo KT aprašymas",
+        titleEn: "Cervical spine CT report",
+        date: "2025-03-25",
+        clinicLt: "Affidea Diagnostikos centras, Vilnius",
+        clinicEn: "Affidea Diagnostic Centre, Vilnius",
+        bodyLt: [
+          "Atlikta: Affidea Diagnostikos centras, Vilnius. Siuntėjas: Dr. Martynas Gedvilas (Lyfora Spine Desk).",
+          "Metodas: spiralinė KT, axialiniai pjūviai su sagitalinėmis ir koronalinėmis rekonstrukcijomis, be kontrasto.",
+          "Išvada:",
+          "• C5–C6 ir C6–C7: vidutinio laipsnio osteochondrozė, disko aukščio sumažėjimas, kraštiniai osteofitai.",
+          "• Dešinėje C5–C6 neuroforameninė stenozė dėl uncinatinių ataugų hipertrofijos — atitinka klinikinius simptomus.",
+          "• Stuburo kanalas išlaiko pakankamą plotį; mielopatijos požymių nėra.",
+          "• Trauminių lūžių, destrukcijos ar įtartinų kaulinių masių nerasta.",
+          "Rekomendacija: ortopedo / neurologo kontrolė, fizioterapija; jei simptomai progresuoja — MRT ir konsultacija dėl intervencijos.",
+        ].join("\n"),
+        bodyEn: [
+          "Performed at: Affidea Diagnostic Centre, Vilnius. Referring clinician: Dr. Martynas Gedvilas (Lyfora Spine Desk).",
+          "Method: helical CT, axial slices with sagittal and coronal reconstructions, no contrast.",
+          "Impression:",
+          "• C5–C6 and C6–C7: moderate osteochondrosis, disc-height loss, marginal osteophytes.",
+          "• Right C5–C6 foraminal stenosis from uncovertebral hypertrophy — matches the clinical symptoms.",
+          "• Spinal canal calibre preserved; no myelopathy signs.",
+          "• No fractures, destructive lesions, or suspicious bone masses.",
+          "Recommendation: ortho/neuro follow-up and physiotherapy; if symptoms worsen — MRI and procedural consult.",
+        ].join("\n"),
+      },
+    ],
+    referrals: [
+      {
+        id: "ref-neck-ct",
+        date: "2025-03-18",
+        titleLt: "Siuntimas kaklo stuburo KT",
+        titleEn: "Referral for cervical spine CT",
+        toSpecialtyLt: "Radiologija / KT",
+        toSpecialtyEn: "Radiology / CT",
+        toPlaceLt: "Affidea Diagnostikos centras, Vilnius",
+        toPlaceEn: "Affidea Diagnostic Centre, Vilnius",
+        status: "completed",
+        notesLt:
+          "KT be kontrasto, C2–Th1. Atlikta 2025-03-25 — žr. tyrimo aprašymą.",
+        notesEn:
+          "CT without contrast, C2–Th1. Completed 2025-03-25 — see imaging report.",
+      },
+      {
+        id: "ref-neck-physio",
+        date: "2025-03-18",
+        titleLt: "Siuntimas fizioterapijai",
+        titleEn: "Referral to physiotherapy",
+        toSpecialtyLt: "Fizioterapija",
+        toSpecialtyEn: "Physiotherapy",
+        toPlaceLt: "Lyfora Rehab Hub",
+        toPlaceEn: "Lyfora Rehab Hub",
+        status: "completed",
+        notesLt:
+          "Kaklo mobilizacija, laikysenos korekcija, namų pratimų programa (8 vizitai).",
+        notesEn:
+          "Cervical mobilisation, posture work, home exercise plan (8 sessions).",
+      },
+      {
+        id: "ref-neck-neuro",
+        date: "2025-03-25",
+        titleLt: "Siuntimas neurologui",
+        titleEn: "Referral to neurology",
+        toSpecialtyLt: "Neurologija",
+        toSpecialtyEn: "Neurology",
+        toPlaceLt: "Lyfora klinika, Vilnius",
+        toPlaceEn: "Lyfora Clinic, Vilnius",
+        status: "scheduled",
+        notesLt:
+          "Po KT: dešinės C5–C6 foraminalinė stenozė. Įvertinti radikulopatiją ir tolesnį planą.",
+        notesEn:
+          "After CT: right C5–C6 foraminal stenosis. Assess radiculopathy and next steps.",
+      },
+    ],
+  },
+  {
     id: "v-2025-06-25",
     date: "2025-06-25",
     time: "10:00",
@@ -99,6 +279,83 @@ export const DEMO_VISITS: DemoVisit[] = [
     notesLt:
       "Glikemijos ir metabolinių žymenų peržiūra po 2025-06-18 tyrimų.",
     notesEn: "Glucose and metabolic markers reviewed after 2025-06-18 labs.",
+  },
+  {
+    id: "v-2025-08-07",
+    date: "2025-08-07",
+    time: "08:30",
+    titleLt: "Gastroskopija (EGD)",
+    titleEn: "Gastroscopy (EGD)",
+    doctorLt: "Dr. Laura Šimkutė",
+    doctorEn: "Dr. Laura Simkute",
+    specialtyLt: "Gastroenterologija",
+    specialtyEn: "Gastroenterology",
+    placeLt: "Lyfora Endoskopijos kabinetas",
+    placeEn: "Lyfora Endoscopy Suite",
+    status: "past",
+    notesLt:
+      "Dėl epigastrinio diskomforto ir ankstesnio H. pylori kontakto atlikta fibroezofagogastroduodenoskopija (ryjama endoskopinė slanga).",
+    notesEn:
+      "For epigastric discomfort and prior H. pylori exposure — fibre-optic EGD (swallowed endoscope).",
+    reports: [
+      {
+        id: "r-egd-report",
+        kind: "procedure",
+        titleLt: "Fibroezofagogastroduodenoskopijos (EGD) aprašymas",
+        titleEn: "Upper endoscopy (EGD) report",
+        date: "2025-08-07",
+        clinicLt: "Lyfora Endoskopijos kabinetas, Vilnius",
+        clinicEn: "Lyfora Endoscopy Suite, Vilnius",
+        bodyLt: [
+          "Atlikta: Lyfora Endoskopijos kabinetas, Vilnius. Gydytoja: Dr. Laura Šimkutė.",
+          "Procedūra: diagnostinė fibroezofagogastroduodenoskopija vietinėje anestezijoje (lidokaino purškalas).",
+          "Eiga: pacientas ryjo lanksčią endoskopinę slangą; apžiūrėtas stemplė, skrandis ir dvylikapirštė žarna iki D2.",
+          "Stemplė: gleivinė lygi, be erozijų; Z linija aiški, be įtartinų pakitimų.",
+          "Skrandis: antrumo gleivinė paraudusi, matomos paviršinės erozijos; kūne — lengva hiperemija. Biopsijos iš antrumo (×2) H. pylori ureazės / histologijai.",
+          "Dvylikapirštė žarna: svogūnėlis ir D2 be opų ar stenozės.",
+          "Išvada: antralinis erozinis gastritas. Kraujavimo požymių nėra.",
+          "Rekomendacijos: PPI kursas 4 sav., vengti NSAID; laukti biopsijos / H. pylori atsakymo; kontrolė pagal šeimos gydytoją.",
+        ].join("\n"),
+        bodyEn: [
+          "Performed at: Lyfora Endoscopy Suite, Vilnius. Clinician: Dr. Laura Simkute.",
+          "Procedure: diagnostic fibre-optic EGD under topical lidocaine spray.",
+          "Course: patient swallowed the flexible endoscope; oesophagus, stomach and duodenum to D2 inspected.",
+          "Oesophagus: smooth mucosa, no erosions; Z-line clear, no suspicious changes.",
+          "Stomach: antral erythema with superficial erosions; mild body hyperaemia. Antral biopsies (×2) for H. pylori urease / histology.",
+          "Duodenum: bulb and D2 without ulcer or stenosis.",
+          "Impression: antral erosive gastritis. No bleeding.",
+          "Plan: PPI course 4 weeks, avoid NSAIDs; await biopsy / H. pylori result; GP follow-up.",
+        ].join("\n"),
+      },
+    ],
+    referrals: [
+      {
+        id: "ref-gastro-path",
+        date: "2025-08-07",
+        titleLt: "Siuntimas biopsijos histologijai",
+        titleEn: "Referral for biopsy histology",
+        toSpecialtyLt: "Patologija",
+        toSpecialtyEn: "Pathology",
+        toPlaceLt: "Lyfora Pathology Lab",
+        toPlaceEn: "Lyfora Pathology Lab",
+        status: "completed",
+        notesLt: "Antrumo biopsijos ×2 — H. pylori / histologija.",
+        notesEn: "Antral biopsies ×2 — H. pylori / histology.",
+      },
+      {
+        id: "ref-gastro-gp",
+        date: "2025-08-07",
+        titleLt: "Siuntimas šeimos gydytojui (eradikacija)",
+        titleEn: "Referral to family doctor (eradication)",
+        toSpecialtyLt: "Šeimos medicina",
+        toSpecialtyEn: "Family medicine",
+        toPlaceLt: "Lyfora klinika, Vilnius",
+        toPlaceEn: "Lyfora Clinic, Vilnius",
+        status: "issued",
+        notesLt: "Po EGD — derinti PPI ir H. pylori eradikacijos planą.",
+        notesEn: "After EGD — align PPI and H. pylori eradication plan.",
+      },
+    ],
   },
   {
     id: "v-2025-12-16",
@@ -118,6 +375,21 @@ export const DEMO_VISITS: DemoVisit[] = [
       "Aptarta MYBPC3 / NGS radiniai ir šeimos anamnezė. Rekomenduota kardiogenetikos kontrolė.",
     notesEn:
       "Reviewed MYBPC3 / NGS findings and family history. Cardiology–genetics follow-up advised.",
+    referrals: [
+      {
+        id: "ref-ngs-cardio",
+        date: "2025-12-16",
+        titleLt: "Siuntimas kardiogenetikos kontrolei",
+        titleEn: "Referral for cardio-genetics follow-up",
+        toSpecialtyLt: "Kardiologija",
+        toSpecialtyEn: "Cardiology",
+        toPlaceLt: "Lyfora Heart Center",
+        toPlaceEn: "Lyfora Heart Center",
+        status: "scheduled",
+        notesLt: "Dėl MYBPC3 — echoskopija ir rizikos stebėsena.",
+        notesEn: "For MYBPC3 — echo and risk surveillance.",
+      },
+    ],
   },
   {
     id: "v-2026-02-26",
@@ -209,9 +481,34 @@ export const DEMO_VISITS: DemoVisit[] = [
     status: "past",
     relatedLabDates: ["2026-09-15"],
     notesLt:
-      "Metinė peržiūra pagal 2026-09-15 tyrimus. Suderinti tolesni vizitai.",
+      "Metinė peržiūra pagal 2026-09-15 tyrimus. Teigiamas H. pylori IgG — aptartas eradikacijos planas.",
     notesEn:
-      "Annual review based on 2026-09-15 labs. Follow-up visits scheduled.",
+      "Annual review based on 2026-09-15 labs. Positive H. pylori IgG — eradication plan discussed.",
+    reports: [
+      {
+        id: "r-hp-ambulatory-2026",
+        kind: "ambulatory",
+        titleLt: "Ambulatorinio apsilankymo aprašymas (laboratorija)",
+        titleEn: "Ambulatory visit note (laboratory)",
+        date: "2026-09-15",
+        bodyLt: [
+          "Paslauga: ambulatorinės gydymo paslaugos suteikimas (apsilankymas), 2026-09-15 08:00.",
+          "Diagnozė: Z01.7 Laboratorinis ištyrimas.",
+          "Atlikti tyrimai: HP IgG kiekybinis — Helicobacter pylori IgG antikūnų nustatymas.",
+          "Rezultatas: 1,329 (indeksas) — Teigiamas.",
+          "Referentinės ribos: neigiama < 0,9; ribinė 0,9–1,1; teigiama > 1,1.",
+          "Pastaba: rezultatas perduotas šeimos gydytojui tolesniam eradikacijos sprendimui.",
+        ].join("\n"),
+        bodyEn: [
+          "Service: ambulatory visit, 2026-09-15 08:00.",
+          "Diagnosis: Z01.7 Laboratory examination.",
+          "Tests: quantitative HP IgG — Helicobacter pylori IgG antibodies.",
+          "Result: 1.329 (index) — Positive.",
+          "Reference: negative < 0.9; borderline 0.9–1.1; positive > 1.1.",
+          "Note: result forwarded to the family doctor for eradication planning.",
+        ].join("\n"),
+      },
+    ],
   },
   // Upcoming — always show planned visits ahead
   {
@@ -330,4 +627,73 @@ export function visitPlace(visit: DemoVisit, locale: "lt" | "en") {
 
 export function visitNotes(visit: DemoVisit, locale: "lt" | "en") {
   return locale === "en" ? visit.notesEn : visit.notesLt;
+}
+
+export function visitReportTitle(report: VisitReport, locale: "lt" | "en") {
+  return locale === "en" ? report.titleEn : report.titleLt;
+}
+
+export function visitReportBody(report: VisitReport, locale: "lt" | "en") {
+  return locale === "en" ? report.bodyEn : report.bodyLt;
+}
+
+export function visitReportKindLabel(
+  kind: VisitReportKind,
+  locale: "lt" | "en"
+) {
+  const map: Record<VisitReportKind, { lt: string; en: string }> = {
+    ambulatory: { lt: "Ambulatorinis aprašymas", en: "Ambulatory note" },
+    procedure: { lt: "Procedūros aprašymas", en: "Procedure report" },
+    imaging_order: { lt: "Tyrimo paskyrimas", en: "Imaging order" },
+    imaging_report: { lt: "Tyrimo aprašymas", en: "Imaging report" },
+  };
+  return locale === "en" ? map[kind].en : map[kind].lt;
+}
+
+export function visitReportClinic(report: VisitReport, locale: "lt" | "en") {
+  if (!report.clinicLt && !report.clinicEn) return null;
+  return locale === "en"
+    ? report.clinicEn || report.clinicLt || null
+    : report.clinicLt || report.clinicEn || null;
+}
+
+export function referralStatusLabel(
+  status: VisitReferralStatus,
+  locale: "lt" | "en"
+) {
+  const map: Record<VisitReferralStatus, { lt: string; en: string }> = {
+    issued: { lt: "Išduotas", en: "Issued" },
+    completed: { lt: "Atlikta", en: "Completed" },
+    scheduled: { lt: "Suplanuota", en: "Scheduled" },
+  };
+  return locale === "en" ? map[status].en : map[status].lt;
+}
+
+export type ReferralListItem = VisitReferral & {
+  visitId: string;
+  visitTitleLt: string;
+  visitTitleEn: string;
+  visitDate: string;
+};
+
+/** Flatten referrals across all demo visits, newest first. */
+export function allReferrals(): ReferralListItem[] {
+  const rows: ReferralListItem[] = [];
+  for (const v of DEMO_VISITS) {
+    for (const r of v.referrals || []) {
+      rows.push({
+        ...r,
+        visitId: v.id,
+        visitTitleLt: v.titleLt,
+        visitTitleEn: v.titleEn,
+        visitDate: v.date,
+      });
+    }
+  }
+  return rows.sort(
+    (a, b) =>
+      b.date.localeCompare(a.date) ||
+      b.visitDate.localeCompare(a.visitDate) ||
+      a.titleLt.localeCompare(b.titleLt, "lt")
+  );
 }

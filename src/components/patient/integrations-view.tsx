@@ -1,7 +1,14 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import type { Dictionary } from "@/lib/i18n/dictionary";
+import {
+  formatSyncWhen,
+  integrationSlugForName,
+  isConnectedIntegrationName,
+  INTEGRATION_DEMOS,
+} from "@/lib/health/integrations-demo";
 
 type IntegrationGroup = {
   id: string;
@@ -105,21 +112,42 @@ export function IntegrationsView({
           <div className="integ-grid">
             {group.items.map((name) => {
               const key = `${group.id}:${name}`;
-              const on = !!connected[key];
+              const demoSlug = integrationSlugForName(name);
+              const demoConnected = isConnectedIntegrationName(name);
+              const on = demoConnected || !!connected[key];
+              const demo = demoSlug ? INTEGRATION_DEMOS[demoSlug] : null;
+
               return (
                 <div key={key} className={`integ-row${on ? " on" : ""}`}>
                   <span className="integ-av" aria-hidden="true">
                     {initials(name)}
                   </span>
-                  <span className="integ-name">{name}</span>
-                  <button
-                    type="button"
-                    className={on ? "btn ghost sm" : "btn sm"}
-                    onClick={() => toggle(key)}
-                    aria-pressed={on}
-                  >
-                    {on ? labels.connected : labels.connect}
-                  </button>
+                  <div className="integ-name-wrap">
+                    <span className="integ-name">{name}</span>
+                    {demoConnected && demo ? (
+                      <span className="integ-sync">
+                        {locale === "en" ? "Synced" : "Sinchronizuota"}{" "}
+                        {formatSyncWhen(demo.syncedAt, locale)}
+                      </span>
+                    ) : null}
+                  </div>
+                  {demoConnected && demoSlug ? (
+                    <Link
+                      href={`/patient/integrations/${demoSlug}`}
+                      className="btn ghost sm"
+                    >
+                      {locale === "en" ? "View data" : "Peržiūrėti duomenis"}
+                    </Link>
+                  ) : (
+                    <button
+                      type="button"
+                      className={on ? "btn ghost sm" : "btn sm"}
+                      onClick={() => toggle(key)}
+                      aria-pressed={on}
+                    >
+                      {on ? labels.connected : labels.connect}
+                    </button>
+                  )}
                 </div>
               );
             })}

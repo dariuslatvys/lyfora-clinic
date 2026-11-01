@@ -65,6 +65,7 @@ export function loadDigitalTwin(patientId: string, locale: Locale) {
         refHigh: m.refHigh,
         flag: m.flag,
         observedAt: m.observedAt,
+        source: m.source,
         categories: def ? (JSON.parse(def.categoriesJson) as string[]) : [],
         descriptionLt: def?.descriptionLt,
         descriptionEn: def?.descriptionEn,

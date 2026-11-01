@@ -13,6 +13,7 @@ const items = [
   { href: "/patient/labs", key: "labs" as const, icon: "flask" },
   { href: "/patient/consultations", key: "consultations" as const, icon: "consult" },
   { href: "/patient/visits", key: "visits" as const, icon: "cal" },
+  { href: "/patient/referrals", key: "referrals" as const, icon: "send" },
   { href: "/patient/prescriptions", key: "prescriptions" as const, icon: "rx" },
   { href: "/patient/recommendations", key: "recommendations" as const, icon: "bulb" },
   { href: "/patient/uploads", key: "uploads" as const, icon: "upload" },
@@ -59,6 +60,12 @@ const ICONS: Record<string, ReactNode> = {
     <g>
       <rect x="3" y="5" width="18" height="16" rx="2" />
       <path d="M3 10h18M8 3v4M16 3v4" />
+    </g>
+  ),
+  send: (
+    <g>
+      <path d="M4 12l16-8-6 16-2.5-6.5L4 12z" />
+      <path d="M11.5 13.5L20 4" />
     </g>
   ),
   bulb: (

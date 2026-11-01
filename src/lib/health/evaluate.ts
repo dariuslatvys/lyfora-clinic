@@ -36,6 +36,7 @@ export type MarkerResult = {
   refHigh?: number | null;
   flag?: string | null;
   observedAt: string;
+  source?: string | null;
   categories: string[];
   descriptionLt?: string | null;
   descriptionEn?: string | null;

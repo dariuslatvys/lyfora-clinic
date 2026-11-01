@@ -9,6 +9,7 @@ import {
 } from "@/lib/health/colours";
 import { explainSnp } from "@/lib/health/explain-snp";
 import type { EvaluatedSnp } from "@/lib/health/evaluate";
+import { AskAiButton } from "@/components/patient/ask-ai-button";
 
 export function SnpDetailPanel({
   snp,
@@ -44,9 +45,19 @@ export function SnpDetailPanel({
             <p className="mt-1 text-xs text-[var(--muted)]">{snpTestLabel}</p>
           ) : null}
         </div>
-        <span className={`pill ${PILL_CLASS[colour]}`}>
-          {labels.colourLabels[colour]}
-        </span>
+        <div className="row" style={{ gap: 8 }}>
+          <span className={`pill ${PILL_CLASS[colour]}`}>
+            {labels.colourLabels[colour]}
+          </span>
+          <AskAiButton
+            label={labels.askAi}
+            question={
+              locale === "en"
+                ? `Explain ${snp.gene} ${snp.snpId} (${snp.allele1}/${snp.allele2}) from my SNP data in plain language`
+                : `Paaiškink ${snp.gene} ${snp.snpId} (${snp.allele1}/${snp.allele2}) pagal mano SNP duomenis paprasta kalba`
+            }
+          />
+        </div>
       </div>
 
       <div className="stack" style={{ gap: 14 }}>

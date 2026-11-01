@@ -11,8 +11,10 @@ import {
   type RiskColour,
 } from "@/lib/health/colours";
 import { markerItemColour } from "@/lib/health/marker-colour";
+import { explainSnp } from "@/lib/health/explain-snp";
 import { MarkerChart } from "@/components/patient/marker-chart";
 import { SnpDetailPanel } from "@/components/patient/snp-detail";
+import { AskAiButton } from "@/components/patient/ask-ai-button";
 import type { HealthCategoryId } from "@/lib/health/categories";
 
 function Pill({
@@ -187,64 +189,131 @@ export default async function CategoryDetailPage({
         {hasDrivers && (
           <div className="mt-4">
             <p className="eyebrow mb-2">{labels.colourDrivers}</p>
-            <div className="flex flex-col gap-2">
-              {catRare.map((v) => (
-                <div
-                  key={v.id ?? `${v.gene}-rare`}
-                  className="row between rounded-[var(--radius-s)] border border-[var(--r-red)]/25 bg-[var(--r-red-bg)]/50 px-3 py-2"
-                >
-                  <div>
-                    <b className="text-sm">{v.gene}</b>
-                    <span className="ml-2 text-xs text-[var(--muted)]">
-                      NGS · {v.hgvs}
-                    </span>
-                  </div>
-                  <Pill colour="red" label={labels.colourLabels.red} />
-                </div>
-              ))}
-              {driverMarkers.map((m) => {
-                const c = markerItemColour(m);
+            <div className="flex flex-col gap-3">
+              {catRare.map((v) => {
+                const title =
+                  (locale === "lt" ? v.titleLt : v.titleEn) || v.gene;
+                const summary =
+                  (locale === "lt" ? v.summaryLt : v.summaryEn) || "";
+                const ask =
+                  locale === "en"
+                    ? `Explain my NGS finding ${v.gene} (${v.hgvs}) in plain language using my data`
+                    : `Paaiškink mano NGS radinį ${v.gene} (${v.hgvs}) paprasta kalba pagal mano duomenis`;
                 return (
-                  <Link
-                    key={`drv-m-${m.markerKey}`}
-                    href={`/patient/digital-twin/${category}?marker=${m.markerKey}`}
-                    className="row between rounded-[var(--radius-s)] border border-[var(--line)] bg-[var(--surface)] px-3 py-2 no-underline text-inherit"
+                  <article
+                    key={v.id ?? `${v.gene}-rare`}
+                    className="rounded-[var(--radius)] border border-[var(--r-red)]/30 bg-[var(--r-red-bg)]/35 p-4"
                   >
-                    <div>
-                      <b className="text-sm">{m.name || m.markerKey}</b>
-                      <span className="ml-2 text-xs text-[var(--muted)]">
-                        {labels.markers} · {m.value}
-                        {m.unit ? ` ${m.unit}` : ""}
-                      </span>
+                    <div className="row between" style={{ alignItems: "flex-start" }}>
+                      <div>
+                        <div className="row" style={{ gap: 8 }}>
+                          <Pill colour="red" label={labels.colourLabels.red} />
+                          <b className="text-sm">{title}</b>
+                        </div>
+                        <p className="mt-1 text-xs text-[var(--muted)]">
+                          NGS · {v.gene} · {v.hgvs}
+                        </p>
+                      </div>
+                      <AskAiButton question={ask} label={labels.askAi} />
                     </div>
-                    <Pill colour={c} label={labels.colourLabels[c]} />
-                  </Link>
+                    <p className="eyebrow mt-3">{labels.plainLanguage}</p>
+                    <p className="mt-1 text-sm leading-relaxed text-[var(--ink)]">
+                      {summary}
+                    </p>
+                  </article>
                 );
               })}
-              {driverSnps.map((s) => (
-                <Link
-                  key={`drv-s-${s.snpId}`}
-                  href={`/patient/digital-twin/${category}?snp=${encodeURIComponent(s.snpId)}#snp-detail`}
-                  className="row between rounded-[var(--radius-s)] border border-[var(--line)] bg-[var(--surface)] px-3 py-2 no-underline text-inherit"
-                >
-                  <div>
-                    <b className="text-sm">
-                      {s.gene}{" "}
-                      <span className="font-normal text-[var(--muted)]">
-                        {s.snpId.split("__")[0]}
-                      </span>
-                    </b>
-                    <span className="ml-2 text-xs text-[var(--muted)]">
-                      {s.allele1}/{s.allele2} · {s.matchCount}{" "}
-                      {labels.riskAlleleMatches}
-                    </span>
-                  </div>
-                  <Pill
-                    colour={s.colour || "grey"}
-                    label={labels.colourLabels[s.colour || "grey"]}
-                  />
-                </Link>
-              ))}
+              {driverMarkers.map((m) => {
+                const c = markerItemColour(m);
+                const desc =
+                  (locale === "lt" ? m.descriptionLt : m.descriptionEn) ||
+                  (locale === "en"
+                    ? `Your latest value is ${m.value}${m.unit ? " " + m.unit : ""}. Reference: ${m.refLow ?? "—"}–${m.refHigh ?? "—"}.`
+                    : `Jūsų paskutinė reikšmė: ${m.value}${m.unit ? " " + m.unit : ""}. Norma: ${m.refLow ?? "—"}–${m.refHigh ?? "—"}.`);
+                const ask =
+                  locale === "en"
+                    ? `Explain my marker ${m.name || m.markerKey} (${m.value}${m.unit ? " " + m.unit : ""}) in plain language`
+                    : `Paaiškink mano žymenį ${m.name || m.markerKey} (${m.value}${m.unit ? " " + m.unit : ""}) paprasta kalba`;
+                return (
+                  <article
+                    key={`drv-m-${m.markerKey}`}
+                    className="rounded-[var(--radius)] border border-[var(--line)] bg-[var(--surface)] p-4"
+                    style={{ borderLeft: `4px solid ${COLOUR_HEX[c]}` }}
+                  >
+                    <div className="row between" style={{ alignItems: "flex-start" }}>
+                      <div>
+                        <div className="row" style={{ gap: 8 }}>
+                          <Pill colour={c} label={labels.colourLabels[c]} />
+                          <b className="text-sm">{m.name || m.markerKey}</b>
+                        </div>
+                        <p className="mt-1 text-xs text-[var(--muted)]">
+                          {labels.markers} · {m.value}
+                          {m.unit ? ` ${m.unit}` : ""}
+                        </p>
+                      </div>
+                      <div className="row" style={{ gap: 6 }}>
+                        <AskAiButton question={ask} label={labels.askAi} />
+                        <Link
+                          href={`/patient/digital-twin/${category}?marker=${m.markerKey}`}
+                          className="btn ghost sm"
+                        >
+                          {labels.openCategory}
+                        </Link>
+                      </div>
+                    </div>
+                    <p className="eyebrow mt-3">{labels.plainLanguage}</p>
+                    <p className="mt-1 text-sm leading-relaxed text-[var(--ink)]">
+                      {desc}
+                    </p>
+                  </article>
+                );
+              })}
+              {driverSnps.map((s) => {
+                const expl = explainSnp(s, locale);
+                const c = s.colour || "grey";
+                const ask =
+                  locale === "en"
+                    ? `Explain ${s.gene} ${s.snpId} (${s.allele1}/${s.allele2}) from my SNP data in plain language`
+                    : `Paaiškink ${s.gene} ${s.snpId} (${s.allele1}/${s.allele2}) pagal mano SNP duomenis paprasta kalba`;
+                return (
+                  <article
+                    key={`drv-s-${s.snpId}`}
+                    className="rounded-[var(--radius)] border border-[var(--line)] bg-[var(--surface)] p-4"
+                    style={{ borderLeft: `4px solid ${COLOUR_HEX[c]}` }}
+                  >
+                    <div className="row between" style={{ alignItems: "flex-start" }}>
+                      <div>
+                        <div className="row" style={{ gap: 8 }}>
+                          <Pill colour={c} label={labels.colourLabels[c]} />
+                          <b className="text-sm">
+                            {s.gene}{" "}
+                            <span className="font-normal text-[var(--muted)]">
+                              {s.snpId}
+                            </span>
+                          </b>
+                        </div>
+                        <p className="mt-1 text-xs text-[var(--muted)]">
+                          {s.allele1}/{s.allele2} · {s.matchCount}{" "}
+                          {labels.riskAlleleMatches}
+                        </p>
+                      </div>
+                      <div className="row" style={{ gap: 6 }}>
+                        <AskAiButton question={ask} label={labels.askAi} />
+                        <Link
+                          href={`/patient/digital-twin/${category}?snp=${s.snpId}#snp-detail`}
+                          className="btn ghost sm"
+                        >
+                          {labels.mechanism}
+                        </Link>
+                      </div>
+                    </div>
+                    <p className="eyebrow mt-3">{labels.plainLanguage}</p>
+                    <p className="mt-1 text-sm leading-relaxed text-[var(--ink)]">
+                      {expl.whyColour} {expl.plainBody}
+                    </p>
+                  </article>
+                );
+              })}
             </div>
           </div>
         )}

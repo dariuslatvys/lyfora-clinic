@@ -4,6 +4,18 @@
   "dob": "1972-04-17",
   "markers": [
     {
+      "markerKey": "H_PYLORI",
+      "name": "Helicobacter pylori IgG",
+      "value": 0.531,
+      "unit": "kU/l",
+      "refLow": null,
+      "refHigh": 0.9,
+      "flag": null,
+      "date": "2023-12-01",
+      "source": "Helicobacter.pdf",
+      "raw": "IgG klasės antikūnai prieš Helicobacter pylori 0,531 (Neigiamas)"
+    },
+    {
       "markerKey": "CREATININE",
       "name": "Kreatininas",
       "value": 97.0,
@@ -12,7 +24,7 @@
       "refHigh": 104.0,
       "flag": null,
       "date": "2024-05-07",
-      "source": "20251208_Atliktu__tyrimu__rezultatai_c8e4.pdf",
+      "source": "20251208_Atliktu__tyrimu__rezultatai.pdf",
       "raw": "Kreatininas µmol/L 59 - 104 97"
     },
     {
@@ -24,8 +36,20 @@
       "refHigh": 6.1,
       "flag": "high",
       "date": "2024-05-07",
-      "source": "20251208_Atliktu__tyrimu__rezultatai_c8e4.pdf",
+      "source": "20251208_Atliktu__tyrimu__rezultatai.pdf",
       "raw": "Gliukozė mmol/L 4.2 - 6.1 6,48 +"
+    },
+    {
+      "markerKey": "HDL",
+      "name": "DTL cholesterolis",
+      "value": 1.14,
+      "unit": "mmol/L",
+      "refLow": 0.0,
+      "refHigh": 1.45,
+      "flag": null,
+      "date": "2024-05-07",
+      "source": "20251208_Atliktu__tyrimu__rezultatai.pdf",
+      "raw": "DTL mmol/L 0 - 1.45 1,14"
     },
     {
       "markerKey": "HEMOGLOBIN",
@@ -36,7 +60,7 @@
       "refHigh": 160.0,
       "flag": "high",
       "date": "2024-05-07",
-      "source": "20251208_Atliktu__tyrimu__rezultatai_c8e4.pdf",
+      "source": "20251208_Atliktu__tyrimu__rezultatai.pdf",
       "raw": "Hemoglobinas (HGB) g/L 135 - 160 172 +"
     },
     {
@@ -48,7 +72,7 @@
       "refHigh": 5.1,
       "flag": null,
       "date": "2024-05-07",
-      "source": "20251208_Atliktu__tyrimu__rezultatai_c8e4.pdf",
+      "source": "20251208_Atliktu__tyrimu__rezultatai.pdf",
       "raw": "Kalis mmol/L 3.5 - 5.1 4,5"
     },
     {
@@ -60,7 +84,7 @@
       "refHigh": 2.59,
       "flag": "high",
       "date": "2024-05-07",
-      "source": "20251208_Atliktu__tyrimu__rezultatai_c8e4.pdf",
+      "source": "20251208_Atliktu__tyrimu__rezultatai.pdf",
       "raw": "MTL mmol/L 0 - 2.59 4,08 +"
     },
     {
@@ -72,7 +96,7 @@
       "refHigh": 3.1,
       "flag": null,
       "date": "2024-05-07",
-      "source": "20251208_Atliktu__tyrimu__rezultatai_c8e4.pdf",
+      "source": "20251208_Atliktu__tyrimu__rezultatai.pdf",
       "raw": "PSA µg/L 0 - 3.1 1,300"
     },
     {
@@ -84,7 +108,7 @@
       "refHigh": 9.0,
       "flag": null,
       "date": "2024-05-07",
-      "source": "20251208_Atliktu__tyrimu__rezultatai_c8e4.pdf",
+      "source": "20251208_Atliktu__tyrimu__rezultatai.pdf",
       "raw": "Leukocitai (WBC) 10^9/L 4 - 9 6,45"
     },
     {
@@ -96,7 +120,7 @@
       "refHigh": null,
       "flag": "low",
       "date": "2024-05-07",
-      "source": "20251208_Atliktu__tyrimu__rezultatai_c8e4.pdf",
+      "source": "20251208_Atliktu__tyrimu__rezultatai.pdf",
       "raw": "GFG > 90 77,05 -"
     },
     {
@@ -108,7 +132,7 @@
       "refHigh": 1.45,
       "flag": null,
       "date": "2024-08-29",
-      "source": "20251208_Atliktu__tyrimu__rezultatai_c8e4.pdf",
+      "source": "Atliktu__tyrimu__rezultatai_2024_08.pdf",
       "raw": "DTL mmol/L 0 - 1.45 1,05"
     },
     {
@@ -120,7 +144,7 @@
       "refHigh": 172.0,
       "flag": null,
       "date": "2024-08-29",
-      "source": "20251208_Atliktu__tyrimu__rezultatai_c8e4.pdf",
+      "source": "Atliktu__tyrimu__rezultatai_2024_08.pdf",
       "raw": "Hemoglobinas (HGB) g/L 135 - 172 159"
     },
     {
@@ -132,7 +156,7 @@
       "refHigh": 2.59,
       "flag": "high",
       "date": "2024-08-29",
-      "source": "20251208_Atliktu__tyrimu__rezultatai_c8e4.pdf",
+      "source": "Atliktu__tyrimu__rezultatai_2024_08.pdf",
       "raw": "MTL mmol/L 0 - 2.59 3,59 +"
     },
     {
@@ -144,7 +168,7 @@
       "refHigh": 10.5,
       "flag": null,
       "date": "2024-08-29",
-      "source": "20251208_Atliktu__tyrimu__rezultatai_c8e4.pdf",
+      "source": "Atliktu__tyrimu__rezultatai_2024_08.pdf",
       "raw": "Leukocitai (WBC) 10^9/L 3.6 - 10.5 7,25"
     },
     {
@@ -156,7 +180,7 @@
       "refHigh": 104.0,
       "flag": null,
       "date": "2025-06-18",
-      "source": "20251208_Atliktu__tyrimu__rezultatai_c8e4.pdf",
+      "source": "2025_06.pdf",
       "raw": "Kreatininas µmol/L 59 - 104 97"
     },
     {
@@ -168,7 +192,7 @@
       "refHigh": 6.0,
       "flag": "high",
       "date": "2025-06-18",
-      "source": "20251208_Atliktu__tyrimu__rezultatai_c8e4.pdf",
+      "source": "2025_06.pdf",
       "raw": "Gliukozė mmol/L 4 - 6 6,16 +"
     },
     {
@@ -180,7 +204,7 @@
       "refHigh": 172.0,
       "flag": null,
       "date": "2025-06-18",
-      "source": "20251208_Atliktu__tyrimu__rezultatai_c8e4.pdf",
+      "source": "2025_06.pdf",
       "raw": "Hemoglobinas (HGB) g/L 135 - 172 156"
     },
     {
@@ -192,7 +216,7 @@
       "refHigh": 5.0,
       "flag": null,
       "date": "2025-06-18",
-      "source": "20251208_Atliktu__tyrimu__rezultatai_c8e4.pdf",
+      "source": "2025_06.pdf",
       "raw": "CRB mg/L 0 - 5 0,40"
     },
     {
@@ -204,7 +228,7 @@
       "refHigh": 5.1,
       "flag": null,
       "date": "2025-06-18",
-      "source": "20251208_Atliktu__tyrimu__rezultatai_c8e4.pdf",
+      "source": "2025_06.pdf",
       "raw": "Kalis mmol/L 3.5 - 5.1 4,0"
     },
     {
@@ -216,7 +240,7 @@
       "refHigh": 2.59,
       "flag": null,
       "date": "2025-06-18",
-      "source": "20251208_Atliktu__tyrimu__rezultatai_c8e4.pdf",
+      "source": "2025_06.pdf",
       "raw": "MTL mmol/L 0 - 2.59 1,83"
     },
     {
@@ -228,7 +252,7 @@
       "refHigh": 5.2,
       "flag": null,
       "date": "2025-06-18",
-      "source": "20251208_Atliktu__tyrimu__rezultatai_c8e4.pdf",
+      "source": "2025_06.pdf",
       "raw": "Cholesterolis mmol/L <= 5.2 3,13"
     },
     {
@@ -240,7 +264,7 @@
       "refHigh": 10.5,
       "flag": null,
       "date": "2025-06-18",
-      "source": "20251208_Atliktu__tyrimu__rezultatai_c8e4.pdf",
+      "source": "2025_06.pdf",
       "raw": "Leukocitai (WBC) 10^9/L 3.6 - 10.5 8,77"
     },
     {
@@ -252,7 +276,7 @@
       "refHigh": null,
       "flag": "low",
       "date": "2025-06-18",
-      "source": "20251208_Atliktu__tyrimu__rezultatai_c8e4.pdf",
+      "source": "2025_06.pdf",
       "raw": "GFG > 90 76,51 -"
     },
     {
@@ -264,8 +288,8 @@
       "refHigh": 50.0,
       "flag": null,
       "date": "2025-12-08",
-      "source": "2025.12.08_DARIUS_LATVYS_laboratoriniu_tyrimu_rezultatai_6a78.PDF",
-      "raw": "ALT (su P-5-P, IFCC) U/l 10 - 50 23 2025.12.08"
+      "source": "2025_12.pdf",
+      "raw": "ALT (su P-5-P, IFCC) U/l 10 - 50 23"
     },
     {
       "markerKey": "AST",
@@ -276,8 +300,8 @@
       "refHigh": 50.0,
       "flag": null,
       "date": "2025-12-08",
-      "source": "2025.12.08_DARIUS_LATVYS_laboratoriniu_tyrimu_rezultatai_6a78.PDF",
-      "raw": "AST (su P-5-P, IFCC) U/l 10 - 50 26 2025.12.08"
+      "source": "2025_12.pdf",
+      "raw": "AST (su P-5-P, IFCC) U/l 10 - 50 26"
     },
     {
       "markerKey": "CREATININE",
@@ -288,8 +312,8 @@
       "refHigh": 104.0,
       "flag": null,
       "date": "2025-12-08",
-      "source": "2025.12.08_DARIUS_LATVYS_laboratoriniu_tyrimu_rezultatai_6a78.PDF",
-      "raw": "Kreatininas µmol/L 59 - 104 94 2025.12.08"
+      "source": "2025_12.pdf",
+      "raw": "Kreatininas µmol/L 59 - 104 94"
     },
     {
       "markerKey": "GGT",
@@ -300,8 +324,8 @@
       "refHigh": 60.0,
       "flag": null,
       "date": "2025-12-08",
-      "source": "2025.12.08_DARIUS_LATVYS_laboratoriniu_tyrimu_rezultatai_6a78.PDF",
-      "raw": "GGT (IFCC) U/l 0 - 60 38 2025.12.08"
+      "source": "2025_12.pdf",
+      "raw": "GGT (IFCC) U/l 0 - 60 38"
     },
     {
       "markerKey": "GLUCOSE",
@@ -312,7 +336,7 @@
       "refHigh": 6.0,
       "flag": null,
       "date": "2025-12-08",
-      "source": "2025_12_cb44.pdf",
+      "source": "2025_12.pdf",
       "raw": "Gliukozė mmol/L 4 - 6 5,91"
     },
     {
@@ -324,7 +348,7 @@
       "refHigh": 1.45,
       "flag": null,
       "date": "2025-12-08",
-      "source": "20251208_Atliktu__tyrimu__rezultatai_c8e4.pdf",
+      "source": "2025_12.pdf",
       "raw": "DTL mmol/L 0 - 1.45 0,94"
     },
     {
@@ -336,8 +360,8 @@
       "refHigh": 172.0,
       "flag": null,
       "date": "2025-12-08",
-      "source": "2025.12.08_DARIUS_LATVYS_laboratoriniu_tyrimu_rezultatai_6a78.PDF",
-      "raw": "Hemoglobinas (HGB) g/L 135 - 172 166 2025.12.08"
+      "source": "2025_12.pdf",
+      "raw": "Hemoglobinas (HGB) g/L 135 - 172 166"
     },
     {
       "markerKey": "HS_CRP",
@@ -348,7 +372,7 @@
       "refHigh": 5.0,
       "flag": null,
       "date": "2025-12-08",
-      "source": "20251208_Atliktu__tyrimu__rezultatai_c8e4.pdf",
+      "source": "2025_12.pdf",
       "raw": "CRB mg/L 0 - 5 0,44"
     },
     {
@@ -360,8 +384,8 @@
       "refHigh": 5.1,
       "flag": null,
       "date": "2025-12-08",
-      "source": "2025.12.08_DARIUS_LATVYS_laboratoriniu_tyrimu_rezultatai_6a78.PDF",
-      "raw": "Kalis mmol/L 3.5 - 5.1 4,4 2025.12.08"
+      "source": "2025_12.pdf",
+      "raw": "Kalis mmol/L 3.5 - 5.1 4,4"
     },
     {
       "markerKey": "LDL",
@@ -372,7 +396,7 @@
       "refHigh": 2.59,
       "flag": "high",
       "date": "2025-12-08",
-      "source": "20251208_Atliktu__tyrimu__rezultatai_c8e4.pdf",
+      "source": "2025_12.pdf",
       "raw": "MTL mmol/L 0 - 2.59 3,67 +"
     },
     {
@@ -384,8 +408,8 @@
       "refHigh": 5.2,
       "flag": "high",
       "date": "2025-12-08",
-      "source": "2025.12.08_DARIUS_LATVYS_laboratoriniu_tyrimu_rezultatai_6a78.PDF",
-      "raw": "Cholesterolis mmol/L <= 5.2 5,26 + 2025.12.08"
+      "source": "2025_12.pdf",
+      "raw": "Cholesterolis mmol/L <= 5.2 5,26 +"
     },
     {
       "markerKey": "WBC",
@@ -396,8 +420,8 @@
       "refHigh": 10.5,
       "flag": null,
       "date": "2025-12-08",
-      "source": "2025.12.08_DARIUS_LATVYS_laboratoriniu_tyrimu_rezultatai_6a78.PDF",
-      "raw": "Leukocitai (WBC) 10^9/L 3.6 - 10.5 7,48 2025.12.08"
+      "source": "2025_12.pdf",
+      "raw": "Leukocitai (WBC) 10^9/L 3.6 - 10.5 7,48"
     },
     {
       "markerKey": "eGFR",
@@ -408,7 +432,7 @@
       "refHigh": null,
       "flag": "low",
       "date": "2025-12-08",
-      "source": "20251208_Atliktu__tyrimu__rezultatai_c8e4.pdf",
+      "source": "2025_12.pdf",
       "raw": "GFG > 90 79,47 -"
     },
     {
@@ -420,7 +444,7 @@
       "refHigh": 50.0,
       "flag": null,
       "date": "2026-02-19",
-      "source": "20260226_Atliktu__tyrimu__rezultatai_8b15.pdf",
+      "source": "20260226_Atliktu__tyrimu__rezultatai.pdf",
       "raw": "ALT (su P-5-P, IFCC) U/l 10 - 50 19"
     },
     {
@@ -432,7 +456,7 @@
       "refHigh": 50.0,
       "flag": null,
       "date": "2026-02-19",
-      "source": "20260226_Atliktu__tyrimu__rezultatai_8b15.pdf",
+      "source": "20260226_Atliktu__tyrimu__rezultatai.pdf",
       "raw": "AST (su P-5-P, IFCC) U/l 10 - 50 25"
     },
     {
@@ -444,7 +468,7 @@
       "refHigh": 104.0,
       "flag": null,
       "date": "2026-02-19",
-      "source": "20260226_Atliktu__tyrimu__rezultatai_8b15.pdf",
+      "source": "20260226_Atliktu__tyrimu__rezultatai.pdf",
       "raw": "Kreatininas µmol/L 59 - 104 95"
     },
     {
@@ -456,7 +480,7 @@
       "refHigh": 6.0,
       "flag": null,
       "date": "2026-02-19",
-      "source": "20260226_Atliktu__tyrimu__rezultatai_8b15.pdf",
+      "source": "20260226_Atliktu__tyrimu__rezultatai.pdf",
       "raw": "Gliukozė mmol/L 4 - 6 5,72"
     },
     {
@@ -468,7 +492,7 @@
       "refHigh": 1.45,
       "flag": null,
       "date": "2026-02-19",
-      "source": "20260226_Atliktu__tyrimu__rezultatai_8b15.pdf",
+      "source": "20260226_Atliktu__tyrimu__rezultatai.pdf",
       "raw": "DTL mmol/L 0 - 1.45 1,03"
     },
     {
@@ -480,7 +504,7 @@
       "refHigh": 172.0,
       "flag": null,
       "date": "2026-02-19",
-      "source": "20260226_Atliktu__tyrimu__rezultatai_8b15.pdf",
+      "source": "20260226_Atliktu__tyrimu__rezultatai.pdf",
       "raw": "Hemoglobinas (HGB) g/L 135 - 172 168"
     },
     {
@@ -492,7 +516,7 @@
       "refHigh": 5.0,
       "flag": null,
       "date": "2026-02-19",
-      "source": "20260226_Atliktu__tyrimu__rezultatai_8b15.pdf",
+      "source": "20260226_Atliktu__tyrimu__rezultatai.pdf",
       "raw": "CRB mg/L 0 - 5 0,32"
     },
     {
@@ -504,7 +528,7 @@
       "refHigh": 5.1,
       "flag": null,
       "date": "2026-02-19",
-      "source": "20260226_Atliktu__tyrimu__rezultatai_8b15.pdf",
+      "source": "20260226_Atliktu__tyrimu__rezultatai.pdf",
       "raw": "Kalis mmol/L 3.5 - 5.1 4,1"
     },
     {
@@ -516,7 +540,7 @@
       "refHigh": 2.59,
       "flag": "high",
       "date": "2026-02-19",
-      "source": "20260226_Atliktu__tyrimu__rezultatai_8b15.pdf",
+      "source": "20260226_Atliktu__tyrimu__rezultatai.pdf",
       "raw": "MTL mmol/L 0 - 2.59 4,11 +"
     },
     {
@@ -528,7 +552,7 @@
       "refHigh": 5.2,
       "flag": "high",
       "date": "2026-02-19",
-      "source": "20260226_Atliktu__tyrimu__rezultatai_8b15.pdf",
+      "source": "20260226_Atliktu__tyrimu__rezultatai.pdf",
       "raw": "Cholesterolis mmol/L <= 5.2 5,79 +"
     },
     {
@@ -540,7 +564,7 @@
       "refHigh": 10.5,
       "flag": null,
       "date": "2026-02-19",
-      "source": "20260226_Atliktu__tyrimu__rezultatai_8b15.pdf",
+      "source": "20260226_Atliktu__tyrimu__rezultatai.pdf",
       "raw": "Leukocitai (WBC) 10^9/L 3.6 - 10.5 7,55"
     },
     {
@@ -552,7 +576,7 @@
       "refHigh": null,
       "flag": "low",
       "date": "2026-02-19",
-      "source": "20260226_Atliktu__tyrimu__rezultatai_8b15.pdf",
+      "source": "20260226_Atliktu__tyrimu__rezultatai.pdf",
       "raw": "GFG > 90 78,46 -"
     },
     {
@@ -564,7 +588,7 @@
       "refHigh": 6.0,
       "flag": null,
       "date": "2026-04-03",
-      "source": "2026_04_dcc7.pdf",
+      "source": "Atliktu__tyrimu__rezultatai_gliukoze.pdf",
       "raw": "Gliukozė mmol/L 4 - 6 6,00"
     },
     {
@@ -576,7 +600,7 @@
       "refHigh": 1.45,
       "flag": null,
       "date": "2026-04-03",
-      "source": "2026_04_dcc7.pdf",
+      "source": "Atliktu__tyrimu__rezultatai_Didelio_tankio.pdf",
       "raw": "DTL mmol/L 0 - 1.45 0,99"
     },
     {
@@ -588,7 +612,7 @@
       "refHigh": 2.59,
       "flag": "high",
       "date": "2026-04-03",
-      "source": "2026_04_dcc7.pdf",
+      "source": "Atliktu__tyrimu__rezultatai_MTL.pdf",
       "raw": "MTL mmol/L 0 - 2.59 2,84 +"
     },
     {
@@ -600,32 +624,44 @@
       "refHigh": 5.2,
       "flag": null,
       "date": "2026-04-03",
-      "source": "2026_04_dcc7.pdf",
+      "source": "Atliktu__tyrimu__rezultatai_bendras_cholesterolis.pdf",
       "raw": "Cholesterolis mmol/L <= 5.2 4,37"
     },
     {
       "markerKey": "APO_B",
       "name": "Apo B",
       "value": 1.04,
-      "unit": "g/L",
+      "unit": "g/l",
       "refLow": 0.66,
       "refHigh": 1.44,
       "flag": null,
       "date": "2026-04-10",
-      "source": "ApoeB_Lpa_bcdd.pdf",
-      "raw": "Apo B 1.04"
+      "source": "ApoeB_Lpa.pdf",
+      "raw": "NV 1884-6 Apolipoproteinas B (Apo B) g/l 0,66 - 1,44 1,04 2026-04-10 13:28 BT001347"
+    },
+    {
+      "markerKey": "CORTISOL",
+      "name": "Kortizolis",
+      "value": 329.0,
+      "unit": "nmol/L",
+      "refLow": 68.2,
+      "refHigh": 537.0,
+      "flag": null,
+      "date": "2026-04-10",
+      "source": "Kortizolis_Atliktu__tyrimu__rezultatai.pdf",
+      "raw": "Kort. nmol/L 68.2 - 537 329,00"
     },
     {
       "markerKey": "LPA",
       "name": "Lp(a)",
       "value": 24.2,
-      "unit": "nmol/L",
+      "unit": "nmol/l",
       "refLow": null,
       "refHigh": 75.0,
       "flag": null,
       "date": "2026-04-10",
-      "source": "ApoeB_Lpa_bcdd.pdf",
-      "raw": "Lp(a) 24.2"
+      "source": "ApoeB_Lpa.pdf",
+      "raw": "NV 43583-4 Lipoproteinas (a) (Lp(a)) nmol/l Mažiau nei 75,0 24,2 2026-04-10 13:27 BT001347"
     },
     {
       "markerKey": "CREATININE",
@@ -636,7 +672,7 @@
       "refHigh": 104.0,
       "flag": null,
       "date": "2026-05-25",
-      "source": "2026_05_a39a.pdf",
+      "source": "2026_06_02_Atliktu__tyrimu__rezultatai.pdf",
       "raw": "Kreatininas µmol/L 59 - 104 94"
     },
     {
@@ -648,7 +684,7 @@
       "refHigh": 6.0,
       "flag": null,
       "date": "2026-05-25",
-      "source": "2026_05_a39a.pdf",
+      "source": "2026_06_02_Atliktu__tyrimu__rezultatai.pdf",
       "raw": "Gliukozė mmol/L 4 - 6 5,94"
     },
     {
@@ -660,7 +696,7 @@
       "refHigh": 1.45,
       "flag": null,
       "date": "2026-05-25",
-      "source": "2026_05_a39a.pdf",
+      "source": "2026_06_02_Atliktu__tyrimu__rezultatai.pdf",
       "raw": "DTL mmol/L 0 - 1.45 1,11"
     },
     {
@@ -672,7 +708,7 @@
       "refHigh": 2.59,
       "flag": "high",
       "date": "2026-05-25",
-      "source": "2026_05_a39a.pdf",
+      "source": "2026_06_02_Atliktu__tyrimu__rezultatai.pdf",
       "raw": "MTL mmol/L 0 - 2.59 3,00 +"
     },
     {
@@ -684,7 +720,7 @@
       "refHigh": 3.1,
       "flag": null,
       "date": "2026-05-25",
-      "source": "2026_06_02_Atliktu__tyrimu__rezultatai_febd.pdf",
+      "source": "2026_06_02_Atliktu__tyrimu__rezultatai.pdf",
       "raw": "PSA µg/L 0 - 3.1 1,25"
     },
     {
@@ -696,7 +732,7 @@
       "refHigh": 5.2,
       "flag": null,
       "date": "2026-05-25",
-      "source": "2026_05_a39a.pdf",
+      "source": "2026_06_02_Atliktu__tyrimu__rezultatai.pdf",
       "raw": "Cholesterolis mmol/L <= 5.2 4,34"
     },
     {
@@ -708,32 +744,44 @@
       "refHigh": null,
       "flag": "low",
       "date": "2026-05-25",
-      "source": "2026_05_a39a.pdf",
+      "source": "2026_06_02_Atliktu__tyrimu__rezultatai.pdf",
       "raw": "GFG > 90 78,92 -"
     },
     {
       "markerKey": "APO_B",
       "name": "Apo B",
       "value": 1.11,
-      "unit": "g/L",
+      "unit": "g/l",
       "refLow": 0.66,
       "refHigh": 1.44,
       "flag": null,
       "date": "2026-06-03",
-      "source": "20260602_Lpa_ApoeB_46b8.pdf",
-      "raw": "Apo B 1.11"
+      "source": "20260602_Lpa_ApoeB.pdf",
+      "raw": "NV 1884-6 Apolipoproteinas B (Apo B) g/l 0,66 - 1,44 1,11 2026-06-03 12:41"
     },
     {
       "markerKey": "LPA",
       "name": "Lp(a)",
       "value": 14.7,
-      "unit": "nmol/L",
+      "unit": "nmol/l",
       "refLow": null,
       "refHigh": 75.0,
       "flag": null,
       "date": "2026-06-03",
-      "source": "20260602_Lpa_ApoeB_46b8.pdf",
-      "raw": "Lp(a) 14.7"
+      "source": "20260602_Lpa_ApoeB.pdf",
+      "raw": "NV 43583-4 Lipoproteinas (a) (Lp(a)) nmol/l Mažiau nei 75,0 14,7 2026-06-03 12:40"
+    },
+    {
+      "markerKey": "H_PYLORI",
+      "name": "Helicobacter pylori IgG",
+      "value": 1.329,
+      "unit": "index",
+      "refLow": null,
+      "refHigh": 1.1,
+      "flag": "high",
+      "date": "2026-09-15",
+      "source": "Helicobacteri_2026.pdf",
+      "raw": "HP IgG kiekybinis 1.329 Teigiamas"
     }
   ]
 }

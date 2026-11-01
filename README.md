@@ -34,7 +34,7 @@ Atidarykite [http://127.0.0.1:43123](http://127.0.0.1:43123).
 
 Šaltiniai: `data/lyfora-source/` ir normalizuoti JSON `data/parsed/`.
 
-- Darius Latvys — importuoti PDF laboratoriniai tyrimai (2024–2026) + vyrų NGS VCF (`MYBPC3`, `MSH2` demonstracinės pozicijos). SNP microarray failas dar neįkeltas — bazinio SNP sluoksnio spalvos jam skaičiuojamos iš žymenų.
+- Darius Latvys — **65** laboratoriniai žymenys iš **20** unikalių Blood tests PDF (datos 2023-12 → 2026-09, įskaitant lipidus, ApoB/Lp(a), kortizolį, H. pylori) + vyrų NGS VCF (`MYBPC3`, `MSH2`). SNP microarray failas dar neįkeltas.
 - Ona Pavyzdinė — demonstraciniai SNP genotipai + sintetinis moterų NGS VCF (PALB2, RYR1).
 
 ## Stack

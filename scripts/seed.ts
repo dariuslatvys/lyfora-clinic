@@ -117,6 +117,16 @@ const MARKER_COPY: Record<
     en: "PSA — a prostate marker monitored in men’s health.",
     unit: "µg/L",
   },
+  CORTISOL: {
+    lt: "Kortizolis — streso ir antinksčių ašies hormonas; reikšmė priklauso nuo paros meto.",
+    en: "Cortisol — a stress and adrenal-axis hormone; values depend on time of day.",
+    unit: "nmol/L",
+  },
+  H_PYLORI: {
+    lt: "Helicobacter pylori IgG — antikūnai, rodantys kontaktą su H. pylori bakterija.",
+    en: "Helicobacter pylori IgG — antibodies indicating exposure to H. pylori.",
+    unit: "index",
+  },
 };
 
 function nonRiskAllele(effect1?: string | null, effect2?: string | null) {
@@ -261,6 +271,51 @@ function main() {
     VALUES (?, ?, ?, ?, ?, ?)
   `);
   for (const m of markerDefs) {
+    const copy = MARKER_COPY[m.key];
+    insertDef.run(
+      m.key,
+      m.name,
+      JSON.stringify(m.categories),
+      copy?.lt ?? `${m.name} — laboratorinis sveikatos žymuo.`,
+      copy?.en ?? `${m.name} — a laboratory health marker.`,
+      copy?.unit ?? null
+    );
+  }
+  // Extra keys used by imported blood PDFs (aliases / infection markers)
+  const extraDefs: {
+    key: string;
+    name: string;
+    categories: string[];
+  }[] = [
+    {
+      key: "APO_B",
+      name: "Apolipoprotein B",
+      categories: ["Cardiovascular Health", "Metabolic Health"],
+    },
+    {
+      key: "LPA",
+      name: "Lipoprotein (a)",
+      categories: ["Cardiovascular Health"],
+    },
+    {
+      key: "CORTISOL",
+      name: "Cortisol",
+      categories: ["Hormonal Health", "Mental & Cognitive Health"],
+    },
+    {
+      key: "H_PYLORI",
+      name: "Helicobacter pylori IgG",
+      categories: ["Immune & Inflammation"],
+    },
+    {
+      key: "CREATININE",
+      name: "Creatinine",
+      categories: ["Cardiovascular Health", "Metabolic Health"],
+    },
+  ];
+  const existingKeys = new Set(markerDefs.map((m) => m.key));
+  for (const m of extraDefs) {
+    if (existingKeys.has(m.key)) continue;
     const copy = MARKER_COPY[m.key];
     insertDef.run(
       m.key,

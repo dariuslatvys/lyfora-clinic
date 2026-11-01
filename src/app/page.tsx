@@ -6,7 +6,7 @@ export default function HomePage() {
     <main className="landing">
       <div className="landing-dna" aria-hidden="true">
         <Image
-          src="/brand/dna-bg-wash.jpg"
+          src="/brand/dna-bg-vivid.jpg"
           alt=""
           fill
           priority
@@ -25,12 +25,9 @@ export default function HomePage() {
             priority
             className="landing-logo"
           />
-          <span className="landing-pill">
-            <span className="landing-pill-line">
-              Visa tavo sveikata vienoje vietoje
-            </span>
-            <strong>24/7</strong>
-          </span>
+          <p className="landing-tagline">
+            Visa tavo sveikata vienoje vietoje <strong>24/7</strong>
+          </p>
         </div>
 
         <div className="landing-copy rise-in-delay">

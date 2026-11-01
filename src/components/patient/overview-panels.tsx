@@ -46,6 +46,9 @@ type Labels = {
   myPlan: string;
   changePlan: string;
   noUpcomingVisits: string;
+  goalsProgressHint: string;
+  goalAchieved: string;
+  goalRemaining: string;
   colourLabels: Record<string, string>;
 };
 
@@ -231,13 +234,44 @@ export function OverviewPanels({
                 <div className="card-head">
                   <h2>{labels.myGoals}</h2>
                 </div>
-                <div className="stack" style={{ gap: 10 }}>
+                <p className="xs muted" style={{ margin: "0 0 10px" }}>
+                  {labels.goalsProgressHint}
+                </p>
+                <div className="stack" style={{ gap: 12 }}>
                   {goals.map((g) => {
+                    const done = g.progress >= 100;
+                    const left = Math.max(0, 100 - g.progress);
                     const body = (
                       <>
-                        <div className="row between small" style={{ gap: 8 }}>
-                          <span>{g.title}</span>
-                          <b className="num">{g.progress} %</b>
+                        <div className="row between" style={{ gap: 10, alignItems: "flex-start" }}>
+                          <span className="small" style={{ flex: 1 }}>
+                            {g.title}
+                          </span>
+                          <div className="goal-pct">
+                            {done ? (
+                              <>
+                                <span className="goal-pct-label">
+                                  {labels.goalAchieved}
+                                </span>
+                                <b className="num">100 %</b>
+                              </>
+                            ) : (
+                              <div className="goal-pct-pair">
+                                <div>
+                                  <span className="goal-pct-label">
+                                    {labels.goalAchieved}
+                                  </span>
+                                  <b className="num">{g.progress} %</b>
+                                </div>
+                                <div>
+                                  <span className="goal-pct-label">
+                                    {labels.goalRemaining}
+                                  </span>
+                                  <b className="num muted-num">{left} %</b>
+                                </div>
+                              </div>
+                            )}
+                          </div>
                         </div>
                         {g.detail ? (
                           <p
@@ -248,7 +282,7 @@ export function OverviewPanels({
                           </p>
                         ) : null}
                         <div className="progress" style={{ marginTop: 6 }}>
-                          <i style={{ width: `${g.progress}%` }} />
+                          <i style={{ width: `${Math.min(100, g.progress)}%` }} />
                         </div>
                       </>
                     );

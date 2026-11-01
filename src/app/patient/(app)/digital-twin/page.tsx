@@ -180,6 +180,12 @@ export default async function DigitalTwinPage() {
           changePlan: locale === "en" ? "Change plan" : "Keisti planą",
           noUpcomingVisits:
             locale === "en" ? "No upcoming visits" : "Būsimų vizitų nėra",
+          goalsProgressHint:
+            locale === "en"
+              ? "Percentages show how close you are to the target: achieved vs still remaining."
+              : "Procentai rodo, kiek jau esate arti tikslo: pasiekta ir kiek dar liko.",
+          goalAchieved: locale === "en" ? "Achieved" : "Pasiekta",
+          goalRemaining: locale === "en" ? "Remaining" : "Liko",
           colourLabels: labels.colourLabels,
         }}
         categories={mapCategories}

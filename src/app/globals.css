@@ -857,6 +857,38 @@ a.who.on {
   color: inherit;
 }
 
+.goal-pct {
+  text-align: right;
+  flex: none;
+}
+
+.goal-pct-label {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  line-height: 1.2;
+  margin-bottom: 1px;
+}
+
+.goal-pct-pair {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.goal-pct-pair > div {
+  text-align: right;
+  min-width: 3.4rem;
+}
+
+.muted-num {
+  color: var(--ink-soft);
+  font-weight: 650;
+}
+
 .visits-tabs {
   display: flex;
   gap: 6px;

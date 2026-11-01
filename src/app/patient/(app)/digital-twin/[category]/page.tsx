@@ -147,16 +147,33 @@ export default async function CategoryDetailPage({
         <nav className="cat-source-tabs" aria-label={labels.categoriesTitle}>
           {hasMarkers ? (
             <a href="#section-markers" className="cat-source-tab">
+              <span
+                className="cat-source-dot"
+                style={{ background: COLOUR_HEX[biomarkerColour] }}
+                aria-hidden="true"
+              />
               {labels.markers}
             </a>
           ) : null}
           {hasSnps ? (
             <a href="#section-genes" className="cat-source-tab">
+              <span
+                className="cat-source-dot"
+                style={{
+                  background: COLOUR_HEX[cat.geneticColour ? geneticColour : "grey"],
+                }}
+                aria-hidden="true"
+              />
               {labels.genes}
             </a>
           ) : null}
           {hasRare ? (
             <a href="#section-rare" className="cat-source-tab">
+              <span
+                className="cat-source-dot"
+                style={{ background: COLOUR_HEX.red }}
+                aria-hidden="true"
+              />
               {labels.rareShort}
             </a>
           ) : null}

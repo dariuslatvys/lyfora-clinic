@@ -105,7 +105,7 @@ export const dict = {
     awaitingDna: "Laukia DNR failo",
     askDoctor: "Klausti gydytojo 24/7",
     uploadLab: "Įkelti tyrimą",
-    bookVisit: "Registruotis vizitui",
+    bookVisit: "Rezervuoti vizitą / Konsultaciją",
     of100: "iš 100",
     patientsNav: "Pacientai",
     categoryNames: {
@@ -231,7 +231,7 @@ export const dict = {
     awaitingDna: "Awaiting DNA file",
     askDoctor: "Ask doctor 24/7",
     uploadLab: "Upload lab",
-    bookVisit: "Book a visit",
+    bookVisit: "Book a visit / Consultation",
     of100: "of 100",
     patientsNav: "Patients",
     categoryNames: {

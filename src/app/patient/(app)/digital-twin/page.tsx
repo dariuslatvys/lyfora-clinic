@@ -82,10 +82,13 @@ export default async function DigitalTwinPage() {
             <Link href="/patient/urgent" className="btn">
               {labels.urgentConsult}
             </Link>
+            <Link href="/patient/visits" className="btn ghost">
+              {labels.bookVisit}
+            </Link>
             <Link href="/patient/questions" className="btn ghost">
               {labels.askDoctor247}
             </Link>
-            <Link href="/patient/labs" className="btn ghost">
+            <Link href="/patient/uploads" className="btn ghost">
               {labels.uploadLab}
             </Link>
           </div>

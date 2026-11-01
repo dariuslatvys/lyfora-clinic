@@ -32,9 +32,9 @@ const ANGLE_BY_ID: Record<string, number> = {
   cardiovascular: -90,
   hormones_men: -28,
   hormones_women: -28,
-  mental: 180,
+  oncology: 180,
   immune: 142,
-  oncology: 38,
+  mental: 38,
   metabolic: 0,
 };
 
@@ -44,9 +44,9 @@ const LABEL_SIDE: Record<string, "left" | "right" | "top"> = {
   cardiovascular: "top",
   hormones_men: "right",
   hormones_women: "right",
-  mental: "left",
+  oncology: "left",
   immune: "left",
-  oncology: "right",
+  mental: "right",
   metabolic: "right",
 };
 

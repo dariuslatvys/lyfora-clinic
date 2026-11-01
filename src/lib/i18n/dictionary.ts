@@ -242,7 +242,7 @@ export const dict = {
       metabolic: "Metabolic Health",
       hormones_men: "Hormones (Men)",
       hormones_women: "Hormones (Women)",
-      mental: "Mental and Cognitive Health",
+      mental: "Mental and emotional health",
       immune: "Immune & Inflammation",
       oncology: "Oncology",
     } as Record<string, string>,

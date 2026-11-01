@@ -340,6 +340,51 @@ async function main() {
       name: "Creatinine",
       categories: ["Cardiovascular Health", "Metabolic Health"],
     },
+    {
+      key: "ESTRADIOL",
+      name: "Estradiol",
+      categories: ["Hormonal Health", "Hormonal Health WOMEN"],
+    },
+    {
+      key: "PROGESTERONE",
+      name: "Progesterone",
+      categories: ["Hormonal Health", "Hormonal Health WOMEN"],
+    },
+    {
+      key: "FSH",
+      name: "Follicle-stimulating hormone",
+      categories: ["Hormonal Health", "Hormonal Health WOMEN"],
+    },
+    {
+      key: "LH",
+      name: "Luteinising hormone",
+      categories: ["Hormonal Health", "Hormonal Health WOMEN"],
+    },
+    {
+      key: "PROLACTIN",
+      name: "Prolactin",
+      categories: ["Hormonal Health", "Hormonal Health WOMEN"],
+    },
+    {
+      key: "AMH",
+      name: "Anti-Müllerian hormone",
+      categories: ["Hormonal Health", "Hormonal Health WOMEN"],
+    },
+    {
+      key: "FREE_T4",
+      name: "Free thyroxine (FT4)",
+      categories: ["Hormonal Health"],
+    },
+    {
+      key: "FOLATE",
+      name: "Folate",
+      categories: ["Hormonal Health", "Hormonal Health WOMEN", "Metabolic Health"],
+    },
+    {
+      key: "FERRITIN",
+      name: "Ferritin",
+      categories: ["Hormonal Health", "Hormonal Health WOMEN", "Metabolic Health"],
+    },
   ];
   const existingKeys = new Set(markerDefs.map((m) => m.key));
   for (const m of extraDefs) {
@@ -354,6 +399,20 @@ async function main() {
       copy?.unit ?? null
     );
   }
+  // Vitamin D feeds women's hormonal (+ metabolic) categories.
+  sqlite
+    .prepare(
+      `UPDATE marker_defs
+       SET categories_json = ?
+       WHERE key = 'VITAMIN_D'`
+    )
+    .run(
+      JSON.stringify([
+        "Hormonal Health",
+        "Hormonal Health WOMEN",
+        "Metabolic Health",
+      ])
+    );
 
   const insertResult = sqlite.prepare(`
     INSERT INTO marker_results (patient_id, marker_key, value, unit, ref_low, ref_high, flag, observed_at, source)
@@ -545,11 +604,13 @@ async function main() {
     { key: "LH", value: 5.4, unit: "U/L", low: 2, high: 12, flag: null, date: "2026-05-01" },
     { key: "PROLACTIN", value: 380, unit: "mU/L", low: 100, high: 500, flag: null, date: "2026-05-01" },
     { key: "AMH", value: 2.1, unit: "ng/mL", low: 1.0, high: 4.0, flag: null, date: "2026-05-01" },
-    { key: "TSH", value: 3.8, unit: "mU/L", low: 0.4, high: 4.0, flag: null, date: "2026-05-01" },
+    { key: "TSH", value: 4.8, unit: "mU/L", low: 0.4, high: 4.0, flag: "high", date: "2026-05-01" },
+    { key: "TSH", value: 4.6, unit: "mU/L", low: 0.4, high: 4.0, flag: "high", date: "2026-09-12" },
     { key: "FREE_T4", value: 14.2, unit: "pmol/L", low: 11, high: 22, flag: null, date: "2026-05-01" },
     { key: "VITAMIN_D", value: 52, unit: "nmol/L", low: 75, high: 250, flag: "low", date: "2026-05-01" },
     { key: "VITAMIN_D", value: 68, unit: "nmol/L", low: 75, high: 250, flag: "low", date: "2026-09-12" },
     { key: "FOLATE", value: 9.5, unit: "nmol/L", low: 10, high: 40, flag: "low", date: "2026-05-01" },
+    { key: "FERRITIN", value: 28, unit: "µg/L", low: 30, high: 200, flag: "low", date: "2026-05-01" },
   ];
   for (const m of femaleHormonePanel) {
     insertResult.run(

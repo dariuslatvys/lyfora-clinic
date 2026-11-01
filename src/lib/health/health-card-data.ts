@@ -460,24 +460,45 @@ export function buildHealthCard(input: {
       ],
     });
   }
-  conditions.push({
-    code: "Z15.89",
-    nameLt: "Genetinis polinkis į širdies ligas (MYBPC3)",
-    nameEn: "Genetic susceptibility to cardiac disease (MYBPC3)",
-    since: "2025-12-16",
-    statusLt: "aktyvi",
-    statusEn: "active",
-    byLt: "Dr. Eglė Navickaitė",
-    byEn: "Dr. Eglė Navickaitė",
-    href: "/patient/digital-twin/cardiovascular#section-rare",
-    links: [
-      {
-        href: "/patient/visits/v-2025-12-16",
-        labelLt: "Genetiko vizitas",
-        labelEn: "Genetics visit",
-      },
-    ],
-  });
+  if (input.sex === "female") {
+    conditions.push({
+      code: "Z15.01",
+      nameLt: "Genetinis polinkis į piktybinį naviką (PALB2)",
+      nameEn: "Genetic susceptibility to malignant neoplasm (PALB2)",
+      since: "2025-12-16",
+      statusLt: "aktyvi",
+      statusEn: "active",
+      byLt: "Dr. Eglė Navickaitė",
+      byEn: "Dr. Eglė Navickaitė",
+      href: "/patient/digital-twin/oncology#section-rare",
+      links: [
+        {
+          href: "/patient/rare/PALB2",
+          labelLt: "NGS radinys",
+          labelEn: "NGS finding",
+        },
+      ],
+    });
+  } else {
+    conditions.push({
+      code: "Z15.89",
+      nameLt: "Genetinis polinkis į širdies ligas (MYBPC3)",
+      nameEn: "Genetic susceptibility to cardiac disease (MYBPC3)",
+      since: "2025-12-16",
+      statusLt: "aktyvi",
+      statusEn: "active",
+      byLt: "Dr. Eglė Navickaitė",
+      byEn: "Dr. Eglė Navickaitė",
+      href: "/patient/digital-twin/cardiovascular#section-rare",
+      links: [
+        {
+          href: "/patient/visits/v-2025-12-16",
+          labelLt: "Genetiko vizitas",
+          labelEn: "Genetics visit",
+        },
+      ],
+    });
+  }
 
   const episodes: HealthCardEpisode[] = [
     {

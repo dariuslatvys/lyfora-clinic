@@ -275,7 +275,8 @@ function SummaryPane({
             </Link>
           </div>
           <div className="list mt-2">
-            {card.conditions.map((c) => {
+            {card.conditions.map((c, i) => {
+              const rowKey = `${c.code}-${c.since}-${c.nameEn}-${i}`;
               const body = (
                 <>
                   <span className="mono small" style={{ width: 56 }}>
@@ -294,15 +295,11 @@ function SummaryPane({
                 </>
               );
               return c.href ? (
-                <Link
-                  key={c.code + c.since}
-                  href={c.href}
-                  className="li click"
-                >
+                <Link key={rowKey} href={c.href} className="li click">
                   {body}
                 </Link>
               ) : (
-                <div key={c.code + c.since} className="li">
+                <div key={rowKey} className="li">
                   {body}
                 </div>
               );
@@ -336,8 +333,8 @@ function DiagnosesPane({
               </tr>
             </thead>
             <tbody>
-              {card.conditions.map((c) => (
-                <tr key={c.code + c.since}>
+              {card.conditions.map((c, i) => (
+                <tr key={`${c.code}-${c.since}-${c.nameEn}-${i}`}>
                   <td className="mono">{c.code}</td>
                   <td>
                     {c.href ? (

@@ -23,7 +23,7 @@ export function DoctorRail({
   return (
     <aside className="rail">
       <div className="brand">
-        <Link href="/doctor" className="logo">
+        <Link href="/" className="logo" aria-label="Lyfora home">
           <Image
             src="/brand/lyfora-logo.png"
             alt="Lyfora"

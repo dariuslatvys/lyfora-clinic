@@ -125,7 +125,7 @@ export function PatientRail({
   return (
     <aside className="rail">
       <div className="brand">
-        <Link href="/patient/digital-twin" className="logo">
+        <Link href="/" className="logo" aria-label="Lyfora pradinis puslapis">
           <Image
             src="/brand/lyfora-logo.png"
             alt="Lyfora"

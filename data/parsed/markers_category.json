@@ -1,0 +1,300 @@
+[
+  {
+    "key": "HRV",
+    "name": "Heart Rate Variability",
+    "categories": [
+      "Physical & Functional Health",
+      "Cardiovascular Health",
+      "Mental & Cognitive Health"
+    ]
+  },
+  {
+    "key": "LDL",
+    "name": "Low-density Lipoprotein Cholesterol",
+    "categories": [
+      "Cardiovascular Health"
+    ]
+  },
+  {
+    "key": "HDL",
+    "name": "High-density Lipoprotein Cholesterol",
+    "categories": [
+      "Cardiovascular Health"
+    ]
+  },
+  {
+    "key": "RESTING_HR",
+    "name": "Resting Heart Rate",
+    "categories": [
+      "Physical & Functional Health",
+      "Cardiovascular Health"
+    ]
+  },
+  {
+    "key": "TOTAL_CHOLESTEROL",
+    "name": "Total Cholesterol",
+    "categories": [
+      "Cardiovascular Health"
+    ]
+  },
+  {
+    "key": "TRIGLYCERIDES",
+    "name": "Triglycerides",
+    "categories": [
+      "Cardiovascular Health",
+      "Metabolic Health"
+    ]
+  },
+  {
+    "key": "APOB",
+    "name": "Apolipoprotein B",
+    "categories": [
+      "Cardiovascular Health",
+      "Metabolic Health"
+    ]
+  },
+  {
+    "key": "BLOOD_PRESSURE",
+    "name": "Blood Pressure",
+    "categories": [
+      "Cardiovascular Health",
+      "Physical & Functional Health"
+    ]
+  },
+  {
+    "key": "Lp(a)",
+    "name": "Lipoprotein(a) (Lp(a))",
+    "categories": [
+      "Cardiovascular Health"
+    ]
+  },
+  {
+    "key": "GLUCOSE",
+    "name": "Glucose",
+    "categories": [
+      "Metabolic Health"
+    ]
+  },
+  {
+    "key": "HBA1C",
+    "name": "Glycated Hemoglobin",
+    "categories": [
+      "Metabolic Health"
+    ]
+  },
+  {
+    "key": "INSULIN",
+    "name": "Insulin",
+    "categories": [
+      "Metabolic Health"
+    ]
+  },
+  {
+    "key": "HOMA_IR",
+    "name": "Homeostatic Model Assessment of Insulin Resistance",
+    "categories": [
+      "Metabolic Health"
+    ]
+  },
+  {
+    "key": "ALT",
+    "name": "Alanine Aminotransferase",
+    "categories": [
+      "Metabolic Health"
+    ]
+  },
+  {
+    "key": "AST",
+    "name": "Aspartate Aminotransferase",
+    "categories": [
+      "Metabolic Health"
+    ]
+  },
+  {
+    "key": "BMI",
+    "name": "Body Mass Index",
+    "categories": [
+      "Metabolic Health"
+    ]
+  },
+  {
+    "key": "BILIRUBIN_TOTAL",
+    "name": "Total bilirubin",
+    "categories": [
+      "Metabolic Health",
+      "Hormonal Health",
+      "Immune & Inflammation"
+    ]
+  },
+  {
+    "key": "TSH",
+    "name": "Thyroid-stimulating Hormone",
+    "categories": [
+      "Hormonal Health",
+      "Mental & Cognitive Health"
+    ]
+  },
+  {
+    "key": "SLEEP_DATA",
+    "name": "Sleep Data",
+    "categories": [
+      "Mental & Cognitive Health"
+    ]
+  },
+  {
+    "key": "VITAMIN_D",
+    "name": "Vitamin D",
+    "categories": [
+      "Mental & Cognitive Health"
+    ]
+  },
+  {
+    "key": "B12",
+    "name": "Vitamin B12",
+    "categories": [
+      "Mental & Cognitive Health"
+    ]
+  },
+  {
+    "key": "CORTISOL",
+    "name": "Cortisol",
+    "categories": [
+      "Hormonal Health",
+      "Mental & Cognitive Health"
+    ]
+  },
+  {
+    "key": "VO2MAX",
+    "name": "Maximal Oxygen Uptake",
+    "categories": [
+      "Physical & Functional Health"
+    ]
+  },
+  {
+    "key": "ACTIVITY_DATA",
+    "name": "Physical Activity Data",
+    "categories": [
+      "Physical & Functional Health"
+    ]
+  },
+  {
+    "key": "PSA",
+    "name": "Prostate-Specific Antigen",
+    "categories": [
+      "Physical & Functional Health",
+      "Cancer RiskHormonal Health"
+    ]
+  },
+  {
+    "key": "HEMOGLOBIN",
+    "name": "Hemoglobin",
+    "categories": [
+      "Physical & Functional Health"
+    ]
+  },
+  {
+    "key": "FT4",
+    "name": "Free Thyroxine",
+    "categories": [
+      "Hormonal Health"
+    ]
+  },
+  {
+    "key": "TESTOSTERONE",
+    "name": "Testosterone",
+    "categories": [
+      "Hormonal Health"
+    ]
+  },
+  {
+    "key": "ESTROGEN",
+    "name": "Estrogen",
+    "categories": [
+      "Hormonal Health"
+    ]
+  },
+  {
+    "key": "HS_CRP",
+    "name": "High-sensitivity C-reactive Protein",
+    "categories": [
+      "Immune & Inflammation"
+    ]
+  },
+  {
+    "key": "WBC",
+    "name": "White Blood Cell Count",
+    "categories": [
+      "Immune & Inflammation"
+    ]
+  },
+  {
+    "key": "DIFFERENTIAL_COUNTS",
+    "name": "White Blood Cell Differential Count",
+    "categories": [
+      "Immune & Inflammation"
+    ]
+  },
+  {
+    "key": "CYP2D6",
+    "name": "Cytochrome P450 Family 2 Subfamily D Member 6",
+    "categories": [
+      "Nutrient & Drug metabolism"
+    ]
+  },
+  {
+    "key": "ASAT",
+    "name": "Aspartate Aminotransferase",
+    "categories": [
+      "Nutrient & Drug metabolism"
+    ]
+  },
+  {
+    "key": "Albumin",
+    "name": "Albumin",
+    "categories": [
+      "Nutrient & Drug metabolism"
+    ]
+  },
+  {
+    "key": "eGFR",
+    "name": "Creatinine with eGFR",
+    "categories": [
+      "Cardiovascular Health"
+    ]
+  },
+  {
+    "key": "GGT",
+    "name": "Gamaglutamiltransferazė (GGT)",
+    "categories": [
+      "Cardiovascular Health"
+    ]
+  },
+  {
+    "key": "K",
+    "name": "Potassium",
+    "categories": [
+      "Cardiovascular Health"
+    ]
+  },
+  {
+    "key": "Mg2+/Mg",
+    "name": "Magnesium",
+    "categories": [
+      "Cardiovascular Health"
+    ]
+  },
+  {
+    "key": "Fer",
+    "name": "Ferritin",
+    "categories": [
+      "Cardiovascular Health"
+    ]
+  },
+  {
+    "key": "NT-proBNP",
+    "name": "N-Terminal Pro-B-Type Natriuretic Peptide",
+    "categories": [
+      "Cardiovascular Health"
+    ]
+  }
+]

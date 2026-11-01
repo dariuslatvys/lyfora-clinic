@@ -1,0 +1,40 @@
+{
+  "sample": "SYNTHETIC_SAMPLE_02",
+  "sex": "female",
+  "ngsTest": true,
+  "variants": [
+    {
+      "gene": "PALB2",
+      "transcript": "NM_024675",
+      "hgvs": "c.3113G>A (p.Trp1038*)",
+      "chrom": "chr16",
+      "pos": 23641121,
+      "ref": "C",
+      "alt": "T",
+      "gt": "0/1",
+      "significance": "pathogenic_demo",
+      "titleLt": "PALB2 geno pokytis",
+      "titleEn": "PALB2 gene variant",
+      "summaryLt": "Rasta reta PALB2 geno atmaina. Šis genas padeda taisyti DNR pažeidimus. Toks pokytis gali didinti paveldimos vėžio rizikos tikimybę šeimoje — tai ne diagnozė, o signalas aptarti su gydytoju genetiku.",
+      "summaryEn": "A rare PALB2 variant was found. This gene helps repair DNA damage. Such a change can raise hereditary cancer risk in a family — not a diagnosis, but a signal to discuss with a clinical geneticist.",
+      "synthetic": true
+    },
+    {
+      "gene": "RYR1",
+      "transcript": "NM_000540",
+      "hgvs": "c.1840C>T (p.Arg614Cys)",
+      "chrom": "chr19",
+      "pos": 38948175,
+      "ref": "C",
+      "alt": "T",
+      "gt": "0/1",
+      "significance": "risk_demo",
+      "titleLt": "RYR1 geno pokytis",
+      "titleEn": "RYR1 gene variant",
+      "summaryLt": "Rasta RYR1 geno atmaina, siejama su padidėjusiu jautrumu kai kurioms anestezijos medžiagoms (piktybinė hipertermija). Prieš operacijas svarbu apie tai informuoti anesteziologą.",
+      "summaryEn": "An RYR1 variant linked to increased sensitivity to certain anesthetics (malignant hyperthermia risk) was found. Tell your anesthesiologist before surgery.",
+      "synthetic": true
+    }
+  ],
+  "syntheticNotice": "Derived from synthetic demonstration VCF. Not for clinical use."
+}

@@ -19,6 +19,7 @@ import {
   biologicalSex,
 } from "@/lib/health/questionnaire";
 import { MedicationPicker } from "@/components/patient/medication-picker";
+import { formatDateTime } from "@/lib/utils";
 
 type Mode = "edit" | "view";
 
@@ -164,9 +165,10 @@ export function QuestionnaireForm({
               ? `Completion ${stats.percent}% · ${stats.filled}/${stats.required} required fields`
               : `Užpildyta ${stats.percent}% · ${stats.filled}/${stats.required} privalomi laukai`}
             {savedAt
-              ? ` · ${locale === "en" ? "Saved" : "Išsaugota"} ${new Date(
-                  savedAt
-                ).toLocaleString(locale === "en" ? "en-GB" : "lt-LT")}`
+              ? ` · ${locale === "en" ? "Saved" : "Išsaugota"} ${formatDateTime(
+                  savedAt,
+                  locale
+                )}`
               : ""}
           </p>
         </div>

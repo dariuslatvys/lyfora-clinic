@@ -14,6 +14,7 @@ import { loadQuestionnaireDefinition } from "@/lib/health/questionnaire-loader";
 import { buildHealthCard } from "@/lib/health/health-card-data";
 import { HealthCardTabs } from "@/components/patient/health-card-tabs";
 import { loadDigitalTwin } from "@/lib/health/load-twin";
+import { formatDateTime } from "@/lib/utils";
 
 export default async function HealthCardPage() {
   const current = await getCurrentUser();
@@ -106,9 +107,7 @@ export default async function HealthCardPage() {
             </span>
             <b>
               {answers.updatedAt
-                ? new Date(answers.updatedAt).toLocaleString(
-                    locale === "en" ? "en-GB" : "lt-LT"
-                  )
+                ? formatDateTime(answers.updatedAt, locale)
                 : locale === "en"
                   ? "Not started"
                   : "Dar nepradėta"}

@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { loadDigitalTwin } from "@/lib/health/load-twin";
 import { t } from "@/lib/i18n/dictionary";
 import { patientDisplayName } from "@/lib/i18n/patient-name";
+import { formatDate } from "@/lib/utils";
 import { OverviewPanels } from "@/components/patient/overview-panels";
 import { collectFlaggedLabs } from "@/lib/health/marker-colour";
 import { goalsFromMetrics } from "@/lib/health/goals-from-metrics";
@@ -38,7 +39,7 @@ export default async function DigitalTwinPage() {
 
   const name = patientDisplayName(current.patient.sex, locale);
   const attention = twin.categories.filter((c) => RANK[c.colour] >= 3);
-  const today = new Date().toLocaleDateString(locale === "en" ? "en-GB" : "lt-LT", {
+  const today = formatDate(new Date(), locale, {
     year: "numeric",
     month: "long",
     day: "numeric",

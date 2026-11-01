@@ -135,7 +135,7 @@ export default async function CategoryDetailPage({
         }}
       >
         <Pill colour={cat.colour} label={labels.colourLabels[cat.colour]} />
-        <h2 className="mt-2 font-[family-name:var(--font-display)] text-3xl sm:text-4xl">
+        <h2 className="mt-2 font-[family-name:var(--font-display)] text-2xl sm:text-[1.75rem] font-semibold tracking-[-0.02em]">
           {labels.categoryNames[cat.id as HealthCategoryId]}
         </h2>
         <p className="mt-2 w-full text-sm leading-relaxed text-[var(--ink-soft)]">
@@ -208,10 +208,6 @@ export default async function CategoryDetailPage({
                     <Pill colour="red" label={labels.colourLabels.red} />
                     <span className="driver-chip-text">
                       <b>{title}</b>
-                      <em>
-                        {v.gene}
-                        {v.hgvs ? ` · ${v.hgvs}` : ""}
-                      </em>
                     </span>
                   </a>
                 );

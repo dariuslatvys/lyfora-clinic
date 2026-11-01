@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { RiskColour } from "@/lib/health/colours";
 import { COLOUR_HEX } from "@/lib/health/colours";
@@ -39,8 +40,8 @@ function CatIcon({ id }: { id: string }) {
   return (
     <svg
       viewBox="0 0 24 24"
-      width="18"
-      height="18"
+      width="20"
+      height="20"
       fill="none"
       stroke="currentColor"
       strokeWidth="1.7"
@@ -60,25 +61,27 @@ function orderCategories(categories: BodyMapCategory[]) {
   );
 }
 
-/** Even circle around the center hub. */
+/** Even circle; start at top, go clockwise. */
 function orbitPoint(index: number, total: number) {
   const n = Math.max(total, 1);
-  const startDeg = -90; // top
-  const step = 360 / n;
-  const deg = startDeg + index * step;
+  const startDeg = -90;
+  const deg = startDeg + (360 / n) * index;
   const rad = (deg * Math.PI) / 180;
-  const rx = 38;
-  const ry = 38;
-  const left = 50 + rx * Math.cos(rad);
-  const top = 50 + ry * Math.sin(rad);
-  const side: "left" | "right" = left < 50 ? "left" : "right";
-  return { left, top, side };
+  // Icon ring
+  const ir = 34;
+  // Label ring (slightly outside)
+  const lr = 44;
+  const ix = 50 + ir * Math.cos(rad);
+  const iy = 50 + ir * Math.sin(rad);
+  const lx = 50 + lr * Math.cos(rad);
+  const ly = 50 + lr * Math.sin(rad);
+  const side: "left" | "right" = lx < 50 ? "left" : "right";
+  return { ix, iy, lx, ly, side, deg };
 }
 
 export function BodyMap({
   categories,
   geneHint,
-  centerLabel,
 }: {
   categories: BodyMapCategory[];
   geneHint: string;
@@ -91,8 +94,16 @@ export function BodyMap({
     <div className="body-map rise-in-delay">
       <div className="body-map-stage">
         <div className="body-map-orbit" aria-hidden="true" />
-        <div className="body-map-hub" aria-hidden="true">
-          <span>{centerLabel || "Lyfora"}</span>
+
+        <div className="body-map-figure" aria-hidden="true">
+          <Image
+            src="/brand/body-twin-hub.png"
+            alt=""
+            width={480}
+            height={640}
+            className="body-map-photo"
+            priority
+          />
         </div>
 
         <svg
@@ -108,12 +119,12 @@ export function BodyMap({
                 key={c.id}
                 x1="50"
                 y1="50"
-                x2={s.left}
-                y2={s.top}
-                stroke={COLOUR_HEX[c.colour]}
-                strokeWidth="0.25"
-                strokeDasharray="1 1.1"
-                opacity="0.4"
+                x2={s.ix}
+                y2={s.iy}
+                stroke="#9eb6c8"
+                strokeWidth="0.22"
+                strokeDasharray="0.9 1.1"
+                opacity="0.75"
               />
             );
           })}
@@ -125,33 +136,30 @@ export function BodyMap({
             <Link
               key={c.id}
               href={`/patient/digital-twin/${c.id}`}
-              className={`body-cat body-cat-${s.side}`}
+              className={`twin-node twin-node-${s.side}`}
               style={{
-                left: `${s.left}%`,
-                top: `${s.top}%`,
+                ["--ix" as string]: `${s.ix}%`,
+                ["--iy" as string]: `${s.iy}%`,
+                ["--lx" as string]: `${s.lx}%`,
+                ["--ly" as string]: `${s.ly}%`,
                 ["--cc" as string]: COLOUR_HEX[c.colour],
               }}
             >
-              <span className="body-cat-ic">
+              <span className="twin-dot" aria-hidden="true">
                 <CatIcon id={c.id} />
               </span>
-              <span className="body-cat-txt">
+              <span className="twin-label">
                 <b>{c.title}</b>
-                <span
-                  className={`pill ${c.colour === "grey" ? "c-none" : `c-${c.colour}`}`}
-                >
+                <em>
                   {c.colourLabel}
-                </span>
+                  {c.geneticBadge ? " · G" : ""}
+                </em>
               </span>
-              {c.geneticBadge ? (
-                <span className="gene-mark" title={geneHint}>
-                  G
-                </span>
-              ) : null}
             </Link>
           );
         })}
       </div>
+      <p className="body-map-hint">{geneHint}</p>
     </div>
   );
 }

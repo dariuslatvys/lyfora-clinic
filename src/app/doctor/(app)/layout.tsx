@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser, destroySession } from "@/lib/auth/session";
 import { t } from "@/lib/i18n/dictionary";
 import { LocaleSwitch } from "@/components/layout/locale-switch";
-import { Button } from "@/components/ui/button";
+import { DoctorRail } from "@/components/doctor/sidebar";
 
 export default async function DoctorLayout({
   children,
@@ -23,26 +23,23 @@ export default async function DoctorLayout({
   }
 
   return (
-    <div className="mx-auto min-h-screen max-w-6xl px-6 py-8">
-      <header className="mb-8 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <p className="text-xs uppercase tracking-[0.22em] text-[var(--muted)]">
-            {labels.brandShort}
-          </p>
-          <h1 className="font-[family-name:var(--font-display)] text-3xl">
-            {labels.brandDoctor}
-          </h1>
-        </div>
-        <div className="flex items-center gap-2">
+    <div className="app">
+      <DoctorRail
+        labels={labels}
+        doctorName={locale === "en" ? "Dr. Jane Smith" : "Dr. Rasa Rasaitė"}
+        logoutLabel={labels.signOut}
+        logoutAction={logout}
+      />
+      <div className="main">
+        <header className="topbar">
+          <div className="crumb">
+            <b>{labels.brandDoctor}</b>
+          </div>
+          <div className="sp" />
           <LocaleSwitch locale={locale} />
-          <form action={logout}>
-            <Button type="submit" variant="outline" size="sm">
-              {labels.signOut}
-            </Button>
-          </form>
-        </div>
-      </header>
-      {children}
+        </header>
+        <div className="page">{children}</div>
+      </div>
     </div>
   );
 }

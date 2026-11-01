@@ -1,17 +1,17 @@
 import type { Metadata } from "next";
-import { Fraunces, Manrope } from "next/font/google";
+import { Figtree, Manrope } from "next/font/google";
 import "./globals.css";
 
-const display = Fraunces({
+const display = Manrope({
   variable: "--font-display",
   subsets: ["latin", "latin-ext"],
   weight: ["500", "600", "700"],
 });
 
-const body = Manrope({
+const body = Figtree({
   variable: "--font-body",
   subsets: ["latin", "latin-ext"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {

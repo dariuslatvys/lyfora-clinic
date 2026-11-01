@@ -12,7 +12,7 @@ const RANK: Record<RiskColour, number> = {
 export function normalizeColour(raw?: string | null): RiskColour | null {
   if (!raw) return null;
   const v = raw.trim().toLowerCase();
-  if (v === "grey" || v === "gray") return "grey";
+  if (v === "grey" || v === "gray" || v === "none") return "grey";
   if (v === "green") return "green";
   if (v === "yellow") return "yellow";
   if (v === "orange") return "orange";
@@ -41,20 +41,21 @@ export function combineCategoryColour(
   };
 }
 
+/** Risk colours from Lyfora Klinika.html example */
 export const COLOUR_HEX: Record<RiskColour, string> = {
-  grey: "#94A3B8",
-  green: "#1B7F5A",
-  yellow: "#C9A227",
-  orange: "#D97706",
-  red: "#C23B2E",
-  badge: "#5B7C99",
+  grey: "#a2b0ab",
+  green: "#23885a",
+  yellow: "#c99700",
+  orange: "#dc6214",
+  red: "#c42f3a",
+  badge: "#6b55c9",
 };
 
 export const COLOUR_SOFT: Record<RiskColour, string> = {
-  grey: "rgba(148,163,184,0.18)",
-  green: "rgba(27,127,90,0.14)",
-  yellow: "rgba(201,162,39,0.16)",
-  orange: "rgba(217,119,6,0.16)",
-  red: "rgba(194,59,46,0.16)",
-  badge: "rgba(91,124,153,0.16)",
+  grey: "#eef1f0",
+  green: "#e1f3ea",
+  yellow: "#fbf2d3",
+  orange: "#fde8da",
+  red: "#fbe1e3",
+  badge: "#ece8fa",
 };

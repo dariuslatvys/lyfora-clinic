@@ -2,9 +2,8 @@ import { redirect } from "next/navigation";
 import { getCurrentUser, destroySession } from "@/lib/auth/session";
 import { t } from "@/lib/i18n/dictionary";
 import { patientDisplayName } from "@/lib/i18n/patient-name";
-import { PatientSidebar } from "@/components/patient/sidebar";
+import { PatientRail } from "@/components/patient/sidebar";
 import { LocaleSwitch } from "@/components/layout/locale-switch";
-import { Button } from "@/components/ui/button";
 
 export default async function PatientLayout({
   children,
@@ -17,6 +16,7 @@ export default async function PatientLayout({
   }
   const locale = (current.user.locale as "lt" | "en") || "lt";
   const labels = t(locale);
+  const name = patientDisplayName(current.patient.sex, locale);
 
   async function logout() {
     "use server";
@@ -25,33 +25,27 @@ export default async function PatientLayout({
   }
 
   return (
-    <div className="shell">
-      <div className="min-w-0">
-        <header className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <p className="text-xs uppercase tracking-[0.22em] text-[var(--muted)]">
-              {labels.brandShort}
-            </p>
-            <h1 className="font-[family-name:var(--font-display)] text-2xl md:text-3xl">
-              {labels.brandPatient}
-            </h1>
-            <p className="text-sm text-[var(--ink-soft)]">
-              {patientDisplayName(current.patient.sex, locale)} ·{" "}
-              {current.patient.sex === "male" ? labels.sexMale : labels.sexFemale}
-            </p>
+    <div className="app">
+      <PatientRail
+        labels={labels}
+        patientName={name}
+        sexLabel={
+          current.patient.sex === "male" ? labels.sexMale : labels.sexFemale
+        }
+        logoutLabel={labels.signOut}
+        logoutAction={logout}
+      />
+      <div className="main">
+        <header className="topbar">
+          <div className="crumb">
+            <b>{labels.patientPortal}</b>
+            <span> · {labels.overview}</span>
           </div>
-          <div className="flex items-center gap-2">
-            <LocaleSwitch locale={locale} />
-            <form action={logout}>
-              <Button type="submit" variant="outline" size="sm">
-                {labels.signOut}
-              </Button>
-            </form>
-          </div>
+          <div className="sp" />
+          <LocaleSwitch locale={locale} />
         </header>
-        {children}
+        <div className="page">{children}</div>
       </div>
-      <PatientSidebar labels={labels} />
     </div>
   );
 }

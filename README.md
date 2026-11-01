@@ -14,7 +14,8 @@ UI niekur nerodo tikrų asmenų. Demo pacientai:
 ## Kas veikia dabar
 
 - Dvi aplinkos su atskiru prisijungimu (LT / EN)
-- Paciento meniu dešinėje, įskaitant **Apžvalga | Mano skaitmeninis dvynys**
+- Paciento ir gydytojo meniu **kairėje** (pagal `Lyfora Klinika.html`), pine-green paletė
+- Apžvalga su sveikatos indeksu ir spalvotomis sveikatos sričių plytelėmis
 - Sveikatos kategorijų spalvos pagal `Health Category Colour Determination` + žymenis + SNP rizikos matricą
 - Markerio detalės, normos, pokyčių grafikas
 - SNP paaiškinimai iš `Gene_SNP_Risk_Table` (Mechanism) + bazinio SNP tyrimo pavadinimai

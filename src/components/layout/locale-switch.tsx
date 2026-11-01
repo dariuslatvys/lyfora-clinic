@@ -19,7 +19,7 @@ export function LocaleSwitch({ locale }: { locale: "lt" | "en" }) {
   }
 
   return (
-    <div className="inline-flex items-center gap-1 rounded-md border border-[var(--line)] bg-white/70 p-1 text-xs">
+    <div className="inline-flex items-center gap-1 rounded-md border border-[var(--line)] bg-[var(--surface-2)] p-1 text-xs">
       {(["lt", "en"] as const).map((l) => (
         <button
           key={l}

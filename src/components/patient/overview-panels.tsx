@@ -71,31 +71,26 @@ export function OverviewPanels({
   const [tab, setTab] = useState<"map" | "summary">("map");
 
   return (
-    <section className="stack overview-section" style={{ gap: 10 }}>
-      <div className="row between overview-section-head">
-        <h2 className="font-[family-name:var(--font-display)] text-[1.15rem] font-semibold m-0">
-          {tab === "map" ? labels.healthMapTitle : labels.cardSummary}
-        </h2>
-        <div className="tabs" role="tablist" aria-label={labels.healthMapTitle}>
-          <button
-            type="button"
-            role="tab"
-            className={tab === "map" ? "on" : undefined}
-            aria-selected={tab === "map"}
-            onClick={() => setTab("map")}
-          >
-            {labels.healthMapTitle}
-          </button>
-          <button
-            type="button"
-            role="tab"
-            className={tab === "summary" ? "on" : undefined}
-            aria-selected={tab === "summary"}
-            onClick={() => setTab("summary")}
-          >
-            {labels.cardSummary}
-          </button>
-        </div>
+    <section className="stack overview-section" style={{ gap: 12 }}>
+      <div className="tabs overview-tabs" role="tablist" aria-label={labels.healthMapTitle}>
+        <button
+          type="button"
+          role="tab"
+          className={tab === "map" ? "on" : undefined}
+          aria-selected={tab === "map"}
+          onClick={() => setTab("map")}
+        >
+          {labels.healthMapTitle}
+        </button>
+        <button
+          type="button"
+          role="tab"
+          className={tab === "summary" ? "on" : undefined}
+          aria-selected={tab === "summary"}
+          onClick={() => setTab("summary")}
+        >
+          {labels.cardSummary}
+        </button>
       </div>
 
       {tab === "map" ? (

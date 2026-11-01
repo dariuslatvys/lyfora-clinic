@@ -88,7 +88,7 @@ export default async function DigitalTwinPage() {
         ];
 
   return (
-    <div className="stack overview-page" style={{ gap: 14 }}>
+    <div className="stack overview-page" style={{ gap: 12 }}>
       <section className="hero hero-plain hero-compact rise-in">
         <div className="hero-top">
           <span className="eyebrow">{today}</span>
@@ -104,8 +104,8 @@ export default async function DigitalTwinPage() {
             </Link>
           </div>
         </div>
-        <div className="stack" style={{ gap: 6, width: "100%" }}>
-          <h1>
+        <div className="stack" style={{ gap: 4, width: "100%" }}>
+          <h1 className="overview-hello">
             {labels.goodMorning}, {firstName(name)}
           </h1>
           <p className="diag-line">

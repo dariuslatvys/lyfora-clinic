@@ -4,39 +4,40 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Clinical-calm palette from Lyfora Klinika.html — pine-green ink */
+/* Clinical pine-green DARK theme (Lyfora Klinika data-theme=dark) */
 :root {
-  --bg: #eef2f0;
-  --surface: #ffffff;
-  --surface-2: #f6f8f7;
-  --ink: #0f1f1b;
-  --ink-soft: #3c4d48;
-  --muted: #687a74;
-  --line: #d9e1de;
-  --line-2: #e8eeeb;
-  --accent: #0b8f6a;
-  --accent-strong: #067556;
-  --accent-ink: #ffffff;
-  --accent-soft: #d8f5ea;
-  --accent-soft-2: #b7ecd8;
-  --brand: #0b8f6a;
-  --rail: #ffffff;
-  --rail-ink: #1f3b33;
-  --rail-muted: #5f7a71;
-  --rail-active: #d8f5ea;
-  --r-green: #12b886;
-  --r-badge: #7c5cbf;
-  --r-yellow: #e0a800;
-  --r-orange: #f06a1a;
-  --r-red: #e03131;
-  --r-none: #8b9c96;
-  --r-green-bg: #d3f9e8;
-  --r-badge-bg: #ece4ff;
-  --r-yellow-bg: #fff3bf;
-  --r-orange-bg: #ffe8d6;
-  --r-red-bg: #ffe3e3;
-  --r-none-bg: #eef1f0;
-  --shadow: 0 1px 2px rgba(15, 31, 27, 0.06), 0 8px 24px rgba(15, 31, 27, 0.06);
+  color-scheme: dark;
+  --bg: #0b1412;
+  --surface: #121e1b;
+  --surface-2: #17251f;
+  --ink: #e3ece8;
+  --ink-soft: #bccbc5;
+  --muted: #8aa099;
+  --line: #253632;
+  --line-2: #1d2c28;
+  --accent: #5cc9a7;
+  --accent-strong: #3db892;
+  --accent-ink: #04241b;
+  --accent-soft: #173a32;
+  --accent-soft-2: #1f4a40;
+  --brand: #0b3d2f;
+  --rail: #0f1a17;
+  --rail-ink: #cfe3dc;
+  --rail-muted: #7b958d;
+  --rail-active: #173a32;
+  --r-green: #45c08a;
+  --r-badge: #a594ff;
+  --r-yellow: #e5bd3a;
+  --r-orange: #f08a47;
+  --r-red: #f0626b;
+  --r-none: #6c7d78;
+  --r-green-bg: #12302a;
+  --r-badge-bg: #241f43;
+  --r-yellow-bg: #332b0f;
+  --r-orange-bg: #3a2312;
+  --r-red-bg: #3c1a1e;
+  --r-none-bg: #1c2825;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.3);
   --radius: 14px;
   --radius-s: 9px;
   --paper: var(--bg);
@@ -110,6 +111,12 @@ a {
 .logo {
   display: inline-flex;
   align-items: center;
+}
+
+.logo img,
+.brand .logo img {
+  filter: brightness(0) saturate(100%) invert(78%) sepia(28%) saturate(500%)
+    hue-rotate(108deg) brightness(1.05);
 }
 
 .who {
@@ -618,7 +625,19 @@ a {
 }
 
 .hero-compact {
-  padding: 14px 18px 16px;
+  padding: 12px 16px 12px;
+  gap: 6px !important;
+  align-items: stretch;
+}
+
+.hero-compact .hero-top {
+  margin-bottom: 0;
+}
+
+.hero-compact::after {
+  width: 180px;
+  height: 180px;
+  opacity: 0.55;
 }
 
 .hero-top {
@@ -640,13 +659,29 @@ a {
   font-size: 0.84rem;
 }
 
+.hero-compact h1,
+.overview-page .hero h1 {
+  font-size: 1.2rem;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+  margin: 0;
+}
+
+.hero-compact .diag-line {
+  font-size: 0.92rem;
+  line-height: 1.4;
+}
+
 .overview-page {
   min-height: 0;
+  gap: 12px !important;
 }
 
 .overview-section-head {
   align-items: center;
   gap: 12px;
+  justify-content: flex-start;
 }
 
 .overview-subhead {
@@ -658,17 +693,20 @@ a {
 
 .tabs {
   display: flex;
-  gap: 4px;
+  gap: 2px;
   border-bottom: 1px solid var(--line);
   overflow-x: auto;
+  width: 100%;
 }
 
 .tabs button {
   all: unset;
   cursor: pointer;
-  padding: 8px 12px;
-  font-weight: 500;
-  font-size: 0.84rem;
+  padding: 8px 14px 10px 0;
+  margin-right: 14px;
+  font-family: var(--font-display), Manrope, sans-serif;
+  font-weight: 600;
+  font-size: 1.05rem;
   color: var(--muted);
   border-bottom: 2px solid transparent;
   white-space: nowrap;
@@ -676,7 +714,7 @@ a {
 
 .tabs button.on {
   color: var(--ink);
-  font-weight: 650;
+  font-weight: 700;
   border-color: var(--accent);
 }
 
@@ -765,7 +803,7 @@ a {
 .progress {
   height: 8px;
   border-radius: 99px;
-  background: color-mix(in srgb, var(--line) 80%, #fff);
+  background: color-mix(in srgb, var(--line) 80%, var(--surface));
   overflow: hidden;
   margin-top: 6px;
 }
@@ -1326,20 +1364,26 @@ a {
 
 /* ---------- Category ring map with center twin ---------- */
 .ring-map {
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 16px;
-  padding: 10px 10px 8px;
+  padding: 28px 18px 16px;
   overflow: visible;
 }
 
 .ring-map-stage {
   position: relative;
-  width: min(100%, 480px);
-  max-height: min(52vh, 480px);
+  width: min(100%, 460px);
+  max-height: min(50vh, 460px);
   aspect-ratio: 1 / 1;
-  margin: 0 auto;
+  margin: 12px auto 4px;
   max-width: 100%;
+}
+
+.ring-map-stage::before {
+  content: "";
+  display: block;
+  padding-top: 4%;
 }
 
 .ring-map-svg {
@@ -1391,12 +1435,12 @@ a {
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: color-mix(in srgb, var(--cc, var(--accent)) 14%, #fff);
+  background: color-mix(in srgb, var(--cc, var(--accent)) 22%, var(--surface));
   color: var(--cc, var(--accent));
-  border: 2px solid color-mix(in srgb, var(--cc, var(--accent)) 72%, #fff);
+  border: 2px solid color-mix(in srgb, var(--cc, var(--accent)) 65%, var(--surface));
   box-shadow:
-    0 0 0 4px color-mix(in srgb, var(--cc, var(--accent)) 8%, #fff),
-    0 6px 14px rgba(20, 40, 60, 0.1);
+    0 0 0 4px color-mix(in srgb, var(--cc, var(--accent)) 14%, transparent),
+    0 6px 14px rgba(0, 0, 0, 0.28);
   transition: transform 0.18s ease, box-shadow 0.18s ease;
   z-index: 2;
 }
@@ -1409,8 +1453,8 @@ a {
 .ring-node:hover .ring-dot {
   transform: scale(1.08);
   box-shadow:
-    0 0 0 7px color-mix(in srgb, var(--cc, var(--accent)) 12%, #fff),
-    0 14px 26px rgba(20, 40, 60, 0.16);
+    0 0 0 7px color-mix(in srgb, var(--cc, var(--accent)) 18%, transparent),
+    0 14px 26px rgba(0, 0, 0, 0.35);
 }
 
 .ring-label {
@@ -1453,9 +1497,9 @@ a {
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-shadow:
-    0 0 8px #fff,
-    0 0 12px #fff,
-    0 1px 0 #fff;
+    0 0 10px var(--surface),
+    0 0 16px var(--bg),
+    0 1px 0 var(--surface);
 }
 
 .ring-label em {
@@ -1504,7 +1548,7 @@ a {
     padding: 10px 12px;
     border-radius: 12px;
     border: 1px solid var(--line);
-    background: #fff;
+    background: var(--surface);
   }
   .ring-dot {
     position: relative;
@@ -1791,7 +1835,7 @@ a {
 
 .integ-row.on {
   border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
-  background: color-mix(in srgb, var(--accent-soft) 55%, white);
+  background: color-mix(in srgb, var(--accent-soft) 70%, var(--surface));
 }
 
 .integ-av {
@@ -1803,7 +1847,7 @@ a {
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.02em;
-  background: #fff;
+  background: var(--surface);
   color: var(--accent);
   border: 1px solid var(--line);
   font-family: var(--font-display), Manrope, sans-serif;
@@ -1844,7 +1888,7 @@ a {
 
 .driver-chip-red {
   border-color: color-mix(in srgb, var(--r-red) 35%, var(--line));
-  background: color-mix(in srgb, var(--r-red-bg) 55%, white);
+  background: color-mix(in srgb, var(--r-red-bg) 55%, var(--surface));
 }
 
 .driver-chip-text {
@@ -1917,7 +1961,7 @@ a {
 
 .colour-source:hover {
   border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
-  background: color-mix(in srgb, var(--accent-soft) 40%, white);
+  background: color-mix(in srgb, var(--accent-soft) 40%, var(--surface));
 }
 
 .colour-source-label {
@@ -2049,7 +2093,7 @@ a {
   border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
   background: linear-gradient(
     160deg,
-    color-mix(in srgb, var(--accent-soft) 70%, white),
+    color-mix(in srgb, var(--accent-soft) 70%, var(--surface)),
     white
   );
 }

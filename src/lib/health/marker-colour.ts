@@ -13,15 +13,19 @@ export function markerItemColour(m: {
     m.flag === "high" || (m.refHigh != null && m.value > m.refHigh);
   let low = m.flag === "low" || (m.refLow != null && m.value < m.refLow);
 
-  // Blood pressure unit may carry "145/95 mmHg" — honour diastolic too.
+  // Blood pressure: parse "132/79 mmHg" and grade by ESC-style bands.
   if (m.markerKey === "BLOOD_PRESSURE" || (m.unit && /\d+\s*\/\s*\d+/.test(m.unit))) {
     const match = String(m.unit || "").match(/(\d+)\s*\/\s*(\d+)/);
     if (match) {
       const sys = Number(match[1]);
       const dia = Number(match[2]);
-      if (sys >= 140 || dia >= 90) high = true;
-      else if (sys > 129 || dia > 84) high = true;
-      if (sys < 90 || dia < 60) low = true;
+      if (sys < 90 || dia < 60) return "orange"; // too low
+      if (sys >= 160 || dia >= 100) return "red";
+      if (sys >= 140 || dia >= 90) return "orange";
+      // High-normal / elevated — not green optimal (e.g. 132/79)
+      if (sys >= 130 || dia >= 85) return "yellow";
+      if (sys >= 120 && sys <= 129 && dia < 85) return "green";
+      return "green"; // optimal <120/<80 and normal band
     }
   }
 

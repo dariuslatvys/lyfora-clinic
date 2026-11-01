@@ -28,7 +28,9 @@ export function formatMarkerReference(
   locale: "lt" | "en" = "lt"
 ): string {
   if (markerKey === "BLOOD_PRESSURE") {
-    return locale === "en" ? "< 130 / 85 mmHg" : "< 130 / 85 mmHg";
+    return locale === "en"
+      ? "Optimal < 120/80 · elevated from 130/85"
+      : "Optimalu < 120/80 · padidėjęs nuo 130/85";
   }
   if (refLow != null || refHigh != null) {
     return `${refLow ?? "—"} – ${refHigh ?? "—"}`;

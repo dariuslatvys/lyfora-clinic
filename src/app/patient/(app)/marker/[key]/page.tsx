@@ -231,17 +231,42 @@ export default async function MarkerDetailPage({
         </div>
       </section>
 
-      <section className="card surface-raised-card">
+      <section
+        className={`card surface-raised-card reading-card reading-card-${colour}`}
+        style={
+          colour !== "green" && colour !== "grey"
+            ? {
+                borderColor: COLOUR_HEX[colour],
+                background: `linear-gradient(160deg, ${COLOUR_SOFT[colour]}, var(--surface-raised) 60%)`,
+                boxShadow: `inset 0 0 0 1px ${COLOUR_HEX[colour]}55`,
+              }
+            : undefined
+        }
+      >
         <div className="card-head">
           <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold">
             {locale === "en" ? "Your reading" : "Jūsų matavimas"}
           </h2>
+          {latest ? (
+            <span className={`pill ${PILL_CLASS[colour]}`}>
+              {labels.colourLabels[colour]}
+            </span>
+          ) : null}
         </div>
         {latest ? (
           <div className="grid gap-4 sm:grid-cols-3">
             <div>
               <p className="eyebrow">{labels.value}</p>
-              <p className="mt-1 text-2xl font-semibold">{reading}</p>
+              <p
+                className="mt-1 text-2xl font-semibold"
+                style={
+                  colour !== "green" && colour !== "grey"
+                    ? { color: COLOUR_HEX[colour] }
+                    : undefined
+                }
+              >
+                {reading}
+              </p>
               <p className="mt-1 text-xs text-[var(--muted)]">
                 {latest.observedAt}
               </p>

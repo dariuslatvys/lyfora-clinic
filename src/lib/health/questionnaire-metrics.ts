@@ -29,8 +29,9 @@ function num(v: unknown): number | null {
 }
 
 function bpFlag(sys: number, dia: number): string | null {
-  if (sys >= 140 || dia >= 90) return "high";
-  if (sys > 129 || dia > 84) return "high";
+  if (sys < 90 || dia < 60) return "low";
+  // Elevated / high-normal and above — not optimal green
+  if (sys >= 130 || dia >= 85) return "high";
   return null;
 }
 

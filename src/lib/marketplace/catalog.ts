@@ -16,17 +16,23 @@ export type MarketItem = {
   nameEn: string;
   summaryLt: string;
   summaryEn: string;
+  /** Longer description shown in package / item detail. */
+  detailLt?: string;
+  detailEn?: string;
   priceEur: number;
-  /** Optional list price before clinic markup (labs from source file). */
-  basePriceEur?: number;
   durationMin?: number;
   badgeLt?: string;
   badgeEn?: string;
   metaLt?: string;
   metaEn?: string;
+  /** Included markers / services (lab packages) or short gene preview. */
   includes?: string[];
+  /** Full gene list for genetics packages (CeGaT-style). */
+  genes?: string[];
   geneCount?: number;
   code?: string;
+  /** Lab group label for singles. */
+  groupLt?: string;
 };
 
 const labSingles: MarketItem[] = (
@@ -36,7 +42,6 @@ const labSingles: MarketItem[] = (
     nameEn: string;
     groupLt: string;
     price: number;
-    basePrice: number;
   }[]
 ).map((r) => ({
   id: r.id,
@@ -46,8 +51,10 @@ const labSingles: MarketItem[] = (
   nameEn: r.nameEn,
   summaryLt: r.groupLt,
   summaryEn: r.groupLt,
+  detailLt: `Laboratorinis tyrimas iš Markers katalogo. Grupė: ${r.groupLt}.`,
+  detailEn: `Laboratory test from the Markers catalogue. Group: ${r.groupLt}.`,
   priceEur: r.price,
-  basePriceEur: r.basePrice,
+  groupLt: r.groupLt,
   badgeLt: "Vienetinis",
   badgeEn: "Single test",
 }));
@@ -59,34 +66,47 @@ const labPackages: MarketItem[] = (
     nameEn: string;
     tier: string;
     price: number;
-    basePrice: number;
     testCount: number | null;
     includes: string[];
   }[]
-).map((r) => ({
-  id: r.id,
-  category: "labs" as const,
-  kind: "package" as const,
-  nameLt: r.nameLt,
-  nameEn: r.nameEn,
-  summaryLt:
-    r.testCount != null
-      ? `${r.testCount} tyrimai · klinikinė kaina aukštesnė nei šaltinio faile`
-      : "Kompleksinis laboratorinių tyrimų paketas",
-  summaryEn:
-    r.testCount != null
-      ? `${r.testCount} markers · clinic price above source file`
-      : "Bundled laboratory package",
-  priceEur: r.price,
-  basePriceEur: r.basePrice,
-  badgeLt: r.tier === "full" ? "FULL paketas" : r.tier === "core" ? "CORE paketas" : "Paketas",
-  badgeEn: r.tier === "full" ? "FULL package" : r.tier === "core" ? "CORE package" : "Package",
-  includes: r.includes,
-  metaLt: r.testCount != null ? `${r.testCount} analitės` : undefined,
-  metaEn: r.testCount != null ? `${r.testCount} analytes` : undefined,
-}));
+).map((r) => {
+  const n = r.testCount ?? r.includes.length;
+  return {
+    id: r.id,
+    category: "labs" as const,
+    kind: "package" as const,
+    nameLt: r.nameLt,
+    nameEn: r.nameEn,
+    summaryLt: `${n} tyrimai · spauskite kortelę detalesnei sudėčiai`,
+    summaryEn: `${n} markers · open the card for the full list`,
+    detailLt:
+      r.tier === "full"
+        ? `FULL paketas pagal Markers_Category lentelę — išplėstas ${n} analitės rinkinys sveikatos sričiai stebėti. Į kainą įskaičiuotas klinikinis administravimas.`
+        : `CORE paketas pagal Markers_Category lentelę — bazinis ${n} analitės rinkinys greitam įvertinimui. Į kainą įskaičiuotas klinikinis administravimas.`,
+    detailEn:
+      r.tier === "full"
+        ? `FULL package from the Markers_Category table — expanded set of ${n} analytes for this health area. Clinic administration included.`
+        : `CORE package from the Markers_Category table — baseline set of ${n} analytes for a quick review. Clinic administration included.`,
+    priceEur: r.price,
+    badgeLt:
+      r.tier === "full"
+        ? "FULL paketas"
+        : r.tier === "core"
+          ? "CORE paketas"
+          : "Paketas",
+    badgeEn:
+      r.tier === "full"
+        ? "FULL package"
+        : r.tier === "core"
+          ? "CORE package"
+          : "Package",
+    includes: r.includes,
+    metaLt: `${n} analitės`,
+    metaEn: `${n} analytes`,
+  };
+});
 
-/** CeGaT Cardiac Diseases gene sets (HRT) — prices aligned with typical EU NGS panel quotes. */
+/** CeGaT Cardiac Diseases gene sets — genes from https://cegat.com/diagnostics/rare-diseases/cardiac-diseases/ */
 const genetics: MarketItem[] = [
   {
     id: "gen-hrt01",
@@ -96,14 +116,26 @@ const genetics: MarketItem[] = [
     nameLt: "Dilatuota kardiomiopatija",
     nameEn: "Dilated Cardiomyopathy",
     summaryLt:
-      "CeGaT tipo genų rinkinys (HRT01) — 58 genai, susiję su dilatuota kardiomiopatija.",
+      "CeGaT Gene Set HRT01 — 58 genai, susiję su dilatuota kardiomiopatija.",
     summaryEn:
-      "CeGaT-style gene set (HRT01) — 58 genes linked to dilated cardiomyopathy.",
+      "CeGaT Gene Set HRT01 — 58 genes linked to dilated cardiomyopathy.",
+    detailLt:
+      "NGS skydelio (ExomeXtra® tipo) genų rinkinys dilatuotai kardiomiopatijai. Analizuojami visi žinomi su DCM susiję genai; ataskaitoje — ACMG 3/4/5 klasės variantai. Mėginys: EDTA kraujas arba genominė DNR. Tipinis atlikimo laikas 2–4 sav.",
+    detailEn:
+      "NGS panel (ExomeXtra®-style) gene set for dilated cardiomyopathy. All known DCM-associated genes are analysed; report includes ACMG class 3/4/5 variants. Sample: EDTA blood or genomic DNA. Typical turnaround 2–4 weeks.",
     priceEur: 890,
     geneCount: 58,
     badgeLt: "Gene set",
     badgeEn: "Gene set",
-    includes: ["MYBPC3", "MYH7", "TTN", "LMNA", "RBM20", "SCN5A", "+52"],
+    genes: [
+      "ABCC9", "ACTC1", "ACTN2", "BAG3", "BAG5", "C10orf71", "CAP2", "CRYAB",
+      "DES", "DMD", "DOLK", "DSG2", "DSP", "EMD", "FKTN", "FLII", "FLNC", "HFE",
+      "JPH2", "LAMA4", "LAMP2", "LDB3", "LMNA", "LMOD2", "MYBPC3", "MYH6",
+      "MYH7", "MYLK3", "MYPN", "MYZAP", "NEXN", "NRAP", "PLEKHM2", "PLN",
+      "PPA2", "PPCS", "PPP1R13L", "PRDM16", "PSEN2", "RAF1", "RBM20", "RPL3L",
+      "RRAGC", "RRAGD", "RYR2", "SCN5A", "SDHA", "SGCD", "SPEG", "TAFAZZIN",
+      "TNNC1", "TNNI3", "TNNI3K", "TNNT2", "TPM1", "TTN", "TTR", "VCL",
+    ],
   },
   {
     id: "gen-hrt02",
@@ -112,13 +144,23 @@ const genetics: MarketItem[] = [
     code: "HRT02",
     nameLt: "Hipertrofinė kardiomiopatija",
     nameEn: "Hypertrophic Cardiomyopathy",
-    summaryLt: "HRT02 — 37 genai hipertrofinei kardiomiopatijai.",
-    summaryEn: "HRT02 — 37 genes for hypertrophic cardiomyopathy.",
+    summaryLt: "CeGaT Gene Set HRT02 — 37 genai hipertrofinei kardiomiopatijai.",
+    summaryEn: "CeGaT Gene Set HRT02 — 37 genes for hypertrophic cardiomyopathy.",
+    detailLt:
+      "HCM genų rinkinys: sarkomeriniai ir susiję genai (MYBPC3, MYH7, TNNT2 ir kt.). Galima derinti su kitais Cardiac Diseases rinkiniais be pakartotinio sekoskaitos.",
+    detailEn:
+      "HCM gene set: sarcomeric and related genes (MYBPC3, MYH7, TNNT2 and more). Can be combined with other Cardiac Diseases sets without re-sequencing.",
     priceEur: 790,
     geneCount: 37,
     badgeLt: "Gene set",
     badgeEn: "Gene set",
-    includes: ["MYBPC3", "MYH7", "TNNT2", "TNNI3", "TPM1", "GLA", "+31"],
+    genes: [
+      "ACTC1", "ACTN2", "ALPK3", "APOA1", "B2M", "CAV3", "CSRP3", "FHOD3",
+      "FLNC", "FNIP1", "GAA", "GLA", "JPH2", "KLHL24", "LAMP2", "LDB3",
+      "MYBPC3", "MYH6", "MYH7", "MYL2", "MYL3", "MYLK2", "MYOZ2", "MYPN",
+      "NEXN", "PLN", "PRKAG2", "SLC25A4", "TCAP", "TNNC1", "TNNI3", "TNNT2",
+      "TPM1", "TRIM63", "TTR", "TULP3", "VCL",
+    ],
   },
   {
     id: "gen-hrt03",
@@ -127,12 +169,21 @@ const genetics: MarketItem[] = [
     code: "HRT03",
     nameLt: "Kairiojo skilvelio nekompaktiškumas (LVNC)",
     nameEn: "Left Ventricular Noncompaction (LVNC)",
-    summaryLt: "HRT03 — 17 genų NCCM/LVNC fenotipui.",
-    summaryEn: "HRT03 — 17 genes for NCCM/LVNC phenotype.",
+    summaryLt: "CeGaT Gene Set HRT03 — 17 genų NCCM/LVNC fenotipui.",
+    summaryEn: "CeGaT Gene Set HRT03 — 17 genes for NCCM/LVNC phenotype.",
+    detailLt:
+      "LVNC / noncompaction kardiomiopatijos genų rinkinys. Naudinga esant šeimos anamnezei ar neaiškiam fenotipui kartu su DCM/HCM.",
+    detailEn:
+      "LVNC / noncompaction cardiomyopathy gene set. Useful with family history or overlapping DCM/HCM phenotypes.",
     priceEur: 690,
     geneCount: 17,
     badgeLt: "Gene set",
     badgeEn: "Gene set",
+    genes: [
+      "ACTC1", "ACTN2", "DES", "DTNA", "HCN4", "LDB3", "MIB1", "MYBPC3",
+      "MYH7", "NONO", "PRDM16", "RBM20", "SPEG", "TAFAZZIN", "TNNT2", "TPM1",
+      "TTN",
+    ],
   },
   {
     id: "gen-hrt04",
@@ -141,12 +192,17 @@ const genetics: MarketItem[] = [
     code: "HRT04",
     nameLt: "Trumpo QT sindromas",
     nameEn: "Short QT Syndrome",
-    summaryLt: "HRT04 — 4 genai (KCNH2, KCNJ2, KCNQ1, SLC4A3).",
-    summaryEn: "HRT04 — 4 genes (KCNH2, KCNJ2, KCNQ1, SLC4A3).",
+    summaryLt: "CeGaT Gene Set HRT04 — 4 genai (KCNH2, KCNJ2, KCNQ1, SLC4A3).",
+    summaryEn: "CeGaT Gene Set HRT04 — 4 genes (KCNH2, KCNJ2, KCNQ1, SLC4A3).",
+    detailLt:
+      "Trumpo QT sindromo jonų kanalų genai. Dažnai užsakomas kartu su ilgo QT / aritmijų rinkiniais.",
+    detailEn:
+      "Ion-channel genes for short QT syndrome. Often ordered with long QT / arrhythmia sets.",
     priceEur: 590,
     geneCount: 4,
     badgeLt: "Gene set",
     badgeEn: "Gene set",
+    genes: ["KCNH2", "KCNJ2", "KCNQ1", "SLC4A3"],
   },
   {
     id: "gen-hrt05",
@@ -155,12 +211,20 @@ const genetics: MarketItem[] = [
     code: "HRT05",
     nameLt: "Ilgo QT sindromas",
     nameEn: "Long QT Syndrome",
-    summaryLt: "HRT05 — 11 genų ilgo QT sindromui.",
-    summaryEn: "HRT05 — 11 genes for long QT syndrome.",
+    summaryLt: "CeGaT Gene Set HRT05 — 11 genų ilgo QT sindromui.",
+    summaryEn: "CeGaT Gene Set HRT05 — 11 genes for long QT syndrome.",
+    detailLt:
+      "Klasikiniai LQTS genai (KCNQ1, KCNH2, SCN5A ir kt.) — staigios mirties rizikos ir šeimos skriningo kontekste.",
+    detailEn:
+      "Classic LQTS genes (KCNQ1, KCNH2, SCN5A and more) — for sudden-death risk and family screening.",
     priceEur: 650,
     geneCount: 11,
     badgeLt: "Gene set",
     badgeEn: "Gene set",
+    genes: [
+      "CACNA1C", "CALM1", "CALM2", "CALM3", "KCNE1", "KCNE2", "KCNH2",
+      "KCNJ2", "KCNQ1", "SCN5A", "TRDN",
+    ],
   },
   {
     id: "gen-hrt06",
@@ -169,12 +233,20 @@ const genetics: MarketItem[] = [
     code: "HRT06",
     nameLt: "Aritmogeninė dešiniojo skilvelio displazija (ARVD/C)",
     nameEn: "Arrhythmogenic Right Ventricular Dysplasia (ARVD/C)",
-    summaryLt: "HRT06 — 11 genų ARVD/C.",
-    summaryEn: "HRT06 — 11 genes for ARVD/C.",
+    summaryLt: "CeGaT Gene Set HRT06 — 11 genų ARVD/C.",
+    summaryEn: "CeGaT Gene Set HRT06 — 11 genes for ARVD/C.",
+    detailLt:
+      "Desmosomų ir susiję ARVC/D genai (PKP2, DSP, DSG2, DSC2, JUP ir kt.).",
+    detailEn:
+      "Desmosomal and related ARVC/D genes (PKP2, DSP, DSG2, DSC2, JUP and more).",
     priceEur: 650,
     geneCount: 11,
     badgeLt: "Gene set",
     badgeEn: "Gene set",
+    genes: [
+      "CDH2", "DES", "DSC2", "DSG2", "DSP", "JUP", "PKP2", "PLN", "SCN5A",
+      "TMEM43", "TTN",
+    ],
   },
   {
     id: "gen-hrt07",
@@ -183,12 +255,20 @@ const genetics: MarketItem[] = [
     code: "HRT07",
     nameLt: "Brugada sindromas",
     nameEn: "Brugada Syndrome",
-    summaryLt: "HRT07 — 8 genai Brugada sindromui.",
-    summaryEn: "HRT07 — 8 genes for Brugada syndrome.",
+    summaryLt: "CeGaT Gene Set HRT07 — 8 genai Brugada sindromui.",
+    summaryEn: "CeGaT Gene Set HRT07 — 8 genes for Brugada syndrome.",
+    detailLt:
+      "Brugada sindromo genų rinkinys su SCN5A ir susijusiais kanalų genais.",
+    detailEn:
+      "Brugada syndrome gene set including SCN5A and related channel genes.",
     priceEur: 620,
     geneCount: 8,
     badgeLt: "Gene set",
     badgeEn: "Gene set",
+    genes: [
+      "CACNA1C", "CACNB2", "GPD1L", "KCND3", "SCN1B", "SCN5A", "SEMA3A",
+      "TRPM4",
+    ],
   },
   {
     id: "gen-hrt08",
@@ -197,12 +277,19 @@ const genetics: MarketItem[] = [
     code: "HRT08",
     nameLt: "Katecholaminerginė polimorfinė VT (CPVT)",
     nameEn: "Catecholaminergic Polymorphic VT (CPVT)",
-    summaryLt: "HRT08 — 8 genai CPVT.",
-    summaryEn: "HRT08 — 8 genes for CPVT.",
+    summaryLt: "CeGaT Gene Set HRT08 — 8 genai CPVT.",
+    summaryEn: "CeGaT Gene Set HRT08 — 8 genes for CPVT.",
+    detailLt:
+      "CPVT genai (RYR2, CASQ2, TECRL ir kt.) — streso / fizinio krūvio aritmijų kontekste.",
+    detailEn:
+      "CPVT genes (RYR2, CASQ2, TECRL and more) — for stress / exercise-triggered arrhythmias.",
     priceEur: 620,
     geneCount: 8,
     badgeLt: "Gene set",
     badgeEn: "Gene set",
+    genes: [
+      "CALM1", "CALM2", "CALM3", "CASQ2", "KCNJ2", "RYR2", "TECRL", "TRDN",
+    ],
   },
   {
     id: "gen-hrt17",
@@ -212,13 +299,24 @@ const genetics: MarketItem[] = [
     nameLt: "Širdies aritmijos (apjungiantis rinkinys)",
     nameEn: "Cardiac Arrhythmias (overarching set)",
     summaryLt:
-      "HRT17 — 39 genai: Short/Long QT, ARVD/C, Brugada, CPVT ir susiję fenotipai.",
+      "CeGaT HRT17 — 39 genai: Short/Long QT, ARVD/C, Brugada, CPVT ir susiję fenotipai.",
     summaryEn:
-      "HRT17 — 39 genes covering Short/Long QT, ARVD/C, Brugada, CPVT and related phenotypes.",
+      "CeGaT HRT17 — 39 genes covering Short/Long QT, ARVD/C, Brugada, CPVT and related phenotypes.",
+    detailLt:
+      "Apjungiantis aritmijų genų rinkinys — kai klinikinis fenotipas neaiškus arba reikia platesnės diferencialinės diagnostikos.",
+    detailEn:
+      "Overarching arrhythmia gene set — when the clinical phenotype is unclear or broader differential diagnosis is needed.",
     priceEur: 990,
     geneCount: 39,
     badgeLt: "Gene set",
     badgeEn: "Gene set",
+    genes: [
+      "CACNA1C", "CACNA1D", "CACNB2", "CALM1", "CALM2", "CALM3", "CASQ2",
+      "CDH2", "DES", "DSC2", "DSG2", "DSP", "GPD1L", "JUP", "KCND3", "KCNE1",
+      "KCNE2", "KCNH2", "KCNJ2", "KCNQ1", "PKP2", "PLN", "POPDC2", "RYR2",
+      "SCN1B", "SCN5A", "SLC4A3", "TECRL", "TMEM43", "TRDN", "TRPM4", "TTN",
+      "ANK2", "GJA5", "HCN4", "NKX2-5", "PRKAG2", "RANGRF", "SNTA1",
+    ],
   },
   {
     id: "gen-hrt09",
@@ -227,12 +325,35 @@ const genetics: MarketItem[] = [
     code: "HRT09",
     nameLt: "Įgimtos širdies ydos (izoliuotos ir sindrominės)",
     nameEn: "Isolated and Syndromal Congenital Heart Defects",
-    summaryLt: "HRT09 — 126 genai įgimtoms širdies ydoms.",
-    summaryEn: "HRT09 — 126 genes for congenital heart defects.",
+    summaryLt: "CeGaT Gene Set HRT09 — 126 genai įgimtoms širdies ydoms.",
+    summaryEn: "CeGaT Gene Set HRT09 — 126 genes for congenital heart defects.",
+    detailLt:
+      "Platus CHD genų rinkinys (izoliuotos ir sindrominės formos, įskaitant Noonan / RASopathy diferencialą pagal CeGaT Cardiac Diseases panelį).",
+    detailEn:
+      "Broad CHD gene set (isolated and syndromal forms, including Noonan / RASopathy differential per CeGaT Cardiac Diseases panel).",
     priceEur: 1290,
     geneCount: 126,
     badgeLt: "Gene set",
     badgeEn: "Gene set",
+    genes: [
+      "ABL1", "ACTA2", "ACTC1", "ACVR2B", "ADAMTS10", "ADAMTS19", "ALDH1A2",
+      "ANKRD11", "B3GAT3", "BCOR", "CBL", "CCDC39", "CDK13", "CFAP53", "CHD4",
+      "CHD7", "CIROP", "CIROZ", "CITED2", "CREBBP", "CRELD1", "CTNND1", "CUL3",
+      "DNAAF1", "DNAAF3", "DNAH11", "DNAH5", "DNAI1", "EHMT1", "ELN", "ETS1",
+      "EVC", "EVC2", "FLNA", "FLT4", "FOXC1", "FOXH1", "G6PC3", "GATA4",
+      "GATA5", "GATA6", "GDF1", "GJA1", "GPC3", "HAAO", "HAND1", "HAND2",
+      "HEY2", "HOXA1", "HRAS", "HYAL2", "ISL1", "JAG1", "KDM2B", "KDM6A",
+      "KLF13", "KMT2D", "KYNU", "LZTR1", "MAP2K1", "MAP2K2", "MAP3K7",
+      "MAPKAPK5", "MED12", "MEIS2", "MESP1", "MID1", "MMP21", "MNS1", "MYH6",
+      "MYH7", "MYRF", "NADSYN1", "NEK8", "NIPBL", "NKX2-5", "NKX2-6", "NODAL",
+      "NONO", "NOTCH1", "NOTCH2", "NR2F2", "NUP188", "PAN2", "PBX1", "PKD1L1",
+      "PLD1", "PPP1CB", "PRKACA", "PRKACB", "PRKD1", "PTPN11", "RAF1",
+      "RBFOX2", "RBM10", "RIT1", "ROBO1", "ROBO4", "ROCK2", "RRAGC", "SALL1",
+      "SALL4", "SMAD2", "SMAD6", "SMG9", "SOS1", "SOS2", "SOX17", "SPRED2",
+      "SRF", "STRA6", "TAB2", "TBX1", "TBX20", "TBX5", "TFAP2B", "TLL1",
+      "TM2D3", "TMEM260", "TMEM94", "TRAF7", "WBP11", "ZEB2", "ZFPM1",
+      "ZFPM2", "ZIC3",
+    ],
   },
   {
     id: "gen-hrt-lipid",
@@ -242,14 +363,22 @@ const genetics: MarketItem[] = [
     nameLt: "Šeiminė hiperlipidemia / dislipidemija",
     nameEn: "Familial Hypercholesterolemia / Dyslipidemia",
     summaryLt:
-      "18 genų: LDLR, APOB, PCSK9, ABCG5/8, LPL ir kt. (CeGaT kardiologinio skydelio lipidų rinkinys).",
+      "CeGaT lipidų rinkinys — 18 genų: LDLR, APOB, PCSK9, ABCG5/8, LPL ir kt.",
     summaryEn:
-      "18 genes: LDLR, APOB, PCSK9, ABCG5/8, LPL and more (CeGaT cardiac panel lipid set).",
+      "CeGaT lipid set — 18 genes: LDLR, APOB, PCSK9, ABCG5/8, LPL and more.",
+    detailLt:
+      "Šeiminės hiperlipidemijos / dislipidemijos genai iš Cardiac Diseases panelio. Tinka esant aukštam MTL, šeimos anamnezei ar blogai toleruojamiems statinams (derinama su PGX).",
+    detailEn:
+      "Familial hypercholesterolemia / dyslipidemia genes from the Cardiac Diseases panel. Useful for high LDL, family history or statin intolerance (combine with PGX).",
     priceEur: 690,
     geneCount: 18,
     badgeLt: "Gene set",
     badgeEn: "Gene set",
-    includes: ["LDLR", "APOB", "PCSK9", "APOE", "LPL", "ABCG5", "+12"],
+    genes: [
+      "ABCA1", "ABCG5", "ABCG8", "APOA1", "APOA5", "APOB", "APOC2", "APOE",
+      "CREB3L3", "GPD1", "GPIHBP1", "LCAT", "LDLR", "LDLRAP1", "LIPA", "LMF1",
+      "LPL", "PCSK9",
+    ],
   },
   {
     id: "gen-hrt-full",
@@ -262,6 +391,10 @@ const genetics: MarketItem[] = [
       "Visas Cardiac Diseases skydelis (~257 genai): kardiomiopatijos, aritmijos, lipidai, įgimtos ydos.",
     summaryEn:
       "Full Cardiac Diseases panel (~257 genes): cardiomyopathies, arrhythmias, lipids, congenital defects.",
+    detailLt:
+      "Pilnas CeGaT Cardiac Diseases diagnostinis skydelis pagal ExomeXtra® — kardiomiopatijos, aritmijos, šeiminės hiperlipidemijos, įgimtos ydos. Vienas mėginys, plati ataskaita su ACMG klasifikacija.",
+    detailEn:
+      "Full CeGaT Cardiac Diseases diagnostic panel on ExomeXtra® — cardiomyopathies, arrhythmias, familial hyperlipidemias, congenital defects. One sample, broad report with ACMG classification.",
     priceEur: 2490,
     geneCount: 257,
     badgeLt: "Pilnas skydelis",
@@ -278,6 +411,10 @@ const genetics: MarketItem[] = [
       "21 geno farmakogenetinis profilis — vaistų metabolizmas, tolerancija ir dozavimas.",
     summaryEn:
       "21-gene pharmacogenetic profile — drug metabolism, tolerance and dosing.",
+    detailLt:
+      "CeGaT PGX priedas: variantai, veikiantys vaistų metabolizmą (statinai, beta blokatoriai, antidepresantai ir kt.). Gydytojas gali individualiai koreguoti terapiją.",
+    detailEn:
+      "CeGaT PGX add-on: variants affecting drug metabolism (statins, beta-blockers, antidepressants and more). Helps tailor therapy.",
     priceEur: 390,
     geneCount: 21,
     badgeLt: "Papildoma analizė",
@@ -294,6 +431,10 @@ const genetics: MarketItem[] = [
       "Papildoma ACMG 4/5 klasės patogeninių variantų ataskaita (antriniai radiniai).",
     summaryEn:
       "Optional ACMG class 4/5 pathogenic secondary-findings report.",
+    detailLt:
+      "Pagal ACMG gaires — patogeniniai / tikėtinai patogeniniai antriniai radiniai genuose, kuriems yra klinikinis veiksmų planas jums ar šeimai.",
+    detailEn:
+      "Per ACMG guidelines — pathogenic / likely pathogenic secondary findings in genes with an actionable care plan for you or your family.",
     priceEur: 190,
     badgeLt: "Priedas",
     badgeEn: "Add-on",
@@ -309,6 +450,10 @@ const genetics: MarketItem[] = [
       "Platus SNP genotipavimas sveikatos kategorijoms ir rizikos aleliams skaitmeniniame dvyne.",
     summaryEn:
       "Broad SNP genotyping for digital-twin health categories and risk alleles.",
+    detailLt:
+      "Mikroarray SNP genotipavimas — rezultatai įkeliami į skaitmeninį dvynį (širdies, metabolizmo, miego ir kt. kategorijos).",
+    detailEn:
+      "Microarray SNP genotyping — results feed the digital twin (heart, metabolism, sleep and more).",
     priceEur: 450,
     badgeLt: "Vienetinis",
     badgeEn: "Single test",
@@ -324,6 +469,10 @@ const genetics: MarketItem[] = [
       "Retų genų mutacijų ir paveldimų ligų rizikos paieška nuskaitant giliąją DNR seką (ExomeXtra® tipo).",
     summaryEn:
       "Deep DNA sequencing to detect rare genetic mutations and hereditary disease risks (ExomeXtra®-style).",
+    detailLt:
+      "Išsamus NGS (ExomeXtra® tipo) — baltymus koduojančios sritys ir žinomos patogeninės introninės / intergeninės vietos. Tinka platesnei paveldimų ligų diagnostikai.",
+    detailEn:
+      "Comprehensive NGS (ExomeXtra®-style) — protein-coding regions plus known pathogenic intronic / intergenic sites. For broader hereditary disease diagnostics.",
     priceEur: 1890,
     badgeLt: "Išsamus NGS",
     badgeEn: "Comprehensive NGS",
@@ -419,6 +568,10 @@ const consultations: MarketItem[] = [
       "4 planinės konsultacijos + prioritetinis chat + 1 genetikos rezultatų aptarimas.",
     summaryEn:
       "4 planned consults + priority chat + 1 genetics results review.",
+    detailLt:
+      "Metinis paketas: keturi planiniai vizitai, prioritetinis chat su klinika ir vienas genetikos rezultatų aptarimas.",
+    detailEn:
+      "Annual package: four planned visits, priority clinic chat and one genetics results review.",
     priceEur: 490,
     badgeLt: "Paketas",
     badgeEn: "Package",
@@ -437,9 +590,14 @@ const consultations: MarketItem[] = [
     nameEn: "Heart monitoring package",
     summaryLt: "Kardiologas + slaugytoja + EKG interpretacija per 3 mėnesius.",
     summaryEn: "Cardiologist + nurse + ECG interpretation over 3 months.",
+    detailLt:
+      "3 mėn. širdies stebėsena: kardiologo vizitas, slaugytojos kontrolė ir EKG interpretacija.",
+    detailEn:
+      "3-month heart monitoring: cardiologist visit, nurse check-in and ECG interpretation.",
     priceEur: 320,
     badgeLt: "Paketas",
     badgeEn: "Package",
+    includes: ["Kardiologo vizitas", "Slaugytojos kontrolė", "EKG interpretacija"],
   },
 ];
 
@@ -478,6 +636,8 @@ const wellness: MarketItem[] = [
     nameEn: "5-massage pass",
     summaryLt: "5× 60 min klasikinis arba sportinis masažas per 3 mėn.",
     summaryEn: "5× 60 min classic or sports massage within 3 months.",
+    detailLt: "Penki 60 min masažai (klasikinis arba sportinis) per 3 mėnesius.",
+    detailEn: "Five 60 min massages (classic or sports) within 3 months.",
     priceEur: 310,
     badgeLt: "Paketas",
     badgeEn: "Package",
@@ -505,6 +665,8 @@ const wellness: MarketItem[] = [
     nameEn: "Couples SPA evening",
     summaryLt: "Dviem: SPA zona, sinchroninis masažas ir lengvi užkandžiai.",
     summaryEn: "For two: SPA zone, synchronised massage and light snacks.",
+    detailLt: "Poroms: SPA zona, sinchroninis masažas ir lengvi užkandžiai.",
+    detailEn: "For couples: SPA zone, synchronised massage and light snacks.",
     priceEur: 279,
     badgeLt: "Paketas",
     badgeEn: "Package",
@@ -517,9 +679,14 @@ const wellness: MarketItem[] = [
     nameEn: "Detox & recovery weekend",
     summaryLt: "2 dienos: SPA, 2 masažai, kvėpavimo sesija ir miego higienos planas.",
     summaryEn: "2 days: SPA, 2 massages, breathwork and a sleep-hygiene plan.",
+    detailLt:
+      "Savaitgalio atstatymas: SPA, du masažai, kvėpavimo sesija ir miego higienos planas.",
+    detailEn:
+      "Weekend recovery: SPA, two massages, breathwork and a sleep-hygiene plan.",
     priceEur: 420,
     badgeLt: "Paketas",
     badgeEn: "Package",
+    includes: ["SPA", "2× masažas", "Kvėpavimo sesija", "Miego planas"],
   },
   {
     id: "wel-diet-intro",
@@ -557,9 +724,14 @@ const wellness: MarketItem[] = [
       "Įžanga + 3 kontrolės + savaitiniai meniu + chat palaikymas.",
     summaryEn:
       "Intro + 3 check-ins + weekly menus + chat support.",
+    detailLt:
+      "Aštuonių savaičių mentorystė: įvadinė konsultacija, trys kontrolės, savaitiniai meniu ir chat palaikymas.",
+    detailEn:
+      "Eight-week mentorship: intro consult, three check-ins, weekly menus and chat support.",
     priceEur: 320,
     badgeLt: "Paketas",
     badgeEn: "Package",
+    includes: ["Įžanga", "3× kontrolė", "Savaitiniai meniu", "Chat"],
   },
   {
     id: "wel-recovery-pkg",
@@ -569,6 +741,8 @@ const wellness: MarketItem[] = [
     nameEn: "Post-stress recovery package",
     summaryLt: "Dietologas + 3 masažai + 1 SPA diena.",
     summaryEn: "Dietitian + 3 massages + 1 SPA day.",
+    detailLt: "Po streso: dietologo konsultacija, trys masažai ir SPA diena.",
+    detailEn: "After stress: dietitian consult, three massages and a SPA day.",
     priceEur: 399,
     badgeLt: "Paketas",
     badgeEn: "Package",
@@ -594,15 +768,19 @@ export const MARKET_CATEGORIES: {
     id: "labs",
     lt: "Laboratoriniai tyrimai",
     en: "Laboratory tests",
-    blurbLt: "Vienetiniai žymenys ir CORE/FULL paketai iš Markers lentelės.",
-    blurbEn: "Single markers and CORE/FULL packages from the Markers table.",
+    blurbLt:
+      "Visi Markers lentelės tyrimai ir CORE/FULL paketai. Spauskite paketą — pamatysite visą sudėtį.",
+    blurbEn:
+      "All Markers-table tests and CORE/FULL packages. Open a package for the full contents.",
   },
   {
     id: "genetics",
     lt: "Genetiniai tyrimai",
     en: "Genetic tests",
-    blurbLt: "CeGaT Cardiac Diseases gene sets, SNP, NGS ir PGX.",
-    blurbEn: "CeGaT Cardiac Diseases gene sets, SNP, NGS and PGX.",
+    blurbLt:
+      "CeGaT Cardiac Diseases gene sets, SNP, NGS ir PGX. Spauskite paketą — genų sąrašas ir aprašymas.",
+    blurbEn:
+      "CeGaT Cardiac Diseases gene sets, SNP, NGS and PGX. Open a package for genes and description.",
   },
   {
     id: "wellness",
@@ -620,6 +798,10 @@ export const MARKETPLACE_ITEMS: MarketItem[] = [
   ...genetics,
   ...wellness,
 ];
+
+export function getMarketItem(id: string) {
+  return MARKETPLACE_ITEMS.find((i) => i.id === id) || null;
+}
 
 export function formatEur(n: number, locale: "lt" | "en") {
   return new Intl.NumberFormat(locale === "en" ? "en-GB" : "lt-LT", {

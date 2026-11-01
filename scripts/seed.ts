@@ -351,6 +351,77 @@ function main() {
     );
   }
 
+  // Physical / functional metrics (wearable + clinic vitals) for male demo
+  const physicalMale = [
+    {
+      key: "BLOOD_PRESSURE",
+      value: 142,
+      unit: "mmHg SYS",
+      low: 90,
+      high: 129,
+      flag: "high",
+      date: "2026-09-15",
+    },
+    {
+      key: "RESTING_HR",
+      value: 78,
+      unit: "bpm",
+      low: 50,
+      high: 75,
+      flag: "high",
+      date: "2026-09-15",
+    },
+    {
+      key: "HRV",
+      value: 28,
+      unit: "ms",
+      low: 40,
+      high: 120,
+      flag: "low",
+      date: "2026-09-14",
+    },
+    {
+      key: "VO2MAX",
+      value: 34,
+      unit: "ml/kg/min",
+      low: 35,
+      high: 55,
+      flag: "low",
+      date: "2026-06-03",
+    },
+    {
+      key: "ACTIVITY_DATA",
+      value: 5200,
+      unit: "steps/day",
+      low: 7000,
+      high: 15000,
+      flag: "low",
+      date: "2026-09-15",
+    },
+    {
+      key: "BMI",
+      value: 27.4,
+      unit: "kg/m²",
+      low: 18.5,
+      high: 24.9,
+      flag: "high",
+      date: "2026-09-15",
+    },
+  ];
+  for (const m of physicalMale) {
+    insertResult.run(
+      patientId,
+      m.key,
+      m.value,
+      m.unit,
+      m.low,
+      m.high,
+      m.flag,
+      m.date,
+      "physical-demo"
+    );
+  }
+
   // Light marker set for female demo (synthetic)
   const femaleMarkers = [
     { key: "LDL", value: 2.4, unit: "mmol/L", low: 0, high: 2.59, flag: null, date: "2026-05-01" },
@@ -443,7 +514,11 @@ function main() {
   console.log("Seeded Lyfora DB");
   console.log("  patients: Jonas Jonaitis / John Doe (labs + SNP + NGS), Rasa Rasaitė / Jane Smith (AncestryDNA SNP + female VCF)");
   console.log("  SNPs:", snps.length);
-  console.log("  marker results:", blood.markers.length);
+  console.log(
+    "  marker results:",
+    blood.markers.length + physicalMale.length,
+    `(labs ${blood.markers.length} + physical ${physicalMale.length})`
+  );
   console.log("  male microarray genotypes:", maleGeno.genotypes.length);
   console.log("  female microarray genotypes:", femaleGeno.genotypes.length);
   console.log("  male rare:", rareMale.variants.length, "female rare:", rareFemale.variants.length);

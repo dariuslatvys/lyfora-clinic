@@ -83,6 +83,9 @@ export const dict = {
     noRiskAlleles: "Rizikos alelių sutapimų nėra",
     riskAlleleMatches: "rizikos alelis (-iai)",
     markers: "Žymenys",
+    physicalMetrics: "Fiziniai rodikliai",
+    physicalMetricsHint:
+      "Kraujo spaudimas, HRV, VO₂max, aktyvumas ir kiti funkciniai matavimai — ne laboratoriniai biomarkeriai, bet daro įtaką kategorijos signalui.",
     genes: "Genai (SNP)",
     rareMutations: "Retos genetinės mutacijos",
     rareShort: "Retos mutacijos",
@@ -212,6 +215,9 @@ export const dict = {
     noRiskAlleles: "No risk-allele matches",
     riskAlleleMatches: "risk alleles",
     markers: "Markers",
+    physicalMetrics: "Physical metrics",
+    physicalMetricsHint:
+      "Blood pressure, HRV, VO₂max, activity and other functional readings — not lab biomarkers, but they still affect the category signal.",
     genes: "Genes (SNP)",
     rareMutations: "Rare genetic mutations",
     rareShort: "Rare mutations",

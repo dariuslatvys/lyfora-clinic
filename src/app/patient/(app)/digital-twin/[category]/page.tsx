@@ -50,7 +50,7 @@ export default async function CategoryDetailPage({
 
   const historyByKey = (() => {
     const map = new Map<string, number[]>();
-    for (const m of [...cat.markers].sort((a, b) =>
+    for (const m of [...cat.markers, ...cat.physical].sort((a, b) =>
       a.observedAt.localeCompare(b.observedAt)
     )) {
       const cur = map.get(m.markerKey) || [];
@@ -60,9 +60,9 @@ export default async function CategoryDetailPage({
     return map;
   })();
 
-  const latestMarkers = (() => {
+  const latestOf = (rows: typeof cat.markers) => {
     const map = new Map<string, (typeof cat.markers)[number]>();
-    for (const m of [...cat.markers].sort((a, b) =>
+    for (const m of [...rows].sort((a, b) =>
       a.observedAt.localeCompare(b.observedAt)
     )) {
       map.set(m.markerKey, m);
@@ -70,7 +70,10 @@ export default async function CategoryDetailPage({
     return [...map.values()].sort(
       (a, b) => colourRank(markerItemColour(b)) - colourRank(markerItemColour(a))
     );
-  })();
+  };
+
+  const latestMarkers = latestOf(cat.markers);
+  const latestPhysical = latestOf(cat.physical);
 
   const sortedSnps = [...cat.snps].sort((a, b) => {
     const ra = colourRank(a.colour);
@@ -80,7 +83,9 @@ export default async function CategoryDetailPage({
   });
 
   const selectedMarker = selectedMarkerKey
-    ? cat.markers.filter((m) => m.markerKey === selectedMarkerKey)
+    ? [...cat.markers, ...cat.physical].filter(
+        (m) => m.markerKey === selectedMarkerKey
+      )
     : [];
   const markerMeta = selectedMarker[0];
   const selectedSnp = selectedSnpId
@@ -89,8 +94,10 @@ export default async function CategoryDetailPage({
 
   const catRare = cat.rare ?? [];
   const hasMarkers = latestMarkers.length > 0;
+  const hasPhysical = latestPhysical.length > 0;
   const hasSnps = sortedSnps.length > 0;
   const hasRare = catRare.length > 0;
+  const physicalColour = cat.physicalColour ?? "grey";
 
   const snpTitle =
     cat.id === "pharmacogenetics"
@@ -102,9 +109,9 @@ export default async function CategoryDetailPage({
   const geneticColour: RiskColour = cat.geneticColour ?? "grey";
   const biomarkerColour = cat.biomarkerColour;
   // Pharmacogenetics (and any genes-only category): skip colour chrome.
-  const genesOnly = hasSnps && !hasMarkers && !hasRare;
+  const genesOnly = hasSnps && !hasMarkers && !hasPhysical && !hasRare;
 
-  const bothColumns = hasMarkers && hasSnps;
+  const bothColumns = (hasMarkers || hasPhysical) && hasSnps;
   const columnsClass = bothColumns
     ? "grid gap-5 lg:grid-cols-2"
     : "grid gap-5";
@@ -143,7 +150,7 @@ export default async function CategoryDetailPage({
         </p>
       </section>
 
-      {!genesOnly && (hasMarkers || hasSnps || hasRare) && (
+      {!genesOnly && (hasMarkers || hasPhysical || hasSnps || hasRare) && (
         <nav className="cat-source-tabs" aria-label={labels.categoriesTitle}>
           {hasMarkers ? (
             <a href="#section-markers" className="cat-source-tab">
@@ -153,6 +160,16 @@ export default async function CategoryDetailPage({
                 aria-hidden="true"
               />
               {labels.markers}
+            </a>
+          ) : null}
+          {hasPhysical ? (
+            <a href="#section-physical" className="cat-source-tab">
+              <span
+                className="cat-source-dot"
+                style={{ background: COLOUR_HEX[physicalColour] }}
+                aria-hidden="true"
+              />
+              {labels.physicalMetrics}
             </a>
           ) : null}
           {hasSnps ? (
@@ -197,11 +214,14 @@ export default async function CategoryDetailPage({
                   key={v.id ?? `${v.gene}-${v.hgvs}`}
                   id={anchor}
                   href={`/patient/rare/${encodeURIComponent(String(v.id ?? v.gene))}`}
-                  className="block scroll-mt-24 rounded-lg border border-[var(--r-red)]/30 bg-[var(--r-red-bg)]/40 p-4 transition hover:border-[var(--r-red)]"
+                  className="rare-finding-card block scroll-mt-24 rounded-lg border border-[var(--r-red)]/30 bg-[var(--r-red-bg)]/40 p-4 transition hover:border-[var(--r-red)]"
                 >
                   <div className="flex flex-wrap items-center gap-2">
                     <Pill colour="red" label={labels.colourLabels.red} />
-                    <h4 className="text-lg font-semibold">
+                    <h4
+                      className="text-lg font-semibold"
+                      style={{ color: COLOUR_HEX.red }}
+                    >
                       {(locale === "lt" ? v.titleLt : v.titleEn) || v.gene}
                     </h4>
                   </div>
@@ -211,6 +231,59 @@ export default async function CategoryDetailPage({
                   <p className="mt-2 text-sm leading-relaxed text-[var(--ink-soft)]">
                     {locale === "lt" ? v.summaryLt : v.summaryEn}
                   </p>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {hasPhysical && (
+        <section id="section-physical" className="panel scroll-mt-24 space-y-3">
+          <div className="card-head" style={{ marginBottom: 0 }}>
+            <h3 className="font-[family-name:var(--font-display)] text-2xl">
+              {labels.physicalMetrics}
+            </h3>
+            <Pill
+              colour={physicalColour}
+              label={labels.colourLabels[physicalColour]}
+            />
+          </div>
+          <p className="m-0 text-sm text-[var(--ink-soft)]">
+            {labels.physicalMetricsHint}
+          </p>
+          <div className="marker-list">
+            <div className="marker-list-head" aria-hidden="true">
+              <span>{labels.labsIndicator}</span>
+              <span>{labels.labsResult}</span>
+              <span>{labels.labsChange}</span>
+              <span>{labels.labsStatus}</span>
+            </div>
+            {latestPhysical.map((m) => {
+              const c = markerItemColour(m);
+              const series = historyByKey.get(m.markerKey) || [m.value];
+              return (
+                <Link
+                  key={m.markerKey}
+                  href={`/patient/marker/${encodeURIComponent(m.markerKey)}?cat=${category}`}
+                  className={`marker-row ${
+                    selectedMarkerKey === m.markerKey ? "on" : ""
+                  }`}
+                  style={{ borderLeftColor: COLOUR_HEX[c] }}
+                >
+                  <span className="marker-row-name">
+                    {m.name || m.markerKey}
+                  </span>
+                  <span className="marker-row-val">
+                    {m.value}
+                    {m.unit ? ` ${m.unit}` : ""}
+                  </span>
+                  <span className="marker-row-spark">
+                    <Sparkline values={series} width={84} height={28} />
+                  </span>
+                  <span className="marker-row-status">
+                    <Pill colour={c} label={labels.colourLabels[c]} />
+                  </span>
                 </Link>
               );
             })}
@@ -268,7 +341,7 @@ export default async function CategoryDetailPage({
                 })}
               </div>
 
-              {markerMeta && (
+              {markerMeta && !latestPhysical.some((m) => m.markerKey === markerMeta.markerKey) && (
                 <div
                   className="mt-4 rounded-lg border bg-[var(--surface-raised)] p-4"
                   style={{

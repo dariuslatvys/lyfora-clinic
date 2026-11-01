@@ -6,6 +6,7 @@ import {
   type HealthCategoryId,
 } from "./categories";
 import { rareGeneCategory, rareMutationForcesRed } from "./rare-genes";
+import { splitMarkersByKind } from "./physical-metrics";
 
 export type SnpRiskRow = {
   gene: string;
@@ -99,25 +100,31 @@ export function evaluateSnp(
   };
 }
 
-/** Biomarker colour per Health Category Colour Determination (markers). */
-export function evaluateMarkerColour(
-  markers: MarkerResult[]
-): RiskColour {
-  if (!markers.length) return "grey";
-
+function latestMarkers(markers: MarkerResult[]) {
   const latestByKey = new Map<string, MarkerResult>();
   for (const m of [...markers].sort((a, b) =>
     a.observedAt.localeCompare(b.observedAt)
   )) {
     latestByKey.set(m.markerKey, m);
   }
-  const latest = [...latestByKey.values()];
-  const abnormal = latest.filter((m) => {
-    if (m.flag === "high" || m.flag === "low") return true;
-    if (m.refHigh != null && m.value > m.refHigh) return true;
-    if (m.refLow != null && m.value < m.refLow) return true;
-    return false;
-  });
+  return [...latestByKey.values()];
+}
+
+function isAbnormalMarker(m: MarkerResult) {
+  if (m.flag === "high" || m.flag === "low") return true;
+  if (m.refHigh != null && m.value > m.refHigh) return true;
+  if (m.refLow != null && m.value < m.refLow) return true;
+  return false;
+}
+
+/** Biomarker colour per Health Category Colour Determination (markers). */
+export function evaluateMarkerColour(
+  markers: MarkerResult[]
+): RiskColour {
+  if (!markers.length) return "grey";
+
+  const latest = latestMarkers(markers);
+  const abnormal = latest.filter(isAbnormalMarker);
 
   if (latest.length < 2) return "grey";
   if (!abnormal.length) return "green";
@@ -126,6 +133,32 @@ export function evaluateMarkerColour(
   const strong = abnormal.filter((m) => {
     if (m.refHigh == null) return m.flag === "high";
     return m.value >= m.refHigh * 1.35;
+  });
+  if (strong.length >= 2 && abnormal.length >= 3) return "red";
+  if (abnormal.length >= 2) return "orange";
+  return "yellow";
+}
+
+/**
+ * Physical / functional metrics (BP, HRV, VO₂max, …).
+ * Even a single out-of-range reading should raise the signal.
+ */
+export function evaluatePhysicalColour(
+  markers: MarkerResult[]
+): RiskColour {
+  if (!markers.length) return "grey";
+  const latest = latestMarkers(markers);
+  const abnormal = latest.filter(isAbnormalMarker);
+  if (!abnormal.length) return "green";
+  if (abnormal.length === 1) return "yellow";
+  const strong = abnormal.filter((m) => {
+    if (m.refHigh != null && m.value > m.refHigh) {
+      return m.value >= m.refHigh * 1.25;
+    }
+    if (m.refLow != null && m.refLow !== 0 && m.value < m.refLow) {
+      return m.value <= m.refLow * 0.7;
+    }
+    return false;
   });
   if (strong.length >= 2 && abnormal.length >= 3) return "red";
   if (abnormal.length >= 2) return "orange";
@@ -166,10 +199,14 @@ export type RareVariant = {
 export type CategoryEvaluation = {
   id: HealthCategoryId;
   biomarkerColour: RiskColour;
+  physicalColour: RiskColour;
   geneticColour: RiskColour | null;
   colour: RiskColour;
   geneticBadge: boolean;
+  /** Lab biomarkers for this category */
   markers: MarkerResult[];
+  /** Physical / functional metrics (BP, HRV, VO₂max, …) */
+  physical: MarkerResult[];
   snps: EvaluatedSnp[];
   rare: RareVariant[];
   latestMarkerCount: number;
@@ -214,17 +251,20 @@ export function evaluateDigitalTwin(input: {
       )
       .filter((s) => s.genotypeAvailable);
 
-    const markers = input.markers.filter((m) =>
+    const allForCat = input.markers.filter((m) =>
       markerBelongs(m.categories, cat.markerCategoryNames)
     );
+    const { biomarkers: markers, physical } = splitMarkersByKind(allForCat);
 
     const catRare = rare.filter((v) => rareGeneCategory(v.gene) === cat.id);
 
     const biomarkerColour = evaluateMarkerColour(markers);
+    const physicalColour = evaluatePhysicalColour(physical);
     const geneticColour = geneticCategoryColour(snps);
+    const panelColour = maxColour([biomarkerColour, physicalColour]);
     const combined = geneticColour
-      ? combineCategoryColour(biomarkerColour, geneticColour)
-      : { colour: biomarkerColour, geneticBadge: false };
+      ? combineCategoryColour(panelColour, geneticColour)
+      : { colour: panelColour, geneticBadge: false };
 
     // NGS rare pathogenic findings force the category to red
     const hasRedRare = catRare.some((v) => rareMutationForcesRed(v.gene));
@@ -238,10 +278,12 @@ export function evaluateDigitalTwin(input: {
     return {
       id: cat.id,
       biomarkerColour,
+      physicalColour,
       geneticColour,
       colour,
       geneticBadge: combined.geneticBadge,
       markers,
+      physical,
       snps,
       rare: catRare,
       latestMarkerCount: latestByKey.size,
@@ -260,12 +302,12 @@ export function summarizeCategory(
   const abn = (() => {
     const latest = new Map<string, MarkerResult>();
     for (const m of evaluation.markers) latest.set(m.markerKey, m);
-    return [...latest.values()].filter((m) => {
-      if (m.flag === "high" || m.flag === "low") return true;
-      if (m.refHigh != null && m.value > m.refHigh) return true;
-      if (m.refLow != null && m.value < m.refLow) return true;
-      return false;
-    });
+    return [...latest.values()].filter(isAbnormalMarker);
+  })();
+  const abnPhysical = (() => {
+    const latest = new Map<string, MarkerResult>();
+    for (const m of evaluation.physical) latest.set(m.markerKey, m);
+    return [...latest.values()].filter(isAbnormalMarker);
   })();
 
   if (locale === "lt") {
@@ -294,6 +336,14 @@ export function summarizeCategory(
     if (abn.length) {
       parts.push(
         `Stebimi žymenys: ${abn
+          .slice(0, 5)
+          .map((m) => m.name || m.markerKey)
+          .join(", ")}.`
+      );
+    }
+    if (abnPhysical.length) {
+      parts.push(
+        `Fiziniai rodikliai virš normos arba žemiau jos: ${abnPhysical
           .slice(0, 5)
           .map((m) => m.name || m.markerKey)
           .join(", ")}.`
@@ -337,6 +387,14 @@ export function summarizeCategory(
   if (abn.length) {
     parts.push(
       `Markers in focus: ${abn
+        .slice(0, 5)
+        .map((m) => m.name || m.markerKey)
+        .join(", ")}.`
+    );
+  }
+  if (abnPhysical.length) {
+    parts.push(
+      `Physical metrics outside usual range: ${abnPhysical
         .slice(0, 5)
         .map((m) => m.name || m.markerKey)
         .join(", ")}.`

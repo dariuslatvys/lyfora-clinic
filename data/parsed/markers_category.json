@@ -167,14 +167,18 @@
     "key": "VO2MAX",
     "name": "Maximal Oxygen Uptake",
     "categories": [
-      "Physical & Functional Health"
+      "Physical & Functional Health",
+      "Cardiovascular Health",
+      "Metabolic Health"
     ]
   },
   {
     "key": "ACTIVITY_DATA",
     "name": "Physical Activity Data",
     "categories": [
-      "Physical & Functional Health"
+      "Physical & Functional Health",
+      "Metabolic Health",
+      "Mental & Cognitive Health"
     ]
   },
   {

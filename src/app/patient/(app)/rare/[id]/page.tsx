@@ -56,13 +56,16 @@ export default async function RareDetailPage({
         className="panel"
         style={{
           borderColor: COLOUR_HEX.red,
-          background: `linear-gradient(160deg, ${COLOUR_HEX.red}18, white)`,
+          background: `linear-gradient(160deg, ${COLOUR_HEX.red}22, var(--surface) 55%)`,
         }}
       >
         <div className="row between" style={{ alignItems: "flex-start" }}>
           <div>
             <span className="eyebrow">{labels.rareMutations}</span>
-            <h1 className="mt-1 font-[family-name:var(--font-display)] text-3xl font-semibold">
+            <h1
+              className="mt-1 font-[family-name:var(--font-display)] text-3xl font-semibold"
+              style={{ color: COLOUR_HEX.red }}
+            >
               {title}
             </h1>
             <p className="mt-1 text-xs text-[var(--muted)]">

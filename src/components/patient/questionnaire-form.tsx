@@ -36,9 +36,8 @@ export function QuestionnaireForm({
   const def = initialDefinition;
   const [answers, setAnswers] = useState<QuestionnaireAnswers>(initialAnswers);
   const [stepIdx, setStepIdx] = useState(0);
-  const [mode, setMode] = useState<Mode>(
-    initialAnswers.updatedAt ? "view" : "edit"
-  );
+  // Always open ready to fill — view mode blocked list picks before.
+  const [mode, setMode] = useState<Mode>("edit");
   const [saving, setSaving] = useState(false);
   const [savedAt, setSavedAt] = useState<string | null>(
     initialAnswers.updatedAt
@@ -103,7 +102,8 @@ export function QuestionnaireForm({
       const data = (await res.json()) as { answers: QuestionnaireAnswers };
       setAnswers(data.answers);
       setSavedAt(data.answers.updatedAt);
-      setMode("view");
+      // Stay in edit so list/chip answers remain selectable after save.
+      setMode("edit");
     } catch {
       setError(
         locale === "en"
@@ -347,10 +347,17 @@ function FieldRenderer({
         {hint ? <p className="q-hint">{hint}</p> : null}
       </div>
 
-      <div className="q-control">
+      <div
+        className={
+          field.type === "multiselect" || field.type === "tags"
+            ? "q-control q-control-stack"
+            : "q-control"
+        }
+      >
       {field.type === "select" || field.type === "select_list" ? (
         <select
           id={`q-${field.id}`}
+          className="q-select"
           disabled={readOnly}
           value={typeof value === "string" ? value : ""}
           onChange={(e) => onChange(field.id, e.target.value || null)}
@@ -513,6 +520,34 @@ function FieldRenderer({
   );
 }
 
+function ChipOption({
+  item,
+  on,
+  disabled,
+  onToggle,
+}: {
+  item: string;
+  on: boolean;
+  disabled: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <label className={on ? "chip on" : "chip"}>
+      <input
+        type="checkbox"
+        className="chip-input"
+        checked={on}
+        disabled={disabled}
+        onChange={onToggle}
+      />
+      <span className="chip-check" aria-hidden="true">
+        {on ? "✓" : ""}
+      </span>
+      <span>{item}</span>
+    </label>
+  );
+}
+
 function MultiSelect({
   value,
   options,
@@ -534,21 +569,19 @@ function MultiSelect({
 
   if (grouped && grouped.grouped) {
     return (
-      <div className="q-multi">
+      <div className="q-multi" role="group">
         {grouped.groups.map((g) => (
           <div key={g.name} className="q-multi-group">
             <div className="q-multi-title">{g.name}</div>
             <div className="q-chips">
               {g.items.map((item) => (
-                <button
+                <ChipOption
                   key={item}
-                  type="button"
+                  item={item}
+                  on={value.includes(item)}
                   disabled={disabled}
-                  className={value.includes(item) ? "chip on" : "chip"}
-                  onClick={() => toggle(item)}
-                >
-                  {item}
-                </button>
+                  onToggle={() => toggle(item)}
+                />
               ))}
             </div>
           </div>
@@ -558,17 +591,15 @@ function MultiSelect({
   }
 
   return (
-    <div className="q-chips">
+    <div className="q-chips" role="group">
       {options.map((item) => (
-        <button
+        <ChipOption
           key={item}
-          type="button"
+          item={item}
+          on={value.includes(item)}
           disabled={disabled}
-          className={value.includes(item) ? "chip on" : "chip"}
-          onClick={() => toggle(item)}
-        >
-          {item}
-        </button>
+          onToggle={() => toggle(item)}
+        />
       ))}
     </div>
   );

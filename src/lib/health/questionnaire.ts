@@ -195,6 +195,13 @@ export const FIELD_LABEL_LT: Record<string, string> = {
 export const OPTION_LABEL_LT: Record<string, string> = {
   Male: "Vyras",
   Female: "Moteris",
+  Yes: "Taip",
+  No: "Ne",
+  Current: "Dabartinė",
+  Past: "Buvusi",
+  Active: "Aktyvus",
+  Remission: "Remisija",
+  Resolved: "Išspręsta",
 };
 
 export function fieldLabel(field: QField, locale: "lt" | "en") {

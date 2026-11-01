@@ -9,6 +9,7 @@ import {
   HEALTH_CATEGORIES,
   type HealthCategoryId,
 } from "@/lib/health/categories";
+import { markerAllowedForSex } from "@/lib/health/marker-sex";
 
 function guessCategory(categoriesJson: string): HealthCategoryId | null {
   let cats: string[] = [];
@@ -42,11 +43,13 @@ export default async function LabsPage() {
       .all()
       .map((d) => [d.key, d])
   );
+  const sex = current.patient.sex as "male" | "female";
   const rows = db
     .select()
     .from(markerResults)
     .where(eq(markerResults.patientId, current.patient.id))
     .all()
+    .filter((r) => markerAllowedForSex(r.markerKey, sex))
     .sort((a, b) => b.observedAt.localeCompare(a.observedAt))
     .map((r) => {
       const def = defs.get(r.markerKey);

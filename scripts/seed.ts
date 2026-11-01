@@ -507,8 +507,13 @@ async function main() {
     } else if (m.markerKey === "LDL" || m.markerKey === "LDL_C") {
       value = 2.75;
       flag = high != null && value > high ? "high" : null;
-    } else if (m.markerKey === "TESTOSTERONE") {
-      // skip male androgen as primary — women's panel added below
+    } else if (
+      m.markerKey === "TESTOSTERONE" ||
+      m.markerKey === "PSA" ||
+      m.markerKey === "FREE_PSA" ||
+      m.markerKey === "FPSA"
+    ) {
+      // Male-only markers — women's hormone panel is added below
       continue;
     }
     insertResult.run(

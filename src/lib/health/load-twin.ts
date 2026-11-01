@@ -10,6 +10,7 @@ import {
   questionnaire,
 } from "@/lib/db/schema";
 import { evaluateDigitalTwin, summarizeCategory } from "./evaluate";
+import { markerAllowedForSex } from "./marker-sex";
 import type { Locale } from "@/lib/i18n/dictionary";
 
 export function loadDigitalTwin(patientId: string, locale: Locale) {
@@ -49,6 +50,7 @@ export function loadDigitalTwin(patientId: string, locale: Locale) {
   const defs = db.select().from(markerDefs).all();
   const defMap = new Map(defs.map((d) => [d.key, d]));
 
+  const sex = patient.sex as "male" | "female";
   const results = db
     .select()
     .from(markerResults)
@@ -70,7 +72,8 @@ export function loadDigitalTwin(patientId: string, locale: Locale) {
         descriptionLt: def?.descriptionLt,
         descriptionEn: def?.descriptionEn,
       };
-    });
+    })
+    .filter((m) => markerAllowedForSex(m.markerKey, sex));
 
   const rare = db
     .select()
@@ -85,7 +88,7 @@ export function loadDigitalTwin(patientId: string, locale: Locale) {
     .all();
 
   const categories = evaluateDigitalTwin({
-    sex: patient.sex as "male" | "female",
+    sex,
     snpRows,
     genotypes,
     markers: results,

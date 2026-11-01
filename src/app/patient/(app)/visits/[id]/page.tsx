@@ -30,6 +30,10 @@ import {
   visitSpecialty,
   visitTitle,
 } from "@/lib/health/demo-visits";
+import {
+  prescriptionsForVisit,
+  rxStatusLabel,
+} from "@/lib/health/demo-prescriptions";
 
 function guessCategory(categoriesJson: string): HealthCategoryId | null {
   let cats: string[] = [];
@@ -61,6 +65,8 @@ export default async function VisitDetailPage({
   const labels = t(locale);
   const visit = getVisit(id);
   if (!visit) notFound();
+
+  const relatedRx = prescriptionsForVisit(visit.id);
 
   ensureSchema();
   const db = getDb();
@@ -138,24 +144,38 @@ export default async function VisitDetailPage({
                 ? locale === "en"
                   ? "Upcoming visit"
                   : "Suplanuotas vizitas"
-                : locale === "en"
-                  ? "Past visit"
-                  : "Įvykęs vizitas"}
+                : visit.status === "missed"
+                  ? locale === "en"
+                    ? "Missed visit"
+                    : "Praleistas vizitas"
+                  : locale === "en"
+                    ? "Past visit"
+                    : "Įvykęs vizitas"}
             </span>
             <h1 className="font-[family-name:var(--font-display)] text-[1.55rem] font-bold mt-1 mb-0">
               {visitTitle(visit, locale)}
             </h1>
           </div>
           <span
-            className={`pill ${visit.status === "upcoming" ? "c-green" : "c-none"}`}
+            className={`pill ${
+              visit.status === "upcoming"
+                ? "c-green"
+                : visit.status === "missed"
+                  ? "c-orange"
+                  : "c-none"
+            }`}
           >
             {visit.status === "upcoming"
               ? locale === "en"
                 ? "Planned"
                 : "Suplanuota"
-              : locale === "en"
-                ? "Completed"
-                : "Įvyko"}
+              : visit.status === "missed"
+                ? locale === "en"
+                  ? "Missed"
+                  : "Praleista"
+                : locale === "en"
+                  ? "Completed"
+                  : "Įvyko"}
           </span>
         </div>
 
@@ -240,6 +260,64 @@ export default async function VisitDetailPage({
                 </article>
               );
             })}
+          </div>
+        </section>
+      ) : null}
+
+      {relatedRx.length > 0 ? (
+        <section className="card">
+          <div className="card-head">
+            <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold m-0">
+              {locale === "en" ? "Related prescriptions" : "Susiję receptai"}
+            </h2>
+            <span className="pill plain c-acc">{relatedRx.length}</span>
+          </div>
+          <p className="small muted mt-1 mb-3">
+            {locale === "en"
+              ? "e-Prescriptions issued during or after this visit — open for full ESPBI-style details."
+              : "E. receptai, išrašyti šio vizito metu ar po jo — atidarykite detales."}
+          </p>
+          <div className="list">
+            {relatedRx.map((r) => (
+              <Link
+                key={r.id}
+                href={`/patient/prescriptions?rx=${encodeURIComponent(r.id)}`}
+                className="li click"
+              >
+                <div className="grow">
+                  <b>
+                    {locale === "en" ? r.substanceEn : r.substanceLt}{" "}
+                    {r.strength}
+                  </b>
+                  <p className="small muted m-0 mt-1">
+                    {r.diagnosisCode} ·{" "}
+                    {locale === "en" ? r.diagnosisEn : r.diagnosisLt}
+                  </p>
+                  <p className="small muted m-0 mt-1">
+                    {locale === "en" ? r.directionsEn : r.directionsLt}
+                  </p>
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <span
+                    className={`pill ${
+                      r.status === "active"
+                        ? "c-green"
+                        : r.status === "dispensed"
+                          ? "c-acc"
+                          : "c-none"
+                    }`}
+                  >
+                    {rxStatusLabel(r.status, locale)}
+                  </span>
+                  <p className="small muted m-0 mt-2">{r.issuedAt}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+          <div className="mt-3">
+            <Link href="/patient/prescriptions" className="btn ghost sm">
+              {locale === "en" ? "All prescriptions" : "Visi receptai"}
+            </Link>
           </div>
         </section>
       ) : null}

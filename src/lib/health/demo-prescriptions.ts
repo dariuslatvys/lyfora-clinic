@@ -232,6 +232,7 @@ export const DEMO_PRESCRIPTIONS: DemoPrescription[] = [
     clinicEn: "Baltic Family Medicine, UAB",
     clinicAddressLt: "Savanorių pr. 176, Vilnius",
     clinicAddressEn: "Savanorių pr. 176, Vilnius",
+    visitId: "v-2026-02-26",
     patientNoteLt: "Nosies purškalas po viršutinių kvėpavimo takų simptomų.",
     patientNoteEn: "Nasal spray after upper-airway symptoms.",
   },
@@ -342,6 +343,7 @@ export const DEMO_PRESCRIPTIONS: DemoPrescription[] = [
     clinicEn: "Green Family Clinic, UAB",
     clinicAddressLt: "Kalvarijų g. 125, Vilnius",
     clinicAddressEn: "Kalvarijų g. 125, Vilnius",
+    visitId: "v-2025-12-16",
   },
 ];
 
@@ -357,6 +359,15 @@ export function activePrescriptions() {
 
 export function historicalPrescriptions() {
   return allPrescriptions().filter((r) => r.status !== "active");
+}
+
+/** Prescriptions issued from / linked to a visit (reverse of visitId). */
+export function prescriptionsForVisit(visitId: string) {
+  return allPrescriptions().filter((r) => r.visitId === visitId);
+}
+
+export function getPrescription(id: string) {
+  return DEMO_PRESCRIPTIONS.find((r) => r.id === id) || null;
 }
 
 export function rxStatusLabel(status: RxStatus, locale: "lt" | "en") {

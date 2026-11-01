@@ -10,6 +10,9 @@ export type VisitListItem = {
   specialty: string;
   when: string;
   place?: string;
+  status?: "past" | "upcoming" | "missed";
+  /** Short labels of linked e-prescriptions */
+  relatedRx?: string[];
 };
 
 export function VisitsTabs({
@@ -35,12 +38,16 @@ export function VisitsTabs({
             history: "Visit history",
             emptyUpcoming: "No upcoming visits planned.",
             emptyHistory: "No past visits yet.",
+            missed: "Missed",
+            rx: "Prescriptions",
           }
         : {
             upcoming: "Suplanuoti ir būsimi",
             history: "Vizitų istorija",
             emptyUpcoming: "Suplanuotų vizitų nėra.",
             emptyHistory: "Vizitų istorijos dar nėra.",
+            missed: "Praleista",
+            rx: "Receptai",
           },
     [locale]
   );
@@ -97,11 +104,21 @@ export function VisitsTabs({
                 className="li click"
               >
                 <div className="grow">
-                  <b>{v.title}</b>
+                  <div className="row" style={{ gap: 8, alignItems: "center" }}>
+                    <b>{v.title}</b>
+                    {v.status === "missed" ? (
+                      <span className="pill c-orange">{labels.missed}</span>
+                    ) : null}
+                  </div>
                   <span className="xs muted">
                     {v.doctor} · {v.specialty}
                     {v.place ? ` · ${v.place}` : ""}
                   </span>
+                  {v.relatedRx && v.relatedRx.length > 0 ? (
+                    <span className="xs muted">
+                      {labels.rx}: {v.relatedRx.join(" · ")}
+                    </span>
+                  ) : null}
                 </div>
                 <span className="small muted">{v.when}</span>
               </Link>

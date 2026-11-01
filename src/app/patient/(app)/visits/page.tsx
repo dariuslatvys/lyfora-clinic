@@ -10,7 +10,29 @@ import {
   visitSpecialty,
   visitTitle,
 } from "@/lib/health/demo-visits";
+import { prescriptionsForVisit } from "@/lib/health/demo-prescriptions";
 import { VisitsTabs } from "@/components/patient/visits-tabs";
+
+function mapVisit(
+  v: ReturnType<typeof upcomingVisits>[number],
+  locale: "lt" | "en"
+) {
+  const relatedRx = prescriptionsForVisit(v.id).map((r) =>
+    locale === "en"
+      ? `${r.substanceEn} ${r.strength}`
+      : `${r.substanceLt} ${r.strength}`
+  );
+  return {
+    id: v.id,
+    title: visitTitle(v, locale),
+    doctor: visitDoctor(v, locale),
+    specialty: visitSpecialty(v, locale),
+    place: visitPlace(v, locale),
+    when: formatVisitWhen(v, locale),
+    status: v.status,
+    relatedRx,
+  };
+}
 
 export default async function VisitsPage({
   searchParams,
@@ -23,23 +45,8 @@ export default async function VisitsPage({
   const labels = t(locale);
   const sp = await searchParams;
 
-  const upcoming = upcomingVisits().map((v) => ({
-    id: v.id,
-    title: visitTitle(v, locale),
-    doctor: visitDoctor(v, locale),
-    specialty: visitSpecialty(v, locale),
-    place: visitPlace(v, locale),
-    when: formatVisitWhen(v, locale),
-  }));
-
-  const past = pastVisits().map((v) => ({
-    id: v.id,
-    title: visitTitle(v, locale),
-    doctor: visitDoctor(v, locale),
-    specialty: visitSpecialty(v, locale),
-    place: visitPlace(v, locale),
-    when: formatVisitWhen(v, locale),
-  }));
+  const upcoming = upcomingVisits().map((v) => mapVisit(v, locale));
+  const past = pastVisits().map((v) => mapVisit(v, locale));
 
   return (
     <VisitsTabs

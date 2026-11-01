@@ -4,6 +4,11 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { DemoPrescription } from "@/lib/health/demo-prescriptions";
 import { rxStatusLabel } from "@/lib/health/demo-prescriptions";
+import {
+  getVisit,
+  visitTitle,
+  formatVisitWhen,
+} from "@/lib/health/demo-visits";
 
 function statusPill(status: DemoPrescription["status"]) {
   if (status === "active") return "c-green";
@@ -12,17 +17,38 @@ function statusPill(status: DemoPrescription["status"]) {
   return "c-none";
 }
 
+function findRxTab(
+  id: string | null | undefined,
+  active: DemoPrescription[],
+  history: DemoPrescription[]
+): { tab: "active" | "history"; openId: string | null } {
+  if (!id) {
+    return { tab: "active", openId: active[0]?.id || null };
+  }
+  if (active.some((r) => r.id === id)) {
+    return { tab: "active", openId: id };
+  }
+  if (history.some((r) => r.id === id)) {
+    return { tab: "history", openId: id };
+  }
+  return { tab: "active", openId: active[0]?.id || null };
+}
+
 export function PrescriptionsView({
   locale,
   active,
   history,
+  initialRxId = null,
 }: {
   locale: "lt" | "en";
   active: DemoPrescription[];
   history: DemoPrescription[];
+  /** Deep-link from a visit: /patient/prescriptions?rx=… */
+  initialRxId?: string | null;
 }) {
-  const [tab, setTab] = useState<"active" | "history">("active");
-  const [openId, setOpenId] = useState<string | null>(active[0]?.id || null);
+  const initial = findRxTab(initialRxId, active, history);
+  const [tab, setTab] = useState<"active" | "history">(initial.tab);
+  const [openId, setOpenId] = useState<string | null>(initial.openId);
 
   const copy = useMemo(
     () =>
@@ -89,6 +115,7 @@ export function PrescriptionsView({
   const list = tab === "active" ? active : history;
   const empty = tab === "active" ? copy.emptyActive : copy.emptyHistory;
   const selected = list.find((r) => r.id === openId) || list[0] || null;
+  const linkedVisit = selected?.visitId ? getVisit(selected.visitId) : null;
 
   return (
     <div className="stack" style={{ gap: 14 }}>
@@ -330,13 +357,35 @@ export function PrescriptionsView({
               ) : null}
 
               {selected.visitId ? (
-                <div className="mt-3">
-                  <Link
-                    href={`/patient/visits/${selected.visitId}`}
-                    className="btn ghost sm"
-                  >
-                    {copy.openVisit}
-                  </Link>
+                <div className="rx-block mt-3">
+                  <span className="eyebrow">{copy.openVisit}</span>
+                  {linkedVisit ? (
+                    <Link
+                      href={`/patient/visits/${selected.visitId}`}
+                      className="li click mt-2"
+                      style={{ display: "flex" }}
+                    >
+                      <div className="grow">
+                        <b>{visitTitle(linkedVisit, locale)}</b>
+                        <span className="small muted">
+                          {formatVisitWhen(linkedVisit, locale)} ·{" "}
+                          {locale === "en"
+                            ? linkedVisit.doctorEn
+                            : linkedVisit.doctorLt}
+                        </span>
+                      </div>
+                      <span className="pill plain c-acc">→</span>
+                    </Link>
+                  ) : (
+                    <div className="mt-2">
+                      <Link
+                        href={`/patient/visits/${selected.visitId}`}
+                        className="btn ghost sm"
+                      >
+                        {copy.openVisit}
+                      </Link>
+                    </div>
+                  )}
                 </div>
               ) : null}
             </article>

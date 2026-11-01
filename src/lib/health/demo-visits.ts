@@ -1,4 +1,4 @@
-export type VisitStatus = "past" | "upcoming";
+export type VisitStatus = "past" | "upcoming" | "missed";
 
 export type VisitReportKind =
   | "ambulatory"
@@ -39,8 +39,13 @@ export type VisitReferral = {
 
 export type DemoVisit = {
   id: string;
-  /** ISO date YYYY-MM-DD */
+  /** ISO date YYYY-MM-DD (seed / fallback; upcoming & missed may shift via dateOffsetDays) */
   date: string;
+  /**
+   * If set, `date` is resolved as today + N calendar days so planned visits
+   * always stay in the future (negative = missed / skipped).
+   */
+  dateOffsetDays?: number;
   time: string;
   titleLt: string;
   titleEn: string;
@@ -60,6 +65,35 @@ export type DemoVisit = {
   /** Referrals (siuntimai) issued from this visit */
   referrals?: VisitReferral[];
 };
+
+function pad2(n: number) {
+  return String(n).padStart(2, "0");
+}
+
+/** Local calendar YYYY-MM-DD (Europe/Vilnius-friendly via host local TZ). */
+export function todayIsoDate(now = new Date()) {
+  return `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}`;
+}
+
+export function addCalendarDays(iso: string, days: number) {
+  const [y, m, d] = iso.split("-").map(Number);
+  const dt = new Date(y, m - 1, d);
+  dt.setDate(dt.getDate() + days);
+  return `${dt.getFullYear()}-${pad2(dt.getMonth() + 1)}-${pad2(dt.getDate())}`;
+}
+
+/** Apply relative offsets so upcoming dates never go stale. */
+export function resolveVisitDate(visit: DemoVisit, now = new Date()): string {
+  if (visit.dateOffsetDays == null) return visit.date;
+  return addCalendarDays(todayIsoDate(now), visit.dateOffsetDays);
+}
+
+export function withResolvedVisitDate(
+  visit: DemoVisit,
+  now = new Date()
+): DemoVisit {
+  return { ...visit, date: resolveVisitDate(visit, now) };
+}
 
 /**
  * Demo visits for Jonas — past ones aligned with uploaded lab dates,
@@ -634,10 +668,50 @@ export const DEMO_VISITS: DemoVisit[] = [
       },
     ],
   },
-  // Upcoming — always show planned visits ahead
+  // Missed / skipped — recent past relative to "today"
+  {
+    id: "v-missed-physio",
+    date: "2026-10-24",
+    dateOffsetDays: -8,
+    time: "16:20",
+    titleLt: "Fizioterapija (kaklas) — neatvyko",
+    titleEn: "Physiotherapy (neck) — no-show",
+    doctorLt: "Kineziterapeutė Greta Paulauskaitė",
+    doctorEn: "Physiotherapist Greta Paulauskaite",
+    specialtyLt: "Fizioterapija",
+    specialtyEn: "Physiotherapy",
+    placeLt: "Lyfora Rehab Hub",
+    placeEn: "Lyfora Rehab Hub",
+    status: "missed",
+    notesLt:
+      "Suplanuotas vizitas praleistas. Klinika siūlo perkelti į kitą savaitę.",
+    notesEn:
+      "Scheduled visit was missed. Clinic offers to reschedule next week.",
+  },
+  {
+    id: "v-missed-diet",
+    date: "2026-10-28",
+    dateOffsetDays: -3,
+    time: "12:00",
+    titleLt: "Dietologo konsultacija — praleista",
+    titleEn: "Dietitian consult — missed",
+    doctorLt: "Dietologė Aušra Mileikaitė",
+    doctorEn: "Dietitian Ausra Mileikaite",
+    specialtyLt: "Dietologija",
+    specialtyEn: "Dietetics",
+    placeLt: "Lyfora Care Hub (nuotolinė)",
+    placeEn: "Lyfora Care Hub (remote)",
+    status: "missed",
+    notesLt:
+      "Nuotolinis vizitas neatidarytas per 15 min. — pažymėta kaip praleista.",
+    notesEn:
+      "Remote visit not joined within 15 min — marked as missed.",
+  },
+  // Upcoming — offsets keep dates always ahead of "today"
   {
     id: "v-2026-11-12",
     date: "2026-11-12",
+    dateOffsetDays: 4,
     time: "10:30",
     titleLt: "Kardiologo kontrolė",
     titleEn: "Cardiology follow-up",
@@ -656,6 +730,7 @@ export const DEMO_VISITS: DemoVisit[] = [
   {
     id: "v-2026-11-28",
     date: "2026-11-28",
+    dateOffsetDays: 14,
     time: "13:00",
     titleLt: "Genetiko pakartotinė konsultacija",
     titleEn: "Genetics follow-up",
@@ -672,6 +747,7 @@ export const DEMO_VISITS: DemoVisit[] = [
   {
     id: "v-2026-12-09",
     date: "2026-12-09",
+    dateOffsetDays: 28,
     time: "09:00",
     titleLt: "Endokrinologo kontrolė",
     titleEn: "Endocrinology follow-up",
@@ -686,8 +762,28 @@ export const DEMO_VISITS: DemoVisit[] = [
     notesEn: "Review cortisol / hormone trends.",
   },
   {
+    id: "v-upcoming-neuro",
+    date: "2026-12-18",
+    dateOffsetDays: 38,
+    time: "15:30",
+    titleLt: "Neurologo konsultacija (kaklas)",
+    titleEn: "Neurology consult (neck)",
+    doctorLt: "Dr. Saulius Vaičiūnas",
+    doctorEn: "Dr. Saulius Vaiciunas",
+    specialtyLt: "Neurologija",
+    specialtyEn: "Neurology",
+    placeLt: "Lyfora klinika, Vilnius",
+    placeEn: "Lyfora Clinic, Vilnius",
+    status: "upcoming",
+    notesLt:
+      "Po ortopedo siuntimo — C5/C6 foraminalinė stenozė, radikulopatijos įvertinimas.",
+    notesEn:
+      "After ortho referral — C5/C6 foraminal stenosis, radiculopathy assessment.",
+  },
+  {
     id: "v-2027-01-20",
     date: "2027-01-20",
+    dateOffsetDays: 55,
     time: "11:45",
     titleLt: "Metabolinės sveikatos vizitas",
     titleEn: "Metabolic health visit",
@@ -704,33 +800,49 @@ export const DEMO_VISITS: DemoVisit[] = [
 ];
 
 export function getVisit(id: string) {
-  return DEMO_VISITS.find((v) => v.id === id) || null;
+  const hit = DEMO_VISITS.find((v) => v.id === id);
+  return hit ? withResolvedVisitDate(hit) : null;
 }
 
+/** Planned list: future upcoming + recent missed/no-shows. */
 export function upcomingVisits(limit?: number) {
-  const list = DEMO_VISITS.filter((v) => v.status === "upcoming").sort((a, b) =>
-    a.date.localeCompare(b.date)
-  );
+  const list = DEMO_VISITS.filter(
+    (v) => v.status === "upcoming" || v.status === "missed"
+  )
+    .map((v) => withResolvedVisitDate(v))
+    .sort((a, b) => {
+      // Missed first (past), then upcoming by date
+      if (a.status !== b.status) {
+        if (a.status === "missed") return -1;
+        if (b.status === "missed") return 1;
+      }
+      return a.date.localeCompare(b.date) || a.time.localeCompare(b.time);
+    });
   return limit ? list.slice(0, limit) : list;
 }
 
 export function pastVisits() {
-  return DEMO_VISITS.filter((v) => v.status === "past").sort((a, b) =>
-    b.date.localeCompare(a.date)
-  );
+  return DEMO_VISITS.filter((v) => v.status === "past")
+    .map((v) => withResolvedVisitDate(v))
+    .sort((a, b) => b.date.localeCompare(a.date));
 }
 
 export function formatVisitWhen(
   visit: DemoVisit,
   locale: "lt" | "en"
 ) {
-  const d = new Date(`${visit.date}T12:00:00`);
+  const resolved = withResolvedVisitDate(visit);
+  const d = new Date(`${resolved.date}T12:00:00`);
   const date = d.toLocaleDateString(locale === "en" ? "en-GB" : "lt-LT", {
     year: "numeric",
     month: "short",
     day: "numeric",
   });
-  return `${date} · ${visit.time}`;
+  const base = `${date} · ${resolved.time}`;
+  if (resolved.status === "missed") {
+    return locale === "en" ? `${base} · Missed` : `${base} · Praleista`;
+  }
+  return base;
 }
 
 export function visitTitle(visit: DemoVisit, locale: "lt" | "en") {

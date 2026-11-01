@@ -23,8 +23,8 @@ function itemHasDetail(it: MarketItem) {
 }
 
 export function MarketplaceView({ locale }: { locale: "lt" | "en" }) {
-  const [category, setCategory] = useState<MarketCategory>("consultations");
-  const [kind, setKind] = useState<"all" | MarketKind>("all");
+  const [category, setCategory] = useState<MarketCategory>("labs");
+  const [kind, setKind] = useState<"all" | MarketKind>("package");
   const [q, setQ] = useState("");
   const [cart, setCart] = useState<CartLine[]>([]);
   const [flash, setFlash] = useState<string | null>(null);
@@ -54,11 +54,10 @@ export function MarketplaceView({ locale }: { locale: "lt" | "en" }) {
             empty: "No matching offers in this category.",
             includes: "Includes",
             openDetail: "Details",
-            close: "Close",
-            geneList: "Gene list",
-            markerList: "Tests in this package",
-            about: "About",
-            hintPkg: "Click a package card to see full contents.",
+            back: "← All packages",
+            geneList: "Genes included",
+            markerList: "Tests included",
+            about: "Description",
           }
         : {
             eyebrow: "Klinikos parduotuvė",
@@ -81,11 +80,10 @@ export function MarketplaceView({ locale }: { locale: "lt" | "en" }) {
             empty: "Šioje kategorijoje atitikmenų nerasta.",
             includes: "Apima",
             openDetail: "Detalės",
-            close: "Uždaryti",
-            geneList: "Genų sąrašas",
-            markerList: "Paketo tyrimai",
+            back: "← Visi paketai",
+            geneList: "Įtraukti genai",
+            markerList: "Įtraukti tyrimai",
             about: "Aprašymas",
-            hintPkg: "Spauskite paketo kortelę — pamatysite visą sudėtį.",
           },
     [locale]
   );
@@ -177,7 +175,16 @@ export function MarketplaceView({ locale }: { locale: "lt" | "en" }) {
   }
 
   function openDetail(it: MarketItem) {
-    if (itemHasDetail(it)) setDetailId(it.id);
+    if (!itemHasDetail(it)) return;
+    setDetailId(it.id);
+    // Keep user in view of the detail block
+    if (typeof window !== "undefined") {
+      window.requestAnimationFrame(() => {
+        document
+          .getElementById("market-detail-view")
+          ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
   }
 
   function renderCard(it: MarketItem) {
@@ -186,56 +193,56 @@ export function MarketplaceView({ locale }: { locale: "lt" | "en" }) {
     const badge = locale === "en" ? it.badgeEn : it.badgeLt;
     const meta = locale === "en" ? it.metaEn : it.metaLt;
     const clickable = itemHasDetail(it);
+    const selected = detailId === it.id;
     return (
       <article
         key={it.id}
         className={`card market-card${clickable ? " market-card-click" : ""}${
-          detailId === it.id ? " on" : ""
+          selected ? " on" : ""
         }`}
-        role={clickable ? "button" : undefined}
-        tabIndex={clickable ? 0 : undefined}
-        onClick={clickable ? () => openDetail(it) : undefined}
-        onKeyDown={
-          clickable
-            ? (e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  openDetail(it);
-                }
-              }
-            : undefined
-        }
       >
-        <div className="market-card-top">
-          {badge ? <span className="pill plain c-acc">{badge}</span> : <span />}
-          {it.code ? (
-            <span className="mono small muted">{it.code}</span>
+        <button
+          type="button"
+          className="market-card-main"
+          onClick={() => (clickable ? openDetail(it) : undefined)}
+          disabled={!clickable}
+          aria-expanded={selected}
+        >
+          <div className="market-card-top">
+            {badge ? (
+              <span className="pill plain c-acc">{badge}</span>
+            ) : (
+              <span />
+            )}
+            {it.code ? (
+              <span className="mono small muted">{it.code}</span>
+            ) : null}
+          </div>
+          <h3 className="font-[family-name:var(--font-display)] text-lg font-semibold m-0 mt-2">
+            {name}
+          </h3>
+          <p className="small muted mt-2 mb-0">{summary}</p>
+          {it.geneCount != null ? (
+            <p className="small mt-2 mb-0">
+              <b>{it.geneCount}</b> {copy.genes}
+            </p>
           ) : null}
-        </div>
-        <h3 className="font-[family-name:var(--font-display)] text-lg font-semibold m-0 mt-2">
-          {name}
-        </h3>
-        <p className="small muted mt-2 mb-0">{summary}</p>
-        {it.geneCount != null ? (
-          <p className="small mt-2 mb-0">
-            <b>{it.geneCount}</b> {copy.genes}
-          </p>
-        ) : null}
-        {meta ? <p className="small muted mt-1 mb-0">{meta}</p> : null}
-        {it.includes && it.includes.length && it.kind === "package" ? (
-          <p className="small muted mt-2 mb-0">
-            <span className="market-includes-label">{copy.includes}: </span>
-            {it.includes.slice(0, 4).join(", ")}
-            {it.includes.length > 4 ? "…" : ""}
-          </p>
-        ) : null}
-        {it.durationMin ? (
-          <p className="small muted mt-2 mb-0">{it.durationMin} min</p>
-        ) : null}
+          {meta ? <p className="small muted mt-1 mb-0">{meta}</p> : null}
+          {it.includes && it.includes.length && it.kind === "package" ? (
+            <p className="small muted mt-2 mb-0">
+              <span className="market-includes-label">{copy.includes}: </span>
+              {it.includes.slice(0, 4).join(", ")}
+              {it.includes.length > 4 ? "…" : ""}
+            </p>
+          ) : null}
+          {it.durationMin ? (
+            <p className="small muted mt-2 mb-0">{it.durationMin} min</p>
+          ) : null}
+        </button>
 
         <div className="market-card-foot">
           <p className="market-price m-0">{formatEur(it.priceEur, locale)}</p>
-          <div className="row" style={{ gap: 6 }} onClick={(e) => e.stopPropagation()}>
+          <div className="row" style={{ gap: 6 }}>
             {clickable ? (
               <button
                 type="button"
@@ -284,7 +291,9 @@ export function MarketplaceView({ locale }: { locale: "lt" | "en" }) {
             aria-selected={category === c.id}
             onClick={() => {
               setCategory(c.id);
-              setKind("all");
+              setKind(
+                c.id === "labs" || c.id === "genetics" ? "package" : "all"
+              );
               setQ("");
               setDetailId(null);
             }}
@@ -297,228 +306,103 @@ export function MarketplaceView({ locale }: { locale: "lt" | "en" }) {
 
       <p className="small muted m-0">
         {locale === "en" ? catMeta.blurbEn : catMeta.blurbLt}
-        {(category === "labs" || category === "genetics") && (
-          <> · {copy.hintPkg}</>
-        )}
       </p>
 
-      <div className="market-toolbar">
-        <div className="upload-filter">
-          {(
-            [
-              ["all", copy.all],
-              ["single", copy.single],
-              ["package", copy.package],
-            ] as const
-          ).map(([id, label]) => (
-            <button
-              key={id}
-              type="button"
-              className={`upload-filter-btn${kind === id ? " on" : ""}`}
-              onClick={() => {
-                setKind(id);
-                setDetailId(null);
-              }}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-        <input
-          className="market-search"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder={copy.search}
-          aria-label={copy.search}
-        />
-      </div>
-
-      <div className="market-layout">
-        <div className="stack" style={{ gap: 14 }}>
-          {packageItems.length && kind !== "single" ? (
-            <div>
-              {(category === "labs" || category === "genetics") &&
-              kind === "all" ? (
-                <p className="eyebrow mb-2">{copy.package}</p>
-              ) : null}
-              <div className="market-grid">{packageItems.map(renderCard)}</div>
-            </div>
-          ) : null}
-
-          {groupedSingles ? (
-            <div className="stack" style={{ gap: 16 }}>
-              {kind === "all" && packageItems.length ? (
-                <p className="eyebrow mb-0">{copy.single}</p>
-              ) : null}
-              {groupedSingles.map(([group, rows]) => (
-                <section key={group} className="card">
-                  <div className="card-head">
-                    <h2 className="font-[family-name:var(--font-display)] text-base font-semibold m-0">
-                      {group}
-                    </h2>
-                    <span className="pill plain c-acc">{rows.length}</span>
-                  </div>
-                  <div className="list mt-2">
-                    {rows.map((it) => (
-                      <div key={it.id} className="li market-single-li">
-                        <div className="grow">
-                          <b>{locale === "en" ? it.nameEn : it.nameLt}</b>
-                        </div>
-                        <b className="num">{formatEur(it.priceEur, locale)}</b>
-                        <button
-                          type="button"
-                          className="btn sm"
-                          onClick={() => addToCart(it)}
-                        >
-                          {copy.add}
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              ))}
-            </div>
-          ) : kind === "single" ||
-            (kind === "all" && !packageItems.length) ||
-            category === "consultations" ||
-            category === "wellness" ? (
-            items.length ? (
-              <div className="market-grid">
-                {items
-                  .filter((i) =>
-                    kind === "all" &&
-                    (category === "labs" || category === "genetics")
-                      ? i.kind !== "package"
-                      : true
-                  )
-                  .map(renderCard)}
-              </div>
-            ) : (
-              <div className="card empty">{copy.empty}</div>
-            )
-          ) : !packageItems.length ? (
-            <div className="card empty">{copy.empty}</div>
-          ) : null}
-        </div>
-
-        <aside className="card market-cart">
-          <div className="card-head">
-            <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold m-0">
-              {copy.cart}
-            </h2>
-            <span className="pill plain c-acc">{cartCount}</span>
-          </div>
-          {flash ? (
-            <p className="small mt-2 mb-0 text-[var(--accent)]">{flash}</p>
-          ) : null}
-          {cart.length ? (
-            <>
-              <div className="list mt-3">
-                {cart.map((l) => (
-                  <div key={l.item.id} className="li market-cart-line">
-                    <div className="grow">
-                      <b>
-                        {locale === "en" ? l.item.nameEn : l.item.nameLt}
-                      </b>
-                      <span className="small muted">
-                        {l.qty} × {formatEur(l.item.priceEur, locale)}
-                      </span>
-                    </div>
-                    <button
-                      type="button"
-                      className="btn ghost sm"
-                      onClick={() => removeLine(l.item.id)}
-                    >
-                      {copy.remove}
-                    </button>
-                  </div>
-                ))}
-              </div>
-              <div className="market-cart-total">
-                <span>{copy.total}</span>
-                <b>{formatEur(cartTotal, locale)}</b>
-              </div>
+      {!detail ? (
+        <div className="market-toolbar">
+          <div className="upload-filter">
+            {(
+              [
+                ["all", copy.all],
+                ["single", copy.single],
+                ["package", copy.package],
+              ] as const
+            ).map(([id, label]) => (
               <button
+                key={id}
                 type="button"
-                className="btn mt-3 w-full"
-                onClick={placeOrder}
+                className={`upload-filter-btn${kind === id ? " on" : ""}`}
+                onClick={() => {
+                  setKind(id);
+                  setDetailId(null);
+                }}
               >
-                {copy.order}
+                {label}
               </button>
-            </>
-          ) : (
-            <div className="empty mt-3">{copy.emptyCart}</div>
-          )}
-        </aside>
-      </div>
+            ))}
+          </div>
+          <input
+            className="market-search"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder={copy.search}
+            aria-label={copy.search}
+          />
+        </div>
+      ) : null}
 
       {detail ? (
-        <div
-          className="market-detail-backdrop"
-          role="presentation"
-          onClick={() => setDetailId(null)}
-        >
-          <aside
-            className="card market-detail-panel"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="market-detail-title"
-            onClick={(e) => e.stopPropagation()}
+        <div className="market-detail-page" id="market-detail-view">
+          <button
+            type="button"
+            className="btn ghost sm market-detail-back"
+            onClick={() => setDetailId(null)}
           >
-            <div className="row between" style={{ gap: 10, alignItems: "flex-start" }}>
-              <div>
-                <div className="row" style={{ gap: 8, alignItems: "center" }}>
-                  {(locale === "en" ? detail.badgeEn : detail.badgeLt) ? (
-                    <span className="pill plain c-acc">
-                      {locale === "en" ? detail.badgeEn : detail.badgeLt}
-                    </span>
-                  ) : null}
-                  {detail.code ? (
-                    <span className="mono small muted">{detail.code}</span>
-                  ) : null}
-                </div>
-                <h2
-                  id="market-detail-title"
-                  className="font-[family-name:var(--font-display)] text-2xl font-semibold m-0 mt-2"
-                >
-                  {locale === "en" ? detail.nameEn : detail.nameLt}
-                </h2>
-                <p className="market-price m-0 mt-2">
+            {copy.back}
+          </button>
+
+          <article className="market-detail-article">
+            <header className="market-detail-header">
+              <div className="market-detail-badges">
+                {(locale === "en" ? detail.badgeEn : detail.badgeLt) ? (
+                  <span className="pill plain c-acc">
+                    {locale === "en" ? detail.badgeEn : detail.badgeLt}
+                  </span>
+                ) : null}
+                {detail.code ? (
+                  <span className="mono small muted">{detail.code}</span>
+                ) : null}
+                {detail.geneCount != null ? (
+                  <span className="small muted">
+                    {detail.geneCount} {copy.genes}
+                  </span>
+                ) : null}
+              </div>
+              <h2 className="market-detail-title">
+                {locale === "en" ? detail.nameEn : detail.nameLt}
+              </h2>
+              <p className="market-detail-lead">
+                {locale === "en" ? detail.summaryEn : detail.summaryLt}
+              </p>
+              <div className="market-detail-buy">
+                <p className="market-price m-0">
                   {formatEur(detail.priceEur, locale)}
                 </p>
+                <button
+                  type="button"
+                  className="btn"
+                  onClick={() => addToCart(detail)}
+                >
+                  {copy.addDetail}
+                </button>
               </div>
-              <button
-                type="button"
-                className="btn ghost sm"
-                onClick={() => setDetailId(null)}
-              >
-                {copy.close}
-              </button>
-            </div>
-
-            <p className="mt-3 mb-0 text-[var(--ink-soft)]">
-              {locale === "en" ? detail.summaryEn : detail.summaryLt}
-            </p>
+            </header>
 
             {(locale === "en" ? detail.detailEn : detail.detailLt) ? (
-              <div className="mt-4">
-                <p className="eyebrow mb-1">{copy.about}</p>
-                <p className="m-0 leading-relaxed">
+              <section className="market-detail-section">
+                <h3 className="market-detail-h">{copy.about}</h3>
+                <p className="market-detail-prose">
                   {locale === "en" ? detail.detailEn : detail.detailLt}
                 </p>
-              </div>
-            ) : null}
-
-            {detail.geneCount != null ? (
-              <p className="small mt-3 mb-0">
-                <b>{detail.geneCount}</b> {copy.genes}
-                {detail.durationMin ? ` · ${detail.durationMin} min` : ""}
-              </p>
+              </section>
             ) : null}
 
             {detail.genes && detail.genes.length ? (
-              <div className="mt-4">
-                <p className="eyebrow mb-2">{copy.geneList}</p>
+              <section className="market-detail-section">
+                <h3 className="market-detail-h">
+                  {copy.geneList}
+                  <span className="pill plain c-acc">{detail.genes.length}</span>
+                </h3>
                 <div className="market-gene-chips">
                   {detail.genes.map((g) => (
                     <span key={g} className="market-gene-chip">
@@ -526,49 +410,204 @@ export function MarketplaceView({ locale }: { locale: "lt" | "en" }) {
                     </span>
                   ))}
                 </div>
-              </div>
+              </section>
             ) : null}
 
             {detail.includes && detail.includes.length ? (
-              <div className="mt-4">
-                <p className="eyebrow mb-2">
+              <section className="market-detail-section">
+                <h3 className="market-detail-h">
                   {detail.category === "labs"
                     ? copy.markerList
                     : copy.includes}
-                  <span className="pill plain c-acc" style={{ marginLeft: 8 }}>
+                  <span className="pill plain c-acc">
                     {detail.includes.length}
                   </span>
-                </p>
+                </h3>
                 <ul className="market-detail-list">
                   {detail.includes.map((line) => (
                     <li key={line}>{line}</li>
                   ))}
                 </ul>
+              </section>
+            ) : null}
+          </article>
+
+          <aside className="card market-cart market-cart-under">
+            <div className="card-head">
+              <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold m-0">
+                {copy.cart}
+              </h2>
+              <span className="pill plain c-acc">{cartCount}</span>
+            </div>
+            {flash ? (
+              <p className="small mt-2 mb-0 text-[var(--accent)]">{flash}</p>
+            ) : null}
+            {cart.length ? (
+              <>
+                <div className="list mt-3">
+                  {cart.map((l) => (
+                    <div key={l.item.id} className="li market-cart-line">
+                      <div className="grow">
+                        <b>
+                          {locale === "en" ? l.item.nameEn : l.item.nameLt}
+                        </b>
+                        <span className="small muted">
+                          {l.qty} × {formatEur(l.item.priceEur, locale)}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        className="btn ghost sm"
+                        onClick={() => removeLine(l.item.id)}
+                      >
+                        {copy.remove}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <div className="market-cart-total">
+                  <span>{copy.total}</span>
+                  <b>{formatEur(cartTotal, locale)}</b>
+                </div>
+                <button
+                  type="button"
+                  className="btn mt-3 w-full"
+                  onClick={placeOrder}
+                >
+                  {copy.order}
+                </button>
+              </>
+            ) : (
+              <div className="empty mt-3">{copy.emptyCart}</div>
+            )}
+          </aside>
+        </div>
+      ) : (
+        <div className="market-layout">
+          <div className="stack" style={{ gap: 14 }}>
+            {packageItems.length && kind !== "single" ? (
+              <div>
+                {(category === "labs" || category === "genetics") &&
+                kind === "all" ? (
+                  <p className="eyebrow mb-2">{copy.package}</p>
+                ) : null}
+                <div className="market-grid">
+                  {packageItems.map(renderCard)}
+                </div>
               </div>
             ) : null}
 
-            <div className="row mt-5" style={{ gap: 8 }}>
-              <button
-                type="button"
-                className="btn"
-                onClick={() => {
-                  addToCart(detail);
-                  setDetailId(null);
-                }}
-              >
-                {copy.addDetail}
-              </button>
-              <button
-                type="button"
-                className="btn ghost"
-                onClick={() => setDetailId(null)}
-              >
-                {copy.close}
-              </button>
+            {groupedSingles ? (
+              <div className="stack" style={{ gap: 16 }}>
+                {kind === "all" && packageItems.length ? (
+                  <p className="eyebrow mb-0">{copy.single}</p>
+                ) : null}
+                {groupedSingles.map(([group, rows]) => (
+                  <section key={group} className="card">
+                    <div className="card-head">
+                      <h2 className="font-[family-name:var(--font-display)] text-base font-semibold m-0">
+                        {group}
+                      </h2>
+                      <span className="pill plain c-acc">{rows.length}</span>
+                    </div>
+                    <div className="list mt-2">
+                      {rows.map((it) => (
+                        <div key={it.id} className="li market-single-li">
+                          <div className="grow">
+                            <b>
+                              {locale === "en" ? it.nameEn : it.nameLt}
+                            </b>
+                          </div>
+                          <b className="num">
+                            {formatEur(it.priceEur, locale)}
+                          </b>
+                          <button
+                            type="button"
+                            className="btn sm"
+                            onClick={() => addToCart(it)}
+                          >
+                            {copy.add}
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                ))}
+              </div>
+            ) : kind === "single" ||
+              (kind === "all" && !packageItems.length) ||
+              category === "consultations" ||
+              category === "wellness" ? (
+              items.length ? (
+                <div className="market-grid">
+                  {items
+                    .filter((i) =>
+                      kind === "all" &&
+                      (category === "labs" || category === "genetics")
+                        ? i.kind !== "package"
+                        : true
+                    )
+                    .map(renderCard)}
+                </div>
+              ) : (
+                <div className="card empty">{copy.empty}</div>
+              )
+            ) : !packageItems.length ? (
+              <div className="card empty">{copy.empty}</div>
+            ) : null}
+          </div>
+
+          <aside className="card market-cart">
+            <div className="card-head">
+              <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold m-0">
+                {copy.cart}
+              </h2>
+              <span className="pill plain c-acc">{cartCount}</span>
             </div>
+            {flash ? (
+              <p className="small mt-2 mb-0 text-[var(--accent)]">{flash}</p>
+            ) : null}
+            {cart.length ? (
+              <>
+                <div className="list mt-3">
+                  {cart.map((l) => (
+                    <div key={l.item.id} className="li market-cart-line">
+                      <div className="grow">
+                        <b>
+                          {locale === "en" ? l.item.nameEn : l.item.nameLt}
+                        </b>
+                        <span className="small muted">
+                          {l.qty} × {formatEur(l.item.priceEur, locale)}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        className="btn ghost sm"
+                        onClick={() => removeLine(l.item.id)}
+                      >
+                        {copy.remove}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <div className="market-cart-total">
+                  <span>{copy.total}</span>
+                  <b>{formatEur(cartTotal, locale)}</b>
+                </div>
+                <button
+                  type="button"
+                  className="btn mt-3 w-full"
+                  onClick={placeOrder}
+                >
+                  {copy.order}
+                </button>
+              </>
+            ) : (
+              <div className="empty mt-3">{copy.emptyCart}</div>
+            )}
           </aside>
         </div>
-      ) : null}
+      )}
     </div>
   );
 }

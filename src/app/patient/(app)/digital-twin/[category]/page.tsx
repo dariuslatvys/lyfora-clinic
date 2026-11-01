@@ -19,6 +19,7 @@ import {
 import { MarkerChart } from "@/components/patient/marker-chart";
 import { Sparkline } from "@/components/patient/sparkline";
 import { SnpDetailPanel } from "@/components/patient/snp-detail";
+import { PharmaGenesTabs } from "@/components/patient/pharma-genes-tabs";
 import type { HealthCategoryId } from "@/lib/health/categories";
 
 function Pill({
@@ -437,70 +438,94 @@ export default async function CategoryDetailPage({
                 </div>
               )}
               <div
-                className={`mt-3 space-y-2 pr-1 ${
-                  genesOnly ? "" : "max-h-[480px] overflow-auto"
+                className={`mt-3 pr-1 ${
+                  genesOnly || cat.id === "pharmacogenetics"
+                    ? ""
+                    : "max-h-[480px] overflow-auto"
                 }`}
               >
-                {sortedSnps.map((s) => {
-                  const c: RiskColour = s.colour || "grey";
-                  const isDriver =
-                    !genesOnly &&
-                    s.colour != null &&
-                    colourRank(s.colour) >=
-                      Math.max(2, colourRank(cat.colour));
-                  const selected = selectedSnpId === s.snpId;
-                  return (
-                    <Link
-                      key={`${s.gene}-${s.snpId}`}
-                      href={`/patient/snp/${encodeURIComponent(s.snpId)}?cat=${category}`}
-                      className={`block rounded-md border px-3 py-2 text-[var(--ink)] no-underline transition hover:border-[var(--accent)] ${
-                        selected
-                          ? "border-[var(--accent)]"
-                          : "border-[var(--line)]"
-                      }`}
-                      style={{
-                        borderLeft: `4px solid ${COLOUR_HEX[c]}`,
-                        background: selected
-                          ? "var(--accent-soft)"
-                          : isDriver
-                            ? `linear-gradient(90deg, ${COLOUR_SOFT[c]}, var(--surface-raised) 55%)`
-                            : "var(--surface-raised)",
-                      }}
-                    >
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="min-w-0">
-                          <span className="font-medium text-[var(--ink)]">
-                            {s.gene}{" "}
-                            <span className="text-[var(--ink-soft)] font-normal">
-                              {s.snpId.split("__")[0]}
-                            </span>
-                          </span>
-                          <p className="text-xs text-[var(--ink-soft)]">
-                            {s.genotypeAvailable
-                              ? `${s.allele1}/${s.allele2} · ${s.matchCount} ${
-                                  s.matchCount === 1
-                                    ? locale === "en"
-                                      ? "risk allele"
-                                      : "rizikos alelis"
-                                    : locale === "en"
-                                      ? "risk alleles"
-                                      : "rizikos aleliai"
-                                }`
-                              : labels.awaitingDna}
-                          </p>
-                        </div>
-                        <Pill
-                          colour={c}
-                          label={
-                            s.colour
-                              ? labels.colourLabels[s.colour]
-                              : labels.colourLabels.grey
-                          }
-                        />
-                      </div>
-                    </Link>
-                  );
-                })}
+                {cat.id === "pharmacogenetics" ? (
+                  <PharmaGenesTabs
+                    locale={locale}
+                    category={category}
+                    snps={sortedSnps.map((s) => ({
+                      gene: s.gene,
+                      snpId: s.snpId,
+                      allele1: s.allele1,
+                      allele2: s.allele2,
+                      matchCount: s.matchCount,
+                      colour: s.colour,
+                      genotypeAvailable: s.genotypeAvailable,
+                      subcategory: s.subcategory,
+                    }))}
+                    selectedSnpId={selectedSnpId}
+                    colourLabels={labels.colourLabels}
+                    awaitingDna={labels.awaitingDna}
+                  />
+                ) : (
+                  <div className="space-y-2">
+                    {sortedSnps.map((s) => {
+                      const c: RiskColour = s.colour || "grey";
+                      const isDriver =
+                        !genesOnly &&
+                        s.colour != null &&
+                        colourRank(s.colour) >=
+                          Math.max(2, colourRank(cat.colour));
+                      const selected = selectedSnpId === s.snpId;
+                      return (
+                        <Link
+                          key={`${s.gene}-${s.snpId}`}
+                          href={`/patient/snp/${encodeURIComponent(s.snpId)}?cat=${category}`}
+                          className={`block rounded-md border px-3 py-2 text-[var(--ink)] no-underline transition hover:border-[var(--accent)] ${
+                            selected
+                              ? "border-[var(--accent)]"
+                              : "border-[var(--line)]"
+                          }`}
+                          style={{
+                            borderLeft: `4px solid ${COLOUR_HEX[c]}`,
+                            background: selected
+                              ? "var(--accent-soft)"
+                              : isDriver
+                                ? `linear-gradient(90deg, ${COLOUR_SOFT[c]}, var(--surface-raised) 55%)`
+                                : "var(--surface-raised)",
+                          }}
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="min-w-0">
+                              <span className="font-medium text-[var(--ink)]">
+                                {s.gene}{" "}
+                                <span className="text-[var(--ink-soft)] font-normal">
+                                  {s.snpId.split("__")[0]}
+                                </span>
+                              </span>
+                              <p className="text-xs text-[var(--ink-soft)]">
+                                {s.genotypeAvailable
+                                  ? `${s.allele1}/${s.allele2} · ${s.matchCount} ${
+                                      s.matchCount === 1
+                                        ? locale === "en"
+                                          ? "risk allele"
+                                          : "rizikos alelis"
+                                        : locale === "en"
+                                          ? "risk alleles"
+                                          : "rizikos aleliai"
+                                    }`
+                                  : labels.awaitingDna}
+                              </p>
+                            </div>
+                            <Pill
+                              colour={c}
+                              label={
+                                s.colour
+                                  ? labels.colourLabels[s.colour]
+                                  : labels.colourLabels.grey
+                              }
+                            />
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </div>
           )}

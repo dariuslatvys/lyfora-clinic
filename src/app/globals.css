@@ -3489,7 +3489,6 @@ a.hc-kpi.clickable:hover {
 }
 
 .market-card-click {
-  cursor: pointer;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -3497,6 +3496,127 @@ a.hc-kpi.clickable:hover {
 .market-card-click.on {
   border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
   box-shadow: 0 10px 28px rgba(6, 78, 59, 0.08);
+}
+
+.market-card-main {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+}
+
+.market-card-main:disabled {
+  cursor: default;
+}
+
+.pharma-purpose-block {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  padding: 14px 16px 16px;
+}
+
+.pharma-purpose-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.pharma-purpose-title {
+  margin: 0;
+  font-family: var(--font-display), Manrope, sans-serif;
+  font-size: 1.12rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.market-detail-page {
+  scroll-margin-top: 12px;
+  display: grid;
+  gap: 16px;
+}
+
+.market-detail-back {
+  justify-self: start;
+}
+
+.market-detail-article {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 22px 24px 26px;
+  color: var(--ink);
+}
+
+.market-detail-header {
+  display: grid;
+  gap: 10px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line-2);
+}
+
+.market-detail-badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.market-detail-title {
+  margin: 0;
+  font-family: var(--font-display), Manrope, sans-serif;
+  font-size: clamp(1.45rem, 2.4vw, 1.9rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  max-width: 36rem;
+}
+
+.market-detail-lead {
+  margin: 0;
+  max-width: 40rem;
+  font-size: 1.02rem;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+.market-detail-buy {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.market-detail-section {
+  margin-top: 20px;
+}
+
+.market-detail-h {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  font-family: var(--font-display), Manrope, sans-serif;
+  font-size: 1.05rem;
+  font-weight: 650;
+}
+
+.market-detail-prose {
+  margin: 0;
+  max-width: 42rem;
+  font-size: 0.98rem;
+  line-height: 1.65;
+  color: var(--ink-soft);
+}
+
+.market-cart-under {
+  max-width: 420px;
 }
 
 .market-single-li {
@@ -3507,49 +3627,6 @@ a.hc-kpi.clickable:hover {
 .market-single-li .num {
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
-}
-
-.market-detail-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 80;
-  background: color-mix(in srgb, var(--ink) 42%, transparent);
-  display: flex;
-  justify-content: flex-end;
-  padding: 0;
-  animation: market-fade 0.18s ease;
-}
-
-@keyframes market-fade {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.market-detail-panel {
-  width: min(520px, 100%);
-  max-height: 100vh;
-  overflow: auto;
-  border-radius: 0;
-  border: 0;
-  border-left: 1px solid var(--line);
-  margin: 0;
-  padding: 22px 22px 28px;
-  animation: market-slide 0.22s ease;
-}
-
-@keyframes market-slide {
-  from {
-    transform: translateX(18px);
-    opacity: 0.6;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
 }
 
 .market-gene-chips {
@@ -3563,24 +3640,46 @@ a.hc-kpi.clickable:hover {
   font-size: 0.78rem;
   padding: 4px 8px;
   border-radius: 8px;
-  background: color-mix(in srgb, var(--accent-soft) 70%, var(--surface));
+  background: color-mix(in srgb, var(--accent-soft) 55%, var(--surface));
   border: 1px solid color-mix(in srgb, var(--accent) 18%, var(--line));
   color: var(--ink);
 }
 
 .market-detail-list {
   margin: 0;
-  padding-left: 1.15rem;
+  padding: 0;
+  list-style: none;
   display: grid;
-  gap: 6px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 18px;
   color: var(--ink-soft);
-  font-size: 0.92rem;
+  font-size: 0.94rem;
   line-height: 1.4;
 }
 
-@media (max-width: 640px) {
-  .market-detail-panel {
-    width: 100%;
+.market-detail-list li {
+  position: relative;
+  padding-left: 0.9rem;
+}
+
+.market-detail-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 70%, var(--ink-soft));
+}
+
+@media (max-width: 720px) {
+  .market-detail-list {
+    grid-template-columns: 1fr;
+  }
+
+  .market-detail-article {
+    padding: 16px 16px 20px;
   }
 }
 

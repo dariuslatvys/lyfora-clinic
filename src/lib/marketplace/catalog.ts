@@ -77,16 +77,22 @@ const labPackages: MarketItem[] = (
     kind: "package" as const,
     nameLt: r.nameLt,
     nameEn: r.nameEn,
-    summaryLt: `${n} tyrimai · spauskite kortelę detalesnei sudėčiai`,
-    summaryEn: `${n} markers · open the card for the full list`,
+    summaryLt:
+      r.tier === "full"
+        ? `Išplėstas ${n} analitės rinkinys pagal Markers lentelę.`
+        : `Bazinis ${n} analitės rinkinys greitam įvertinimui.`,
+    summaryEn:
+      r.tier === "full"
+        ? `Expanded set of ${n} analytes from the Markers table.`
+        : `Baseline set of ${n} analytes for a quick review.`,
     detailLt:
       r.tier === "full"
-        ? `FULL paketas pagal Markers_Category lentelę — išplėstas ${n} analitės rinkinys sveikatos sričiai stebėti. Į kainą įskaičiuotas klinikinis administravimas.`
-        : `CORE paketas pagal Markers_Category lentelę — bazinis ${n} analitės rinkinys greitam įvertinimui. Į kainą įskaičiuotas klinikinis administravimas.`,
+        ? `FULL laboratorinių tyrimų paketas pagal Markers_Category lentelę. Apima ${n} analites šiai sveikatos sričiai stebėti. Kaina su klinikinio administravimo mokesčiu.`
+        : `CORE laboratorinių tyrimų paketas pagal Markers_Category lentelę. Apima ${n} bazines analites greitam įvertinimui. Kaina su klinikinio administravimo mokesčiu.`,
     detailEn:
       r.tier === "full"
-        ? `FULL package from the Markers_Category table — expanded set of ${n} analytes for this health area. Clinic administration included.`
-        : `CORE package from the Markers_Category table — baseline set of ${n} analytes for a quick review. Clinic administration included.`,
+        ? `FULL lab package from the Markers_Category table. Includes ${n} analytes for monitoring this health area. Clinic administration included in the price.`
+        : `CORE lab package from the Markers_Category table. Includes ${n} baseline analytes for a quick review. Clinic administration included in the price.`,
     priceEur: r.price,
     badgeLt:
       r.tier === "full"
@@ -768,19 +774,15 @@ export const MARKET_CATEGORIES: {
     id: "labs",
     lt: "Laboratoriniai tyrimai",
     en: "Laboratory tests",
-    blurbLt:
-      "Visi Markers lentelės tyrimai ir CORE/FULL paketai. Spauskite paketą — pamatysite visą sudėtį.",
-    blurbEn:
-      "All Markers-table tests and CORE/FULL packages. Open a package for the full contents.",
+    blurbLt: "Visi Markers lentelės tyrimai ir CORE/FULL paketai.",
+    blurbEn: "All Markers-table tests and CORE/FULL packages.",
   },
   {
     id: "genetics",
     lt: "Genetiniai tyrimai",
     en: "Genetic tests",
-    blurbLt:
-      "CeGaT Cardiac Diseases gene sets, SNP, NGS ir PGX. Spauskite paketą — genų sąrašas ir aprašymas.",
-    blurbEn:
-      "CeGaT Cardiac Diseases gene sets, SNP, NGS and PGX. Open a package for genes and description.",
+    blurbLt: "CeGaT Cardiac Diseases gene sets, SNP, NGS ir PGX.",
+    blurbEn: "CeGaT Cardiac Diseases gene sets, SNP, NGS and PGX.",
   },
   {
     id: "wellness",

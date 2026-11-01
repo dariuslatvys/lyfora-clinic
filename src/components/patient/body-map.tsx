@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { RiskColour } from "@/lib/health/colours";
 import { COLOUR_HEX } from "@/lib/health/colours";
@@ -39,8 +40,8 @@ function CatIcon({ id }: { id: string }) {
   return (
     <svg
       viewBox="0 0 24 24"
-      width="22"
-      height="22"
+      width="20"
+      height="20"
       fill="none"
       stroke="currentColor"
       strokeWidth="1.8"
@@ -61,32 +62,34 @@ function orderCategories(categories: BodyMapCategory[]) {
 }
 
 type Slot = {
-  deg: number;
-  // percent of stage
   x: number;
   y: number;
   labelX: number;
   labelY: number;
-  align: "left" | "right" | "center";
+  place: "top" | "bottom" | "left" | "right";
 };
 
-/** Categories sit ON the circle; labels just outside. */
+/** Icons on the ring; labels farther out so they never collide. */
 function orbitSlots(total: number): Slot[] {
   const n = Math.max(total, 1);
-  const ring = 36; // % radius for icon centers
-  const labelR = 46;
+  const ring = 32;
+  const labelR = 44.5;
   const slots: Slot[] = [];
   for (let i = 0; i < n; i++) {
-    const deg = -90 + (360 / n) * i; // start at top
+    const deg = -90 + (360 / n) * i;
     const rad = (deg * Math.PI) / 180;
-    const x = 50 + ring * Math.cos(rad);
-    const y = 50 + ring * Math.sin(rad);
-    const labelX = 50 + labelR * Math.cos(rad);
-    const labelY = 50 + labelR * Math.sin(rad);
-    let align: Slot["align"] = "center";
-    if (Math.cos(rad) > 0.35) align = "left";
-    else if (Math.cos(rad) < -0.35) align = "right";
-    slots.push({ deg, x, y, labelX, labelY, align });
+    const cos = Math.cos(rad);
+    const sin = Math.sin(rad);
+    const x = 50 + ring * cos;
+    const y = 50 + ring * sin;
+    const labelX = 50 + labelR * cos;
+    const labelY = 50 + labelR * sin;
+    let place: Slot["place"] = "right";
+    if (sin < -0.55) place = "top";
+    else if (sin > 0.55) place = "bottom";
+    else if (cos < 0) place = "left";
+    else place = "right";
+    slots.push({ x, y, labelX, labelY, place });
   }
   return slots;
 }
@@ -105,47 +108,27 @@ export function BodyMap({
   return (
     <div className="ring-map rise-in-delay">
       <div className="ring-map-stage">
-        {/* Base circle */}
-        <svg
-          className="ring-map-svg"
-          viewBox="0 0 100 100"
-          aria-hidden="true"
-        >
+        <svg className="ring-map-svg" viewBox="0 0 100 100" aria-hidden="true">
           <circle
             cx="50"
             cy="50"
-            r="36"
+            r="32"
             fill="none"
             stroke="#d5e0e8"
-            strokeWidth="0.35"
+            strokeWidth="0.4"
           />
-          <circle
-            cx="50"
-            cy="50"
-            r="36"
-            fill="none"
-            stroke="#b7c9d6"
-            strokeWidth="0.2"
-            strokeDasharray="1.2 1.4"
-            opacity="0.9"
-          />
-          {ordered.map((c, i) => {
-            const s = slots[i];
-            return (
-              <line
-                key={`line-${c.id}`}
-                x1="50"
-                y1="50"
-                x2={s.x}
-                y2={s.y}
-                stroke="#c5d4e0"
-                strokeWidth="0.2"
-                strokeDasharray="0.8 1"
-              />
-            );
-          })}
-          <circle cx="50" cy="50" r="2.2" fill="#e8f3f8" stroke="#b7c9d6" strokeWidth="0.25" />
         </svg>
+
+        <div className="ring-map-figure" aria-hidden="true">
+          <Image
+            src="/brand/body-twin-hub.png"
+            alt=""
+            width={360}
+            height={480}
+            className="ring-map-photo"
+            priority
+          />
+        </div>
 
         {ordered.map((c, i) => {
           const s = slots[i];
@@ -153,7 +136,7 @@ export function BodyMap({
             <Link
               key={c.id}
               href={`/patient/digital-twin/${c.id}`}
-              className={`ring-node ring-align-${s.align}`}
+              className={`ring-node ring-place-${s.place}`}
               style={{
                 ["--nx" as string]: `${s.x}%`,
                 ["--ny" as string]: `${s.y}%`,

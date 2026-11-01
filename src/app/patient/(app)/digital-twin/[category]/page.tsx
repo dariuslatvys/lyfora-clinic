@@ -12,6 +12,7 @@ import {
 } from "@/lib/health/colours";
 import { markerItemColour } from "@/lib/health/marker-colour";
 import { MarkerChart } from "@/components/patient/marker-chart";
+import { Sparkline } from "@/components/patient/sparkline";
 import { SnpDetailPanel } from "@/components/patient/snp-detail";
 import type { HealthCategoryId } from "@/lib/health/categories";
 
@@ -46,6 +47,18 @@ export default async function CategoryDetailPage({
 
   const selectedMarkerKey = sp.marker;
   const selectedSnpId = sp.snp;
+
+  const historyByKey = (() => {
+    const map = new Map<string, number[]>();
+    for (const m of [...cat.markers].sort((a, b) =>
+      a.observedAt.localeCompare(b.observedAt)
+    )) {
+      const cur = map.get(m.markerKey) || [];
+      cur.push(m.value);
+      map.set(m.markerKey, cur);
+    }
+    return map;
+  })();
 
   const latestMarkers = (() => {
     const map = new Map<string, (typeof cat.markers)[number]>();
@@ -296,32 +309,38 @@ export default async function CategoryDetailPage({
                   label={labels.colourLabels[biomarkerColour]}
                 />
               </div>
-              <div className="mt-3 space-y-2">
+              <div className="marker-list mt-3">
+                <div className="marker-list-head" aria-hidden="true">
+                  <span>{labels.labsIndicator}</span>
+                  <span>{labels.labsResult}</span>
+                  <span>{labels.labsChange}</span>
+                  <span>{labels.labsStatus}</span>
+                </div>
                 {latestMarkers.map((m) => {
                   const c = markerItemColour(m);
+                  const series = historyByKey.get(m.markerKey) || [m.value];
                   return (
                     <Link
                       key={m.markerKey}
                       href={`/patient/marker/${encodeURIComponent(m.markerKey)}?cat=${category}`}
-                      className={`block rounded-md border px-3 py-2 transition hover:border-[var(--accent)] ${
-                        selectedMarkerKey === m.markerKey
-                          ? "border-[var(--accent)] bg-[var(--accent-soft)]"
-                          : "border-[var(--line)] bg-white/70"
+                      className={`marker-row ${
+                        selectedMarkerKey === m.markerKey ? "on" : ""
                       }`}
-                      style={{ borderLeft: `4px solid ${COLOUR_HEX[c]}` }}
+                      style={{ borderLeftColor: COLOUR_HEX[c] }}
                     >
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="font-medium">
-                          {m.name || m.markerKey}
-                        </span>
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm text-[var(--ink-soft)]">
-                            {m.value}
-                            {m.unit ? ` ${m.unit}` : ""}
-                          </span>
-                          <Pill colour={c} label={labels.colourLabels[c]} />
-                        </div>
-                      </div>
+                      <span className="marker-row-name">
+                        {m.name || m.markerKey}
+                      </span>
+                      <span className="marker-row-val">
+                        {m.value}
+                        {m.unit ? ` ${m.unit}` : ""}
+                      </span>
+                      <span className="marker-row-spark">
+                        <Sparkline values={series} width={84} height={28} />
+                      </span>
+                      <span className="marker-row-status">
+                        <Pill colour={c} label={labels.colourLabels[c]} />
+                      </span>
                     </Link>
                   );
                 })}

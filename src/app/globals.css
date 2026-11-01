@@ -1720,3 +1720,87 @@ a {
   text-transform: uppercase;
   color: var(--muted);
 }
+
+/* ---------- Category marker list with sparkline ---------- */
+.marker-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.marker-list-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(72px, 0.7fr) minmax(96px, 0.9fr) auto;
+  gap: 10px;
+  padding: 0 10px 4px 14px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.marker-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(72px, 0.7fr) minmax(96px, 0.9fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 10px 8px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  border-left-width: 4px;
+  background: rgba(255, 255, 255, 0.72);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.marker-row:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.marker-row.on {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.marker-row-name {
+  font-weight: 600;
+  font-size: 0.92rem;
+  line-height: 1.25;
+  min-width: 0;
+}
+
+.marker-row-val {
+  font-size: 0.86rem;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.marker-row-spark {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.marker-row-status {
+  justify-self: end;
+}
+
+@media (max-width: 720px) {
+  .marker-list-head {
+    display: none;
+  }
+  .marker-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "name status"
+      "val spark";
+  }
+  .marker-row-name { grid-area: name; }
+  .marker-row-val { grid-area: val; }
+  .marker-row-spark { grid-area: spark; justify-self: end; }
+  .marker-row-status { grid-area: status; }
+}

@@ -9,9 +9,9 @@
   color-scheme: dark;
   --bg: #0b1412;
   --surface: #152420;
-  --surface-2: #1b2e29;
-  /* Slightly lighter green for info boxes / gene rows */
-  --surface-raised: #274740;
+  --surface-2: #1e342e;
+  /* Lighter green for info boxes / gene rows / content tiles */
+  --surface-raised: #335f55;
   --ink: #e3ece8;
   --ink-soft: #bccbc5;
   --muted: #8aa099;
@@ -331,7 +331,7 @@ a {
 
 .card,
 .panel {
-  background: var(--surface);
+  background: var(--surface-2);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: 18px;
@@ -1395,10 +1395,10 @@ a {
 .ring-map-figure {
   position: absolute;
   left: 50%;
-  /* Lower so the twin clears the heart node and side icons */
-  top: 62%;
-  transform: translate(-50%, -42%);
-  width: min(100px, 17%);
+  /* Larger twin, raised toward ring center */
+  top: 50%;
+  transform: translate(-50%, -48%);
+  width: min(168px, 30%);
   z-index: 1;
   pointer-events: none;
 }
@@ -1458,42 +1458,42 @@ a {
   position: absolute;
   left: 0;
   top: 0;
-  width: 124px;
+  width: 148px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
   pointer-events: none;
   z-index: 3;
 }
 
 /* Titles sit beside the icon disc — outside the dashed ring. */
 .ring-place-right .ring-label {
-  transform: translate(32px, -50%);
+  transform: translate(34px, -50%);
   text-align: left;
 }
 
 .ring-place-left .ring-label {
-  transform: translate(calc(-100% - 32px), -50%);
+  transform: translate(calc(-100% - 34px), -50%);
   text-align: right;
 }
 
 .ring-place-top .ring-label {
-  transform: translate(-50%, calc(-100% - 34px));
+  transform: translate(-50%, calc(-100% - 36px));
   text-align: center;
-  width: 150px;
+  width: 180px;
 }
 
 .ring-place-bottom .ring-label {
-  transform: translate(-50%, 34px);
+  transform: translate(-50%, 36px);
   text-align: center;
-  width: 150px;
+  width: 180px;
 }
 
 .ring-label b {
   font-family: var(--font-display), Manrope, sans-serif;
-  font-size: 0.72rem;
+  font-size: 0.92rem;
   font-weight: 700;
-  line-height: 1.15;
+  line-height: 1.2;
   color: var(--ink);
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -1507,10 +1507,10 @@ a {
 
 .ring-label em {
   font-style: normal;
-  font-size: 0.62rem;
+  font-size: 0.72rem;
   font-weight: 650;
   color: var(--cc, var(--muted));
-  line-height: 1.15;
+  line-height: 1.2;
 }
 
 .ring-map-hint {

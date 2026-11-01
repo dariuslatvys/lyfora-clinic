@@ -1,14 +1,17 @@
 "use client";
 
+import { Fragment } from "react";
 import { AiProvider, useAi } from "./ai-context";
 import { AiDrawer } from "./ai-drawer";
 
 function ShellFrame({
-  children,
+  rail,
+  main,
   locale,
   patientName,
 }: {
-  children: React.ReactNode;
+  rail: React.ReactNode;
+  main: React.ReactNode;
   locale: "lt" | "en";
   patientName: string;
 }) {
@@ -16,20 +19,19 @@ function ShellFrame({
 
   return (
     <div className={open ? "app ai-open" : "app"}>
-      {children}
-      <AiDrawer locale={locale} patientName={patientName} />
+      <Fragment key="patient-rail">{rail}</Fragment>
+      <Fragment key="patient-main">{main}</Fragment>
+      <AiDrawer key="ai-drawer" locale={locale} patientName={patientName} />
     </div>
   );
 }
 
 export function PatientShell({
-  children,
   locale,
   patientName,
   rail,
   main,
 }: {
-  children?: React.ReactNode;
   locale: "lt" | "en";
   patientName: string;
   askAiLabel?: string;
@@ -38,11 +40,12 @@ export function PatientShell({
 }) {
   return (
     <AiProvider>
-      <ShellFrame locale={locale} patientName={patientName}>
-        {rail}
-        {main}
-        {children}
-      </ShellFrame>
+      <ShellFrame
+        locale={locale}
+        patientName={patientName}
+        rail={rail}
+        main={main}
+      />
     </AiProvider>
   );
 }
@@ -67,8 +70,10 @@ export function AiToggleButton({ label }: { label: string }) {
         strokeLinejoin="round"
         aria-hidden="true"
       >
-        <path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z" />
-        <path d="M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z" />
+        <g>
+          <path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z" />
+          <path d="M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z" />
+        </g>
       </svg>
       {label}
     </button>

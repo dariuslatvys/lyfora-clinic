@@ -129,24 +129,30 @@ const MARKER_COPY: Record<
   },
 };
 
-function nonRiskAllele(effect1?: string | null, effect2?: string | null) {
-  const effects = new Set(
-    [effect1, effect2].filter(Boolean).map((a) => a!.toUpperCase())
-  );
-  for (const a of ["A", "C", "G", "T"]) {
-    if (!effects.has(a)) return a;
-  }
-  return "N";
-}
-
 function main() {
   const dbPath = path.join(ROOT, "data", "db", "lyfora.sqlite");
   if (fs.existsSync(dbPath)) fs.unlinkSync(dbPath);
   if (fs.existsSync(dbPath + "-wal")) fs.unlinkSync(dbPath + "-wal");
   if (fs.existsSync(dbPath + "-shm")) fs.unlinkSync(dbPath + "-shm");
 
+  // Create an empty DB file so getSqlite() does not restore the bundled demo
+  // snapshot (which already contains users and would hit UNIQUE on insert).
+  fs.mkdirSync(path.dirname(dbPath), { recursive: true });
+  fs.writeFileSync(dbPath, "");
+
   ensureSchema();
   const sqlite = getSqlite();
+  // Belt-and-braces: clear any leftover rows if schema bootstrap was odd
+  sqlite.exec(`
+    DELETE FROM snp_genotypes;
+    DELETE FROM rare_mutations;
+    DELETE FROM marker_results;
+    DELETE FROM questionnaire;
+    DELETE FROM patients;
+    DELETE FROM users;
+    DELETE FROM gene_snp_risk;
+    DELETE FROM marker_defs;
+  `);
 
   const snps = readJson<JsonSnp[]>("gene_snp_risk.json");
   const markerDefs = readJson<
@@ -233,7 +239,7 @@ function main() {
     null,
     1,
     1,
-    "Demo moters pacientė su sintetiniu NGS VCF ir demonstraciniais SNP genotipais."
+    "Demo moters pacientė su AncestryDNA SNP microarray (sampleDNA.txt) ir sintetiniu NGS VCF."
   );
 
   const insertSnp = sqlite.prepare(`
@@ -365,7 +371,7 @@ function main() {
     VALUES (?, ?, ?, ?, ?)
   `);
 
-  // Real microarray genotypes for male demo patient (23andMe-format sample)
+  // Real AncestryDNA microarray genotypes for male demo patient
   const maleGeno = readJson<{
     genotypes: { snpId: string; allele1: string; allele2: string }[];
     source?: string;
@@ -376,47 +382,24 @@ function main() {
       g.snpId,
       g.allele1,
       g.allele2,
-      maleGeno.source || "snp_microarray"
+      maleGeno.source || "ancestry_microarray"
     );
   }
 
-  // Demo SNP genotypes for female patient — create 1-match / 2-match patterns
-  const cardio = snps.filter((s) => s.primaryCategory === "Cardiovascular Health");
-  const hormonesW = snps.filter((s) => s.primaryCategory === "Hormones (Women)");
-  const mental = snps.filter((s) => s.primaryCategory === "Mental and Cognitive Health");
-  const immune = snps.filter((s) => s.primaryCategory === "Immune & Inflammation");
-  const metabolic = snps.filter((s) => s.primaryCategory === "Metabolic Health");
-  const pharma = snps.filter((s) => s.primaryCategory === "Pharmacogenetics");
-
-  function seedGenotypes(rows: JsonSnp[], pattern: "sparse" | "light") {
-    rows.forEach((r, i) => {
-      const eff = (r.effectAllele1 || "A").toUpperCase();
-      const safe = nonRiskAllele(r.effectAllele1, r.effectAllele2);
-      let a1 = safe;
-      let a2 = safe;
-      // Keep most genotypes non-risk so category colours stay readable
-      const mode =
-        pattern === "sparse"
-          ? i % 6 === 0
-            ? "het"
-            : "none"
-          : i % 8 === 0
-            ? "het"
-            : "none";
-      if (mode === "het") {
-        a1 = eff;
-        a2 = safe;
-      }
-      insertGeno.run(femaleId, r.snpId, a1, a2, "demo_microarray");
-    });
+  // Real AncestryDNA microarray genotypes for female demo patient
+  const femaleGeno = readJson<{
+    genotypes: { snpId: string; allele1: string; allele2: string }[];
+    source?: string;
+  }>("snp_genotypes_female.json");
+  for (const g of femaleGeno.genotypes) {
+    insertGeno.run(
+      femaleId,
+      g.snpId,
+      g.allele1,
+      g.allele2,
+      femaleGeno.source || "ancestry_microarray"
+    );
   }
-
-  seedGenotypes(cardio, "sparse");
-  seedGenotypes(hormonesW, "sparse");
-  seedGenotypes(mental, "light");
-  seedGenotypes(immune, "light");
-  seedGenotypes(metabolic, "sparse");
-  seedGenotypes(pharma.slice(0, 40), "light");
 
   const insertRare = sqlite.prepare(`
     INSERT INTO rare_mutations (
@@ -458,10 +441,11 @@ function main() {
   insertQ.run(patientId, "sleep_hours", "6-7");
 
   console.log("Seeded Lyfora DB");
-  console.log("  patients: Jonas Jonaitis / John Doe (labs + SNP + NGS), Rasa Rasaitė / Jane Smith (demo SNP + female VCF)");
+  console.log("  patients: Jonas Jonaitis / John Doe (labs + SNP + NGS), Rasa Rasaitė / Jane Smith (AncestryDNA SNP + female VCF)");
   console.log("  SNPs:", snps.length);
   console.log("  marker results:", blood.markers.length);
   console.log("  male microarray genotypes:", maleGeno.genotypes.length);
+  console.log("  female microarray genotypes:", femaleGeno.genotypes.length);
   console.log("  male rare:", rareMale.variants.length, "female rare:", rareFemale.variants.length);
   console.log("  logins: pacientas@lyfora.lt / paciente@lyfora.lt / gydytojas@lyfora.lt  pass: lyfora2026");
 }

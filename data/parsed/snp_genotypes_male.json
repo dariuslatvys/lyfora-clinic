@@ -1,7 +1,10 @@
 {
-  "source": "SNP_genome_sample_v5_Full_20260402230601.txt",
-  "format": "23andMe",
-  "matched": 131,
+  "source": "SamplemanDNA.txt",
+  "format": "ancestry",
+  "riskTableSnps": 158,
+  "matched": 130,
+  "missing": 28,
+  "skippedNoCall": 4,
   "genotypes": [
     {
       "snpId": "rs1006737",
@@ -26,6 +29,18 @@
       "allele1": "A",
       "allele2": "A",
       "genotype": "AA"
+    },
+    {
+      "snpId": "rs1050828",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs1050829",
+      "allele1": "T",
+      "allele2": "T",
+      "genotype": "TT"
     },
     {
       "snpId": "rs1056836",
@@ -76,18 +91,6 @@
       "genotype": "GG"
     },
     {
-      "snpId": "rs10835638",
-      "allele1": "G",
-      "allele2": "G",
-      "genotype": "GG"
-    },
-    {
-      "snpId": "rs112766203",
-      "allele1": "G",
-      "allele2": "G",
-      "genotype": "GG"
-    },
-    {
       "snpId": "rs1135840",
       "allele1": "C",
       "allele2": "G",
@@ -100,16 +103,10 @@
       "genotype": "CC"
     },
     {
-      "snpId": "rs1142345",
-      "allele1": "T",
-      "allele2": "T",
-      "genotype": "TT"
-    },
-    {
-      "snpId": "rs115232898",
-      "allele1": "T",
-      "allele2": "T",
-      "genotype": "TT"
+      "snpId": "rs113994097",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
     },
     {
       "snpId": "rs116855232",
@@ -154,12 +151,6 @@
       "genotype": "TT"
     },
     {
-      "snpId": "rs12769205",
-      "allele1": "A",
-      "allele2": "A",
-      "genotype": "AA"
-    },
-    {
       "snpId": "rs12777823",
       "allele1": "G",
       "allele2": "G",
@@ -172,16 +163,10 @@
       "genotype": "TT"
     },
     {
-      "snpId": "rs1360780",
-      "allele1": "C",
-      "allele2": "C",
-      "genotype": "CC"
-    },
-    {
-      "snpId": "rs146356975",
-      "allele1": "T",
-      "allele2": "T",
-      "genotype": "TT"
+      "snpId": "rs143383",
+      "allele1": "A",
+      "allele2": "A",
+      "genotype": "AA"
     },
     {
       "snpId": "rs147390019",
@@ -220,12 +205,6 @@
       "genotype": "TT"
     },
     {
-      "snpId": "rs1799807",
-      "allele1": "T",
-      "allele2": "T",
-      "genotype": "TT"
-    },
-    {
       "snpId": "rs1799853",
       "allele1": "C",
       "allele2": "C",
@@ -256,10 +235,10 @@
       "genotype": "AG"
     },
     {
-      "snpId": "rs1800460",
-      "allele1": "C",
-      "allele2": "C",
-      "genotype": "CC"
+      "snpId": "rs1799963",
+      "allele1": "G",
+      "allele2": "G",
+      "genotype": "GG"
     },
     {
       "snpId": "rs1800462",
@@ -298,6 +277,12 @@
       "genotype": "GG"
     },
     {
+      "snpId": "rs1801198",
+      "allele1": "C",
+      "allele2": "G",
+      "genotype": "CG"
+    },
+    {
       "snpId": "rs1801279",
       "allele1": "G",
       "allele2": "G",
@@ -311,12 +296,6 @@
     },
     {
       "snpId": "rs1801282",
-      "allele1": "C",
-      "allele2": "C",
-      "genotype": "CC"
-    },
-    {
-      "snpId": "rs1803274",
       "allele1": "C",
       "allele2": "C",
       "genotype": "CC"
@@ -344,6 +323,12 @@
       "allele1": "C",
       "allele2": "T",
       "genotype": "CT"
+    },
+    {
+      "snpId": "rs2066845",
+      "allele1": "G",
+      "allele2": "G",
+      "genotype": "GG"
     },
     {
       "snpId": "rs2108622",
@@ -406,6 +391,30 @@
       "genotype": "TT"
     },
     {
+      "snpId": "rs2476601",
+      "allele1": "G",
+      "allele2": "G",
+      "genotype": "GG"
+    },
+    {
+      "snpId": "rs267606617",
+      "allele1": "A",
+      "allele2": "A",
+      "genotype": "AA"
+    },
+    {
+      "snpId": "rs267606618",
+      "allele1": "T",
+      "allele2": "T",
+      "genotype": "TT"
+    },
+    {
+      "snpId": "rs267606619",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
       "snpId": "rs28371685",
       "allele1": "C",
       "allele2": "C",
@@ -422,6 +431,12 @@
       "allele1": "G",
       "allele2": "G",
       "genotype": "GG"
+    },
+    {
+      "snpId": "rs28371725",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
     },
     {
       "snpId": "rs28399499",
@@ -464,12 +479,6 @@
       "allele1": "C",
       "allele2": "C",
       "genotype": "CC"
-    },
-    {
-      "snpId": "rs34223104",
-      "allele1": "T",
-      "allele2": "T",
-      "genotype": "TT"
     },
     {
       "snpId": "rs34536443",
@@ -532,12 +541,6 @@
       "genotype": "GG"
     },
     {
-      "snpId": "rs429358",
-      "allele1": "C",
-      "allele2": "T",
-      "genotype": "CT"
-    },
-    {
       "snpId": "rs4680",
       "allele1": "A",
       "allele2": "A",
@@ -562,6 +565,12 @@
       "genotype": "GG"
     },
     {
+      "snpId": "rs5030868",
+      "allele1": "G",
+      "allele2": "G",
+      "genotype": "GG"
+    },
+    {
       "snpId": "rs505151",
       "allele1": "A",
       "allele2": "A",
@@ -578,12 +587,6 @@
       "allele1": "C",
       "allele2": "T",
       "genotype": "CT"
-    },
-    {
-      "snpId": "rs523349",
-      "allele1": "G",
-      "allele2": "G",
-      "genotype": "GG"
     },
     {
       "snpId": "rs55886062",
@@ -623,6 +626,12 @@
     },
     {
       "snpId": "rs6166",
+      "allele1": "C",
+      "allele2": "C",
+      "genotype": "CC"
+    },
+    {
+      "snpId": "rs61736512",
       "allele1": "C",
       "allele2": "C",
       "genotype": "CC"
@@ -718,7 +727,7 @@
       "genotype": "TT"
     },
     {
-      "snpId": "rs75017182",
+      "snpId": "rs75527207",
       "allele1": "G",
       "allele2": "G",
       "genotype": "GG"
@@ -742,12 +751,6 @@
       "genotype": "CT"
     },
     {
-      "snpId": "rs7900194",
-      "allele1": "G",
-      "allele2": "G",
-      "genotype": "GG"
-    },
-    {
       "snpId": "rs7903146",
       "allele1": "C",
       "allele2": "T",
@@ -764,12 +767,6 @@
       "allele1": "C",
       "allele2": "T",
       "genotype": "CT"
-    },
-    {
-      "snpId": "rs9263726",
-      "allele1": "G",
-      "allele2": "G",
-      "genotype": "GG"
     },
     {
       "snpId": "rs9349379",

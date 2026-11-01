@@ -23,3 +23,44 @@ export function markerItemColour(m: {
   if (high || low) return "orange";
   return "yellow";
 }
+
+export type FlaggedLab = {
+  markerKey: string;
+  name: string;
+  value: number;
+  unit?: string | null;
+  observedAt: string;
+  colour: RiskColour;
+};
+
+/** Latest abnormal markers across the twin. */
+export function collectFlaggedLabs(
+  markers: {
+    markerKey: string;
+    name?: string;
+    value: number;
+    unit?: string | null;
+    refLow?: number | null;
+    refHigh?: number | null;
+    flag?: string | null;
+    observedAt: string;
+  }[]
+): FlaggedLab[] {
+  const latest = new Map<string, (typeof markers)[number]>();
+  for (const m of [...markers].sort((a, b) =>
+    a.observedAt.localeCompare(b.observedAt)
+  )) {
+    latest.set(m.markerKey, m);
+  }
+  return [...latest.values()]
+    .map((m) => ({
+      markerKey: m.markerKey,
+      name: m.name || m.markerKey,
+      value: m.value,
+      unit: m.unit,
+      observedAt: m.observedAt,
+      colour: markerItemColour(m),
+    }))
+    .filter((m) => m.colour !== "green" && m.colour !== "grey")
+    .sort((a, b) => b.observedAt.localeCompare(a.observedAt));
+}

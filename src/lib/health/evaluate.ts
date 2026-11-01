@@ -200,6 +200,8 @@ export function evaluateDigitalTwin(input: {
   const baseSnpId = (snpId: string) => snpId.split("__")[0]!.toLowerCase();
 
   return cats.map((cat) => {
+    // Only show SNPs that have a real genotype in the patient's DNA file.
+    // Missing positions are omitted entirely (better than grey "no data").
     const snps = input.snpRows
       .filter((r) => matchPrimaryCategory(r.primaryCategory, cat))
       .map((r) =>
@@ -209,7 +211,8 @@ export function evaluateDigitalTwin(input: {
             genoMap.get(baseSnpId(r.snpId)) ??
             null
         )
-      );
+      )
+      .filter((s) => s.genotypeAvailable);
 
     const markers = input.markers.filter((m) =>
       markerBelongs(m.categories, cat.markerCategoryNames)

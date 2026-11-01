@@ -104,7 +104,7 @@ type Slot = {
 };
 
 function slotFor(id: string, index: number, total: number): Slot {
-  const iconR = 32;
+  const iconR = 34;
   const fallbackDeg = -90 + (360 / Math.max(total, 1)) * index;
   const deg = ANGLE_BY_ID[id] ?? fallbackDeg;
   const rad = (deg * Math.PI) / 180;

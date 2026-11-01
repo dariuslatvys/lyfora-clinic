@@ -8,11 +8,11 @@ import {
   COLOUR_SOFT,
   PILL_CLASS,
   colourRank,
-  normalizeColour,
   type RiskColour,
 } from "@/lib/health/colours";
 import { markerItemColour } from "@/lib/health/marker-colour";
 import { MarkerChart } from "@/components/patient/marker-chart";
+import { SnpDetailPanel } from "@/components/patient/snp-detail";
 import type { HealthCategoryId } from "@/lib/health/categories";
 
 function Pill({
@@ -75,7 +75,9 @@ export default async function CategoryDetailPage({
     : null;
 
   const catRare = cat.rare ?? [];
-  const showRare = twin.patient.hasNgsVcf && catRare.length > 0;
+  const hasMarkers = latestMarkers.length > 0;
+  const hasSnps = sortedSnps.length > 0;
+  const hasRare = catRare.length > 0;
 
   const snpTitle =
     cat.id === "pharmacogenetics"
@@ -87,7 +89,10 @@ export default async function CategoryDetailPage({
   const geneticColour: RiskColour = cat.geneticColour ?? "grey";
   const biomarkerColour = cat.biomarkerColour;
   const driverSnps = sortedSnps.filter(
-    (s) => s.colour && colourRank(s.colour) >= colourRank(cat.colour) && cat.colour !== "grey"
+    (s) =>
+      s.colour &&
+      colourRank(s.colour) >= colourRank(cat.colour) &&
+      cat.colour !== "grey"
   );
   const driverMarkers = latestMarkers.filter(
     (m) =>
@@ -96,7 +101,12 @@ export default async function CategoryDetailPage({
       colourRank(markerItemColour(m)) >= 2
   );
   const hasDrivers =
-    driverSnps.length > 0 || driverMarkers.length > 0 || catRare.length > 0;
+    driverSnps.length > 0 || driverMarkers.length > 0 || hasRare;
+
+  const bothColumns = hasMarkers && hasSnps;
+  const columnsClass = bothColumns
+    ? "grid gap-5 lg:grid-cols-2"
+    : "grid gap-5";
 
   return (
     <div className="space-y-5">
@@ -131,39 +141,47 @@ export default async function CategoryDetailPage({
           <Pill colour={cat.colour} label={labels.colourLabels[cat.colour]} />
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-3">
-          <div className="rounded-[var(--radius-s)] border border-[var(--line-2)] bg-[var(--surface-2)] p-3">
-            <p className="eyebrow">{labels.fromMarkers}</p>
-            <div className="mt-2">
-              <Pill
-                colour={biomarkerColour}
-                label={labels.colourLabels[biomarkerColour]}
-              />
+        <div
+          className={`grid gap-3 ${
+            [hasMarkers, hasSnps, hasRare].filter(Boolean).length > 1
+              ? "sm:grid-cols-2 lg:grid-cols-3"
+              : ""
+          }`}
+        >
+          {hasMarkers && (
+            <div className="rounded-[var(--radius-s)] border border-[var(--line-2)] bg-[var(--surface-2)] p-3">
+              <p className="eyebrow">{labels.fromMarkers}</p>
+              <div className="mt-2">
+                <Pill
+                  colour={biomarkerColour}
+                  label={labels.colourLabels[biomarkerColour]}
+                />
+              </div>
             </div>
-          </div>
-          <div className="rounded-[var(--radius-s)] border border-[var(--line-2)] bg-[var(--surface-2)] p-3">
-            <p className="eyebrow">{labels.fromGenetics}</p>
-            <div className="mt-2">
-              <Pill
-                colour={geneticColour}
-                label={
-                  cat.geneticColour
-                    ? labels.colourLabels[geneticColour]
-                    : labels.noRiskAlleles
-                }
-              />
+          )}
+          {hasSnps && (
+            <div className="rounded-[var(--radius-s)] border border-[var(--line-2)] bg-[var(--surface-2)] p-3">
+              <p className="eyebrow">{labels.fromGenetics}</p>
+              <div className="mt-2">
+                <Pill
+                  colour={geneticColour}
+                  label={
+                    cat.geneticColour
+                      ? labels.colourLabels[geneticColour]
+                      : labels.noRiskAlleles
+                  }
+                />
+              </div>
             </div>
-          </div>
-          <div className="rounded-[var(--radius-s)] border border-[var(--line-2)] bg-[var(--surface-2)] p-3">
-            <p className="eyebrow">{labels.fromNgs}</p>
-            <div className="mt-2">
-              {catRare.length ? (
+          )}
+          {hasRare && (
+            <div className="rounded-[var(--radius-s)] border border-[var(--line-2)] bg-[var(--surface-2)] p-3">
+              <p className="eyebrow">{labels.fromNgs}</p>
+              <div className="mt-2">
                 <Pill colour="red" label={labels.colourLabels.red} />
-              ) : (
-                <Pill colour="grey" label={labels.colourLabels.grey} />
-              )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {hasDrivers && (
@@ -206,7 +224,7 @@ export default async function CategoryDetailPage({
               {driverSnps.map((s) => (
                 <Link
                   key={`drv-s-${s.snpId}`}
-                  href={`/patient/digital-twin/${category}?snp=${s.snpId}`}
+                  href={`/patient/digital-twin/${category}?snp=${s.snpId}#snp-detail`}
                   className="row between rounded-[var(--radius-s)] border border-[var(--line)] bg-[var(--surface)] px-3 py-2 no-underline text-inherit"
                 >
                   <div>
@@ -232,7 +250,7 @@ export default async function CategoryDetailPage({
         )}
       </section>
 
-      {showRare && (
+      {hasRare && (
         <section className="panel space-y-3">
           <h3 className="font-[family-name:var(--font-display)] text-2xl">
             {labels.rareMutations}
@@ -265,231 +283,198 @@ export default async function CategoryDetailPage({
         </section>
       )}
 
-      <section className="grid gap-5 lg:grid-cols-2">
-        <div className="panel">
-          <div className="card-head" style={{ marginBottom: 0 }}>
-            <h3 className="font-[family-name:var(--font-display)] text-2xl">
-              {labels.markers}
-            </h3>
-            <Pill
-              colour={biomarkerColour}
-              label={labels.colourLabels[biomarkerColour]}
-            />
-          </div>
-          <div className="mt-3 space-y-2">
-            {latestMarkers.length === 0 && (
-              <p className="text-sm text-[var(--muted)]">{labels.noData}</p>
-            )}
-            {latestMarkers.map((m) => {
-              const c = markerItemColour(m);
-              return (
-                <Link
-                  key={m.markerKey}
-                  href={`/patient/digital-twin/${category}?marker=${m.markerKey}`}
-                  className={`block rounded-md border px-3 py-2 transition hover:border-[var(--accent)] ${
-                    selectedMarkerKey === m.markerKey
-                      ? "border-[var(--accent)] bg-[var(--accent-soft)]"
-                      : "border-[var(--line)] bg-white/70"
-                  }`}
-                  style={{ borderLeft: `4px solid ${COLOUR_HEX[c]}` }}
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="font-medium">{m.name || m.markerKey}</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-[var(--ink-soft)]">
-                        {m.value}
-                        {m.unit ? ` ${m.unit}` : ""}
-                      </span>
-                      <Pill colour={c} label={labels.colourLabels[c]} />
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-
-          {markerMeta && (
-            <div
-              className="mt-4 rounded-lg border bg-white/80 p-4"
-              style={{
-                borderColor: COLOUR_HEX[markerItemColour(markerMeta)],
-              }}
-            >
-              <div className="flex flex-wrap items-center gap-2">
+      {(hasMarkers || hasSnps) && (
+        <section className={columnsClass}>
+          {hasMarkers && (
+            <div className="panel">
+              <div className="card-head" style={{ marginBottom: 0 }}>
+                <h3 className="font-[family-name:var(--font-display)] text-2xl">
+                  {labels.markers}
+                </h3>
                 <Pill
-                  colour={markerItemColour(markerMeta)}
-                  label={labels.colourLabels[markerItemColour(markerMeta)]}
-                />
-                <h4 className="text-lg font-semibold">
-                  {markerMeta.name || markerMeta.markerKey}
-                </h4>
-              </div>
-              <p className="mt-2 text-sm text-[var(--ink-soft)]">
-                {locale === "lt"
-                  ? markerMeta.descriptionLt
-                  : markerMeta.descriptionEn}
-              </p>
-              <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
-                <div>
-                  <p className="text-[var(--muted)]">{labels.value}</p>
-                  <p className="font-medium">
-                    {markerMeta.value}
-                    {markerMeta.unit ? ` ${markerMeta.unit}` : ""}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-[var(--muted)]">{labels.reference}</p>
-                  <p className="font-medium">
-                    {markerMeta.refLow != null || markerMeta.refHigh != null
-                      ? `${markerMeta.refLow ?? "—"} – ${markerMeta.refHigh ?? "—"}`
-                      : "—"}
-                  </p>
-                </div>
-              </div>
-              <div className="mt-4">
-                <p className="mb-2 text-sm text-[var(--muted)]">{labels.trend}</p>
-                <MarkerChart
-                  points={selectedMarker.map((m) => ({
-                    date: m.observedAt,
-                    value: m.value,
-                  }))}
-                  refLow={markerMeta.refLow}
-                  refHigh={markerMeta.refHigh}
-                  unit={markerMeta.unit}
+                  colour={biomarkerColour}
+                  label={labels.colourLabels[biomarkerColour]}
                 />
               </div>
-            </div>
-          )}
-        </div>
+              <div className="mt-3 space-y-2">
+                {latestMarkers.map((m) => {
+                  const c = markerItemColour(m);
+                  return (
+                    <Link
+                      key={m.markerKey}
+                      href={`/patient/digital-twin/${category}?marker=${m.markerKey}`}
+                      className={`block rounded-md border px-3 py-2 transition hover:border-[var(--accent)] ${
+                        selectedMarkerKey === m.markerKey
+                          ? "border-[var(--accent)] bg-[var(--accent-soft)]"
+                          : "border-[var(--line)] bg-white/70"
+                      }`}
+                      style={{ borderLeft: `4px solid ${COLOUR_HEX[c]}` }}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-medium">
+                          {m.name || m.markerKey}
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-[var(--ink-soft)]">
+                            {m.value}
+                            {m.unit ? ` ${m.unit}` : ""}
+                          </span>
+                          <Pill colour={c} label={labels.colourLabels[c]} />
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
 
-        <div className="panel">
-          <div className="card-head" style={{ marginBottom: 0 }}>
-            <h3 className="font-[family-name:var(--font-display)] text-2xl">
-              {labels.genes}
-            </h3>
-            <Pill
-              colour={geneticColour}
-              label={
-                cat.geneticColour
-                  ? labels.colourLabels[geneticColour]
-                  : labels.colourLabels.grey
-              }
-            />
-          </div>
-          {cat.id !== "pharmacogenetics" && (
-            <div className="mt-2 rounded-lg border border-[var(--line)] bg-white/70 p-3">
-              <p className="text-sm font-semibold">{snpTitle}</p>
-              <p className="mt-1 text-xs text-[var(--ink-soft)]">
-                {labels.snpTestBlurb}
-              </p>
-            </div>
-          )}
-          <div className="mt-3 max-h-[480px] space-y-2 overflow-auto pr-1">
-            {sortedSnps.length === 0 && (
-              <p className="text-sm text-[var(--muted)]">{labels.noData}</p>
-            )}
-            {sortedSnps.map((s) => {
-              const c: RiskColour = s.colour || "grey";
-              const isDriver =
-                s.colour != null && colourRank(s.colour) >= Math.max(2, colourRank(cat.colour));
-              return (
-                <Link
-                  key={`${s.gene}-${s.snpId}`}
-                  href={`/patient/digital-twin/${category}?snp=${s.snpId}`}
-                  className={`block rounded-md border px-3 py-2 transition hover:border-[var(--accent)] ${
-                    selectedSnpId === s.snpId
-                      ? "border-[var(--accent)] bg-[var(--accent-soft)]"
-                      : "border-[var(--line)] bg-white/70"
-                  }`}
+              {markerMeta && (
+                <div
+                  className="mt-4 rounded-lg border bg-white/80 p-4"
                   style={{
-                    borderLeft: `4px solid ${COLOUR_HEX[c]}`,
-                    background: isDriver
-                      ? `linear-gradient(90deg, ${COLOUR_SOFT[c]}, transparent 55%)`
-                      : undefined,
+                    borderColor: COLOUR_HEX[markerItemColour(markerMeta)],
                   }}
                 >
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="min-w-0">
-                      <span className="font-medium">
-                        {s.gene}{" "}
-                        <span className="text-[var(--muted)] font-normal">
-                          {s.snpId}
-                        </span>
-                      </span>
-                      <p className="text-xs text-[var(--muted)]">
-                        {s.genotypeAvailable
-                          ? `${s.allele1}/${s.allele2} · ${s.matchCount} ${labels.riskAlleleMatches}`
-                          : labels.awaitingDna}
-                      </p>
-                    </div>
+                  <div className="flex flex-wrap items-center gap-2">
                     <Pill
-                      colour={c}
+                      colour={markerItemColour(markerMeta)}
                       label={
-                        s.colour
-                          ? labels.colourLabels[s.colour]
-                          : labels.colourLabels.grey
+                        labels.colourLabels[markerItemColour(markerMeta)]
                       }
                     />
+                    <h4 className="text-lg font-semibold">
+                      {markerMeta.name || markerMeta.markerKey}
+                    </h4>
                   </div>
-                </Link>
-              );
-            })}
-          </div>
-
-          {selectedSnp && (
-            <div
-              className="mt-4 rounded-lg border bg-white/80 p-4"
-              style={{
-                borderColor: COLOUR_HEX[selectedSnp.colour || "grey"],
-              }}
-            >
-              <div className="flex flex-wrap items-center gap-2">
-                <Pill
-                  colour={selectedSnp.colour || "grey"}
-                  label={
-                    labels.colourLabels[selectedSnp.colour || "grey"]
-                  }
-                />
-                <h4 className="text-lg font-semibold">
-                  {selectedSnp.gene} · {selectedSnp.snpId}
-                </h4>
-              </div>
-              {cat.id !== "pharmacogenetics" && (
-                <p className="mt-1 text-xs text-[var(--muted)]">{snpTitle}</p>
+                  <p className="mt-2 text-sm text-[var(--ink-soft)]">
+                    {locale === "lt"
+                      ? markerMeta.descriptionLt
+                      : markerMeta.descriptionEn}
+                  </p>
+                  <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
+                    <div>
+                      <p className="text-[var(--muted)]">{labels.value}</p>
+                      <p className="font-medium">
+                        {markerMeta.value}
+                        {markerMeta.unit ? ` ${markerMeta.unit}` : ""}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-[var(--muted)]">{labels.reference}</p>
+                      <p className="font-medium">
+                        {markerMeta.refLow != null ||
+                        markerMeta.refHigh != null
+                          ? `${markerMeta.refLow ?? "—"} – ${markerMeta.refHigh ?? "—"}`
+                          : "—"}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <p className="mb-2 text-sm text-[var(--muted)]">
+                      {labels.trend}
+                    </p>
+                    <MarkerChart
+                      points={selectedMarker.map((m) => ({
+                        date: m.observedAt,
+                        value: m.value,
+                      }))}
+                      refLow={markerMeta.refLow}
+                      refHigh={markerMeta.refHigh}
+                      unit={markerMeta.unit}
+                    />
+                  </div>
+                </div>
               )}
-              <p className="mt-2 text-sm">
-                <span className="text-[var(--muted)]">{labels.genotype}: </span>
-                {selectedSnp.genotypeAvailable
-                  ? `${selectedSnp.allele1}/${selectedSnp.allele2} (${selectedSnp.matchCount} ${labels.riskAlleleMatches})`
-                  : labels.awaitingDna}
-              </p>
-              {selectedSnp.match1 && (
-                <p className="mt-1 text-xs text-[var(--muted)]">
-                  1× →{" "}
-                  {
-                    labels.colourLabels[
-                      normalizeColour(selectedSnp.match1) || "grey"
-                    ]
-                  }
-                  {selectedSnp.match2
-                    ? ` · 2× → ${
-                        labels.colourLabels[
-                          normalizeColour(selectedSnp.match2) || "grey"
-                        ]
-                      }`
-                    : ""}
-                </p>
-              )}
-              <p className="mt-3 text-sm leading-relaxed text-[var(--ink-soft)]">
-                <span className="font-medium text-[var(--ink)]">
-                  {labels.mechanism}.{" "}
-                </span>
-                {selectedSnp.mechanism || "—"}
-              </p>
             </div>
           )}
-        </div>
-      </section>
+
+          {hasSnps && (
+            <div className="panel">
+              <div className="card-head" style={{ marginBottom: 0 }}>
+                <h3 className="font-[family-name:var(--font-display)] text-2xl">
+                  {labels.genes}
+                </h3>
+                <Pill
+                  colour={geneticColour}
+                  label={
+                    cat.geneticColour
+                      ? labels.colourLabels[geneticColour]
+                      : labels.colourLabels.grey
+                  }
+                />
+              </div>
+              {cat.id !== "pharmacogenetics" && (
+                <div className="mt-2 rounded-lg border border-[var(--line)] bg-white/70 p-3">
+                  <p className="text-sm font-semibold">{snpTitle}</p>
+                  <p className="mt-1 text-xs text-[var(--ink-soft)]">
+                    {labels.snpTestBlurb}
+                  </p>
+                </div>
+              )}
+              <div className="mt-3 max-h-[480px] space-y-2 overflow-auto pr-1">
+                {sortedSnps.map((s) => {
+                  const c: RiskColour = s.colour || "grey";
+                  const isDriver =
+                    s.colour != null &&
+                    colourRank(s.colour) >=
+                      Math.max(2, colourRank(cat.colour));
+                  return (
+                    <Link
+                      key={`${s.gene}-${s.snpId}`}
+                      href={`/patient/digital-twin/${category}?snp=${s.snpId}#snp-detail`}
+                      className={`block rounded-md border px-3 py-2 transition hover:border-[var(--accent)] ${
+                        selectedSnpId === s.snpId
+                          ? "border-[var(--accent)] bg-[var(--accent-soft)]"
+                          : "border-[var(--line)] bg-white/70"
+                      }`}
+                      style={{
+                        borderLeft: `4px solid ${COLOUR_HEX[c]}`,
+                        background: isDriver
+                          ? `linear-gradient(90deg, ${COLOUR_SOFT[c]}, transparent 55%)`
+                          : undefined,
+                      }}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="min-w-0">
+                          <span className="font-medium">
+                            {s.gene}{" "}
+                            <span className="text-[var(--muted)] font-normal">
+                              {s.snpId}
+                            </span>
+                          </span>
+                          <p className="text-xs text-[var(--muted)]">
+                            {s.genotypeAvailable
+                              ? `${s.allele1}/${s.allele2} · ${s.matchCount} ${labels.riskAlleleMatches}`
+                              : labels.awaitingDna}
+                          </p>
+                        </div>
+                        <Pill
+                          colour={c}
+                          label={
+                            s.colour
+                              ? labels.colourLabels[s.colour]
+                              : labels.colourLabels.grey
+                          }
+                        />
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </section>
+      )}
+
+      {selectedSnp && (
+        <SnpDetailPanel
+          snp={selectedSnp}
+          locale={locale}
+          labels={labels}
+          snpTestLabel={
+            cat.id === "pharmacogenetics" ? undefined : snpTitle
+          }
+        />
+      )}
     </div>
   );
 }

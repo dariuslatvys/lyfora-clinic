@@ -11,16 +11,8 @@ import {
   questionnaireStorageKey,
 } from "@/lib/health/questionnaire";
 import { loadQuestionnaireDefinition } from "@/lib/health/questionnaire-loader";
-
-const tabs = [
-  "cardSummary",
-  "cardDiagnoses",
-  "cardMeds",
-  "cardVaccines",
-  "cardProcedures",
-  "cardVisitHistory",
-  "cardDocuments",
-] as const;
+import { buildHealthCard } from "@/lib/health/health-card-data";
+import { HealthCardTabs } from "@/components/patient/health-card-tabs";
 
 export default async function HealthCardPage() {
   const current = await getCurrentUser();
@@ -45,14 +37,15 @@ export default async function HealthCardPage() {
   const answers = parseStoredAnswers(row?.value);
   const stats = completionStats(def, answers);
 
+  const card = buildHealthCard({
+    patientName: current.patient.fullName,
+    sex: current.patient.sex,
+    dob: current.patient.dob,
+    answers,
+  });
+
   return (
     <div className="stack" style={{ gap: 16 }}>
-      <div className="row between" style={{ alignItems: "flex-end" }}>
-        <h2 className="font-[family-name:var(--font-display)] text-3xl m-0">
-          {labels.healthCard}
-        </h2>
-      </div>
-
       <section className="card">
         <div className="card-head">
           <div>
@@ -61,8 +54,8 @@ export default async function HealthCardPage() {
             </h2>
             <p className="small muted m-0">
               {locale === "en"
-                ? "Structured intake from the Lyfora health questionnaire — view and update your answers."
-                : "Struktūruotas sveikatos klausimynas — peržiūrėkite ir suveskite savo atsakymus."}
+                ? "Structured intake — answers feed the card tabs below."
+                : "Struktūruotas klausimynas — atsakymai papildo kortelės tabus žemiau."}
             </p>
           </div>
           <Link href="/patient/health-card/questionnaire" className="btn">
@@ -108,19 +101,7 @@ export default async function HealthCardPage() {
         </div>
       </section>
 
-      <div className="panel space-y-4">
-        <div className="flex flex-wrap gap-2 border-b border-[var(--line)] pb-3">
-          {tabs.map((tab) => (
-            <span
-              key={tab}
-              className="rounded-md bg-[var(--surface-raised)] px-3 py-1.5 text-sm text-[var(--ink-soft)]"
-            >
-              {labels[tab]}
-            </span>
-          ))}
-        </div>
-        <p className="text-sm text-[var(--muted)]">{labels.comingSoon}</p>
-      </div>
+      <HealthCardTabs locale={locale} labels={labels} card={card} />
     </div>
   );
 }

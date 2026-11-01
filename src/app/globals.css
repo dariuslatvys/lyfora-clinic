@@ -2426,6 +2426,93 @@ a.integ-metric.clickable:hover {
   .marker-row-status { grid-area: status; }
 }
 
+/* ---------- Health card ---------- */
+.page-head-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.hc-tabs {
+  flex-wrap: wrap;
+}
+
+.hc-h3 {
+  margin: 0;
+  font-family: var(--font-display), Manrope, sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.hc-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.hc-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 960px) {
+  .hc-grid-3,
+  .hc-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.hc-alert {
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, #c45c4a 35%, var(--line));
+  background: color-mix(in srgb, #c45c4a 12%, var(--surface));
+  color: var(--ink);
+  font-size: 0.9rem;
+}
+
+.hc-kpi-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.hc-kpi {
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line-2);
+  background: color-mix(in srgb, var(--panel) 88%, var(--accent) 12%);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.hc-kpi .num {
+  font-size: 1.2rem;
+  font-weight: 700;
+  font-family: var(--font-display), Manrope, sans-serif;
+}
+
+.hc-kpi span {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.hc-ul {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  line-height: 1.45;
+}
+
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
 /* ---------- Consultations hub ---------- */
 .consult-grid {
   display: grid;

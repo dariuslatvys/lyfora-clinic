@@ -101,21 +101,7 @@ export default async function CategoryDetailPage({
 
   const geneticColour: RiskColour = cat.geneticColour ?? "grey";
   const biomarkerColour = cat.biomarkerColour;
-  const driverSnps = sortedSnps.filter(
-    (s) =>
-      s.colour &&
-      colourRank(s.colour) >= colourRank(cat.colour) &&
-      cat.colour !== "grey"
-  );
-  const driverMarkers = latestMarkers.filter(
-    (m) =>
-      colourRank(markerItemColour(m)) >= colourRank(cat.colour) &&
-      cat.colour !== "grey" &&
-      colourRank(markerItemColour(m)) >= 2
-  );
-  const hasDrivers =
-    driverSnps.length > 0 || driverMarkers.length > 0 || hasRare;
-  // Pharmacogenetics (and any genes-only category): skip colour/driver chrome.
+  // Pharmacogenetics (and any genes-only category): skip colour chrome.
   const genesOnly = hasSnps && !hasMarkers && !hasRare;
 
   const bothColumns = hasMarkers && hasSnps;
@@ -157,117 +143,24 @@ export default async function CategoryDetailPage({
         </p>
       </section>
 
-      {!genesOnly && (
-        <section className="card colour-sources">
-          <div className="colour-sources-head">
-            <h3 className="font-[family-name:var(--font-display)] text-[1.05rem] font-semibold">
-              {labels.colourLabels[cat.colour]}
-            </h3>
-            <Pill colour={cat.colour} label={labels.colourLabels[cat.colour]} />
-          </div>
-
-          <div
-            className={`colour-source-grid ${
-              [hasMarkers, hasSnps, hasRare].filter(Boolean).length > 1
-                ? "multi"
-                : ""
-            }`}
-          >
-            {hasMarkers && (
-              <a href="#section-markers" className="colour-source">
-                <span className="colour-source-label">{labels.markers}</span>
-                <Pill
-                  colour={biomarkerColour}
-                  label={labels.colourLabels[biomarkerColour]}
-                />
-              </a>
-            )}
-            {hasSnps && (
-              <a href="#section-genes" className="colour-source">
-                <span className="colour-source-label">{labels.genes}</span>
-                <Pill
-                  colour={geneticColour}
-                  label={
-                    cat.geneticColour
-                      ? labels.colourLabels[geneticColour]
-                      : labels.noRiskAlleles
-                  }
-                />
-              </a>
-            )}
-            {hasRare && (
-              <a href="#section-rare" className="colour-source">
-                <span className="colour-source-label">{labels.rareShort}</span>
-                <Pill colour="red" label={labels.colourLabels.red} />
-              </a>
-            )}
-          </div>
-
-          {hasDrivers && (
-            <div className="mt-4">
-              <p className="eyebrow mb-2">{labels.colourDrivers}</p>
-              <div className="driver-chips">
-                {catRare.map((v) => {
-                  const title =
-                    (locale === "lt" ? v.titleLt : v.titleEn) ||
-                    (locale === "en"
-                      ? `${v.gene} gene change`
-                      : `${v.gene} geno pokytis`);
-                  const anchor = `rare-${encodeURIComponent(String(v.id ?? v.gene))}`;
-                  return (
-                    <a
-                      key={v.id ?? `${v.gene}-rare`}
-                      href={`#${anchor}`}
-                      className="driver-chip driver-chip-red"
-                    >
-                      <Pill colour="red" label={labels.colourLabels.red} />
-                      <span className="driver-chip-text">
-                        <b>{title}</b>
-                      </span>
-                    </a>
-                  );
-                })}
-                {driverMarkers.map((m) => {
-                  const c = markerItemColour(m);
-                  return (
-                    <Link
-                      key={`drv-m-${m.markerKey}`}
-                      href={`/patient/marker/${encodeURIComponent(m.markerKey)}?cat=${category}`}
-                      className="driver-chip"
-                      style={{ borderColor: COLOUR_HEX[c] }}
-                    >
-                      <Pill colour={c} label={labels.colourLabels[c]} />
-                      <span className="driver-chip-text">
-                        <b>{m.name || m.markerKey}</b>
-                        <em>
-                          {m.value}
-                          {m.unit ? ` ${m.unit}` : ""}
-                        </em>
-                      </span>
-                    </Link>
-                  );
-                })}
-                {driverSnps.map((s) => {
-                  const c = s.colour || "grey";
-                  return (
-                    <Link
-                      key={`drv-s-${s.snpId}`}
-                      href={`/patient/snp/${encodeURIComponent(s.snpId)}?cat=${category}`}
-                      className="driver-chip"
-                      style={{ borderColor: COLOUR_HEX[c] }}
-                    >
-                      <Pill colour={c} label={labels.colourLabels[c]} />
-                      <span className="driver-chip-text">
-                        <b>{s.gene}</b>
-                        <em>{s.snpId.split("__")[0]}</em>
-                      </span>
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </section>
+      {!genesOnly && (hasMarkers || hasSnps || hasRare) && (
+        <nav className="cat-source-tabs" aria-label={labels.categoriesTitle}>
+          {hasMarkers ? (
+            <a href="#section-markers" className="cat-source-tab">
+              {labels.markers}
+            </a>
+          ) : null}
+          {hasSnps ? (
+            <a href="#section-genes" className="cat-source-tab">
+              {labels.genes}
+            </a>
+          ) : null}
+          {hasRare ? (
+            <a href="#section-rare" className="cat-source-tab">
+              {labels.rareShort}
+            </a>
+          ) : null}
+        </nav>
       )}
 
       {hasRare && (

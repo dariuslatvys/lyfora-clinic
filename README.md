@@ -41,6 +41,26 @@ npm run dev -- -p 43123 -H 127.0.0.1
 
 Atidarykite [http://127.0.0.1:43123](http://127.0.0.1:43123).
 
+## Viešas demo (Vercel free)
+
+Prototipui pakanka nemokamo `*.vercel.app` adreso. SQLite demo DB yra
+`data/demo/lyfora.sqlite` (Vercel’e kopijuojama į `/tmp`).
+
+### Jūsų žingsniai
+
+1. Cursor’e paspauskite **Create repo** (kad projektas taptų tikru GitHub / Origin repo).
+2. Jei repo Origin’e, o Vercel nori GitHub — sukurkite tuščią GitHub repo ir push’inkite:
+   ```bash
+   git remote add github https://github.com/<jūsų-user>/lyfora-clinic.git
+   git push -u github main
+   ```
+3. Eikite į [vercel.com/new](https://vercel.com/new) (tas pats account, kur `avocadotech.eu`).
+4. **Import** tą GitHub repo → Framework: Next.js → **Deploy** (be env vars).
+5. Po 1–2 min gausite `https://lyfora-clinic-….vercel.app` — tuo dalinkitės.
+6. Demo loginai: `pacientas@lyfora.lt` / `lyfora2026`.
+
+Pastaba: serverless cold start’e sesijos /tmp DB gali „atsinaujinti“ — demo’ui to užtenka.
+
 ## Duomenys
 
 Šaltiniai: `data/lyfora-source/` ir normalizuoti JSON `data/parsed/`.

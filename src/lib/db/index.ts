@@ -4,15 +4,34 @@ import fs from "fs";
 import path from "path";
 import * as schema from "./schema";
 
-const DB_PATH =
-  process.env.LYFORA_DB_PATH ||
-  path.join(process.cwd(), "data", "db", "lyfora.sqlite");
+const BUNDLED_DEMO = path.join(process.cwd(), "data", "demo", "lyfora.sqlite");
+const LOCAL_DB = path.join(process.cwd(), "data", "db", "lyfora.sqlite");
+
+/** On Vercel only /tmp is writable — copy the bundled demo DB there. */
+function resolveDbPath() {
+  if (process.env.LYFORA_DB_PATH) return process.env.LYFORA_DB_PATH;
+  if (process.env.VERCEL) return "/tmp/lyfora.sqlite";
+  return LOCAL_DB;
+}
+
+function bootstrapDbFile(dbPath: string) {
+  if (fs.existsSync(dbPath)) return;
+  fs.mkdirSync(path.dirname(dbPath), { recursive: true });
+  if (fs.existsSync(BUNDLED_DEMO)) {
+    fs.copyFileSync(BUNDLED_DEMO, dbPath);
+    return;
+  }
+  // Empty file — schema is created by ensureSchema().
+}
+
+const DB_PATH = resolveDbPath();
 
 let _db: ReturnType<typeof drizzle<typeof schema>> | null = null;
 let _sqlite: Database.Database | null = null;
 
 export function getSqlite() {
   if (_sqlite) return _sqlite;
+  bootstrapDbFile(DB_PATH);
   fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
   _sqlite = new Database(DB_PATH);
   _sqlite.pragma("journal_mode = WAL");

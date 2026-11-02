@@ -492,7 +492,7 @@ export function buildHealthCard(input: {
         },
       ],
     });
-  } else if (input.patientId !== "patient_petraitis") {
+  } else {
     conditions.push({
       code: "Z15.89",
       nameLt: "Genetinis polinkis į širdies ligas (MYBPC3)",
@@ -513,9 +513,8 @@ export function buildHealthCard(input: {
     });
   }
 
-  if (input.patientId === "patient_petraitis") {
-    // Petraitis-specific chronic conditions with attached clinical files.
-    conditions.length = 0;
+  // Jonas Jonaitis (demo patient login) — spine + leg trauma with uploaded files.
+  if (input.patientId === "patient_male") {
     conditions.push(
       {
         code: "M41.9",
@@ -921,8 +920,7 @@ export function buildHealthCard(input: {
     },
   ];
 
-  if (input.patientId === "patient_petraitis") {
-    docs.length = 0;
+  if (input.patientId === "patient_male") {
     docs.push(
       {
         nameLt: "Stuburo išvarža / spondiliozė (PDF)",

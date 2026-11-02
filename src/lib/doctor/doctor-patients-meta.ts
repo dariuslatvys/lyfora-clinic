@@ -21,6 +21,18 @@ export const PATIENT_SPECIAL_NOTES: Record<string, PatientSpecialNote[]> = {
       labelLt: "Nuolatinė hipertenzijos stebėsena",
       labelEn: "Ongoing hypertension monitoring",
     },
+    {
+      id: "mobility",
+      kind: "mobility",
+      labelLt: "Judėjimo sutrikimas (stuburo patologija)",
+      labelEn: "Mobility impairment (spinal pathology)",
+    },
+    {
+      id: "trauma-leg",
+      kind: "other",
+      labelLt: "Blauzdos / šlaunikaulio trauma (2009)",
+      labelEn: "Lower-leg / femur trauma (2009)",
+    },
   ],
   patient_female: [
     {
@@ -36,12 +48,6 @@ export const PATIENT_SPECIAL_NOTES: Record<string, PatientSpecialNote[]> = {
       kind: "disability",
       labelLt: "I grupės invalidumas",
       labelEn: "Group I disability",
-    },
-    {
-      id: "mobility",
-      kind: "mobility",
-      labelLt: "Judėjimo sutrikimas (stuburo patologija)",
-      labelEn: "Mobility impairment (spinal pathology)",
     },
   ],
 };

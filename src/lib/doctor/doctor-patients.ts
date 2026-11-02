@@ -3,6 +3,7 @@ import { getDb } from "@/lib/db";
 import { patients, users } from "@/lib/db/schema";
 import { patientDisplayName } from "@/lib/i18n/patient-name";
 import type { DoctorPatientOption } from "@/lib/doctor/doctor-calendar";
+import { ensurePetraitisPatient } from "@/lib/health/petraitis-patient";
 
 /** Demo contact fields for fragment search (phone / asmens kodas). */
 const DEMO_CONTACTS: Record<
@@ -26,16 +27,23 @@ const DEMO_CONTACTS: Record<
     nameLt: ["Rasa", "Rasaitė"],
     nameEn: ["Jane", "Smith"],
   },
+  patient_petraitis: {
+    phone: "+370 686 11 902",
+    nationalId: "37506181234",
+    nameLt: ["Petras", "Petraitis"],
+    nameEn: ["Peter", "Peters"],
+  },
 };
 
 export function loadDoctorPatientOptions(): DoctorPatientOption[] {
+  ensurePetraitisPatient();
   const db = getDb();
   const list = db.select().from(patients).all();
   return list.map((p) => {
     const user = db.select().from(users).where(eq(users.id, p.userId)).get();
     const demo = DEMO_CONTACTS[p.id];
-    const nameLt = patientDisplayName(p.sex, "lt");
-    const nameEn = patientDisplayName(p.sex, "en");
+    const nameLt = patientDisplayName(p.sex, "lt", p.id);
+    const nameEn = patientDisplayName(p.sex, "en", p.id);
     const [firstLt, ...restLt] = nameLt.split(/\s+/);
     const [firstEn, ...restEn] = nameEn.split(/\s+/);
     return {

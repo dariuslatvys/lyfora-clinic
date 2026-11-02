@@ -362,6 +362,7 @@ export function buildHealthCard(input: {
   sex: string | null;
   dob: string | null;
   answers: QuestionnaireAnswers;
+  patientId?: string | null;
 }): HealthCardModel {
   const v = input.answers.values || {};
   const height = num(v["1_basic_profile_health_metrics__height"]);
@@ -490,7 +491,7 @@ export function buildHealthCard(input: {
         },
       ],
     });
-  } else {
+  } else if (input.patientId !== "patient_petraitis") {
     conditions.push({
       code: "Z15.89",
       nameLt: "Genetinis polinkis į širdies ligas (MYBPC3)",
@@ -509,6 +510,64 @@ export function buildHealthCard(input: {
         },
       ],
     });
+  }
+
+  if (input.patientId === "patient_petraitis") {
+    // Petraitis-specific chronic conditions with attached clinical files.
+    conditions.length = 0;
+    conditions.push(
+      {
+        code: "M41.9",
+        nameLt: "Stuburo iškrypimas, spondiliozė",
+        nameEn: "Spinal curvature, spondylosis",
+        since: "2010-03-12",
+        statusLt: "lėtinė",
+        statusEn: "chronic",
+        byLt: "Dr. Inesa Karpavičienė",
+        byEn: "Dr. Inesa Karpavičienė",
+        href: "/demo/petraitis/stuburo_isvarza.pdf",
+        links: [
+          {
+            href: "/demo/petraitis/stuburo_isvarza.pdf",
+            labelLt: "PDF · stuburo išvarža",
+            labelEn: "PDF · spinal hernia",
+          },
+          {
+            href: "/demo/petraitis/stuburas.jpg",
+            labelLt: "Nuotrauka · stuburas",
+            labelEn: "Photo · spine",
+          },
+        ],
+      },
+      {
+        code: "S82.9",
+        nameLt: "Blauzdos ir šlaunikaulio lūžis",
+        nameEn: "Tibia/fibula and femur fracture",
+        since: "2009-08-20",
+        statusLt: "persirgtas",
+        statusEn: "resolved",
+        byLt: "Traumatologijos skyrius",
+        byEn: "Trauma department",
+        href: "/demo/petraitis/trauma_varztai.jpg",
+        links: [
+          {
+            href: "/demo/petraitis/trauma_varztai.jpg",
+            labelLt: "Nuotrauka · trauma_varztai",
+            labelEn: "Photo · trauma_screws",
+          },
+          {
+            href: "/demo/petraitis/israsas_poliklinikai_2010.pdf",
+            labelLt: "Išrašas poliklinikai 2010",
+            labelEn: "Polyclinic extract 2010",
+          },
+          {
+            href: "/demo/petraitis/traumos_israsas_2009.pdf",
+            labelLt: "Traumos išrašas 2009",
+            labelEn: "Trauma extract 2009",
+          },
+        ],
+      }
+    );
   }
 
   const episodes: HealthCardEpisode[] = [
@@ -860,6 +919,52 @@ export function buildHealthCard(input: {
       href: "/patient/visits/v-2025-03-18",
     },
   ];
+
+  if (input.patientId === "patient_petraitis") {
+    docs.length = 0;
+    docs.push(
+      {
+        nameLt: "Stuburo išvarža / spondiliozė (PDF)",
+        nameEn: "Spinal hernia / spondylosis (PDF)",
+        date: "2010-03-12",
+        size: "867 KB",
+        kind: "report",
+        href: "/demo/petraitis/stuburo_isvarza.pdf",
+      },
+      {
+        nameLt: "Stuburo rentgeno nuotrauka",
+        nameEn: "Spine X-ray photo",
+        date: "2010-03-12",
+        size: "574 KB",
+        kind: "report",
+        href: "/demo/petraitis/stuburas.jpg",
+      },
+      {
+        nameLt: "Trauma · varžtai (nuotrauka)",
+        nameEn: "Trauma · screws (photo)",
+        date: "2009-08-20",
+        size: "479 KB",
+        kind: "report",
+        href: "/demo/petraitis/trauma_varztai.jpg",
+      },
+      {
+        nameLt: "Išrašas poliklinikai 2010",
+        nameEn: "Polyclinic extract 2010",
+        date: "2010-05-01",
+        size: "2.0 MB",
+        kind: "note",
+        href: "/demo/petraitis/israsas_poliklinikai_2010.pdf",
+      },
+      {
+        nameLt: "Traumos išrašas 2009",
+        nameEn: "Trauma extract 2009",
+        date: "2009-09-01",
+        size: "1.8 MB",
+        kind: "note",
+        href: "/demo/petraitis/traumos_israsas_2009.pdf",
+      }
+    );
+  }
 
   const smoking = mapSmoking(
     v["7_lifestyle__do_you_smoke_or_use_nicotine_products"]

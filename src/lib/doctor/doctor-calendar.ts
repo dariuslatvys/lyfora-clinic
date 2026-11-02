@@ -334,28 +334,48 @@ const EXTRA_APPTS: DoctorAppointment[] = [
     time: "14:00",
     titleLt: "Naujas pacientas — anamnezė",
     titleEn: "New patient — intake",
-    patientId: null,
+    patientId: "patient_petraitis",
     patientNameLt: "Petras Petraitis",
     patientNameEn: "Peter Peters",
     patientPhone: "+370 686 11 902",
-    patientEmail: "petras.petraitis@pastas.lt",
+    patientEmail: "petras@lyfora.lt",
     mode: "in_person",
     status: "upcoming",
     placeLt: "Kabinetas 12",
     placeEn: "Room 12",
-    notesLt: "Kitas pacientas (ne Lyfora portalo kortelė).",
-    notesEn: "External patient (no Lyfora portal chart).",
+    notesLt: "Stuburo ir traumų istorija — žr. sveikatos kortelę.",
+    notesEn: "Spine and trauma history — see health card.",
+    documents: [
+      {
+        id: "doc-petraitis-spine",
+        kind: "imaging",
+        titleLt: "Stuburo išvarža / rentgenas",
+        titleEn: "Spinal hernia / X-ray",
+        issuedAt: "2010-03-12",
+        fileName: "stuburo_isvarza.pdf",
+        href: "/demo/petraitis/stuburo_isvarza.pdf",
+      },
+      {
+        id: "doc-petraitis-trauma",
+        kind: "extract",
+        titleLt: "Traumos išrašas 2009",
+        titleEn: "Trauma extract 2009",
+        issuedAt: "2009-09-01",
+        fileName: "traumos_israsas_2009.pdf",
+        href: "/demo/petraitis/traumos_israsas_2009.pdf",
+      },
+    ],
     source: {
       kind: "self",
       self: {
         channel: "phone",
         registeredAt: `${todayIsoDate()}T09:05:00`,
         complaintsLt:
-          "Pirmas vizitas: ilgalaikis nuovargis, nori bendros sveikatos įvertinimo ir kraujo tyrimų plano.",
+          "Kontrolė dėl stuburo skausmo ir senos blauzdos traumos; nori peržiūrėti išrašus.",
         complaintsEn:
-          "First visit: long-standing fatigue; wants a general health review and lab plan.",
-        notesLt: "Registracija telefonu; kortelės portale dar nėra.",
-        notesEn: "Phone registration; no portal chart yet.",
+          "Follow-up for spine pain and old leg trauma; wants extracts reviewed.",
+        notesLt: "Registracija telefonu · kortelė portale su dokumentais.",
+        notesEn: "Phone booking · portal chart with documents.",
         receivedByLt: "Registratūra · Tomas",
         receivedByEn: "Front desk · Tomas",
       },
@@ -614,9 +634,43 @@ export function modeLabel(
   locale: Locale
 ): string {
   if (locale === "en") {
-    return mode === "video" ? "Video" : mode === "phone" ? "Call" : "In person";
+    return mode === "video"
+      ? "Video call"
+      : mode === "phone"
+        ? "Phone call"
+        : "In-person visit";
   }
-  return mode === "video" ? "Video" : mode === "phone" ? "Skambutis" : "Gyvai";
+  return mode === "video"
+    ? "Video skambutis"
+    : mode === "phone"
+      ? "Telefonu skambutis"
+      : "Vizitas";
+}
+
+/** Short badge label for compact agenda rows. */
+export function modeBadgeLabel(
+  mode: DoctorAppointment["mode"],
+  locale: Locale
+): string {
+  if (locale === "en") {
+    return mode === "video" ? "Video" : mode === "phone" ? "Phone" : "Visit";
+  }
+  return mode === "video" ? "Video" : mode === "phone" ? "Telefonas" : "Vizitas";
+}
+
+export function modePillClass(mode: DoctorAppointment["mode"]): string {
+  if (mode === "video") return "c-acc";
+  if (mode === "phone") return "c-yellow";
+  return "c-green";
+}
+
+export function videoPlatformLabel(
+  platform: DoctorAppointment["videoPlatform"] | undefined
+): string {
+  if (platform === "meet") return "Google Meet";
+  if (platform === "zoom") return "Zoom";
+  if (platform === "teams") return "Teams";
+  return "Video";
 }
 
 export function documentKindLabel(

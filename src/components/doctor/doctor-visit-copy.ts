@@ -15,7 +15,10 @@ export type DoctorVisitCopy = {
   attachHint: string;
   removeFile: string;
   mode: string;
+  visitType: string;
   videoLinks: string;
+  joinVideo: string;
+  videoLink: string;
   clearPatient: string;
   backDay: string;
   detail: string;
@@ -66,7 +69,10 @@ export function doctorVisitCopy(locale: "lt" | "en"): DoctorVisitCopy {
         attachHint: "PDF, image or document — saved to the patient chart and portal.",
         removeFile: "Remove",
         mode: "Mode",
+        visitType: "Visit type",
         videoLinks: "Video link",
+        joinVideo: "Join video",
+        videoLink: "Video link",
         clearPatient: "Change",
         backDay: "Back",
         detail: "Visit details",
@@ -114,7 +120,10 @@ export function doctorVisitCopy(locale: "lt" | "en"): DoctorVisitCopy {
         attachHint: "PDF, nuotrauka ar dokumentas — išsaugoma paciento kortelėje ir portale.",
         removeFile: "Pašalinti",
         mode: "Būdas",
+        visitType: "Vizito tipas",
         videoLinks: "Vaizdo nuoroda",
+        joinVideo: "Prisijungti prie vaizdo",
+        videoLink: "Vaizdo nuoroda",
         clearPatient: "Keisti",
         backDay: "Atgal",
         detail: "Vizito detalės",

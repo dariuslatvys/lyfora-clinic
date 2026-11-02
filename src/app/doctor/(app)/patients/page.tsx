@@ -10,10 +10,12 @@ import { eq, sql } from "drizzle-orm";
 import { getCurrentUser } from "@/lib/auth/session";
 import { patientDisplayName } from "@/lib/i18n/patient-name";
 import { loadDigitalTwin } from "@/lib/health/load-twin";
+import { ensurePetraitisPatient } from "@/lib/health/petraitis-patient";
 import { t, type Locale } from "@/lib/i18n/dictionary";
 
 export default async function DoctorPatientsPage() {
   ensureSchema();
+  ensurePetraitisPatient();
   const current = await getCurrentUser();
   const locale = ((current?.user.locale as Locale) || "lt") as Locale;
   const labels = t(locale);
@@ -68,7 +70,7 @@ export default async function DoctorPatientsPage() {
             <div className="card-head">
               <div>
                 <h3 className="font-[family-name:var(--font-display)] text-[1.15rem] font-semibold m-0">
-                  {patientDisplayName(p.sex, locale)}
+                  {patientDisplayName(p.sex, locale, p.id)}
                 </h3>
                 <p className="small muted m-0 mt-1">
                   {p.dob || "—"} ·{" "}

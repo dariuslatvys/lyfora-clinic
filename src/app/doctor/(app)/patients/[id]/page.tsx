@@ -27,6 +27,7 @@ import {
   formatClinicVisitWhen,
   listClinicVisitsForPatient,
 } from "@/lib/health/clinic-visits";
+import { ensurePetraitisPatient } from "@/lib/health/petraitis-patient";
 
 const RANK: Record<RiskColour, number> = {
   grey: 0,
@@ -47,15 +48,16 @@ export default async function DoctorPatientChartPage({
   const locale = ((current.user.locale as Locale) || "lt") as Locale;
   const labels = t(locale);
   const { id } = await params;
+  ensureSchema();
+  ensurePetraitisPatient();
   const twin = loadDigitalTwin(id, locale);
   if (!twin) notFound();
 
-  ensureSchema();
   const db = getDb();
   const patientRow = db.select().from(patients).where(eq(patients.id, id)).get();
   if (!patientRow) notFound();
 
-  const name = patientDisplayName(twin.patient.sex, locale);
+  const name = patientDisplayName(twin.patient.sex, locale, id);
   const attention = twin.categories
     .filter((c) => RANK[c.colour] >= 3)
     .sort((a, b) => RANK[b.colour] - RANK[a.colour]);
@@ -135,6 +137,7 @@ export default async function DoctorPatientChartPage({
     sex: patientRow.sex,
     dob: patientRow.dob,
     answers,
+    patientId: id,
   });
 
   const pharmaSnps =

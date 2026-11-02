@@ -7,10 +7,13 @@ import {
   appointmentsForDay,
   baseDoctorAppointments,
   mergeAppointments,
+  modeBadgeLabel,
   modeLabel,
+  modePillClass,
   monthMatrix,
   readCreatedAppointments,
   statusLabel,
+  videoPlatformLabel,
   type DoctorAppointment,
   type DoctorPatientOption,
 } from "@/lib/doctor/doctor-calendar";
@@ -253,17 +256,29 @@ export function DoctorCalendarView({
                   >
                     <div className="doctor-appt-time">
                       <b>{a.time}</b>
-                      <span>{modeLabel(a.mode, locale)}</span>
                     </div>
                     <div className="doctor-appt-main">
-                      <b>{locale === "en" ? a.titleEn : a.titleLt}</b>
+                      <div className="doctor-appt-title-row">
+                        <b>{locale === "en" ? a.titleEn : a.titleLt}</b>
+                        <span
+                          className={`pill ${modePillClass(a.mode)}`}
+                          title={modeLabel(a.mode, locale)}
+                        >
+                          {modeBadgeLabel(a.mode, locale)}
+                        </span>
+                      </div>
                       <span className="small muted">
                         {locale === "en" ? a.patientNameEn : a.patientNameLt}
+                        {` · ${modeLabel(a.mode, locale)}`}
                         {a.placeLt
                           ? ` · ${locale === "en" ? a.placeEn : a.placeLt}`
                           : ""}
                       </span>
-                      {a.source?.kind === "referral" ? (
+                      {a.mode === "video" && a.videoUrl ? (
+                        <span className="xs" style={{ color: "var(--accent)" }}>
+                          {videoPlatformLabel(a.videoPlatform)}
+                        </span>
+                      ) : a.source?.kind === "referral" ? (
                         <span className="xs" style={{ color: "var(--accent)" }}>
                           {copy.referral}
                         </span>

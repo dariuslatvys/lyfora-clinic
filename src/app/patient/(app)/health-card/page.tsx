@@ -15,6 +15,7 @@ import { buildHealthCard } from "@/lib/health/health-card-data";
 import { HealthCardTabs } from "@/components/patient/health-card-tabs";
 import { loadDigitalTwin } from "@/lib/health/load-twin";
 import { formatDateTime } from "@/lib/utils";
+import { ensurePetraitisPatient } from "@/lib/health/petraitis-patient";
 
 export default async function HealthCardPage() {
   const current = await getCurrentUser();
@@ -23,6 +24,7 @@ export default async function HealthCardPage() {
   const labels = t(locale);
 
   ensureSchema();
+  ensurePetraitisPatient();
   const db = getDb();
   const key = questionnaireStorageKey();
   const row = db
@@ -44,6 +46,7 @@ export default async function HealthCardPage() {
     sex: current.patient.sex,
     dob: current.patient.dob,
     answers,
+    patientId: current.patient.id,
   });
 
   const twin = loadDigitalTwin(current.patient.id, locale);

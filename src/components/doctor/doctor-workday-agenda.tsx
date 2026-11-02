@@ -8,9 +8,12 @@ import {
   baseDoctorAppointments,
   listAppointmentDocuments,
   mergeAppointments,
+  modeBadgeLabel,
   modeLabel,
+  modePillClass,
   readCreatedAppointments,
   statusLabel,
+  videoPlatformLabel,
   type DoctorAppointment,
   type DoctorPatientOption,
 } from "@/lib/doctor/doctor-calendar";
@@ -139,14 +142,26 @@ export function DoctorWorkdayAgenda({
               >
                 <div className="doctor-appt-time">
                   <b>{a.time}</b>
-                  <span>{modeLabel(a.mode, locale)}</span>
                 </div>
                 <div className="doctor-appt-main">
-                  <b>{locale === "en" ? a.titleEn : a.titleLt}</b>
+                  <div className="doctor-appt-title-row">
+                    <b>{locale === "en" ? a.titleEn : a.titleLt}</b>
+                    <span
+                      className={`pill ${modePillClass(a.mode)}`}
+                      title={modeLabel(a.mode, locale)}
+                    >
+                      {modeBadgeLabel(a.mode, locale)}
+                    </span>
+                  </div>
                   <span className="small muted">
                     {locale === "en" ? a.patientNameEn : a.patientNameLt}
+                    {` · ${modeLabel(a.mode, locale)}`}
                   </span>
-                  {a.source?.kind === "referral" ? (
+                  {a.mode === "video" && a.videoUrl ? (
+                    <span className="xs" style={{ color: "var(--accent)" }}>
+                      {videoPlatformLabel(a.videoPlatform)}
+                    </span>
+                  ) : a.source?.kind === "referral" ? (
                     <span className="xs" style={{ color: "var(--accent)" }}>
                       {visitCopy.referral}
                       {docCount > 1 ? ` · ${docCount}` : ""}
@@ -157,9 +172,6 @@ export function DoctorWorkdayAgenda({
                         ? `${docCount} document${docCount === 1 ? "" : "s"}`
                         : `${docCount} dok.`}
                     </span>
-                  ) : a.source?.kind === "self" &&
-                    a.source.self.channel === "phone" ? (
-                    <span className="xs muted">{visitCopy.selfPhone}</span>
                   ) : null}
                 </div>
                 <span className="pill c-acc">

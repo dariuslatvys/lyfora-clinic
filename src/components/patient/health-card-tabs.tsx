@@ -364,11 +364,31 @@ function DiagnosesPane({
                   </td>
                   <td className="small">
                     <div className="hc-link-row">
-                      {(c.links || []).map((l) => (
-                        <Link key={l.href} href={l.href} className="hc-chip-link">
-                          {locale === "en" ? l.labelEn : l.labelLt}
-                        </Link>
-                      ))}
+                      {(c.links || []).map((l) =>
+                        l.href.startsWith("/demo/") ||
+                        l.href.startsWith("/docs/") ||
+                        l.href.endsWith(".pdf") ||
+                        l.href.endsWith(".jpg") ||
+                        l.href.endsWith(".png") ? (
+                          <a
+                            key={l.href}
+                            href={l.href}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="hc-chip-link"
+                          >
+                            {locale === "en" ? l.labelEn : l.labelLt}
+                          </a>
+                        ) : (
+                          <Link
+                            key={l.href}
+                            href={l.href}
+                            className="hc-chip-link"
+                          >
+                            {locale === "en" ? l.labelEn : l.labelLt}
+                          </Link>
+                        )
+                      )}
                     </div>
                   </td>
                 </tr>

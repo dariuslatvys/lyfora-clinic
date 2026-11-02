@@ -5077,6 +5077,19 @@ a.hc-kpi.clickable:hover {
   gap: 2px;
 }
 
+.doctor-appt-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.doctor-appt-title-row .pill {
+  flex-shrink: 0;
+  font-size: 0.72rem;
+  padding: 2px 8px;
+}
+
 .doctor-req-split,
 .doctor-home-split {
   display: grid;

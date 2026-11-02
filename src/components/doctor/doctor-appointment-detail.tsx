@@ -6,7 +6,9 @@ import {
   documentKindLabel,
   listAppointmentDocuments,
   modeLabel,
+  modePillClass,
   statusLabel,
+  videoPlatformLabel,
   type DoctorAppointment,
   type DoctorPatientOption,
 } from "@/lib/doctor/doctor-calendar";
@@ -65,11 +67,31 @@ export function DoctorAppointmentDetail({
           {locale === "en" ? a.titleEn : a.titleLt}
         </h3>
         <p className="small muted m-0 mt-1">
-          {a.date} · {a.time} · {modeLabel(a.mode, locale)}
+          {a.date} · {a.time}
           {a.placeLt
             ? ` · ${locale === "en" ? a.placeEn : a.placeLt}`
             : ""}
         </p>
+      </div>
+
+      <div className="doctor-appt-detail-meta">
+        <span className={`pill ${modePillClass(a.mode)}`}>
+          {modeLabel(a.mode, locale)}
+        </span>
+        <span className="detail-chip">
+          {copy.source}: {sourceLabel}
+        </span>
+        <span
+          className={`pill ${
+            a.status === "upcoming"
+              ? "c-acc"
+              : a.status === "missed" || a.status === "cancelled"
+                ? "c-none"
+                : "c-green"
+          }`}
+        >
+          {statusLabel(a.status, locale)}
+        </span>
       </div>
 
       <div className="doctor-appt-contact">
@@ -93,40 +115,67 @@ export function DoctorAppointmentDetail({
         </div>
       </div>
 
-      <div className="doctor-appt-detail-meta">
-        <span className="detail-chip">
-          {copy.source}: {sourceLabel}
-        </span>
-        <span
-          className={`pill ${
-            a.status === "upcoming"
-              ? "c-acc"
-              : a.status === "missed" || a.status === "cancelled"
-                ? "c-none"
-                : "c-green"
-          }`}
-        >
-          {statusLabel(a.status, locale)}
-        </span>
-      </div>
-
-      {a.mode === "video" && a.videoUrl ? (
-        <a
-          href={a.videoUrl}
-          target="_blank"
-          rel="noreferrer"
-          className="btn ghost sm"
-          style={{ alignSelf: "flex-start" }}
-        >
-          {a.videoPlatform === "meet"
-            ? "Google Meet"
-            : a.videoPlatform === "zoom"
-              ? "Zoom"
-              : a.videoPlatform === "teams"
-                ? "Teams"
-                : a.videoUrl}
-        </a>
-      ) : null}
+      {a.mode === "video" ? (
+        <div className="doctor-appt-source-card stack" style={{ gap: 8 }}>
+          <span className="eyebrow">{copy.visitType}</span>
+          <b>{modeLabel(a.mode, locale)}</b>
+          {a.videoUrl ? (
+            <>
+              <p className="small muted m-0">
+                {videoPlatformLabel(a.videoPlatform)}
+                {" · "}
+                <a
+                  href={a.videoUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mono"
+                >
+                  {a.videoUrl}
+                </a>
+              </p>
+              <a
+                href={a.videoUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="btn sm"
+                style={{ alignSelf: "flex-start" }}
+              >
+                {copy.joinVideo}
+              </a>
+            </>
+          ) : (
+            <p className="small muted m-0">
+              {locale === "en"
+                ? "No video link attached."
+                : "Vaizdo nuoroda nepridėta."}
+            </p>
+          )}
+        </div>
+      ) : a.mode === "phone" ? (
+        <div className="doctor-appt-source-card stack" style={{ gap: 6 }}>
+          <span className="eyebrow">{copy.visitType}</span>
+          <b>{modeLabel(a.mode, locale)}</b>
+          {phone ? (
+            <a
+              href={`tel:${phone.replace(/\s/g, "")}`}
+              className="btn sm"
+              style={{ alignSelf: "flex-start" }}
+            >
+              {locale === "en" ? `Call ${phone}` : `Skambinti ${phone}`}
+            </a>
+          ) : null}
+        </div>
+      ) : (
+        <div className="doctor-appt-source-card stack" style={{ gap: 6 }}>
+          <span className="eyebrow">{copy.visitType}</span>
+          <b>{modeLabel(a.mode, locale)}</b>
+          {a.placeLt ? (
+            <p className="small muted m-0">
+              {locale === "en" ? a.placeEn : a.placeLt}
+            </p>
+          ) : null}
+        </div>
+      )}
 
       {source?.kind === "referral" ? (
         <ReferralBlock locale={locale} r={source.referral} copy={copy} />

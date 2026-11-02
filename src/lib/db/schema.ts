@@ -115,3 +115,22 @@ export const patientUploads = sqliteTable("patient_uploads", {
   note: text("note"),
   createdAt: text("created_at").notNull(),
 });
+
+/** Visits created by the doctor (calendar / workday) — visible to the patient. */
+export const clinicVisits = sqliteTable("clinic_visits", {
+  id: text("id").primaryKey(),
+  patientId: text("patient_id").notNull(),
+  date: text("date").notNull(),
+  time: text("time").notNull(),
+  titleLt: text("title_lt").notNull(),
+  titleEn: text("title_en").notNull(),
+  mode: text("mode").notNull(), // in_person | video | phone
+  status: text("status").notNull().default("upcoming"),
+  placeLt: text("place_lt"),
+  placeEn: text("place_en"),
+  reasonLt: text("reason_lt"),
+  reasonEn: text("reason_en"),
+  videoPlatform: text("video_platform"),
+  videoUrl: text("video_url"),
+  createdAt: text("created_at").notNull(),
+});

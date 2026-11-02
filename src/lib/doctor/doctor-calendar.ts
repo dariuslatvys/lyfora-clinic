@@ -85,12 +85,14 @@ export type AppointmentDocument = {
   sizeBytes?: number;
 };
 
-/** Metadata-only attachment from the new-visit form (demo; not uploaded). */
+/** Attachment on a doctor-created visit (persisted to patient uploads when saved). */
 export type AppointmentAttachment = {
   id: string;
   name: string;
   sizeBytes: number;
   mime?: string;
+  /** Download URL after server persist */
+  href?: string;
 };
 
 export type DoctorAppointment = {

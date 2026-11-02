@@ -17,24 +17,29 @@ export async function GET(
 ) {
   const { id } = await ctx.params;
   const current = await getCurrentUser();
-  if (!current?.patient) {
+  if (!current) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
   ensureSchema();
-  const row = getDb()
-    .select()
-    .from(patientUploads)
-    .where(
-      and(
-        eq(patientUploads.id, id),
-        eq(patientUploads.patientId, current.patient.id)
-      )
-    )
-    .get();
+  const isDoctor = current.user.role === "doctor";
+  const row = isDoctor
+    ? getDb().select().from(patientUploads).where(eq(patientUploads.id, id)).get()
+    : current.patient
+      ? getDb()
+          .select()
+          .from(patientUploads)
+          .where(
+            and(
+              eq(patientUploads.id, id),
+              eq(patientUploads.patientId, current.patient.id)
+            )
+          )
+          .get()
+      : null;
   if (!row) {
     return NextResponse.json({ error: "not_found" }, { status: 404 });
   }
-  const full = resolveUploadFile(current.patient.id, row.storedName);
+  const full = resolveUploadFile(row.patientId, row.storedName);
   if (!full) {
     return NextResponse.json({ error: "missing_file" }, { status: 404 });
   }

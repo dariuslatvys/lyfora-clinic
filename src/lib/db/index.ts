@@ -154,9 +154,27 @@ export function ensureSchema() {
       note TEXT,
       created_at TEXT NOT NULL
     );
+    CREATE TABLE IF NOT EXISTS clinic_visits (
+      id TEXT PRIMARY KEY,
+      patient_id TEXT NOT NULL,
+      date TEXT NOT NULL,
+      time TEXT NOT NULL,
+      title_lt TEXT NOT NULL,
+      title_en TEXT NOT NULL,
+      mode TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'upcoming',
+      place_lt TEXT,
+      place_en TEXT,
+      reason_lt TEXT,
+      reason_en TEXT,
+      video_platform TEXT,
+      video_url TEXT,
+      created_at TEXT NOT NULL
+    );
     CREATE INDEX IF NOT EXISTS idx_marker_results_patient ON marker_results(patient_id);
     CREATE INDEX IF NOT EXISTS idx_snp_geno_patient ON snp_genotypes(patient_id);
     CREATE INDEX IF NOT EXISTS idx_gene_snp_cat ON gene_snp_risk(primary_category);
     CREATE INDEX IF NOT EXISTS idx_uploads_patient ON patient_uploads(patient_id);
+    CREATE INDEX IF NOT EXISTS idx_clinic_visits_patient ON clinic_visits(patient_id);
   `);
 }

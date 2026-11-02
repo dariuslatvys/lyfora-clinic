@@ -34,7 +34,11 @@ export function DoctorNewVisitForm({
   const fileRef = useRef<HTMLInputElement>(null);
   const freeSlots = useMemo(() => freeSlotsForDay(all, date), [all, date]);
   const [patientQuery, setPatientQuery] = useState("");
-  const [attachments, setAttachments] = useState<AppointmentAttachment[]>([]);
+  const [pendingFiles, setPendingFiles] = useState<
+    Array<{ id: string; file: File }>
+  >([]);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [form, setForm] = useState({
     patientId: "" as string,
     time: freeSlots[0] || "",
@@ -57,25 +61,20 @@ export function DoctorNewVisitForm({
   );
   const selectedPatient = patients.find((p) => p.id === form.patientId) || null;
   const canSave = Boolean(
-    form.patientId && form.time && freeSlots.includes(form.time)
+    form.patientId && form.time && freeSlots.includes(form.time) && !saving
   );
 
   function onPickFiles(files: FileList | null) {
     if (!files?.length) return;
-    const next: AppointmentAttachment[] = [];
-    for (const file of Array.from(files)) {
-      next.push({
-        id: `att:${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-        name: file.name,
-        sizeBytes: file.size,
-        mime: file.type || undefined,
-      });
-    }
-    setAttachments((prev) => [...prev, ...next]);
+    const next = Array.from(files).map((file) => ({
+      id: `att:${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      file,
+    }));
+    setPendingFiles((prev) => [...prev, ...next]);
     if (fileRef.current) fileRef.current.value = "";
   }
 
-  function saveVisit() {
+  async function saveVisit() {
     const patient = patients.find((p) => p.id === form.patientId);
     if (!patient || !form.time) return;
     if (!freeSlots.includes(form.time)) return;
@@ -87,41 +86,113 @@ export function DoctorNewVisitForm({
       form.mode === "video"
         ? VIDEO_LINK_OPTIONS.find((v) => v.id === form.videoPlatform)
         : undefined;
-    const appt: DoctorAppointment = {
-      id: `created:${Date.now()}`,
-      date,
-      time: form.time,
-      titleLt: title,
-      titleEn: title,
-      patientId: patient.id,
-      patientNameLt: patient.nameLt,
-      patientNameEn: patient.nameEn,
-      patientPhone: patient.phone,
-      patientEmail: patient.email,
-      mode: form.mode,
-      status: "upcoming",
-      createdByDoctor: true,
-      notesLt: reason || undefined,
-      notesEn: reason || undefined,
-      placeLt:
-        form.mode === "in_person"
-          ? "Kabinetas 12"
-          : form.mode === "phone"
-            ? "Skambutis"
-            : video?.label || "Video",
-      placeEn:
-        form.mode === "in_person"
-          ? "Room 12"
-          : form.mode === "phone"
-            ? "Call"
-            : video?.label || "Video",
-      videoPlatform: video?.id,
-      videoUrl: video?.url,
-      source: { kind: "doctor_created" },
-      attachments: attachments.length ? attachments : undefined,
-    };
-    addCreatedAppointment(appt);
-    onSaved();
+    const placeLt =
+      form.mode === "in_person"
+        ? "Kabinetas 12"
+        : form.mode === "phone"
+          ? "Skambutis"
+          : video?.label || "Video";
+    const placeEn =
+      form.mode === "in_person"
+        ? "Room 12"
+        : form.mode === "phone"
+          ? "Call"
+          : video?.label || "Video";
+
+    setSaving(true);
+    setSaveError(null);
+    try {
+      const fd = new FormData();
+      fd.set("patientId", patient.id);
+      fd.set("date", date);
+      fd.set("time", form.time);
+      fd.set("title", title);
+      fd.set("reason", reason);
+      fd.set("mode", form.mode);
+      fd.set("placeLt", placeLt);
+      fd.set("placeEn", placeEn);
+      if (video?.id) fd.set("videoPlatform", video.id);
+      if (video?.url) fd.set("videoUrl", video.url);
+      for (const item of pendingFiles) {
+        fd.append("file", item.file, item.file.name);
+      }
+
+      const res = await fetch("/api/doctor/visits", {
+        method: "POST",
+        body: fd,
+      });
+      const data = (await res.json().catch(() => ({}))) as {
+        error?: string;
+        visit?: {
+          id: string;
+          attachments?: Array<{
+            id: string;
+            originalName: string;
+            sizeBytes: number;
+            mimeType: string | null;
+            href: string;
+          }>;
+        };
+      };
+      if (!res.ok || !data.visit) {
+        throw new Error(data.error || `save_failed_${res.status}`);
+      }
+
+      const attachments: AppointmentAttachment[] = (
+        data.visit.attachments || []
+      ).map((a) => ({
+        id: a.id,
+        name: a.originalName,
+        sizeBytes: a.sizeBytes,
+        mime: a.mimeType || undefined,
+        href: a.href,
+      }));
+
+      const appt: DoctorAppointment = {
+        id: data.visit.id,
+        date,
+        time: form.time,
+        titleLt: title,
+        titleEn: title,
+        patientId: patient.id,
+        patientNameLt: patient.nameLt,
+        patientNameEn: patient.nameEn,
+        patientPhone: patient.phone,
+        patientEmail: patient.email,
+        mode: form.mode,
+        status: "upcoming",
+        createdByDoctor: true,
+        notesLt: reason || undefined,
+        notesEn: reason || undefined,
+        placeLt,
+        placeEn,
+        videoPlatform: video?.id,
+        videoUrl: video?.url,
+        source: { kind: "doctor_created" },
+        attachments: attachments.length ? attachments : undefined,
+        documents: attachments.map((a) => ({
+          id: a.id,
+          kind: "other" as const,
+          titleLt: a.name,
+          titleEn: a.name,
+          fileName: a.name,
+          href: a.href,
+          sizeBytes: a.sizeBytes,
+        })),
+      };
+      addCreatedAppointment(appt);
+      onSaved();
+    } catch (e) {
+      setSaveError(
+        locale === "en"
+          ? `Could not save visit: ${e instanceof Error ? e.message : "error"}`
+          : `Nepavyko išsaugoti vizito: ${
+              e instanceof Error ? e.message : "klaida"
+            }`
+      );
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -322,22 +393,24 @@ export function DoctorNewVisitForm({
           </label>
           <span className="xs muted">{copy.attachHint}</span>
         </div>
-        {attachments.length ? (
+        {pendingFiles.length ? (
           <ul className="doctor-cal-attach-list">
-            {attachments.map((f) => (
+            {pendingFiles.map((f) => (
               <li key={f.id}>
                 <span>
-                  <b>{f.name}</b>
+                  <b>{f.file.name}</b>
                   <span className="xs muted">
                     {" "}
-                    · {(f.sizeBytes / 1024).toFixed(1)} KB
+                    · {(f.file.size / 1024).toFixed(1)} KB
                   </span>
                 </span>
                 <button
                   type="button"
                   className="btn ghost sm"
                   onClick={() =>
-                    setAttachments((prev) => prev.filter((x) => x.id !== f.id))
+                    setPendingFiles((prev) =>
+                      prev.filter((x) => x.id !== f.id)
+                    )
                   }
                 >
                   {copy.removeFile}
@@ -348,16 +421,27 @@ export function DoctorNewVisitForm({
         ) : null}
       </div>
 
+      {saveError ? <div className="empty">{saveError}</div> : null}
+
       <div className="row" style={{ gap: 8 }}>
         <button
           type="button"
           className="btn"
           disabled={!canSave}
-          onClick={saveVisit}
+          onClick={() => void saveVisit()}
         >
-          {copy.save}
+          {saving
+            ? locale === "en"
+              ? "Saving…"
+              : "Saugoma…"
+            : copy.save}
         </button>
-        <button type="button" className="btn ghost" onClick={onCancel}>
+        <button
+          type="button"
+          className="btn ghost"
+          disabled={saving}
+          onClick={onCancel}
+        >
           {copy.cancel}
         </button>
       </div>

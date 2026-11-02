@@ -166,6 +166,16 @@ export function DoctorAppointmentDetail({
                     {f.mime ? ` · ${f.mime}` : ""}
                   </span>
                 </div>
+                {f.href ? (
+                  <a
+                    href={f.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="btn ghost sm"
+                  >
+                    {copy.openFile}
+                  </a>
+                ) : null}
               </li>
             ))}
           </ul>

@@ -34,6 +34,11 @@ import {
   prescriptionsForVisit,
   rxStatusLabel,
 } from "@/lib/health/demo-prescriptions";
+import {
+  formatClinicVisitWhen,
+  getClinicVisit,
+  listClinicVisitAttachments,
+} from "@/lib/health/clinic-visits";
 
 function guessCategory(categoriesJson: string): HealthCategoryId | null {
   let cats: string[] = [];
@@ -63,12 +68,152 @@ export default async function VisitDetailPage({
   if (!current?.patient) redirect("/login/patient");
   const locale = (current.user.locale as "lt" | "en") || "lt";
   const labels = t(locale);
+
+  ensureSchema();
+  const clinic = getClinicVisit(id);
+  if (clinic) {
+    if (clinic.patientId !== current.patient.id) notFound();
+    const files = listClinicVisitAttachments(clinic.patientId, clinic.id);
+    const modeLabel =
+      locale === "en"
+        ? clinic.mode === "video"
+          ? "Video"
+          : clinic.mode === "phone"
+            ? "Call"
+            : "In person"
+        : clinic.mode === "video"
+          ? "Video"
+          : clinic.mode === "phone"
+            ? "Skambutis"
+            : "Gyvai";
+    return (
+      <div className="stack" style={{ gap: 14 }}>
+        <Link href="/patient/visits" className="text-sm text-[var(--muted)]">
+          ← {labels.visits}
+        </Link>
+
+        <section className="panel">
+          <div
+            className="row between"
+            style={{ alignItems: "flex-start", gap: 12 }}
+          >
+            <div>
+              <span className="eyebrow">
+                {locale === "en"
+                  ? "Clinic booking"
+                  : "Klinikinė registracija"}
+              </span>
+              <h1 className="font-[family-name:var(--font-display)] text-[1.55rem] font-bold mt-1 mb-0">
+                {locale === "en" ? clinic.titleEn : clinic.titleLt}
+              </h1>
+            </div>
+            <span className="pill c-green">
+              {locale === "en" ? "Planned" : "Suplanuota"}
+            </span>
+          </div>
+
+          <div className="visit-meta mt-4">
+            <div>
+              <p className="eyebrow mb-1">
+                {locale === "en" ? "When" : "Kada"}
+              </p>
+              <p className="m-0 font-medium">
+                {formatClinicVisitWhen(clinic, locale)}
+              </p>
+            </div>
+            <div>
+              <p className="eyebrow mb-1">
+                {locale === "en" ? "Mode" : "Būdas"}
+              </p>
+              <p className="m-0 font-medium">{modeLabel}</p>
+            </div>
+            <div>
+              <p className="eyebrow mb-1">
+                {locale === "en" ? "Place" : "Vieta"}
+              </p>
+              <p className="m-0 font-medium">
+                {(locale === "en" ? clinic.placeEn : clinic.placeLt) || "—"}
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {(clinic.reasonLt || clinic.reasonEn) && (
+          <section className="card">
+            <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold m-0">
+              {locale === "en" ? "Reason / notes" : "Priežastis / pastabos"}
+            </h2>
+            <p className="mt-3 mb-0 text-[0.98rem] leading-relaxed text-[var(--ink-soft)]">
+              {locale === "en" ? clinic.reasonEn : clinic.reasonLt}
+            </p>
+          </section>
+        )}
+
+        <section className="card">
+          <div className="card-head">
+            <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold m-0">
+              {locale === "en" ? "Attached documents" : "Prikabinti dokumentai"}
+            </h2>
+            <Link href="/patient/uploads" className="btn ghost sm">
+              {locale === "en" ? "All uploads" : "Visi įkėlimai"}
+            </Link>
+          </div>
+          {files.length ? (
+            <ul className="doctor-appt-docs">
+              {files.map((f) => (
+                <li key={f.id}>
+                  <div>
+                    <b>{f.originalName}</b>
+                    <span className="xs muted"> · {f.sizeLabel}</span>
+                  </div>
+                  <a
+                    href={f.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="btn ghost sm"
+                  >
+                    {locale === "en" ? "Open" : "Atidaryti"}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="empty">
+              {locale === "en"
+                ? "No files were attached to this visit."
+                : "Prie šio vizito failų neprikabinta."}
+            </div>
+          )}
+        </section>
+
+        {clinic.mode === "video" && clinic.videoUrl ? (
+          <a
+            href={clinic.videoUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="btn"
+            style={{ alignSelf: "flex-start" }}
+          >
+            {clinic.videoPlatform === "meet"
+              ? "Google Meet"
+              : clinic.videoPlatform === "zoom"
+                ? "Zoom"
+                : clinic.videoPlatform === "teams"
+                  ? "Teams"
+                  : locale === "en"
+                    ? "Join video"
+                    : "Prisijungti prie vaizdo"}
+          </a>
+        ) : null}
+      </div>
+    );
+  }
+
   const visit = getVisit(id);
   if (!visit) notFound();
 
   const relatedRx = prescriptionsForVisit(visit.id);
 
-  ensureSchema();
   const db = getDb();
   const relatedDates = visit.relatedLabDates || [];
 

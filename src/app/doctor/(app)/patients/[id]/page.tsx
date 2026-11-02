@@ -22,6 +22,11 @@ import {
 } from "@/lib/health/questionnaire";
 import { buildHealthCard } from "@/lib/health/health-card-data";
 import { DoctorPatientChart } from "@/components/doctor/doctor-patient-chart";
+import { DoctorClinicVisitsPanel } from "@/components/doctor/doctor-clinic-visits-panel";
+import {
+  formatClinicVisitWhen,
+  listClinicVisitsForPatient,
+} from "@/lib/health/clinic-visits";
 
 const RANK: Record<RiskColour, number> = {
   grey: 0,
@@ -73,13 +78,24 @@ export default async function DoctorPatientChartPage({
     href: `/patient/digital-twin/${c.id}`,
   }));
 
-  const visits = upcomingVisits(3).map((v) => ({
+  const clinicUpcoming = listClinicVisitsForPatient(id)
+    .filter((v) => v.status === "upcoming")
+    .map((v) => ({
+      id: v.id,
+      when: formatClinicVisitWhen(v, locale),
+      title: locale === "en" ? v.titleEn : v.titleLt,
+      withWhom:
+        locale === "en" ? "Lyfora clinician" : "Lyfora gydytojas",
+      href: `/doctor/patients/${id}#clinic-visits`,
+    }));
+  const demoUpcoming = upcomingVisits(3).map((v) => ({
     id: v.id,
     when: formatVisitWhen(v, locale),
     title: visitTitle(v, locale),
     withWhom: visitDoctor(v, locale),
-    href: `/patient/visits/${v.id}`,
+    href: `/doctor/patients/${id}`,
   }));
+  const visits = [...clinicUpcoming, ...demoUpcoming].slice(0, 6);
 
   const computedGoals = goalsFromMetrics(twin.markers, locale, 5);
   const goals =
@@ -212,6 +228,8 @@ export default async function DoctorPatientChartPage({
         card={card}
         pharmaSnps={pharmaSnps}
       />
+
+      <DoctorClinicVisitsPanel locale={locale} patientId={id} />
     </div>
   );
 }

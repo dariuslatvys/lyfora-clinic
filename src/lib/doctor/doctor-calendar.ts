@@ -66,6 +66,33 @@ export type AppointmentSource =
   | { kind: "self"; self: AppointmentSelfReg }
   | { kind: "doctor_created" };
 
+/** Extra files attached to a visit (siuntimai, išrašai, labs, imaging, …). */
+export type AppointmentDocumentKind =
+  | "referral"
+  | "extract"
+  | "lab"
+  | "imaging"
+  | "other";
+
+export type AppointmentDocument = {
+  id: string;
+  kind: AppointmentDocumentKind;
+  titleLt: string;
+  titleEn: string;
+  issuedAt?: string;
+  href?: string;
+  fileName?: string;
+  sizeBytes?: number;
+};
+
+/** Metadata-only attachment from the new-visit form (demo; not uploaded). */
+export type AppointmentAttachment = {
+  id: string;
+  name: string;
+  sizeBytes: number;
+  mime?: string;
+};
+
 export type DoctorAppointment = {
   id: string;
   date: string;
@@ -89,6 +116,10 @@ export type DoctorAppointment = {
   videoPlatform?: VideoPlatform;
   videoUrl?: string;
   source?: AppointmentSource;
+  /** Siuntimai, išrašai and other clinical documents on the visit */
+  documents?: AppointmentDocument[];
+  /** Files attached when the doctor created the visit */
+  attachments?: AppointmentAttachment[];
 };
 
 export type DoctorPatientOption = {
@@ -217,6 +248,26 @@ const EXTRA_APPTS: DoctorAppointment[] = [
     status: "upcoming",
     placeLt: "Kabinetas 12",
     placeEn: "Room 12",
+    documents: [
+      {
+        id: "doc-lipid-lab",
+        kind: "lab",
+        titleLt: "Lipidograma · 2026-10-20",
+        titleEn: "Lipid panel · 2026-10-20",
+        issuedAt: "2026-10-20",
+        fileName: "lipidograma_2026-10-20.pdf",
+        href: "/demo/referrals/siuntimas_kaklas.pdf",
+      },
+      {
+        id: "doc-lipid-extract",
+        kind: "extract",
+        titleLt: "Ambulatorinis išrašas — lipidų kontrolė",
+        titleEn: "Outpatient extract — lipid follow-up",
+        issuedAt: "2026-09-12",
+        fileName: "israsas_lipidai.pdf",
+        href: "/demo/referrals/siuntimas_kaklas0.pdf",
+      },
+    ],
     source: {
       kind: "self",
       self: {
@@ -250,6 +301,17 @@ const EXTRA_APPTS: DoctorAppointment[] = [
     placeEn: "Google Meet",
     videoPlatform: "meet",
     videoUrl: "https://meet.google.com/lyf-demo-abc",
+    documents: [
+      {
+        id: "doc-hormone-lab",
+        kind: "lab",
+        titleLt: "TSH, FT4, feritinas · 2026-10-28",
+        titleEn: "TSH, FT4, ferritin · 2026-10-28",
+        issuedAt: "2026-10-28",
+        fileName: "hormonai_feritinas.pdf",
+        href: "/demo/referrals/siuntimas_kaklas.pdf",
+      },
+    ],
     source: {
       kind: "self",
       self: {
@@ -343,6 +405,26 @@ const EXTRA_APPTS: DoctorAppointment[] = [
     status: "upcoming",
     placeLt: "Kabinetas 4 · neurologija",
     placeEn: "Room 4 · neurology",
+    documents: [
+      {
+        id: "doc-neuro-mri",
+        kind: "imaging",
+        titleLt: "Kaklo stuburo MRT aprašymas",
+        titleEn: "Cervical spine MRI report",
+        issuedAt: "2026-09-02",
+        fileName: "mrt_kaklas_aprasymas.pdf",
+        href: "/demo/referrals/siuntimas_kaklas0.pdf",
+      },
+      {
+        id: "doc-neuro-extract",
+        kind: "extract",
+        titleLt: "Ortopedo išrašas · peties skausmas",
+        titleEn: "Orthopaedic extract · shoulder pain",
+        issuedAt: "2026-10-15",
+        fileName: "israsas_petys.pdf",
+        href: "/demo/referrals/siuntimas_kaklas.pdf",
+      },
+    ],
     source: {
       kind: "referral",
       referral: REFERRAL_NEURO,
@@ -533,6 +615,55 @@ export function modeLabel(
     return mode === "video" ? "Video" : mode === "phone" ? "Call" : "In person";
   }
   return mode === "video" ? "Video" : mode === "phone" ? "Skambutis" : "Gyvai";
+}
+
+export function documentKindLabel(
+  kind: AppointmentDocumentKind,
+  locale: Locale
+): string {
+  const lt: Record<AppointmentDocumentKind, string> = {
+    referral: "Siuntimas",
+    extract: "Išrašas",
+    lab: "Tyrimai",
+    imaging: "Vaizdinimas",
+    other: "Dokumentas",
+  };
+  const en: Record<AppointmentDocumentKind, string> = {
+    referral: "Referral",
+    extract: "Extract",
+    lab: "Labs",
+    imaging: "Imaging",
+    other: "Document",
+  };
+  return (locale === "en" ? en : lt)[kind];
+}
+
+/** Referral PDF + explicit documents list for the visit detail panel. */
+export function listAppointmentDocuments(
+  a: DoctorAppointment
+): AppointmentDocument[] {
+  const out: AppointmentDocument[] = [];
+  if (a.source?.kind === "referral") {
+    const r = a.source.referral;
+    const href = r.pdfHref;
+    if (href) {
+      out.push({
+        id: `referral-pdf:${a.id}`,
+        kind: "referral",
+        titleLt: r.documentTypeLt,
+        titleEn: r.documentTypeEn,
+        issuedAt: r.issuedAt.slice(0, 10),
+        href,
+        fileName: href.split("/").pop(),
+      });
+    }
+  }
+  for (const d of a.documents || []) {
+    if (!out.some((x) => x.id === d.id || (d.href && x.href === d.href))) {
+      out.push(d);
+    }
+  }
+  return out;
 }
 
 /** Working-day slots every `stepMin` minutes; excludes already booked times. */

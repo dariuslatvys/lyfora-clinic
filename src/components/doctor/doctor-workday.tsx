@@ -2,9 +2,8 @@ import Link from "next/link";
 import {
   appointmentsForDay,
   baseDoctorAppointments,
-  modeLabel,
-  statusLabel,
 } from "@/lib/doctor/doctor-calendar";
+import type { DoctorPatientOption } from "@/lib/doctor/doctor-calendar";
 import {
   activeDoctorRequests,
   requestStatusLabel,
@@ -13,8 +12,15 @@ import { todayIsoDate } from "@/lib/health/demo-visits";
 import { loadDigitalTwin } from "@/lib/health/load-twin";
 import { t, type Locale } from "@/lib/i18n/dictionary";
 import { patientDisplayName } from "@/lib/i18n/patient-name";
+import { DoctorWorkdayAgenda } from "@/components/doctor/doctor-workday-agenda";
 
-export function DoctorWorkday({ locale }: { locale: Locale }) {
+export function DoctorWorkday({
+  locale,
+  patients,
+}: {
+  locale: Locale;
+  patients: DoctorPatientOption[];
+}) {
   const labels = t(locale);
   const today = todayIsoDate();
   const todays = appointmentsForDay(baseDoctorAppointments(locale), today);
@@ -115,37 +121,13 @@ export function DoctorWorkday({ locale }: { locale: Locale }) {
       </div>
 
       <div className="doctor-home-split">
-        <section className="card">
-          <div className="card-head">
-            <h3 className="m-0">{copy.agenda}</h3>
-            <Link href="/doctor/calendar" className="btn ghost sm">
-              {copy.openCal}
-            </Link>
-          </div>
-          {todays.length ? (
-            <div className="stack" style={{ gap: 8 }}>
-              {todays.map((a) => (
-                <div key={a.id} className="doctor-appt-row">
-                  <div className="doctor-appt-time">
-                    <b>{a.time}</b>
-                    <span>{modeLabel(a.mode, locale)}</span>
-                  </div>
-                  <div className="doctor-appt-main">
-                    <b>{locale === "en" ? a.titleEn : a.titleLt}</b>
-                    <span className="small muted">
-                      {locale === "en" ? a.patientNameEn : a.patientNameLt}
-                    </span>
-                  </div>
-                  <span className="pill c-acc">
-                    {statusLabel(a.status, locale)}
-                  </span>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="empty">{copy.emptyAgenda}</div>
-          )}
-        </section>
+        <DoctorWorkdayAgenda
+          locale={locale}
+          patients={patients}
+          title={copy.agenda}
+          openCal={copy.openCal}
+          emptyAgenda={copy.emptyAgenda}
+        />
 
         <section className="card">
           <div className="card-head">

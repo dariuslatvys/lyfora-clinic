@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { ensureSchema, getDb } from "@/lib/db";
-import { patients, snpGenotypes } from "@/lib/db/schema";
+import { patients, rareMutations, snpGenotypes } from "@/lib/db/schema";
 import { normalizeColour } from "./colours";
 import {
   CORE_SNPS,
@@ -9,7 +9,13 @@ import {
   genotypeFromRiskCount,
   type CoreSnpDef,
 } from "./core-snps";
-import type { DnaPanel, DnaResultColour, DnaSnpResult } from "./dna-panel";
+import type {
+  DnaPanel,
+  DnaRareResult,
+  DnaResultColour,
+  DnaSnpResult,
+  DnaSourceFile,
+} from "./dna-panel";
 
 export type { DnaPanel, DnaResultColour, DnaSnpResult } from "./dna-panel";
 export { dnaCategoryLabel, dnaGroupLabel } from "./dna-panel";
@@ -38,10 +44,55 @@ function colourForCount(
   return normalizeColour(def.match2) || "orange";
 }
 
+function snpFileMeta(
+  sex: "male" | "female",
+  testedCount: number,
+  totalCount: number
+): DnaSourceFile {
+  return {
+    kind: "snp",
+    fileName:
+      sex === "female" ? "Lyfora_SNP_RK_2026.txt" : "Lyfora_SNP_JJ_2026.txt",
+    labNameLt: "Lyfora genomikos laboratorija",
+    labNameEn: "Lyfora genomics laboratory",
+    testedAt: "2026-09-22",
+    statusLt: `ištirta ${testedCount} iš ${totalCount} žymenų`,
+    statusEn: `tested ${testedCount} of ${totalCount} markers`,
+  };
+}
+
+function vcfFileMeta(
+  sex: "male" | "female",
+  rareCount: number
+): DnaSourceFile {
+  return {
+    kind: "vcf",
+    fileName:
+      sex === "female"
+        ? "Lyfora_NGS_RK_2026.vcf"
+        : "VCF_sample_synthetic_hg19_noXY-men.vcf",
+    labNameLt: "Lyfora NGS / sekoskaitos laboratorija",
+    labNameEn: "Lyfora NGS sequencing laboratory",
+    testedAt: sex === "female" ? "2026-08-14" : "2026-07-30",
+    statusLt:
+      rareCount > 0
+        ? `${rareCount} retos mutacijos iš VCF`
+        : "VCF įkeltas · retų mutacijų nerasta",
+    statusEn:
+      rareCount > 0
+        ? `${rareCount} rare mutations from VCF`
+        : "VCF uploaded · no rare mutations found",
+  };
+}
+
 export function loadDnaPanel(patientId: string): DnaPanel | null {
   ensureSchema();
   const db = getDb();
-  const patient = db.select().from(patients).where(eq(patients.id, patientId)).get();
+  const patient = db
+    .select()
+    .from(patients)
+    .where(eq(patients.id, patientId))
+    .get();
   if (!patient) return null;
 
   const sex = patient.sex === "female" ? "female" : "male";
@@ -97,6 +148,26 @@ export function loadDnaPanel(patientId: string): DnaPanel | null {
     };
   });
 
+  const rareRows = db
+    .select()
+    .from(rareMutations)
+    .where(eq(rareMutations.patientId, patientId))
+    .all();
+
+  const rare: DnaRareResult[] = rareRows.map((r) => ({
+    id: r.id,
+    gene: r.gene,
+    transcript: r.transcript,
+    hgvs: r.hgvs,
+    chrom: r.chrom,
+    pos: r.pos,
+    gt: r.gt,
+    titleLt: r.titleLt,
+    titleEn: r.titleEn,
+    summaryLt: r.summaryLt,
+    summaryEn: r.summaryEn,
+  }));
+
   const testedCount = results.filter((r) => r.matchCount != null).length;
   const counts = {
     green: results.filter((r) => r.colour === "green").length,
@@ -108,17 +179,24 @@ export function loadDnaPanel(patientId: string): DnaPanel | null {
     none: results.filter((r) => r.colour === "none").length,
   };
 
+  const snp = snpFileMeta(sex, testedCount, results.length);
+  const files: DnaSourceFile[] = [snp];
+  if (patient.hasNgsVcf || rare.length > 0) {
+    files.push(vcfFileMeta(sex, rare.length));
+  }
+
   return {
     patientId,
     sex,
-    fileName:
-      sex === "female" ? "Lyfora_SNP_RK_2026.txt" : "Lyfora_SNP_JJ_2026.txt",
-    labNameLt: "Lyfora genomikos laboratorija",
-    labNameEn: "Lyfora genomics laboratory",
-    testedAt: "2026-09-22",
+    fileName: snp.fileName,
+    labNameLt: snp.labNameLt,
+    labNameEn: snp.labNameEn,
+    testedAt: snp.testedAt,
     testedCount,
     totalCount: results.length,
     results,
     counts,
+    files,
+    rare,
   };
 }

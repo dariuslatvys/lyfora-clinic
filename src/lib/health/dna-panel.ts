@@ -23,9 +23,35 @@ export type DnaSnpResult = {
   effectAllele1: string;
 };
 
+export type DnaSourceFile = {
+  kind: "snp" | "vcf";
+  fileName: string;
+  labNameLt: string;
+  labNameEn: string;
+  testedAt: string;
+  /** Short status line, e.g. tested markers or rare findings count */
+  statusLt: string;
+  statusEn: string;
+};
+
+export type DnaRareResult = {
+  id: number;
+  gene: string;
+  transcript: string | null;
+  hgvs: string | null;
+  chrom: string | null;
+  pos: number | null;
+  gt: string | null;
+  titleLt: string | null;
+  titleEn: string | null;
+  summaryLt: string | null;
+  summaryEn: string | null;
+};
+
 export type DnaPanel = {
   patientId: string;
   sex: "male" | "female";
+  /** @deprecated prefer `files` — kept for older call sites */
   fileName: string;
   labNameLt: string;
   labNameEn: string;
@@ -40,6 +66,10 @@ export type DnaPanel = {
     orange: number;
     none: number;
   };
+  /** SNP microarray + NGS/VCF source files shown in the header */
+  files: DnaSourceFile[];
+  /** Rare pathogenic / risk findings from the NGS VCF */
+  rare: DnaRareResult[];
 };
 
 const CAT_LT: Record<string, string> = {

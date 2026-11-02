@@ -106,7 +106,7 @@ export function DnaView({
     () =>
       locale === "en"
         ? {
-            eyebrow: `Genetic test · ${panel.totalCount} SNP markers`,
+            eyebrow: `Genetic test · ${panel.totalCount} SNP + ${panel.rare.length} NGS`,
             title: "My DNA",
             blurb:
               "Genetics shows predisposition, not a diagnosis. Most risks change a lot with lifestyle and timely tests.",
@@ -146,9 +146,20 @@ export function DnaView({
             tested: "tested",
             of: "of",
             markers: "markers",
+            filesTitle: "Uploaded genetic files",
+            snpKind: "SNP genotyping",
+            vcfKind: "NGS / VCF",
+            snpSection: "SNP panel",
+            rareTitle: "Rare mutations (NGS / VCF)",
+            rareBlurb:
+              "Findings from your sequencing VCF — rarer gene changes that a standard SNP chip may miss.",
+            rareEmpty: "No rare mutations in the uploaded VCF.",
+            rareOpen: "Open",
+            transcript: "Transcript",
+            variant: "Variant",
           }
         : {
-            eyebrow: `Genetinis tyrimas · ${panel.totalCount} SNP žymenys`,
+            eyebrow: `Genetinis tyrimas · ${panel.totalCount} SNP + ${panel.rare.length} NGS`,
             title: "Mano DNR",
             blurb:
               "Genetika rodo polinkį, o ne diagnozę. Daugumą rizikų stipriai keičia gyvensena ir laiku atlikti tyrimai.",
@@ -188,8 +199,19 @@ export function DnaView({
             tested: "ištirta",
             of: "iš",
             markers: "žymenų",
+            filesTitle: "Įkelti genetiniai failai",
+            snpKind: "SNP genotipavimas",
+            vcfKind: "NGS / VCF",
+            snpSection: "SNP panelė",
+            rareTitle: "Retos mutacijos (NGS / VCF)",
+            rareBlurb:
+              "Radiniai iš jūsų sekoskaitos VCF — retesni geno pokyčiai, kurių paprastas SNP lustas gali nepamatyti.",
+            rareEmpty: "Įkeltame VCF retų mutacijų nerasta.",
+            rareOpen: "Atidaryti",
+            transcript: "Transkriptas",
+            variant: "Variantas",
           },
-    [locale, panel.totalCount]
+    [locale, panel.totalCount, panel.rare.length]
   );
 
   const shown = useMemo(() => {
@@ -322,14 +344,86 @@ export function DnaView({
         </div>
       ) : null}
 
-      <div className="card dna-toolbar">
-        <div className="dna-file">
-          <b>{panel.fileName}</b>
-          <div className="muted xs">
-            {locale === "en" ? panel.labNameEn : panel.labNameLt} ·{" "}
-            {panel.testedAt} · {copy.tested} {panel.testedCount} {copy.of}{" "}
-            {panel.totalCount} {copy.markers}
+      <div className="card dna-files-card">
+        <p className="eyebrow m-0 mb-2">{copy.filesTitle}</p>
+        <div className="dna-files">
+          {panel.files.map((f) => (
+            <div key={f.fileName} className="dna-file">
+              <span className="pill plain c-acc">
+                {f.kind === "vcf" ? copy.vcfKind : copy.snpKind}
+              </span>
+              <b>{f.fileName}</b>
+              <div className="muted xs">
+                {locale === "en" ? f.labNameEn : f.labNameLt} · {f.testedAt} ·{" "}
+                {locale === "en" ? f.statusEn : f.statusLt}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <section className="stack" style={{ gap: 10 }} id="dna-rare">
+        <div className="row between" style={{ alignItems: "baseline" }}>
+          <div>
+            <h2 className="m-0 text-lg font-semibold">{copy.rareTitle}</h2>
+            <p className="small muted m-0 mt-1">{copy.rareBlurb}</p>
           </div>
+          <span className="pill c-red">{panel.rare.length}</span>
+        </div>
+        {panel.rare.length ? (
+          <div className="stack" style={{ gap: 8 }}>
+            {panel.rare.map((r) => (
+              <div key={r.id} className="card dna-rare-row">
+                <div className="doctor-appt-main" style={{ flex: 1 }}>
+                  <div className="row" style={{ gap: 8, alignItems: "center" }}>
+                    <b>{r.gene}</b>
+                    <span className="pill c-red">
+                      {locale === "en" ? "Rare / NGS" : "Reta / NGS"}
+                    </span>
+                  </div>
+                  <span className="small muted">
+                    {locale === "en"
+                      ? r.titleEn || r.gene
+                      : r.titleLt || r.gene}
+                    {r.hgvs ? ` · ${r.hgvs}` : ""}
+                    {r.transcript ? ` · ${r.transcript}` : ""}
+                    {r.gt ? ` · GT ${r.gt}` : ""}
+                  </span>
+                  <p className="small m-0 mt-2 text-[var(--ink-soft)]">
+                    {locale === "en" ? r.summaryEn : r.summaryLt}
+                  </p>
+                </div>
+                <div className="row" style={{ gap: 6, flexWrap: "wrap" }}>
+                  <Link
+                    href={`/patient/rare/${encodeURIComponent(String(r.id))}`}
+                    className="btn ghost sm"
+                  >
+                    {copy.rareOpen}
+                  </Link>
+                  <AskAiButton
+                    label={copy.explain}
+                    question={
+                      locale === "en"
+                        ? `Explain my NGS rare finding ${r.gene} (${r.hgvs || ""}) in plain language`
+                        : `Paaiškink mano NGS retą radinį ${r.gene} (${r.hgvs || ""}) paprasta kalba`
+                    }
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="empty">{copy.rareEmpty}</div>
+        )}
+      </section>
+
+      <div className="card dna-toolbar">
+        <div>
+          <p className="eyebrow m-0">{copy.snpSection}</p>
+          <p className="small muted m-0 mt-1">
+            {copy.tested} {panel.testedCount} {copy.of} {panel.totalCount}{" "}
+            {copy.markers}
+          </p>
         </div>
         <div className="dna-toolbar-controls">
           <input

@@ -4503,9 +4503,39 @@ a.hc-kpi.clickable:hover {
   max-width: 320px;
 }
 
+.dna-files-card {
+  padding-bottom: 14px;
+}
+
+.dna-files {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 10px;
+}
+
+.dna-file {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--accent) 6%, var(--surface));
+}
+
 .dna-file b {
   display: block;
   font-size: 0.92rem;
+  word-break: break-all;
+}
+
+.dna-rare-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-start;
+  justify-content: space-between;
 }
 
 .dna-table-card {

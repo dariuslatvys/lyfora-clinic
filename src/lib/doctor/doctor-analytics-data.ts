@@ -19,7 +19,7 @@ import { loadDigitalTwin } from "@/lib/health/load-twin";
 import { patientDisplayName } from "@/lib/i18n/patient-name";
 import { t, type Locale } from "@/lib/i18n/dictionary";
 import type { RiskColour } from "@/lib/health/colours";
-import { todayIsoDate, addCalendarDays } from "@/lib/health/demo-visits";
+import { todayIsoDate } from "@/lib/health/demo-visits";
 
 export type AnalyticsPatient = {
   id: string;

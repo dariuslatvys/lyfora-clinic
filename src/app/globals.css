@@ -4953,6 +4953,22 @@ a.hc-kpi.clickable:hover {
   align-items: center;
 }
 
+.doctor-appt-contact {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  padding: 12px 14px;
+}
+
+.doctor-appt-contact a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.doctor-appt-contact a:hover {
+  text-decoration: underline;
+}
+
 .doctor-appt-source-card {
   border: 1px solid var(--line);
   border-radius: 12px;

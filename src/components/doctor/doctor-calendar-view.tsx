@@ -149,6 +149,9 @@ export function DoctorCalendarView({
           registeredAt: "Registered",
           receivedBy: "Received by",
           chart: "Chart",
+          contact: "Contact",
+          phone: "Phone",
+          email: "Email",
         }
       : {
           eyebrow: "Darbotvarkė",
@@ -196,6 +199,9 @@ export function DoctorCalendarView({
           registeredAt: "Užregistruota",
           receivedBy: "Priėmė",
           chart: "Kortelė",
+          contact: "Kontaktai",
+          phone: "Telefonas",
+          email: "El. paštas",
         };
 
   function openCreate() {
@@ -239,6 +245,8 @@ export function DoctorCalendarView({
       patientId: patient.id,
       patientNameLt: patient.nameLt,
       patientNameEn: patient.nameEn,
+      patientPhone: patient.phone,
+      patientEmail: patient.email,
       mode: form.mode,
       status: "upcoming",
       createdByDoctor: true,
@@ -377,6 +385,7 @@ export function DoctorCalendarView({
             <AppointmentDetail
               locale={locale}
               a={selectedAppt}
+              patients={patients}
               copy={copy}
               onBack={() => setSelectedApptId(null)}
             />
@@ -651,20 +660,30 @@ type DetailCopy = {
   chart: string;
   patient: string;
   mode: string;
+  contact: string;
+  phone: string;
+  email: string;
 };
 
 function AppointmentDetail({
   locale,
   a,
+  patients,
   copy,
   onBack,
 }: {
   locale: "lt" | "en";
   a: DoctorAppointment;
+  patients: DoctorPatientOption[];
   copy: DetailCopy;
   onBack: () => void;
 }) {
   const source = a.source;
+  const linked = a.patientId
+    ? patients.find((p) => p.id === a.patientId)
+    : null;
+  const phone = a.patientPhone || linked?.phone || "";
+  const email = a.patientEmail || linked?.email || "";
   const sourceLabel =
     !source || source.kind === "doctor_created"
       ? copy.doctorCreated
@@ -705,11 +724,28 @@ function AppointmentDetail({
         </p>
       </div>
 
-      <div className="doctor-appt-detail-meta">
-        <span className="detail-chip">
-          {copy.patient}:{" "}
+      <div className="doctor-appt-contact">
+        <span className="eyebrow">{copy.contact}</span>
+        <b className="block mt-1">
           {locale === "en" ? a.patientNameEn : a.patientNameLt}
-        </span>
+        </b>
+        <div className="stack mt-2" style={{ gap: 4 }}>
+          <span className="small">
+            <span className="muted">{copy.phone}: </span>
+            {phone ? (
+              <a href={`tel:${phone.replace(/\s/g, "")}`}>{phone}</a>
+            ) : (
+              "—"
+            )}
+          </span>
+          <span className="small">
+            <span className="muted">{copy.email}: </span>
+            {email ? <a href={`mailto:${email}`}>{email}</a> : "—"}
+          </span>
+        </div>
+      </div>
+
+      <div className="doctor-appt-detail-meta">
         <span className="detail-chip">
           {copy.source}: {sourceLabel}
         </span>

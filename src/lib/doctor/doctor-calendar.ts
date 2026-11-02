@@ -75,6 +75,9 @@ export type DoctorAppointment = {
   patientId: string | null;
   patientNameLt: string;
   patientNameEn: string;
+  /** Contact shown on the visit detail card */
+  patientPhone?: string;
+  patientEmail?: string;
   mode: "in_person" | "video" | "phone";
   status: DoctorApptStatus;
   notesLt?: string;
@@ -208,6 +211,8 @@ const EXTRA_APPTS: DoctorAppointment[] = [
     patientId: "patient_male",
     patientNameLt: "Jonas Jonaitis",
     patientNameEn: "John Doe",
+    patientPhone: "+370 612 44 018",
+    patientEmail: "pacientas@lyfora.lt",
     mode: "in_person",
     status: "upcoming",
     placeLt: "Kabinetas 12",
@@ -237,6 +242,8 @@ const EXTRA_APPTS: DoctorAppointment[] = [
     patientId: "patient_female",
     patientNameLt: "Rasa Rasaitė",
     patientNameEn: "Jane Smith",
+    patientPhone: "+370 655 20 377",
+    patientEmail: "paciente@lyfora.lt",
     mode: "video",
     status: "upcoming",
     placeLt: "Google Meet",
@@ -266,6 +273,8 @@ const EXTRA_APPTS: DoctorAppointment[] = [
     patientId: null,
     patientNameLt: "Petras Petraitis",
     patientNameEn: "Peter Peters",
+    patientPhone: "+370 686 11 902",
+    patientEmail: "petras.petraitis@pastas.lt",
     mode: "in_person",
     status: "upcoming",
     placeLt: "Kabinetas 12",
@@ -289,6 +298,37 @@ const EXTRA_APPTS: DoctorAppointment[] = [
     },
   },
   {
+    id: "da-today-phone",
+    date: todayIsoDate(),
+    time: "11:15",
+    titleLt: "Konsultacija telefonu — vaistų klausimai",
+    titleEn: "Phone consult — medication questions",
+    patientId: "patient_female",
+    patientNameLt: "Rasa Rasaitė",
+    patientNameEn: "Jane Smith",
+    patientPhone: "+370 655 20 377",
+    patientEmail: "paciente@lyfora.lt",
+    mode: "phone",
+    status: "upcoming",
+    placeLt: "Skambutis",
+    placeEn: "Call",
+    source: {
+      kind: "self",
+      self: {
+        channel: "phone",
+        registeredAt: `${todayIsoDate()}T10:02:00`,
+        complaintsLt:
+          "Klausia dėl geležies papildų ir ar galima derinti su dabartiniais vaistais; nori trumpos konsultacijos telefonu.",
+        complaintsEn:
+          "Asks about iron supplements and combining with current meds; wants a short phone consult.",
+        notesLt: "Registracija telefonu · planinė nuotolinė konsultacija.",
+        notesEn: "Phone booking · planned remote consult.",
+        receivedByLt: "Registratūra · Ieva",
+        receivedByEn: "Front desk · Ieva",
+      },
+    },
+  },
+  {
     id: "da-today-referral",
     date: todayIsoDate(),
     time: "16:00",
@@ -297,6 +337,8 @@ const EXTRA_APPTS: DoctorAppointment[] = [
     patientId: "patient_male",
     patientNameLt: "Jonas Jonaitis",
     patientNameEn: "John Doe",
+    patientPhone: "+370 612 44 018",
+    patientEmail: "pacientas@lyfora.lt",
     mode: "in_person",
     status: "upcoming",
     placeLt: "Kabinetas 4 · neurologija",
@@ -315,6 +357,8 @@ const EXTRA_APPTS: DoctorAppointment[] = [
     patientId: "patient_male",
     patientNameLt: "Jonas Jonaitis",
     patientNameEn: "John Doe",
+    patientPhone: "+370 612 44 018",
+    patientEmail: "pacientas@lyfora.lt",
     mode: "in_person",
     status: "upcoming",
     placeLt: "Spine Desk",
@@ -344,8 +388,12 @@ const EXTRA_APPTS: DoctorAppointment[] = [
     patientId: "patient_female",
     patientNameLt: "Rasa Rasaitė",
     patientNameEn: "Jane Smith",
+    patientPhone: "+370 655 20 377",
+    patientEmail: "paciente@lyfora.lt",
     mode: "phone",
     status: "upcoming",
+    placeLt: "Skambutis",
+    placeEn: "Call",
     source: {
       kind: "self",
       self: {
@@ -365,6 +413,8 @@ const EXTRA_APPTS: DoctorAppointment[] = [
     patientId: "patient_male",
     patientNameLt: "Jonas Jonaitis",
     patientNameEn: "John Doe",
+    patientPhone: "+370 612 44 018",
+    patientEmail: "pacientas@lyfora.lt",
     mode: "in_person",
     status: "upcoming",
     source: {
@@ -385,6 +435,7 @@ function visitToAppt(v: DemoVisit, locale: Locale): DoctorAppointment {
     resolved.id.includes("female") || isFemaleHint
       ? "patient_female"
       : "patient_male";
+  const female = patientId === "patient_female";
   return {
     id: `visit:${resolved.id}`,
     date: resolved.date,
@@ -392,14 +443,10 @@ function visitToAppt(v: DemoVisit, locale: Locale): DoctorAppointment {
     titleLt: resolved.titleLt,
     titleEn: resolved.titleEn,
     patientId,
-    patientNameLt: patientDisplayName(
-      patientId === "patient_female" ? "female" : "male",
-      "lt"
-    ),
-    patientNameEn: patientDisplayName(
-      patientId === "patient_female" ? "female" : "male",
-      "en"
-    ),
+    patientNameLt: patientDisplayName(female ? "female" : "male", "lt"),
+    patientNameEn: patientDisplayName(female ? "female" : "male", "en"),
+    patientPhone: female ? "+370 655 20 377" : "+370 612 44 018",
+    patientEmail: female ? "paciente@lyfora.lt" : "pacientas@lyfora.lt",
     mode: /video|nuotol/i.test(resolved.placeLt + resolved.placeEn)
       ? "video"
       : /telefon/i.test(resolved.placeLt + resolved.placeEn)

@@ -26,7 +26,7 @@ export function DoctorSickLeaveView({ locale }: { locale: "lt" | "en" }) {
           title: "Sick-leave certificates",
           blurb:
             "Track certificates ending soon, currently valid, and historical records.",
-          ending: "Ending today",
+          ending: "Ending",
           active: "Valid",
           history: "Historical",
           horizonToday: "Today",
@@ -44,8 +44,8 @@ export function DoctorSickLeaveView({ locale }: { locale: "lt" | "en" }) {
           eyebrow: "Pažymos",
           title: "Nedarbingumo biuleteniai",
           blurb:
-            "Stebėkite šiandien baigiančius, galiojančius ir istorinius nedarbingumo biuletenius.",
-          ending: "Šiandien baigiasi",
+            "Stebėkite baigiančius, galiojančius ir istorinius nedarbingumo biuletenius — data matosi prie paciento.",
+          ending: "Baigiasi",
           active: "Galiojantys",
           history: "Istoriniai",
           horizonToday: "Šiandien",
@@ -126,7 +126,13 @@ export function DoctorSickLeaveView({ locale }: { locale: "lt" | "en" }) {
         {list.length ? (
           <div className="stack" style={{ gap: 10 }}>
             {list.map((s) => (
-              <SickLeaveRow key={s.id} locale={locale} s={s} copy={copy} />
+              <SickLeaveRow
+                key={s.id}
+                locale={locale}
+                s={s}
+                copy={copy}
+                tab={tab}
+              />
             ))}
           </div>
         ) : (
@@ -153,13 +159,6 @@ export function DoctorSickLeaveView({ locale }: { locale: "lt" | "en" }) {
                   onClick={() => setHorizon(id)}
                 >
                   {label}
-                  <span className="xs muted" style={{ display: "block" }}>
-                    {id === "today"
-                      ? today
-                      : id === "tomorrow"
-                        ? addCalendarDays(today, 1)
-                        : addCalendarDays(today, 2)}
-                  </span>
                 </button>
               ))}
             </div>
@@ -174,6 +173,7 @@ function SickLeaveRow({
   locale,
   s,
   copy,
+  tab,
 }: {
   locale: "lt" | "en";
   s: SickLeaveCertificate;
@@ -184,7 +184,21 @@ function SickLeaveRow({
     open: string;
     diagnosis: string;
   };
+  tab: "ending" | "active" | "history";
 }) {
+  const endPill =
+    tab === "ending"
+      ? locale === "en"
+        ? `Ends ${s.to}`
+        : `Baigiasi ${s.to}`
+      : tab === "history"
+        ? locale === "en"
+          ? `Ended ${s.to}`
+          : `Baigėsi ${s.to}`
+        : locale === "en"
+          ? `Until ${s.to}`
+          : `Iki ${s.to}`;
+
   return (
     <div className="doctor-appt-source-card stack" style={{ gap: 8 }}>
       <div className="row between" style={{ alignItems: "flex-start" }}>
@@ -194,12 +208,21 @@ function SickLeaveRow({
             {copy.from} {s.from} · {copy.to} {s.to}
           </p>
         </div>
-        <Link
-          href={`/doctor/patients/${s.patientId}`}
-          className="btn ghost sm"
-        >
-          {copy.open}
-        </Link>
+        <div className="row" style={{ gap: 8, alignItems: "center" }}>
+          <span
+            className={`pill ${
+              tab === "ending" ? "c-orange" : tab === "history" ? "c-acc" : "c-green"
+            }`}
+          >
+            {endPill}
+          </span>
+          <Link
+            href={`/doctor/patients/${s.patientId}`}
+            className="btn ghost sm"
+          >
+            {copy.open}
+          </Link>
+        </div>
       </div>
       <div>
         <span className="eyebrow">{copy.diagnosis}</span>

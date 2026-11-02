@@ -4903,6 +4903,38 @@ a.hc-kpi.clickable:hover {
   background: var(--surface);
 }
 
+.doctor-appt-row-btn {
+  width: 100%;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.doctor-appt-row-btn:hover {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+}
+
+.doctor-appt-detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.doctor-appt-source-card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--accent) 6%, var(--surface));
+  padding: 12px 14px;
+}
+
+.doctor-appt-field + .doctor-appt-field {
+  padding-top: 8px;
+  border-top: 1px solid color-mix(in srgb, var(--line) 80%, transparent);
+}
+
 .doctor-appt-time {
   display: flex;
   flex-direction: column;

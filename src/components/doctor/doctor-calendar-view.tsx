@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, type ReactNode } from "react";
 import {
   DOCTOR_APPT_EVENT,
   VIDEO_LINK_OPTIONS,
@@ -41,6 +41,7 @@ export function DoctorCalendarView({
   );
   const [created, setCreated] = useState<DoctorAppointment[]>([]);
   const [openForm, setOpenForm] = useState(false);
+  const [selectedApptId, setSelectedApptId] = useState<string | null>(null);
   const [patientQuery, setPatientQuery] = useState("");
   const [form, setForm] = useState({
     patientId: "" as string,
@@ -78,6 +79,13 @@ export function DoctorCalendarView({
     [all, selected]
   );
   const matrix = useMemo(() => monthMatrix(anchor), [anchor]);
+  const selectedAppt =
+    dayList.find((a) => a.id === selectedApptId) || null;
+
+  useEffect(() => {
+    setSelectedApptId(null);
+    setOpenForm(false);
+  }, [selected]);
 
   const patientHits = useMemo(
     () => searchDoctorPatients(patients, patientQuery, locale),
@@ -121,6 +129,26 @@ export function DoctorCalendarView({
           prev: "Previous month",
           next: "Next month",
           clearPatient: "Change",
+          backDay: "Back to day",
+          detail: "Visit details",
+          source: "How booked",
+          referral: "Referral",
+          selfPhone: "Phone registration",
+          selfPortal: "Portal registration",
+          selfWalkIn: "Walk-in",
+          doctorCreated: "Created in calendar",
+          openPdf: "Open referral PDF",
+          referringDoctor: "Referring clinician",
+          institution: "Institution",
+          specialty: "To specialty",
+          purpose: "Purpose",
+          reasonWhy: "Reason",
+          diagnosis: "Diagnosis",
+          complaints: "Complaints",
+          anamnesis: "History",
+          registeredAt: "Registered",
+          receivedBy: "Received by",
+          chart: "Chart",
         }
       : {
           eyebrow: "Darbotvarkė",
@@ -148,9 +176,30 @@ export function DoctorCalendarView({
           prev: "Ankstesnis mėnuo",
           next: "Kitas mėnuo",
           clearPatient: "Keisti",
+          backDay: "Atgal į dieną",
+          detail: "Vizito detalės",
+          source: "Kaip užregistruota",
+          referral: "Siuntimas",
+          selfPhone: "Registracija telefonu",
+          selfPortal: "Registracija portale",
+          selfWalkIn: "Atėjo be registracijos",
+          doctorCreated: "Sukurta kalendoriuje",
+          openPdf: "Atidaryti siuntimo PDF",
+          referringDoctor: "Siuntęs gydytojas",
+          institution: "Įstaiga",
+          specialty: "Kam siunčiama",
+          purpose: "Paskirtis",
+          reasonWhy: "Dėl ko",
+          diagnosis: "Diagnozė",
+          complaints: "Nusiskundimai",
+          anamnesis: "Anamnezė",
+          registeredAt: "Užregistruota",
+          receivedBy: "Priėmė",
+          chart: "Kortelė",
         };
 
   function openCreate() {
+    setSelectedApptId(null);
     setOpenForm(true);
     setPatientQuery("");
     setForm({
@@ -207,6 +256,7 @@ export function DoctorCalendarView({
             : video?.label || "Video",
       videoPlatform: video?.id,
       videoUrl: video?.url,
+      source: { kind: "doctor_created" },
     };
     addCreatedAppointment(appt);
     setCreated(readCreatedAppointments());
@@ -316,14 +366,21 @@ export function DoctorCalendarView({
                 {` · ${dayList.length} ${copy.visits}`}
               </p>
             </div>
-            {!openForm ? (
+            {!openForm && !selectedAppt ? (
               <button type="button" className="btn sm" onClick={openCreate}>
                 {copy.create}
               </button>
             ) : null}
           </div>
 
-          {openForm ? (
+          {selectedAppt && !openForm ? (
+            <AppointmentDetail
+              locale={locale}
+              a={selectedAppt}
+              copy={copy}
+              onBack={() => setSelectedApptId(null)}
+            />
+          ) : openForm ? (
             <div className="doctor-cal-form stack" style={{ gap: 12 }}>
               <label className="stack" style={{ gap: 4 }}>
                 <span className="eyebrow">{copy.patient}</span>
@@ -520,7 +577,12 @@ export function DoctorCalendarView({
             <div className="stack mt-3" style={{ gap: 8 }}>
               {dayList.length ? (
                 dayList.map((a) => (
-                  <div key={a.id} className="doctor-appt-row">
+                  <button
+                    key={a.id}
+                    type="button"
+                    className="doctor-appt-row doctor-appt-row-btn"
+                    onClick={() => setSelectedApptId(a.id)}
+                  >
                     <div className="doctor-appt-time">
                       <b>{a.time}</b>
                       <span>{modeLabel(a.mode, locale)}</span>
@@ -533,22 +595,13 @@ export function DoctorCalendarView({
                           ? ` · ${locale === "en" ? a.placeEn : a.placeLt}`
                           : ""}
                       </span>
-                      {a.mode === "video" && a.videoUrl ? (
-                        <a
-                          href={a.videoUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="xs"
-                          style={{ color: "var(--accent)" }}
-                        >
-                          {a.videoPlatform === "meet"
-                            ? "Google Meet"
-                            : a.videoPlatform === "zoom"
-                              ? "Zoom"
-                              : a.videoPlatform === "teams"
-                                ? "Teams"
-                                : a.videoUrl}
-                        </a>
+                      {a.source?.kind === "referral" ? (
+                        <span className="xs" style={{ color: "var(--accent)" }}>
+                          {copy.referral}
+                        </span>
+                      ) : a.source?.kind === "self" &&
+                        a.source.self.channel === "phone" ? (
+                        <span className="xs muted">{copy.selfPhone}</span>
                       ) : null}
                     </div>
                     <span
@@ -562,15 +615,7 @@ export function DoctorCalendarView({
                     >
                       {statusLabel(a.status, locale)}
                     </span>
-                    {a.patientId ? (
-                      <Link
-                        href={`/doctor/patients/${a.patientId}`}
-                        className="btn ghost sm"
-                      >
-                        {locale === "en" ? "Chart" : "Kortelė"}
-                      </Link>
-                    ) : null}
-                  </div>
+                  </button>
                 ))
               ) : (
                 <div className="empty">{copy.empty}</div>
@@ -579,6 +624,299 @@ export function DoctorCalendarView({
           )}
         </section>
       </div>
+    </div>
+  );
+}
+
+type DetailCopy = {
+  backDay: string;
+  detail: string;
+  source: string;
+  referral: string;
+  selfPhone: string;
+  selfPortal: string;
+  selfWalkIn: string;
+  doctorCreated: string;
+  openPdf: string;
+  referringDoctor: string;
+  institution: string;
+  specialty: string;
+  purpose: string;
+  reasonWhy: string;
+  diagnosis: string;
+  complaints: string;
+  anamnesis: string;
+  registeredAt: string;
+  receivedBy: string;
+  chart: string;
+  patient: string;
+  mode: string;
+};
+
+function AppointmentDetail({
+  locale,
+  a,
+  copy,
+  onBack,
+}: {
+  locale: "lt" | "en";
+  a: DoctorAppointment;
+  copy: DetailCopy;
+  onBack: () => void;
+}) {
+  const source = a.source;
+  const sourceLabel =
+    !source || source.kind === "doctor_created"
+      ? copy.doctorCreated
+      : source.kind === "referral"
+        ? copy.referral
+        : source.self.channel === "phone"
+          ? copy.selfPhone
+          : source.self.channel === "portal"
+            ? copy.selfPortal
+            : copy.selfWalkIn;
+
+  return (
+    <div className="doctor-appt-detail stack" style={{ gap: 12 }}>
+      <div className="row between" style={{ alignItems: "center" }}>
+        <button type="button" className="btn ghost sm" onClick={onBack}>
+          ← {copy.backDay}
+        </button>
+        {a.patientId ? (
+          <Link
+            href={`/doctor/patients/${a.patientId}`}
+            className="btn ghost sm"
+          >
+            {copy.chart}
+          </Link>
+        ) : null}
+      </div>
+
+      <div>
+        <span className="eyebrow">{copy.detail}</span>
+        <h3 className="m-0 mt-1">
+          {locale === "en" ? a.titleEn : a.titleLt}
+        </h3>
+        <p className="small muted m-0 mt-1">
+          {a.date} · {a.time} · {modeLabel(a.mode, locale)}
+          {a.placeLt
+            ? ` · ${locale === "en" ? a.placeEn : a.placeLt}`
+            : ""}
+        </p>
+      </div>
+
+      <div className="doctor-appt-detail-meta">
+        <span className="detail-chip">
+          {copy.patient}:{" "}
+          {locale === "en" ? a.patientNameEn : a.patientNameLt}
+        </span>
+        <span className="detail-chip">
+          {copy.source}: {sourceLabel}
+        </span>
+        <span
+          className={`pill ${
+            a.status === "upcoming"
+              ? "c-acc"
+              : a.status === "missed" || a.status === "cancelled"
+                ? "c-none"
+                : "c-green"
+          }`}
+        >
+          {statusLabel(a.status, locale)}
+        </span>
+      </div>
+
+      {a.mode === "video" && a.videoUrl ? (
+        <a
+          href={a.videoUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="btn ghost sm"
+          style={{ alignSelf: "flex-start" }}
+        >
+          {a.videoPlatform === "meet"
+            ? "Google Meet"
+            : a.videoPlatform === "zoom"
+              ? "Zoom"
+              : a.videoPlatform === "teams"
+                ? "Teams"
+                : a.videoUrl}
+        </a>
+      ) : null}
+
+      {source?.kind === "referral" ? (
+        <ReferralBlock locale={locale} r={source.referral} copy={copy} />
+      ) : null}
+
+      {source?.kind === "self" ? (
+        <SelfRegBlock locale={locale} s={source.self} copy={copy} />
+      ) : null}
+
+      {!source || source.kind === "doctor_created" ? (
+        <div className="doctor-appt-source-card">
+          <p className="small m-0">
+            {locale === "en"
+              ? "This visit was created in the doctor calendar."
+              : "Šis vizitas sukurtas gydytojo kalendoriuje."}
+          </p>
+          {a.notesLt || a.notesEn ? (
+            <p className="small muted m-0 mt-2">
+              {locale === "en" ? a.notesEn : a.notesLt}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function ReferralBlock({
+  locale,
+  r,
+  copy,
+}: {
+  locale: "lt" | "en";
+  r: NonNullable<
+    Extract<DoctorAppointment["source"], { kind: "referral" }>
+  >["referral"];
+  copy: DetailCopy;
+}) {
+  return (
+    <div className="doctor-appt-source-card stack" style={{ gap: 10 }}>
+      <div className="row between" style={{ alignItems: "flex-start" }}>
+        <div>
+          <span className="eyebrow">{copy.referral}</span>
+          <b className="block mt-1">
+            {locale === "en" ? r.documentTypeEn : r.documentTypeLt}
+          </b>
+          <span className="xs muted">
+            {new Date(r.issuedAt).toLocaleString(
+              locale === "en" ? "en-GB" : "lt-LT"
+            )}
+            {" · "}
+            {locale === "en" ? r.urgencyEn : r.urgencyLt}
+          </span>
+        </div>
+        {r.pdfHref ? (
+          <a
+            href={r.pdfHref}
+            target="_blank"
+            rel="noreferrer"
+            className="btn sm"
+          >
+            {copy.openPdf}
+          </a>
+        ) : null}
+      </div>
+
+      <DetailField label={copy.institution}>
+        <b>{locale === "en" ? r.institutionEn : r.institutionLt}</b>
+        {r.institutionCode ? (
+          <span className="xs muted"> · įm. kodas {r.institutionCode}</span>
+        ) : null}
+        <div className="xs muted">
+          {locale === "en"
+            ? r.institutionAddressEn
+            : r.institutionAddressLt}
+          {r.institutionPhone ? ` · ${r.institutionPhone}` : ""}
+          {r.institutionEmail ? ` · ${r.institutionEmail}` : ""}
+        </div>
+      </DetailField>
+
+      <DetailField label={copy.referringDoctor}>
+        <b>
+          {locale === "en" ? r.referringDoctorEn : r.referringDoctorLt}
+        </b>
+        <div className="xs muted">
+          {locale === "en"
+            ? r.referringSpecialtyEn
+            : r.referringSpecialtyLt}
+          {r.referringStamp ? ` · spaudo nr. ${r.referringStamp}` : ""}
+        </div>
+      </DetailField>
+
+      <DetailField label={copy.specialty}>
+        {locale === "en" ? r.toSpecialtyEn : r.toSpecialtyLt}
+      </DetailField>
+      <DetailField label={copy.purpose}>
+        {locale === "en" ? r.purposeEn : r.purposeLt}
+      </DetailField>
+      <DetailField label={copy.reasonWhy}>
+        {locale === "en" ? r.reasonEn : r.reasonLt}
+      </DetailField>
+      <DetailField label={copy.diagnosis}>
+        {r.diagnosisCode ? <code className="mono">{r.diagnosisCode}</code> : null}
+        {r.diagnosisCode ? " · " : ""}
+        {locale === "en" ? r.diagnosisEn : r.diagnosisLt}
+      </DetailField>
+      <DetailField label={copy.complaints}>
+        {locale === "en" ? r.complaintsEn : r.complaintsLt}
+      </DetailField>
+      {r.anamnesisLt || r.anamnesisEn ? (
+        <DetailField label={copy.anamnesis}>
+          {locale === "en" ? r.anamnesisEn : r.anamnesisLt}
+        </DetailField>
+      ) : null}
+    </div>
+  );
+}
+
+function SelfRegBlock({
+  locale,
+  s,
+  copy,
+}: {
+  locale: "lt" | "en";
+  s: NonNullable<
+    Extract<DoctorAppointment["source"], { kind: "self" }>
+  >["self"];
+  copy: DetailCopy;
+}) {
+  const channelLabel =
+    s.channel === "phone"
+      ? copy.selfPhone
+      : s.channel === "portal"
+        ? copy.selfPortal
+        : copy.selfWalkIn;
+  return (
+    <div className="doctor-appt-source-card stack" style={{ gap: 10 }}>
+      <div>
+        <span className="eyebrow">{channelLabel}</span>
+        <p className="small muted m-0 mt-1">
+          {copy.registeredAt}:{" "}
+          {new Date(s.registeredAt).toLocaleString(
+            locale === "en" ? "en-GB" : "lt-LT"
+          )}
+        </p>
+      </div>
+      <DetailField label={copy.complaints}>
+        {locale === "en" ? s.complaintsEn : s.complaintsLt}
+      </DetailField>
+      {s.notesLt || s.notesEn ? (
+        <DetailField label={locale === "en" ? "Notes" : "Pastabos"}>
+          {locale === "en" ? s.notesEn : s.notesLt}
+        </DetailField>
+      ) : null}
+      {s.receivedByLt || s.receivedByEn ? (
+        <DetailField label={copy.receivedBy}>
+          {locale === "en" ? s.receivedByEn : s.receivedByLt}
+        </DetailField>
+      ) : null}
+    </div>
+  );
+}
+
+function DetailField({
+  label,
+  children,
+}: {
+  label: string;
+  children: ReactNode;
+}) {
+  return (
+    <div className="doctor-appt-field">
+      <span className="eyebrow">{label}</span>
+      <div className="small m-0 mt-1">{children}</div>
     </div>
   );
 }

@@ -13,6 +13,59 @@ export type DoctorApptStatus = VisitStatus | "cancelled" | "done";
 
 export type VideoPlatform = "meet" | "zoom" | "teams";
 
+/** Incoming E027-style referral attached to a booked visit. */
+export type AppointmentReferral = {
+  documentTypeLt: string;
+  documentTypeEn: string;
+  issuedAt: string;
+  purposeLt: string;
+  purposeEn: string;
+  toSpecialtyLt: string;
+  toSpecialtyEn: string;
+  urgencyLt: string;
+  urgencyEn: string;
+  reasonLt: string;
+  reasonEn: string;
+  diagnosisCode?: string;
+  diagnosisLt: string;
+  diagnosisEn: string;
+  complaintsLt: string;
+  complaintsEn: string;
+  anamnesisLt?: string;
+  anamnesisEn?: string;
+  referringDoctorLt: string;
+  referringDoctorEn: string;
+  referringSpecialtyLt: string;
+  referringSpecialtyEn: string;
+  referringStamp?: string;
+  institutionLt: string;
+  institutionEn: string;
+  institutionCode?: string;
+  institutionAddressLt?: string;
+  institutionAddressEn?: string;
+  institutionPhone?: string;
+  institutionEmail?: string;
+  /** Public URL to sample PDF */
+  pdfHref?: string;
+};
+
+/** Patient self-booked the slot (e.g. by phone). */
+export type AppointmentSelfReg = {
+  channel: "phone" | "portal" | "walk_in";
+  registeredAt: string;
+  complaintsLt: string;
+  complaintsEn: string;
+  notesLt?: string;
+  notesEn?: string;
+  receivedByLt?: string;
+  receivedByEn?: string;
+};
+
+export type AppointmentSource =
+  | { kind: "referral"; referral: AppointmentReferral }
+  | { kind: "self"; self: AppointmentSelfReg }
+  | { kind: "doctor_created" };
+
 export type DoctorAppointment = {
   id: string;
   date: string;
@@ -32,6 +85,7 @@ export type DoctorAppointment = {
   createdByDoctor?: boolean;
   videoPlatform?: VideoPlatform;
   videoUrl?: string;
+  source?: AppointmentSource;
 };
 
 export type DoctorPatientOption = {
@@ -72,6 +126,78 @@ export const VIDEO_LINK_OPTIONS: {
   },
 ];
 
+const REFERRAL_NEURO: AppointmentReferral = {
+  documentTypeLt: "E027. Medicinos dokumentų išrašas / siuntimas",
+  documentTypeEn: "E027. Medical record extract / referral",
+  issuedAt: "2026-10-15T13:51:00",
+  purposeLt: "Siuntimo konsultuoti, gydyti skyrimas",
+  purposeEn: "Referral for consultation / treatment",
+  toSpecialtyLt: "Gydytojas neurologas",
+  toSpecialtyEn: "Neurologist",
+  urgencyLt: "Planinė",
+  urgencyEn: "Elective",
+  reasonLt: "Prašau konsultuoti dėl stuburo kaklinės dalies patologijos.",
+  reasonEn: "Please consult regarding cervical spine pathology.",
+  diagnosisCode: "M54.12",
+  diagnosisLt: "Radikulopatija, kaklo sritis (įtariama, aktyvi)",
+  diagnosisEn: "Radiculopathy, cervical region (suspected, active)",
+  complaintsLt:
+    "Pacientas skundžiasi skausmais, plintančiais į dešinį peties sritį ir mentę.",
+  complaintsEn:
+    "Patient reports pain radiating into the right shoulder and scapula.",
+  anamnesisLt: "Dešinio peties traumos neatžymi.",
+  anamnesisEn: "No recalled trauma to the right shoulder.",
+  referringDoctorLt: "Inesa Karpavičienė",
+  referringDoctorEn: "Inesa Karpavičienė",
+  referringSpecialtyLt: "Gydytojas ortopedas traumatologas",
+  referringSpecialtyEn: "Orthopaedic traumatologist",
+  referringStamp: "31244",
+  institutionLt: "Viešoji įstaiga Antakalnio poliklinika",
+  institutionEn: "Antakalnis Polyclinic (public institution)",
+  institutionCode: "124244035",
+  institutionAddressLt: "Vilnius, Antakalnio g. 59, LT-10207",
+  institutionAddressEn: "Vilnius, Antakalnio g. 59, LT-10207",
+  institutionPhone: "+370 5 234 4518",
+  institutionEmail: "info@antakpol.lt",
+  pdfHref: "/demo/referrals/siuntimas_kaklas.pdf",
+};
+
+const REFERRAL_MRI: AppointmentReferral = {
+  documentTypeLt: "E027. Medicinos dokumentų išrašas / siuntimas",
+  documentTypeEn: "E027. Medical record extract / referral",
+  issuedAt: "2026-08-27T09:50:00",
+  purposeLt: "Siuntimo konsultuoti, gydyti skyrimas",
+  purposeEn: "Referral for consultation / treatment",
+  toSpecialtyLt: "Gydytojas radiologas",
+  toSpecialtyEn: "Radiologist",
+  urgencyLt: "Planinė",
+  urgencyEn: "Elective",
+  reasonLt: "Prašau atlikti stuburo kaklinės dalies MRT.",
+  reasonEn: "Please perform MRI of the cervical spine.",
+  diagnosisCode: "M54.12",
+  diagnosisLt: "Radikulopatija, kaklo sritis (įtariama, aktyvi)",
+  diagnosisEn: "Radiculopathy, cervical region (suspected, active)",
+  complaintsLt:
+    "Pacientas skundžiasi skausmais, plintančiais į dešinį peties sritį ir mentę.",
+  complaintsEn:
+    "Patient reports pain radiating into the right shoulder and scapula.",
+  anamnesisLt: "Dešinio peties traumos neatžymi.",
+  anamnesisEn: "No recalled trauma to the right shoulder.",
+  referringDoctorLt: "Inesa Karpavičienė",
+  referringDoctorEn: "Inesa Karpavičienė",
+  referringSpecialtyLt: "Gydytojas ortopedas traumatologas",
+  referringSpecialtyEn: "Orthopaedic traumatologist",
+  referringStamp: "31244",
+  institutionLt: "Viešoji įstaiga Antakalnio poliklinika",
+  institutionEn: "Antakalnis Polyclinic (public institution)",
+  institutionCode: "124244035",
+  institutionAddressLt: "Vilnius, Antakalnio g. 59, LT-10207",
+  institutionAddressEn: "Vilnius, Antakalnio g. 59, LT-10207",
+  institutionPhone: "+370 5 234 4518",
+  institutionEmail: "info@antakpol.lt",
+  pdfHref: "/demo/referrals/siuntimas_kaklas0.pdf",
+};
+
 const EXTRA_APPTS: DoctorAppointment[] = [
   {
     id: "da-today-1",
@@ -86,6 +212,21 @@ const EXTRA_APPTS: DoctorAppointment[] = [
     status: "upcoming",
     placeLt: "Kabinetas 12",
     placeEn: "Room 12",
+    source: {
+      kind: "self",
+      self: {
+        channel: "phone",
+        registeredAt: `${todayIsoDate()}T08:12:00`,
+        complaintsLt:
+          "Prašo kontrolės po statinų korekcijos — AKS namuose ~127/77, MTL buvo 3,8.",
+        complaintsEn:
+          "Requests follow-up after statin adjustment — home BP ~127/77, LDL was 3.8.",
+        notesLt: "Registravo registratūra telefonu.",
+        notesEn: "Booked by front desk over the phone.",
+        receivedByLt: "Registratūra · Ieva",
+        receivedByEn: "Front desk · Ieva",
+      },
+    },
   },
   {
     id: "da-today-2",
@@ -102,6 +243,19 @@ const EXTRA_APPTS: DoctorAppointment[] = [
     placeEn: "Google Meet",
     videoPlatform: "meet",
     videoUrl: "https://meet.google.com/lyf-demo-abc",
+    source: {
+      kind: "self",
+      self: {
+        channel: "portal",
+        registeredAt: `${todayIsoDate()}T07:40:00`,
+        complaintsLt:
+          "TSH šiek tiek virš normos, feritinas žemesnis — prašo interpretacijos ir ar kartoti tyrimus.",
+        complaintsEn:
+          "TSH slightly above range, ferritin low — wants interpretation and whether to repeat labs.",
+        notesLt: "Užsiregistravo per paciento portalą.",
+        notesEn: "Self-booked via the patient portal.",
+      },
+    },
   },
   {
     id: "da-today-3",
@@ -118,6 +272,39 @@ const EXTRA_APPTS: DoctorAppointment[] = [
     placeEn: "Room 12",
     notesLt: "Kitas pacientas (ne Lyfora portalo kortelė).",
     notesEn: "External patient (no Lyfora portal chart).",
+    source: {
+      kind: "self",
+      self: {
+        channel: "phone",
+        registeredAt: `${todayIsoDate()}T09:05:00`,
+        complaintsLt:
+          "Pirmas vizitas: ilgalaikis nuovargis, nori bendros sveikatos įvertinimo ir kraujo tyrimų plano.",
+        complaintsEn:
+          "First visit: long-standing fatigue; wants a general health review and lab plan.",
+        notesLt: "Registracija telefonu; kortelės portale dar nėra.",
+        notesEn: "Phone registration; no portal chart yet.",
+        receivedByLt: "Registratūra · Tomas",
+        receivedByEn: "Front desk · Tomas",
+      },
+    },
+  },
+  {
+    id: "da-today-referral",
+    date: todayIsoDate(),
+    time: "16:00",
+    titleLt: "Neurologo konsultacija — kaklo stuburas",
+    titleEn: "Neurology consult — cervical spine",
+    patientId: "patient_male",
+    patientNameLt: "Jonas Jonaitis",
+    patientNameEn: "John Doe",
+    mode: "in_person",
+    status: "upcoming",
+    placeLt: "Kabinetas 4 · neurologija",
+    placeEn: "Room 4 · neurology",
+    source: {
+      kind: "referral",
+      referral: REFERRAL_NEURO,
+    },
   },
   {
     id: "da-tomorrow-1",
@@ -132,6 +319,21 @@ const EXTRA_APPTS: DoctorAppointment[] = [
     status: "upcoming",
     placeLt: "Spine Desk",
     placeEn: "Spine Desk",
+    source: {
+      kind: "self",
+      self: {
+        channel: "phone",
+        registeredAt: `${todayIsoDate()}T12:18:00`,
+        complaintsLt:
+          "Dešinys petys skausmas nuo vakar vakaro, ~7/10, tirpimo nėra. Prašo skubios gyvos konsultacijos.",
+        complaintsEn:
+          "Right shoulder pain since last night, ~7/10, no numbness. Requests urgent in-person slot.",
+        notesLt: "Skubi registracija telefonu po pokalbio su gydytoju.",
+        notesEn: "Urgent phone booking after clinician chat.",
+        receivedByLt: "Spine Desk · budinti",
+        receivedByEn: "Spine Desk · on call",
+      },
+    },
   },
   {
     id: "da-plus2",
@@ -144,6 +346,15 @@ const EXTRA_APPTS: DoctorAppointment[] = [
     patientNameEn: "Jane Smith",
     mode: "phone",
     status: "upcoming",
+    source: {
+      kind: "self",
+      self: {
+        channel: "portal",
+        registeredAt: addCalendarDays(todayIsoDate(), 1) + "T18:20:00",
+        complaintsLt: "Prašo receptų pratęsimo ir trumpų klausimų dėl dozių.",
+        complaintsEn: "Requests prescription refill and brief dosing questions.",
+      },
+    },
   },
   {
     id: "da-plus4",
@@ -156,6 +367,10 @@ const EXTRA_APPTS: DoctorAppointment[] = [
     patientNameEn: "John Doe",
     mode: "in_person",
     status: "upcoming",
+    source: {
+      kind: "referral",
+      referral: REFERRAL_MRI,
+    },
   },
 ];
 

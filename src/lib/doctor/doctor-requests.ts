@@ -26,8 +26,9 @@ export type DoctorRequest = {
   slaHours: number;
   tagsLt: string[];
   tagsEn: string[];
-  bodyLt: string;
-  bodyEn: string;
+  /** Original patient question (shown to the doctor). */
+  questionLt: string;
+  questionEn: string;
   replyLt?: string;
   replyEn?: string;
 };
@@ -61,10 +62,10 @@ const EXTRA_REQUESTS: DoctorRequest[] = [
     slaHours: 24,
     tagsLt: ["PGx", "Lipidai", "Receptas"],
     tagsEn: ["PGx", "Lipids", "Rx"],
-    bodyLt:
-      "Pacientas klausia, ar po farmakogenetikos (SLCO1B1) reikia mažinti Roswera 5 mg. MTL 3,8 mmol/L, CK normalus. Prašo atsakymo raštu per 24 val.",
-    bodyEn:
-      "Patient asks whether Roswera 5 mg should be reduced after PGx (SLCO1B1). LDL 3.8 mmol/L, CK normal. Wants a written reply within 24h.",
+    questionLt:
+      "Sveiki, po farmakogenetikos tyrimo matau SLCO1B1 signalą. Ar reikia mažinti Roswera 5 mg dozę? MTL paskutinį kartą buvo 3,8 mmol/L, CK normalus. Prašau atsakymo raštu.",
+    questionEn:
+      "Hello — after PGx I see an SLCO1B1 signal. Should I reduce Roswera 5 mg? Latest LDL was 3.8 mmol/L, CK normal. Please reply in writing.",
   },
   {
     id: "req-female-hormones",
@@ -85,12 +86,14 @@ const EXTRA_REQUESTS: DoctorRequest[] = [
     slaHours: 24,
     tagsLt: ["Hormonai", "Tyrimai"],
     tagsEn: ["Hormones", "Labs"],
-    bodyLt:
-      "Pacientė atsiuntė klausimą dėl TSH ir feritino. Pradėjote juodraštį; reikia užbaigti atsakymą ir pasiūlyti kontrolės datą.",
-    bodyEn:
-      "Patient messaged about TSH and ferritin. Draft started; finish the reply and propose a follow-up date.",
-    replyLt: "Juodraštis: kartoti TSH po 6–8 sav., feritiną vertinti su Simptomais…",
-    replyEn: "Draft: repeat TSH in 6–8 weeks; interpret ferritin with symptoms…",
+    questionLt:
+      "Sveiki, gavau TSH ir feritino rezultatus. TSH šiek tiek virš normos, feritinas žemesnis. Ar reikia kartoti tyrimus, ir po kiek laiko? Taip pat — ar verta papildyti geležimi?",
+    questionEn:
+      "Hello — I received TSH and ferritin results. TSH is slightly above range, ferritin is low. Should I repeat the labs, and when? Also — is iron supplementation worth considering?",
+    replyLt:
+      "Juodraštis: kartoti TSH po 6–8 sav., feritiną vertinti su simptomais…",
+    replyEn:
+      "Draft: repeat TSH in 6–8 weeks; interpret ferritin with symptoms…",
   },
   {
     id: "req-ngs-mybpc3",
@@ -111,10 +114,10 @@ const EXTRA_REQUESTS: DoctorRequest[] = [
     slaHours: 48,
     tagsLt: ["NGS", "Kardiologija", "Siuntimas"],
     tagsEn: ["NGS", "Cardiology", "Referral"],
-    bodyLt:
-      "Po NGS MYBPC3 radinio pacientas klausia dėl pirmos eilės giminaičių Echo / EKG. Reikia klinikinio atsakymo ir siuntimo gairių.",
-    bodyEn:
-      "After NGS MYBPC3 finding, patient asks about first-degree relatives’ Echo/ECG. Needs clinical reply and referral guidance.",
+    questionLt:
+      "Po NGS tyrimo radote MYBPC3 variantą. Ar mano tėvams, broliui ir vaikams reikia Echo / EKG? Kaip greitai turėčiau juos siųsti?",
+    questionEn:
+      "After NGS you found a MYBPC3 variant. Do my parents, brother and children need Echo/ECG? How soon should they be referred?",
   },
   {
     id: "req-vaccine-flu",
@@ -135,8 +138,10 @@ const EXTRA_REQUESTS: DoctorRequest[] = [
     slaHours: 24,
     tagsLt: ["Skiepai"],
     tagsEn: ["Vaccines"],
-    bodyLt: "Klausė dėl sezono gripo vakcinos po nestiprios slogos.",
-    bodyEn: "Asked about seasonal flu vaccine after a mild cold.",
+    questionLt:
+      "Turiu nestiprią slogą, temperatūros nėra. Ar galima šį sezoną skiepytis nuo gripo?",
+    questionEn:
+      "I have a mild cold, no fever. Is it OK to get the seasonal flu vaccine?",
     replyLt:
       "Jei temperatūros nėra ir savijauta gera — skiepytis galima. Po ūmaus karščiavimo palaukite 48 val.",
     replyEn:
@@ -161,8 +166,10 @@ const EXTRA_REQUESTS: DoctorRequest[] = [
     slaHours: 24,
     tagsLt: ["Receptas", "AKS"],
     tagsEn: ["Rx", "BP"],
-    bodyLt: "Prašymas pratęsti Telmisartan 40 mg be vizito.",
-    bodyEn: "Request to extend Telmisartan 40 mg without a visit.",
+    questionLt:
+      "Prašau pratęsti Telmisartan 40 mg e-receptą 90 dienų be vizito. AKS namuose apie 127/77.",
+    questionEn:
+      "Please extend Telmisartan 40 mg e-prescription for 90 days without a visit. Home BP around 127/77.",
     replyLt: "Pratęsta 90 d. po AKS peržiūros klausimyne (127/77).",
     replyEn: "Extended 90 days after BP review in questionnaire (127/77).",
   },
@@ -185,10 +192,14 @@ const EXTRA_REQUESTS: DoctorRequest[] = [
     slaHours: 48,
     tagsLt: ["Marketplace", "Hormonai"],
     tagsEn: ["Marketplace", "Hormones"],
-    bodyLt: "Klausė, kurį laboratorinį paketą užsisakyti prieš vizitą.",
-    bodyEn: "Asked which lab package to order before the visit.",
-    replyLt: "Rekomenduoju hormonų CORE + feritiną; FULL — jei planuojate nėštumą.",
-    replyEn: "Recommend hormones CORE + ferritin; FULL if pregnancy planning.",
+    questionLt:
+      "Prieš vizitą noriu užsisakyti laboratorinį paketą. Ar tinka hormonų CORE, ar geriau FULL?",
+    questionEn:
+      "Before the visit I want to order a lab package. Is hormones CORE fine, or should I take FULL?",
+    replyLt:
+      "Rekomenduoju hormonų CORE + feritiną; FULL — jei planuojate nėštumą.",
+    replyEn:
+      "Recommend hormones CORE + ferritin; FULL if pregnancy planning.",
   },
 ];
 
@@ -198,11 +209,22 @@ function threadToRequest(
   const last = t.messages[t.messages.length - 1];
   const waiting = last?.from === "patient";
   const answered = last?.from === "doctor";
-  // Older answered threads → history; recent patient-last → active waiting
   const ageDays =
     (Date.now() - new Date(t.lastAt).getTime()) / (1000 * 3600 * 24);
   let status: RequestStatus = waiting ? "waiting" : "answered";
   if (answered && ageDays > 14) status = "closed";
+
+  const patientMsgs = t.messages.filter((m) => m.from === "patient");
+  const lastPatient = patientMsgs[patientMsgs.length - 1];
+  const questionLt =
+    patientMsgs.length > 1
+      ? patientMsgs.map((m) => m.textLt).join("\n\n")
+      : lastPatient?.textLt || t.previewLt;
+  const questionEn =
+    patientMsgs.length > 1
+      ? patientMsgs.map((m) => m.textEn).join("\n\n")
+      : lastPatient?.textEn || t.previewEn;
+
   return {
     id: `chat:${t.id}`,
     patientId: "patient_male",
@@ -224,12 +246,8 @@ function threadToRequest(
     slaHours: 24,
     tagsLt: [t.specialtyLt, "Pokalbiai"],
     tagsEn: [t.specialtyEn, "Chat"],
-    bodyLt: t.messages
-      .map((m) => `${m.from === "patient" ? "Pacientas" : "Gydytojas"}: ${m.textLt}`)
-      .join("\n\n"),
-    bodyEn: t.messages
-      .map((m) => `${m.from === "patient" ? "Patient" : "Doctor"}: ${m.textEn}`)
-      .join("\n\n"),
+    questionLt,
+    questionEn,
     replyLt: answered ? last?.textLt : undefined,
     replyEn: answered ? last?.textEn : undefined,
   };

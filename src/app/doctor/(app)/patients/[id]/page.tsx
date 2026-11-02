@@ -1,10 +1,36 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { and, eq } from "drizzle-orm";
 import { getCurrentUser } from "@/lib/auth/session";
 import { loadDigitalTwin } from "@/lib/health/load-twin";
 import { t, type Locale } from "@/lib/i18n/dictionary";
 import { patientDisplayName } from "@/lib/i18n/patient-name";
-import { COLOUR_HEX, PILL_CLASS } from "@/lib/health/colours";
+import { collectFlaggedLabs } from "@/lib/health/marker-colour";
+import { goalsFromMetrics } from "@/lib/health/goals-from-metrics";
+import type { RiskColour } from "@/lib/health/colours";
+import {
+  formatVisitWhen,
+  upcomingVisits,
+  visitDoctor,
+  visitTitle,
+} from "@/lib/health/demo-visits";
+import { ensureSchema, getDb } from "@/lib/db";
+import { questionnaire, patients } from "@/lib/db/schema";
+import {
+  parseStoredAnswers,
+  questionnaireStorageKey,
+} from "@/lib/health/questionnaire";
+import { buildHealthCard } from "@/lib/health/health-card-data";
+import { DoctorPatientChart } from "@/components/doctor/doctor-patient-chart";
+
+const RANK: Record<RiskColour, number> = {
+  grey: 0,
+  green: 1,
+  badge: 1,
+  yellow: 2,
+  orange: 3,
+  red: 4,
+};
 
 export default async function DoctorPatientChartPage({
   params,
@@ -19,10 +45,95 @@ export default async function DoctorPatientChartPage({
   const twin = loadDigitalTwin(id, locale);
   if (!twin) notFound();
 
+  ensureSchema();
+  const db = getDb();
+  const patientRow = db.select().from(patients).where(eq(patients.id, id)).get();
+  if (!patientRow) notFound();
+
   const name = patientDisplayName(twin.patient.sex, locale);
   const attention = twin.categories
-    .filter((c) => c.colour === "red" || c.colour === "orange")
-    .sort((a, b) => (a.colour === "red" ? -1 : 1));
+    .filter((c) => RANK[c.colour] >= 3)
+    .sort((a, b) => RANK[b.colour] - RANK[a.colour]);
+
+  const mapCategories = twin.categories.map((c) => ({
+    id: c.id,
+    title: labels.categoryNames[c.id] || c.id,
+    colour: c.colour,
+    colourLabel: labels.colourLabels[c.colour],
+    geneticBadge: c.geneticBadge || c.rare.length > 0,
+    geneticMark: labels.geneMarkShort,
+  }));
+
+  const flaggedLabs = collectFlaggedLabs(twin.markers);
+  const steps = attention.map((c) => ({
+    id: c.id,
+    title: labels.categoryNames[c.id] || c.id,
+    why: c.summary,
+    colour: c.colour,
+    href: `/patient/digital-twin/${c.id}`,
+  }));
+
+  const visits = upcomingVisits(3).map((v) => ({
+    id: v.id,
+    when: formatVisitWhen(v, locale),
+    title: visitTitle(v, locale),
+    withWhom: visitDoctor(v, locale),
+    href: `/patient/visits/${v.id}`,
+  }));
+
+  const computedGoals = goalsFromMetrics(twin.markers, locale, 5);
+  const goals =
+    computedGoals.length > 0
+      ? computedGoals.map((g) => ({
+          title: g.title,
+          detail: g.detail,
+          progress: g.progress,
+        }))
+      : locale === "en"
+        ? [
+            {
+              title: "Keep labs and vitals in range",
+              detail: "No out-of-range signals right now — maintain the habit.",
+              progress: 100,
+            },
+          ]
+        : [
+            {
+              title: "Išlaikyti rodiklius normoje",
+              detail: "Šiuo metu nukrypimų nėra — tęskite gerus įpročius.",
+              progress: 100,
+            },
+          ];
+
+  const key = questionnaireStorageKey();
+  const row = db
+    .select()
+    .from(questionnaire)
+    .where(
+      and(eq(questionnaire.patientId, id), eq(questionnaire.key, key))
+    )
+    .get();
+  const answers = parseStoredAnswers(row?.value);
+  const card = buildHealthCard({
+    patientName: name,
+    sex: patientRow.sex,
+    dob: patientRow.dob,
+    answers,
+  });
+
+  const pharmaSnps =
+    twin.categories
+      .find((c) => c.id === "pharmacogenetics")
+      ?.snps.map((s) => ({
+        gene: s.gene,
+        snpId: s.snpId,
+        allele1: s.allele1,
+        allele2: s.allele2,
+        matchCount: s.matchCount,
+        colour: s.colour,
+        genotypeAvailable: s.genotypeAvailable,
+        subcategory: s.subcategory,
+      })) || [];
 
   return (
     <div className="stack" style={{ gap: 16 }}>
@@ -50,53 +161,57 @@ export default async function DoctorPatientChartPage({
         </div>
       </div>
 
-      <section className="card">
-        <div className="card-head">
-          <h3 className="m-0">
-            {locale === "en" ? "Health areas" : "Sveikatos sritys"}
-          </h3>
-        </div>
-        <div className="stack" style={{ gap: 8 }}>
-          {twin.categories.map((c) => (
-            <div
-              key={c.id}
-              className="rounded-md border border-[var(--line)] px-3 py-2"
-              style={{
-                borderLeft: `4px solid ${COLOUR_HEX[c.colour]}`,
-              }}
-            >
-              <div className="flex items-center justify-between gap-2">
-                <b>{labels.categoryNames[c.id] || c.id}</b>
-                <span className={`pill ${PILL_CLASS[c.colour]}`}>
-                  {labels.colourLabels[c.colour]}
-                </span>
-              </div>
-              <p className="small muted m-0 mt-1">{c.summary}</p>
-              <p className="xs muted m-0 mt-1">
-                {locale === "en" ? "Markers" : "Žymenys"}: {c.markers.length} ·
-                SNP: {c.snps.length} · NGS: {c.rare.length}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {attention.length ? (
-        <section className="card">
-          <div className="card-head">
-            <h3 className="m-0">
-              {locale === "en" ? "Needs attention" : "Reikalauja dėmesio"}
-            </h3>
-          </div>
-          <ul className="m-0 pl-5 text-sm">
-            {attention.map((c) => (
-              <li key={c.id} className="mb-2">
-                <b>{labels.categoryNames[c.id]}</b> — {c.summary}
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
+      <DoctorPatientChart
+        locale={locale}
+        labels={labels}
+        overviewLabels={{
+          healthMapTitle: labels.healthMapTitle,
+          cardSummary: labels.cardSummary,
+          categoriesTitle: labels.categoriesTitle,
+          categoriesHint: labels.categoriesHint,
+          geneMarkerHint: labels.geneMarkerHint,
+          geneMarkShort: labels.geneMarkShort,
+          recommendations: labels.recommendations,
+          visits: labels.visits,
+          labs: labels.labs,
+          outOfRange: locale === "en" ? "Out of range" : "Už normos ribų",
+          allInRange:
+            locale === "en"
+              ? "Latest results are within range"
+              : "Visi paskutiniai rezultatai normos ribose",
+          keySteps: locale === "en" ? "Key next steps" : "Svarbiausi žingsniai",
+          allRecommendations:
+            locale === "en" ? "All recommendations" : "Visos rekomendacijos",
+          upcomingVisits:
+            locale === "en" ? "Upcoming visits" : "Artimiausi vizitai",
+          allVisits: locale === "en" ? "All visits" : "Visi vizitai",
+          myGoals: locale === "en" ? "My goals" : "Mano tikslai",
+          myPlan: locale === "en" ? "My plan" : "Mano planas",
+          changePlan: locale === "en" ? "Change plan" : "Keisti planą",
+          noUpcomingVisits:
+            locale === "en" ? "No upcoming visits" : "Būsimų vizitų nėra",
+          goalsProgressHint:
+            locale === "en"
+              ? "Percentages show how close you are to the target: achieved vs still remaining."
+              : "Procentai rodo, kiek jau esate arti tikslo: pasiekta ir kiek dar liko.",
+          goalAchieved: locale === "en" ? "Achieved" : "Pasiekta",
+          goalRemaining: locale === "en" ? "Remaining" : "Liko",
+          colourLabels: labels.colourLabels,
+        }}
+        categories={mapCategories}
+        flaggedLabs={flaggedLabs}
+        steps={steps}
+        visits={visits}
+        goals={goals}
+        planName="Lyfora Care+"
+        planPerks={
+          locale === "en"
+            ? "Unlimited messaging · Priority booking · Twin updates"
+            : "Neriboti klausimai · Prioritetinė registracija · Dvynio atnaujinimai"
+        }
+        card={card}
+        pharmaSnps={pharmaSnps}
+      />
     </div>
   );
 }

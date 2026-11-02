@@ -82,7 +82,7 @@ export default async function DoctorPatientsPage() {
                 </p>
               </div>
               <Link href={`/doctor/patients/${p.id}`} className="btn sm">
-                {locale === "en" ? "Open chart" : "Atidaryti kortelę"}
+                {locale === "en" ? "Patient chart" : "Paciento kortelė"}
               </Link>
             </div>
             <p className="mt-2 text-sm text-[var(--ink-soft)] mb-0">

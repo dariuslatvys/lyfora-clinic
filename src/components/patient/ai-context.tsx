@@ -15,13 +15,25 @@ type AiContextValue = {
   draft: string;
   ask: (question: string) => void;
   clearDraft: () => void;
+  patientId: string | null;
+  setPatientId: (id: string | null) => void;
+  apiPath: string;
 };
 
 const AiContext = createContext<AiContextValue | null>(null);
 
-export function AiProvider({ children }: { children: ReactNode }) {
+export function AiProvider({
+  children,
+  apiPath = "/api/patient/ai",
+  initialPatientId = null,
+}: {
+  children: ReactNode;
+  apiPath?: string;
+  initialPatientId?: string | null;
+}) {
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState("");
+  const [patientId, setPatientId] = useState<string | null>(initialPatientId);
 
   const ask = useCallback((question: string) => {
     setDraft(question);
@@ -31,8 +43,17 @@ export function AiProvider({ children }: { children: ReactNode }) {
   const clearDraft = useCallback(() => setDraft(""), []);
 
   const value = useMemo(
-    () => ({ open, setOpen, draft, ask, clearDraft }),
-    [open, draft, ask, clearDraft]
+    () => ({
+      open,
+      setOpen,
+      draft,
+      ask,
+      clearDraft,
+      patientId,
+      setPatientId,
+      apiPath,
+    }),
+    [open, draft, ask, clearDraft, patientId, apiPath]
   );
 
   return <AiContext.Provider value={value}>{children}</AiContext.Provider>;

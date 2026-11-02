@@ -256,7 +256,7 @@ export function runDoctorSearch(input: {
       } · ${requestStatusLabel(r.status, locale)}`,
       href: `/doctor/requests?id=${encodeURIComponent(r.id)}`,
       hay: normalizeSearchText(
-        `${r.subjectLt} ${r.subjectEn} ${r.previewLt} ${r.previewEn} ${r.bodyLt} ${r.bodyEn} ${r.patientNameLt} ${r.tagsLt.join(" ")} uzklausa`
+        `${r.subjectLt} ${r.subjectEn} ${r.previewLt} ${r.previewEn} ${r.questionLt} ${r.questionEn} ${r.patientNameLt} ${r.tagsLt.join(" ")} uzklausa`
       ),
     });
   }

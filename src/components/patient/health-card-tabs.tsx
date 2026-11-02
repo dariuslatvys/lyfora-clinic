@@ -50,11 +50,14 @@ export function HealthCardTabs({
   labels,
   card,
   pharmaSnps = [],
+  readOnly = false,
 }: {
   locale: "lt" | "en";
   labels: Dictionary;
   card: HealthCardModel;
   pharmaSnps?: PharmaSnpRow[];
+  /** Hide patient-only questionnaire CTA (doctor chart). */
+  readOnly?: boolean;
 }) {
   const [tab, setTab] = useState<HealthCardTabId>("sum");
 
@@ -87,9 +90,11 @@ export function HealthCardTabs({
           </h1>
           <p className="small muted mt-1 mb-0">{headMeta}</p>
         </div>
-        <Link href="/patient/health-card/questionnaire" className="btn ghost sm">
-          {locale === "en" ? "Questionnaire" : "Klausimynas"}
-        </Link>
+        {!readOnly ? (
+          <Link href="/patient/health-card/questionnaire" className="btn ghost sm">
+            {locale === "en" ? "Questionnaire" : "Klausimynas"}
+          </Link>
+        ) : null}
       </div>
 
       <div

@@ -62,6 +62,8 @@ export function OverviewPanels({
   goals,
   planName,
   planPerks,
+  mode = "full",
+  interactive = true,
 }: {
   locale: "lt" | "en";
   labels: Labels;
@@ -72,254 +74,353 @@ export function OverviewPanels({
   goals: { title: string; detail?: string; progress: number; href?: string }[];
   planName: string;
   planPerks: string;
+  /** "summary" shows only the Santrauka panel (no health-map tabs). */
+  mode?: "full" | "summary";
+  /** When false, tiles and rows render without patient-portal links. */
+  interactive?: boolean;
 }) {
-  const [tab, setTab] = useState<"map" | "summary">("map");
+  const [tab, setTab] = useState<"map" | "summary">(
+    mode === "summary" ? "summary" : "map"
+  );
+  const showSummary = mode === "summary" || tab === "summary";
 
   return (
     <section className="stack overview-section" style={{ gap: 12 }}>
-      <div className="tabs overview-tabs" role="tablist" aria-label={labels.healthMapTitle}>
-        <button
-          type="button"
-          role="tab"
-          className={tab === "map" ? "on" : undefined}
-          aria-selected={tab === "map"}
-          onClick={() => setTab("map")}
+      {mode === "full" ? (
+        <div
+          className="tabs overview-tabs"
+          role="tablist"
+          aria-label={labels.healthMapTitle}
         >
-          {labels.healthMapTitle}
-        </button>
-        <button
-          type="button"
-          role="tab"
-          className={tab === "summary" ? "on" : undefined}
-          aria-selected={tab === "summary"}
-          onClick={() => setTab("summary")}
-        >
-          {labels.cardSummary}
-        </button>
-      </div>
+          <button
+            type="button"
+            role="tab"
+            className={tab === "map" ? "on" : undefined}
+            aria-selected={tab === "map"}
+            onClick={() => setTab("map")}
+          >
+            {labels.healthMapTitle}
+          </button>
+          <button
+            type="button"
+            role="tab"
+            className={tab === "summary" ? "on" : undefined}
+            aria-selected={tab === "summary"}
+            onClick={() => setTab("summary")}
+          >
+            {labels.cardSummary}
+          </button>
+        </div>
+      ) : null}
 
-      {tab === "map" ? (
+      {!showSummary ? (
         <BodyMap
           categories={categories}
           geneHint={labels.geneMarkerHint}
           centerLabel="Lyfora"
         />
       ) : (
-        <div className="stack overview-summary" style={{ gap: 14 }}>
-          <div className="row between" style={{ alignItems: "baseline" }}>
-            <h3 className="overview-subhead">{labels.categoriesTitle}</h3>
-            <span className="small muted">{labels.categoriesHint}</span>
-          </div>
-          <div className="cats">
-            {categories.map((c) => (
-              <CategoryCard
-                key={c.id}
-                id={c.id}
-                title={c.title}
-                colour={c.colour}
-                colourLabel={c.colourLabel}
-                geneticBadge={!!c.geneticBadge}
-                geneticMark={c.geneticMark || labels.geneMarkShort}
-              />
-            ))}
-          </div>
-
-          <div className="grid g-main">
-            <div className="stack" style={{ gap: 12 }}>
-              <section className="card">
-                <div className="card-head">
-                  <h2>{labels.keySteps}</h2>
-                  <Link href="/patient/recommendations" className="link">
-                    {labels.allRecommendations} ({steps.length})
-                  </Link>
-                </div>
-                <div className="stack" style={{ gap: 10 }}>
-                  {steps.slice(0, 3).map((s) => (
-                    <Link
-                      key={s.id}
-                      href={s.href}
-                      className="rec"
-                      style={{ ["--cc" as string]: `var(--r-${s.colour === "grey" ? "none" : s.colour})` }}
-                    >
-                      <div className="row between nowrap" style={{ alignItems: "flex-start" }}>
-                        <h3>{s.title}</h3>
-                        <span className={`pill ${PILL_CLASS[s.colour]}`}>
-                          {labels.colourLabels[s.colour]}
-                        </span>
-                      </div>
-                      <p className="small" style={{ color: "var(--ink-soft)", margin: 0 }}>
-                        {s.why}
-                      </p>
-                    </Link>
-                  ))}
-                </div>
-              </section>
-
-              <section className="card">
-                <div className="card-head">
-                  <h2>{labels.upcomingVisits}</h2>
-                  <Link href="/patient/visits" className="link">
-                    {labels.allVisits}
-                  </Link>
-                </div>
-                {visits.length ? (
-                  <div className="list">
-                    {visits.map((v) => (
-                      <Link
-                        key={v.id}
-                        href={v.href}
-                        className="li click"
-                      >
-                        <div className="grow">
-                          <b>{v.title}</b>
-                          <span className="xs muted">{v.withWhom}</span>
-                        </div>
-                        <span className="small muted">{v.when}</span>
-                      </Link>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="empty">{labels.noUpcomingVisits}</div>
-                )}
-              </section>
-            </div>
-
-            <div className="stack" style={{ gap: 12 }}>
-              <section className="card">
-                <div className="card-head">
-                  <h2>{labels.outOfRange}</h2>
-                  <Link href="/patient/labs" className="link">
-                    {locale === "en" ? "All labs" : "Visi tyrimai"}
-                  </Link>
-                </div>
-                {flaggedLabs.length ? (
-                  <div className="list">
-                    {flaggedLabs.slice(0, 5).map((m) => (
-                      <Link
-                        key={m.markerKey}
-                        href={`/patient/marker/${encodeURIComponent(m.markerKey)}`}
-                        className="li click"
-                      >
-                        <div className="grow">
-                          <b>{m.name}</b>
-                          <span className="xs muted">
-                            {new Date(m.observedAt).toLocaleDateString(
-                              locale === "en" ? "en-GB" : "lt-LT"
-                            )}
-                          </span>
-                        </div>
-                        <div style={{ textAlign: "right" }}>
-                          <b className="num">
-                            {formatMarkerReading(
-                              m.value,
-                              m.unit,
-                              m.markerKey
-                            )}
-                          </b>
-                          <div>
-                            <span className={`pill ${PILL_CLASS[m.colour]}`}>
-                              {labels.colourLabels[m.colour]}
-                            </span>
-                          </div>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="empty">{labels.allInRange}</div>
-                )}
-              </section>
-
-              <section className="card">
-                <div className="card-head">
-                  <h2>{labels.myGoals}</h2>
-                </div>
-                <p className="xs muted" style={{ margin: "0 0 10px" }}>
-                  {labels.goalsProgressHint}
-                </p>
-                <div className="stack" style={{ gap: 12 }}>
-                  {goals.map((g) => {
-                    const done = g.progress >= 100;
-                    const left = Math.max(0, 100 - g.progress);
-                    const body = (
-                      <>
-                        <div className="row between" style={{ gap: 10, alignItems: "flex-start" }}>
-                          <span className="small" style={{ flex: 1 }}>
-                            {g.title}
-                          </span>
-                          <div className="goal-pct">
-                            {done ? (
-                              <>
-                                <span className="goal-pct-label">
-                                  {labels.goalAchieved}
-                                </span>
-                                <b className="num">100 %</b>
-                              </>
-                            ) : (
-                              <div className="goal-pct-pair">
-                                <div>
-                                  <span className="goal-pct-label">
-                                    {labels.goalAchieved}
-                                  </span>
-                                  <b className="num">{g.progress} %</b>
-                                </div>
-                                <div>
-                                  <span className="goal-pct-label">
-                                    {labels.goalRemaining}
-                                  </span>
-                                  <b className="num muted-num">{left} %</b>
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        {g.detail ? (
-                          <p
-                            className="xs muted"
-                            style={{ margin: "4px 0 0" }}
-                          >
-                            {g.detail}
-                          </p>
-                        ) : null}
-                        <div className="progress" style={{ marginTop: 6 }}>
-                          <i style={{ width: `${Math.min(100, g.progress)}%` }} />
-                        </div>
-                      </>
-                    );
-                    return g.href ? (
-                      <Link
-                        key={g.title}
-                        href={g.href}
-                        className="goal-link"
-                      >
-                        {body}
-                      </Link>
-                    ) : (
-                      <div key={g.title}>{body}</div>
-                    );
-                  })}
-                </div>
-              </section>
-
-              <section className="card">
-                <div className="card-head">
-                  <h2>{labels.myPlan}</h2>
-                  <span className="pill plain c-acc">{planName}</span>
-                </div>
-                <p className="small muted" style={{ margin: 0 }}>
-                  {planPerks}
-                </p>
-                <div className="row" style={{ marginTop: 10 }}>
-                  <Link href="/patient/marketplace" className="btn sm ghost">
-                    {labels.changePlan}
-                  </Link>
-                </div>
-              </section>
-            </div>
-          </div>
-        </div>
+        <OverviewSummaryContent
+          locale={locale}
+          labels={labels}
+          categories={categories}
+          flaggedLabs={flaggedLabs}
+          steps={steps}
+          visits={visits}
+          goals={goals}
+          planName={planName}
+          planPerks={planPerks}
+          interactive={interactive}
+        />
       )}
     </section>
+  );
+}
+
+function OverviewSummaryContent({
+  locale,
+  labels,
+  categories,
+  flaggedLabs,
+  steps,
+  visits,
+  goals,
+  planName,
+  planPerks,
+  interactive,
+}: {
+  locale: "lt" | "en";
+  labels: Labels;
+  categories: BodyMapCategory[];
+  flaggedLabs: OverviewFlaggedLab[];
+  steps: OverviewStep[];
+  visits: OverviewVisit[];
+  goals: { title: string; detail?: string; progress: number; href?: string }[];
+  planName: string;
+  planPerks: string;
+  interactive: boolean;
+}) {
+  return (
+    <div className="stack overview-summary" style={{ gap: 14 }}>
+      <div className="row between" style={{ alignItems: "baseline" }}>
+        <h3 className="overview-subhead">{labels.categoriesTitle}</h3>
+        <span className="small muted">{labels.categoriesHint}</span>
+      </div>
+      <div className="cats">
+        {categories.map((c) => (
+          <CategoryCard
+            key={c.id}
+            id={c.id}
+            title={c.title}
+            colour={c.colour}
+            colourLabel={c.colourLabel}
+            geneticBadge={!!c.geneticBadge}
+            geneticMark={c.geneticMark || labels.geneMarkShort}
+            href={interactive ? undefined : null}
+          />
+        ))}
+      </div>
+
+      <div className="grid g-main">
+        <div className="stack" style={{ gap: 12 }}>
+          <section className="card">
+            <div className="card-head">
+              <h2>{labels.keySteps}</h2>
+              {interactive ? (
+                <Link href="/patient/recommendations" className="link">
+                  {labels.allRecommendations} ({steps.length})
+                </Link>
+              ) : (
+                <span className="small muted">
+                  {labels.allRecommendations} ({steps.length})
+                </span>
+              )}
+            </div>
+            <div className="stack" style={{ gap: 10 }}>
+              {steps.slice(0, 3).map((s) => {
+                const inner = (
+                  <>
+                    <div
+                      className="row between nowrap"
+                      style={{ alignItems: "flex-start" }}
+                    >
+                      <h3>{s.title}</h3>
+                      <span className={`pill ${PILL_CLASS[s.colour]}`}>
+                        {labels.colourLabels[s.colour]}
+                      </span>
+                    </div>
+                    <p
+                      className="small"
+                      style={{ color: "var(--ink-soft)", margin: 0 }}
+                    >
+                      {s.why}
+                    </p>
+                  </>
+                );
+                const style = {
+                  ["--cc" as string]: `var(--r-${s.colour === "grey" ? "none" : s.colour})`,
+                };
+                return interactive ? (
+                  <Link
+                    key={s.id}
+                    href={s.href}
+                    className="rec"
+                    style={style}
+                  >
+                    {inner}
+                  </Link>
+                ) : (
+                  <div key={s.id} className="rec" style={style}>
+                    {inner}
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+
+          <section className="card">
+            <div className="card-head">
+              <h2>{labels.upcomingVisits}</h2>
+              {interactive ? (
+                <Link href="/patient/visits" className="link">
+                  {labels.allVisits}
+                </Link>
+              ) : null}
+            </div>
+            {visits.length ? (
+              <div className="list">
+                {visits.map((v) => {
+                  const inner = (
+                    <>
+                      <div className="grow">
+                        <b>{v.title}</b>
+                        <span className="xs muted">{v.withWhom}</span>
+                      </div>
+                      <span className="small muted">{v.when}</span>
+                    </>
+                  );
+                  return interactive ? (
+                    <Link key={v.id} href={v.href} className="li click">
+                      {inner}
+                    </Link>
+                  ) : (
+                    <div key={v.id} className="li">
+                      {inner}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="empty">{labels.noUpcomingVisits}</div>
+            )}
+          </section>
+        </div>
+
+        <div className="stack" style={{ gap: 12 }}>
+          <section className="card">
+            <div className="card-head">
+              <h2>{labels.outOfRange}</h2>
+              {interactive ? (
+                <Link href="/patient/labs" className="link">
+                  {locale === "en" ? "All labs" : "Visi tyrimai"}
+                </Link>
+              ) : null}
+            </div>
+            {flaggedLabs.length ? (
+              <div className="list">
+                {flaggedLabs.slice(0, 5).map((m) => {
+                  const inner = (
+                    <>
+                      <div className="grow">
+                        <b>{m.name}</b>
+                        <span className="xs muted">
+                          {new Date(m.observedAt).toLocaleDateString(
+                            locale === "en" ? "en-GB" : "lt-LT"
+                          )}
+                        </span>
+                      </div>
+                      <div style={{ textAlign: "right" }}>
+                        <b className="num">
+                          {formatMarkerReading(
+                            m.value,
+                            m.unit,
+                            m.markerKey
+                          )}
+                        </b>
+                        <div>
+                          <span className={`pill ${PILL_CLASS[m.colour]}`}>
+                            {labels.colourLabels[m.colour]}
+                          </span>
+                        </div>
+                      </div>
+                    </>
+                  );
+                  return interactive ? (
+                    <Link
+                      key={m.markerKey}
+                      href={`/patient/marker/${encodeURIComponent(m.markerKey)}`}
+                      className="li click"
+                    >
+                      {inner}
+                    </Link>
+                  ) : (
+                    <div key={m.markerKey} className="li">
+                      {inner}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="empty">{labels.allInRange}</div>
+            )}
+          </section>
+
+          <section className="card">
+            <div className="card-head">
+              <h2>{labels.myGoals}</h2>
+            </div>
+            <p className="xs muted" style={{ margin: "0 0 10px" }}>
+              {labels.goalsProgressHint}
+            </p>
+            <div className="stack" style={{ gap: 12 }}>
+              {goals.map((g) => {
+                const done = g.progress >= 100;
+                const left = Math.max(0, 100 - g.progress);
+                const body = (
+                  <>
+                    <div
+                      className="row between"
+                      style={{ gap: 10, alignItems: "flex-start" }}
+                    >
+                      <span className="small" style={{ flex: 1 }}>
+                        {g.title}
+                      </span>
+                      <div className="goal-pct">
+                        {done ? (
+                          <>
+                            <span className="goal-pct-label">
+                              {labels.goalAchieved}
+                            </span>
+                            <b className="num">100 %</b>
+                          </>
+                        ) : (
+                          <div className="goal-pct-pair">
+                            <div>
+                              <span className="goal-pct-label">
+                                {labels.goalAchieved}
+                              </span>
+                              <b className="num">{g.progress} %</b>
+                            </div>
+                            <div>
+                              <span className="goal-pct-label">
+                                {labels.goalRemaining}
+                              </span>
+                              <b className="num muted-num">{left} %</b>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    {g.detail ? (
+                      <p className="xs muted" style={{ margin: "4px 0 0" }}>
+                        {g.detail}
+                      </p>
+                    ) : null}
+                    <div className="progress" style={{ marginTop: 6 }}>
+                      <i style={{ width: `${Math.min(100, g.progress)}%` }} />
+                    </div>
+                  </>
+                );
+                return interactive && g.href ? (
+                  <Link key={g.title} href={g.href} className="goal-link">
+                    {body}
+                  </Link>
+                ) : (
+                  <div key={g.title}>{body}</div>
+                );
+              })}
+            </div>
+          </section>
+
+          <section className="card">
+            <div className="card-head">
+              <h2>{labels.myPlan}</h2>
+              <span className="pill plain c-acc">{planName}</span>
+            </div>
+            <p className="small muted" style={{ margin: 0 }}>
+              {planPerks}
+            </p>
+            {interactive ? (
+              <div className="row" style={{ marginTop: 10 }}>
+                <Link href="/patient/marketplace" className="btn sm ghost">
+                  {labels.changePlan}
+                </Link>
+              </div>
+            ) : null}
+          </section>
+        </div>
+      </div>
+    </div>
   );
 }
 

@@ -4833,6 +4833,37 @@ a.hc-kpi.clickable:hover {
   margin-top: 10px;
 }
 
+.doctor-req-question {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--accent) 6%, var(--surface));
+  padding: 12px 14px;
+}
+
+.doctor-req-reply {
+  display: block;
+  width: 100%;
+  min-height: 220px;
+  resize: vertical;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  line-height: 1.45;
+  padding: 12px 14px;
+}
+
+.doctor-req-reply:focus {
+  outline: 2px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  outline-offset: 1px;
+  border-color: var(--accent);
+}
+
+.doctor-req-detail .card-head {
+  align-items: flex-start;
+}
+
 .doctor-signal-row {
   display: flex;
   gap: 12px;

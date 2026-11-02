@@ -22,15 +22,27 @@ export function AiDrawer({
   locale: "lt" | "en";
   patientName: string;
 }) {
-  const { open, setOpen, draft, clearDraft } = useAi();
+  const { open, setOpen, draft, clearDraft, apiPath, patientId } = useAi();
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const bodyRef = useRef<HTMLDivElement>(null);
   const busyRef = useRef(false);
+  const isDoctor = apiPath.includes("/doctor/");
 
-  const starters =
-    locale === "en"
+  const starters = isDoctor
+    ? locale === "en"
+      ? [
+          "Summarise this patient's open risks",
+          "Draft a reply about out-of-range labs",
+          "What genetic findings need clinical follow-up?",
+        ]
+      : [
+          "Apibendrink šio paciento atvirus rizikos signalus",
+          "Paruošk atsakymą dėl tyrimų už normos",
+          "Kurie genetiniai radiniai reikalauja klinikinės kontrolės?",
+        ]
+    : locale === "en"
       ? [
           "Explain my health overview in plain language",
           "What do my genetic findings mean?",
@@ -51,10 +63,12 @@ export function AiDrawer({
       setInput("");
       setMsgs((m) => [...m, { role: "user", text: message }]);
       try {
-        const res = await fetch("/api/patient/ai", {
+        const payload: { message: string; patientId?: string } = { message };
+        if (isDoctor && patientId) payload.patientId = patientId;
+        const res = await fetch(apiPath, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message }),
+          body: JSON.stringify(payload),
         });
         if (!res.ok) throw new Error("fail");
         const data = (await res.json()) as {
@@ -81,7 +95,7 @@ export function AiDrawer({
         setBusy(false);
       }
     },
-    [locale]
+    [locale, apiPath, patientId, isDoctor]
   );
 
   useEffect(() => {
@@ -103,11 +117,15 @@ export function AiDrawer({
     <aside className="ai" aria-label={locale === "en" ? "AI assistant" : "AI asistentas"}>
       <div className="ai-head">
         <div style={{ minWidth: 0, flex: 1 }}>
-          <b>{locale === "en" ? "Lyfora AI" : "Lyfora AI"}</b>
+          <b>Lyfora AI</b>
           <div className="ai-ctx">
-            {locale === "en"
-              ? `Context: ${patientName} · based on your card`
-              : `Kontekstas: ${patientName} · pagal jūsų kortelę`}
+            {isDoctor
+              ? locale === "en"
+                ? `Clinician assist · ${patientName}`
+                : `Gydytojo asistentas · ${patientName}`
+              : locale === "en"
+                ? `Context: ${patientName} · based on your card`
+                : `Kontekstas: ${patientName} · pagal jūsų kortelę`}
           </div>
         </div>
         <button
@@ -126,9 +144,13 @@ export function AiDrawer({
         {msgs.length === 0 && (
           <div className="starters">
             <p className="small muted">
-              {locale === "en"
-                ? "Ask in plain language. I use your Lyfora data and never give diagnoses."
-                : "Klauskite paprasta kalba. Remiuosi jūsų Lyfora duomenimis ir niekada neduodu diagnozių."}
+              {isDoctor
+                ? locale === "en"
+                  ? "Draft replies and review chart signals. Never invent diagnoses."
+                  : "Ruoškite atsakymus ir peržiūrėkite kortelės signalus. Negalvokite diagnozių."
+                : locale === "en"
+                  ? "Ask in plain language. I use your Lyfora data and never give diagnoses."
+                  : "Klauskite paprasta kalba. Remiuosi jūsų Lyfora duomenimis ir niekada neduodu diagnozių."}
             </p>
             {starters.map((s) => (
               <button

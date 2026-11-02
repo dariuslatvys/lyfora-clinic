@@ -10,6 +10,8 @@ import {
   requestStatusLabel,
   type DoctorRequest,
 } from "@/lib/doctor/doctor-requests";
+import { AskAiButton } from "@/components/patient/ask-ai-button";
+import { useAi } from "@/components/patient/ai-context";
 
 export function DoctorRequestsView({ locale }: { locale: "lt" | "en" }) {
   const sp = useSearchParams();
@@ -47,12 +49,18 @@ export function DoctorRequestsView({ locale }: { locale: "lt" | "en" }) {
           history: "History",
           emptyActive: "No active requests.",
           emptyHistory: "No historical requests yet.",
-          openChart: "Open chart",
-          reply: "Latest reply",
-          body: "Details",
+          openChart: "Patient chart",
+          reply: "Your reply",
+          question: "Patient question",
           sla: "SLA",
           channel: "Channel",
           priority: "Priority",
+          draftPlaceholder: "Write your reply to the patient…",
+          send: "Send reply",
+          sent: "Reply saved (demo)",
+          askAi: "Ask AI",
+          draftAi: "AI draft",
+          drafting: "Drafting…",
         }
       : {
           eyebrow: "Konsultacijos raštu",
@@ -63,12 +71,18 @@ export function DoctorRequestsView({ locale }: { locale: "lt" | "en" }) {
           history: "Istorinės",
           emptyActive: "Aktyvių užklausų nėra.",
           emptyHistory: "Istorinių užklausų dar nėra.",
-          openChart: "Atidaryti kortelę",
-          reply: "Paskutinis atsakymas",
-          body: "Detalės",
+          openChart: "Paciento kortelė",
+          reply: "Jūsų atsakymas",
+          question: "Paciento klausimas",
           sla: "SLA",
           channel: "Kanalas",
           priority: "Prioritetas",
+          draftPlaceholder: "Įrašykite atsakymą pacientui…",
+          send: "Siųsti atsakymą",
+          sent: "Atsakymas išsaugotas (demo)",
+          askAi: "Ask AI",
+          draftAi: "AI juodraštis",
+          drafting: "Ruošiama…",
         };
 
   return (
@@ -146,7 +160,12 @@ export function DoctorRequestsView({ locale }: { locale: "lt" | "en" }) {
                       {" · "}
                       {new Date(r.updatedAt).toLocaleString(
                         locale === "en" ? "en-GB" : "lt-LT",
-                        { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }
+                        {
+                          month: "short",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        }
                       )}
                     </span>
                   </div>
@@ -187,14 +206,63 @@ function RequestDetail({
   copy: {
     openChart: string;
     reply: string;
-    body: string;
+    question: string;
     sla: string;
     channel: string;
     priority: string;
+    draftPlaceholder: string;
+    send: string;
+    sent: string;
+    askAi: string;
+    draftAi: string;
+    drafting: string;
   };
 }) {
+  const { setPatientId } = useAi();
+  const question = locale === "en" ? r.questionEn : r.questionLt;
+  const initial =
+    (locale === "en" ? r.replyEn : r.replyLt) || "";
+  const [reply, setReply] = useState(initial);
+  const [sent, setSent] = useState(false);
+  const [drafting, setDrafting] = useState(false);
+
+  useEffect(() => {
+    setReply((locale === "en" ? r.replyEn : r.replyLt) || "");
+    setSent(false);
+    setPatientId(r.patientId);
+  }, [r.id, r.replyEn, r.replyLt, r.patientId, locale, setPatientId]);
+
+  const closed = r.status === "answered" || r.status === "closed";
+
+  const aiPrompt =
+    locale === "en"
+      ? `Draft a concise clinician reply to this patient question (patient ${locale === "en" ? r.patientNameEn : r.patientNameLt}). Use the patient's chart. Do not invent diagnoses.\n\nPatient question:\n${question}`
+      : `Paruošk glaustą gydytojo atsakymą į šį paciento klausimą (pacientas ${r.patientNameLt}). Remkis paciento kortele. Negalvok diagnozių.\n\nPaciento klausimas:\n${question}`;
+
+  async function draftWithAi() {
+    if (drafting) return;
+    setDrafting(true);
+    try {
+      const res = await fetch("/api/doctor/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: aiPrompt,
+          patientId: r.patientId,
+        }),
+      });
+      if (!res.ok) throw new Error("fail");
+      const data = (await res.json()) as { reply: string };
+      if (data.reply) setReply(data.reply);
+    } catch {
+      /* keep current draft */
+    } finally {
+      setDrafting(false);
+    }
+  }
+
   return (
-    <section className="card">
+    <section className="card doctor-req-detail">
       <div className="card-head">
         <div>
           <h3 className="m-0">
@@ -247,19 +315,58 @@ function RequestDetail({
         ))}
       </div>
 
-      <p className="eyebrow mt-4 mb-2">{copy.body}</p>
-      <p className="small m-0 whitespace-pre-wrap text-[var(--ink-soft)]">
-        {locale === "en" ? r.bodyEn : r.bodyLt}
-      </p>
+      <p className="eyebrow mt-4 mb-2">{copy.question}</p>
+      <div className="doctor-req-question">
+        <p className="small m-0 whitespace-pre-wrap text-[var(--ink-soft)]">
+          {question}
+        </p>
+      </div>
 
-      {r.replyLt || r.replyEn ? (
-        <>
-          <p className="eyebrow mt-4 mb-2">{copy.reply}</p>
-          <p className="small m-0 rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 py-2 whitespace-pre-wrap">
-            {locale === "en" ? r.replyEn : r.replyLt}
-          </p>
-        </>
-      ) : null}
+      <div className="row between mt-4 mb-2" style={{ alignItems: "center" }}>
+        <p className="eyebrow m-0">{copy.reply}</p>
+        <div className="row" style={{ gap: 8 }}>
+          <button
+            type="button"
+            className="btn ghost sm"
+            disabled={drafting || closed}
+            onClick={() => void draftWithAi()}
+          >
+            {drafting ? copy.drafting : copy.draftAi}
+          </button>
+          <AskAiButton label={copy.askAi} question={aiPrompt} />
+        </div>
+      </div>
+
+      <textarea
+        className="doctor-req-reply"
+        value={reply}
+        onChange={(e) => {
+          setReply(e.target.value);
+          setSent(false);
+        }}
+        placeholder={copy.draftPlaceholder}
+        rows={10}
+        disabled={closed && !r.replyLt && !r.replyEn}
+        aria-label={copy.reply}
+      />
+
+      <div className="row mt-3" style={{ gap: 10, alignItems: "center" }}>
+        {!closed || reply ? (
+          <button
+            type="button"
+            className="btn"
+            disabled={!reply.trim()}
+            onClick={() => setSent(true)}
+          >
+            {copy.send}
+          </button>
+        ) : null}
+        {sent ? (
+          <span className="small" style={{ color: "var(--r-green)" }}>
+            {copy.sent}
+          </span>
+        ) : null}
+      </div>
 
       <p className="xs muted mt-4 mb-0">
         {locale === "en" ? "Updated" : "Atnaujinta"}:{" "}

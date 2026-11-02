@@ -17,6 +17,7 @@ export function CategoryCard({
   colourLabel,
   geneticBadge,
   geneticMark = "DNR",
+  href,
 }: {
   id: string;
   title: string;
@@ -28,13 +29,15 @@ export function CategoryCard({
   snpMatches?: number;
   geneticBadge: boolean;
   geneticMark?: string;
+  /** Pass null to render a non-link tile (e.g. doctor read-only chart). */
+  href?: string | null;
 }) {
-  return (
-    <Link
-      href={`/patient/digital-twin/${id}`}
-      className="cat"
-      style={{ ["--cc" as string]: CSS_VAR[colour] }}
-    >
+  const resolvedHref =
+    href === null ? null : href ?? `/patient/digital-twin/${id}`;
+  const className = "cat";
+  const style = { ["--cc" as string]: CSS_VAR[colour] };
+  const body = (
+    <>
       <b>{title}</b>
       <div className="st">
         <span>{colourLabel}</span>
@@ -44,6 +47,20 @@ export function CategoryCard({
           </span>
         ) : null}
       </div>
+    </>
+  );
+
+  if (!resolvedHref) {
+    return (
+      <div className={className} style={style}>
+        {body}
+      </div>
+    );
+  }
+
+  return (
+    <Link href={resolvedHref} className={className} style={style}>
+      {body}
     </Link>
   );
 }

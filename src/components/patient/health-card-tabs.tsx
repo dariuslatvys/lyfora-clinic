@@ -51,6 +51,7 @@ export function HealthCardTabs({
   card,
   pharmaSnps = [],
   readOnly = false,
+  initialTab = "sum",
 }: {
   locale: "lt" | "en";
   labels: Dictionary;
@@ -58,8 +59,9 @@ export function HealthCardTabs({
   pharmaSnps?: PharmaSnpRow[];
   /** Hide patient-only questionnaire CTA (doctor chart). */
   readOnly?: boolean;
+  initialTab?: HealthCardTabId;
 }) {
-  const [tab, setTab] = useState<HealthCardTabId>("sum");
+  const [tab, setTab] = useState<HealthCardTabId>(initialTab);
 
   const headMeta = useMemo(() => {
     const sex = locale === "en" ? card.sexEn : card.sexLt;
@@ -133,6 +135,22 @@ export function HealthCardTabs({
       {tab === "docs" ? <DocsPane locale={locale} card={card} /> : null}
     </div>
   );
+}
+
+function isFileHref(href: string) {
+  return (
+    href.startsWith("/demo/") ||
+    href.startsWith("/docs/") ||
+    href.endsWith(".pdf") ||
+    href.endsWith(".jpg") ||
+    href.endsWith(".jpeg") ||
+    href.endsWith(".png") ||
+    href.endsWith(".webp")
+  );
+}
+
+function isImageHref(href: string) {
+  return /\.(jpg|jpeg|png|webp)$/i.test(href);
 }
 
 function SummaryPane({
@@ -282,94 +300,30 @@ function SummaryPane({
           <div className="list mt-2">
             {card.conditions.map((c, i) => {
               const rowKey = `${c.code}-${c.since}-${c.nameEn}-${i}`;
-              const body = (
-                <>
-                  <span className="mono small" style={{ width: 56 }}>
-                    {c.code}
-                  </span>
-                  <span className="grow small">
-                    {locale === "en" ? c.nameEn : c.nameLt}
-                  </span>
-                  <span
-                    className={`pill ${
-                      c.statusEn === "active" ? "c-yellow" : "c-none"
-                    }`}
-                  >
-                    {locale === "en" ? c.statusEn : c.statusLt}
-                  </span>
-                </>
-              );
-              return c.href ? (
-                <Link key={rowKey} href={c.href} className="li click">
-                  {body}
-                </Link>
-              ) : (
-                <div key={rowKey} className="li">
-                  {body}
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      </div>
-    </div>
-  );
-}
-
-function DiagnosesPane({
-  locale,
-  card,
-}: {
-  locale: "lt" | "en";
-  card: HealthCardModel;
-}) {
-  return (
-    <div className="stack" style={{ gap: 12 }}>
-      <section className="card">
-        <div className="overflow-x-auto">
-          <table className="labs-table">
-            <thead>
-              <tr>
-                <th>{locale === "en" ? "Code (ICD-10)" : "Kodas (TLK-10)"}</th>
-                <th>{locale === "en" ? "Diagnosis" : "Diagnozė"}</th>
-                <th>{locale === "en" ? "Since" : "Nuo"}</th>
-                <th>{locale === "en" ? "Status" : "Būsena"}</th>
-                <th>{locale === "en" ? "Links" : "Nuorodos"}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {card.conditions.map((c, i) => (
-                <tr key={`${c.code}-${c.since}-${c.nameEn}-${i}`}>
-                  <td className="mono">{c.code}</td>
-                  <td>
-                    {c.href ? (
-                      <Link href={c.href} className="hc-inline-link">
-                        {locale === "en" ? c.nameEn : c.nameLt}
-                      </Link>
-                    ) : locale === "en" ? (
-                      c.nameEn
-                    ) : (
-                      c.nameLt
-                    )}
-                  </td>
-                  <td className="num">{c.since}</td>
-                  <td>
+              const links = c.links || [];
+              return (
+                <div key={rowKey} className="stack" style={{ gap: 6 }}>
+                  <div className="li">
+                    <span className="mono small" style={{ width: 56 }}>
+                      {c.code}
+                    </span>
+                    <span className="grow small">
+                      {locale === "en" ? c.nameEn : c.nameLt}
+                    </span>
                     <span
                       className={`pill ${
-                        c.statusEn === "active" ? "c-yellow" : "c-none"
+                        c.statusEn === "active" || c.statusEn === "chronic"
+                          ? "c-yellow"
+                          : "c-none"
                       }`}
                     >
                       {locale === "en" ? c.statusEn : c.statusLt}
                     </span>
-                  </td>
-                  <td className="small">
-                    <div className="hc-link-row">
-                      {(c.links || []).map((l) =>
-                        l.href.startsWith("/demo/") ||
-                        l.href.startsWith("/docs/") ||
-                        l.href.endsWith(".pdf") ||
-                        l.href.endsWith(".jpg") ||
-                        l.href.endsWith(".png") ? (
+                  </div>
+                  {links.length ? (
+                    <div className="hc-link-row" style={{ paddingLeft: 8 }}>
+                      {links.map((l) =>
+                        isFileHref(l.href) ? (
                           <a
                             key={l.href}
                             href={l.href}
@@ -390,11 +344,125 @@ function DiagnosesPane({
                         )
                       )}
                     </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+}
+
+function DiagnosesPane({
+  locale,
+  card,
+}: {
+  locale: "lt" | "en";
+  card: HealthCardModel;
+}) {
+  const copy =
+    locale === "en"
+      ? {
+          attachments: "Attached clinical files",
+          openFile: "Open",
+          by: "Recorded by",
+          emptyLinks: "No attached files",
+        }
+      : {
+          attachments: "Prisegti klinikiniai failai",
+          openFile: "Atidaryti",
+          by: "Įrašė",
+          emptyLinks: "Prisegtų failų nėra",
+        };
+
+  return (
+    <div className="stack" style={{ gap: 12 }}>
+      <section className="card">
+        <div className="stack" style={{ gap: 12 }}>
+          {card.conditions.map((c, i) => {
+            const links = c.links || [];
+            return (
+              <article
+                key={`${c.code}-${c.since}-${c.nameEn}-${i}`}
+                className="hc-dx-card"
+              >
+                <div className="hc-dx-head">
+                  <div>
+                    <b className="hc-dx-title">
+                      <code className="mono">{c.code}</code>{" "}
+                      {locale === "en" ? c.nameEn : c.nameLt}
+                    </b>
+                    <p className="small muted m-0 mt-1">
+                      {locale === "en" ? "Since" : "Nuo"} {c.since}
+                      {" · "}
+                      {copy.by} {locale === "en" ? c.byEn : c.byLt}
+                    </p>
+                  </div>
+                  <span
+                    className={`pill ${
+                      c.statusEn === "active" || c.statusEn === "chronic"
+                        ? "c-yellow"
+                        : "c-none"
+                    }`}
+                  >
+                    {locale === "en" ? c.statusEn : c.statusLt}
+                  </span>
+                </div>
+
+                <div className="hc-dx-files">
+                  <span className="eyebrow">{copy.attachments}</span>
+                  {links.length ? (
+                    <div className="hc-dx-file-grid">
+                      {links.map((l) => {
+                        const label =
+                          locale === "en" ? l.labelEn : l.labelLt;
+                        if (isFileHref(l.href)) {
+                          return (
+                            <a
+                              key={l.href}
+                              href={l.href}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="hc-dx-file"
+                            >
+                              {isImageHref(l.href) ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img src={l.href} alt={label} />
+                              ) : (
+                                <span className="hc-dx-file-pdf">PDF</span>
+                              )}
+                              <span className="hc-dx-file-meta">
+                                <b>{label}</b>
+                                <span className="xs muted">
+                                  {copy.openFile}
+                                </span>
+                              </span>
+                            </a>
+                          );
+                        }
+                        return (
+                          <Link
+                            key={l.href}
+                            href={l.href}
+                            className="hc-dx-file hc-dx-file-link"
+                          >
+                            <span className="hc-dx-file-pdf">→</span>
+                            <span className="hc-dx-file-meta">
+                              <b>{label}</b>
+                            </span>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <p className="small muted m-0 mt-2">{copy.emptyLinks}</p>
+                  )}
+                </div>
+              </article>
+            );
+          })}
         </div>
       </section>
 

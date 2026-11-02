@@ -1,10 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { OverviewPanels } from "@/components/patient/overview-panels";
 import { HealthCardTabs } from "@/components/patient/health-card-tabs";
 import type { Dictionary } from "@/lib/i18n/dictionary";
-import type { HealthCardModel } from "@/lib/health/health-card-data";
+import type {
+  HealthCardModel,
+  HealthCardTabId,
+} from "@/lib/health/health-card-data";
 import type { BodyMapCategory } from "@/components/patient/body-map";
 import type {
   OverviewFlaggedLab,
@@ -39,6 +42,10 @@ type OverviewLabels = {
   colourLabels: Record<string, string>;
 };
 
+function hasDiagnosisFiles(card: HealthCardModel) {
+  return card.conditions.some((c) => (c.links || []).length > 0);
+}
+
 export function DoctorPatientChart({
   locale,
   labels,
@@ -66,7 +73,13 @@ export function DoctorPatientChart({
   card: HealthCardModel;
   pharmaSnps: PharmaSnpRow[];
 }) {
-  const [tab, setTab] = useState<"summary" | "health">("summary");
+  const startOnDiagnoses = useMemo(() => hasDiagnosisFiles(card), [card]);
+  const [tab, setTab] = useState<"summary" | "health">(
+    startOnDiagnoses ? "health" : "summary"
+  );
+  const [healthTab, setHealthTab] = useState<HealthCardTabId>(
+    startOnDiagnoses ? "dx" : "sum"
+  );
 
   return (
     <div className="stack" style={{ gap: 14 }}>
@@ -89,10 +102,27 @@ export function DoctorPatientChart({
           role="tab"
           className={tab === "health" ? "on" : undefined}
           aria-selected={tab === "health"}
-          onClick={() => setTab("health")}
+          onClick={() => {
+            setTab("health");
+            if (startOnDiagnoses) setHealthTab("dx");
+          }}
         >
           {labels.healthCard}
         </button>
+        {startOnDiagnoses ? (
+          <button
+            type="button"
+            role="tab"
+            className={tab === "health" && healthTab === "dx" ? "on" : undefined}
+            aria-selected={tab === "health" && healthTab === "dx"}
+            onClick={() => {
+              setHealthTab("dx");
+              setTab("health");
+            }}
+          >
+            {labels.cardDiagnoses}
+          </button>
+        ) : null}
       </div>
 
       {tab === "summary" ? (
@@ -116,6 +146,8 @@ export function DoctorPatientChart({
           card={card}
           pharmaSnps={pharmaSnps}
           readOnly
+          initialTab={healthTab}
+          key={healthTab}
         />
       )}
     </div>

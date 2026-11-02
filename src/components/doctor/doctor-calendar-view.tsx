@@ -4,19 +4,23 @@ import Link from "next/link";
 import { useMemo, useState, useEffect } from "react";
 import {
   DOCTOR_APPT_EVENT,
+  VIDEO_LINK_OPTIONS,
   addCreatedAppointment,
   appointmentCountsByDate,
   appointmentsForDay,
   baseDoctorAppointments,
+  freeSlotsForDay,
   mergeAppointments,
   modeLabel,
   monthMatrix,
   readCreatedAppointments,
+  searchDoctorPatients,
   statusLabel,
   type DoctorAppointment,
   type DoctorPatientOption,
+  type VideoPlatform,
 } from "@/lib/doctor/doctor-calendar";
-import { todayIsoDate, addCalendarDays } from "@/lib/health/demo-visits";
+import { todayIsoDate } from "@/lib/health/demo-visits";
 
 const WEEKDAYS_LT = ["Pr", "An", "Tr", "Kt", "Pn", "Št", "Sk"];
 const WEEKDAYS_EN = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
@@ -37,11 +41,13 @@ export function DoctorCalendarView({
   );
   const [created, setCreated] = useState<DoctorAppointment[]>([]);
   const [openForm, setOpenForm] = useState(false);
+  const [patientQuery, setPatientQuery] = useState("");
   const [form, setForm] = useState({
-    patientId: patients[0]?.id || "",
-    time: "10:00",
+    patientId: "" as string,
+    time: "",
     title: "",
     mode: "in_person" as DoctorAppointment["mode"],
+    videoPlatform: "meet" as VideoPlatform,
   });
 
   useEffect(() => {
@@ -67,7 +73,25 @@ export function DoctorCalendarView({
     () => appointmentsForDay(all, selected),
     [all, selected]
   );
+  const freeSlots = useMemo(
+    () => freeSlotsForDay(all, selected),
+    [all, selected]
+  );
   const matrix = useMemo(() => monthMatrix(anchor), [anchor]);
+
+  const patientHits = useMemo(
+    () => searchDoctorPatients(patients, patientQuery, locale),
+    [patients, patientQuery, locale]
+  );
+  const selectedPatient = patients.find((p) => p.id === form.patientId) || null;
+
+  useEffect(() => {
+    if (!openForm) return;
+    setForm((f) => {
+      if (f.time && freeSlots.includes(f.time)) return f;
+      return { ...f, time: freeSlots[0] || "" };
+    });
+  }, [openForm, selected, freeSlots]);
 
   const copy =
     locale === "en"
@@ -83,12 +107,20 @@ export function DoctorCalendarView({
           save: "Save visit",
           cancel: "Cancel",
           patient: "Patient",
+          patientSearch:
+            "Search by name, phone, email, personal code or date of birth…",
+          patientHint: "Type at least 2 characters — fragment match.",
+          noPatients: "No patients match.",
           time: "Time",
+          freeTimes: "Available times",
+          noSlots: "No free times left on this day.",
           reason: "Reason",
           mode: "Mode",
+          videoLinks: "Video link",
           visits: "visits",
           prev: "Previous month",
           next: "Next month",
+          clearPatient: "Change",
         }
       : {
           eyebrow: "Darbotvarkė",
@@ -102,13 +134,33 @@ export function DoctorCalendarView({
           save: "Išsaugoti vizitą",
           cancel: "Atšaukti",
           patient: "Pacientas",
+          patientSearch:
+            "Ieškoti pagal vardą, pavardę, telefoną, el. paštą, asmens kodą ar gimimo datą…",
+          patientHint: "Įveskite bent 2 simbolius — veikia fragmentinė paieška.",
+          noPatients: "Pacientų nerasta.",
           time: "Laikas",
+          freeTimes: "Laisvi laikai",
+          noSlots: "Šią dieną laisvų laikų neliko.",
           reason: "Priežastis",
           mode: "Būdas",
+          videoLinks: "Vaizdo nuoroda",
           visits: "vizit.",
           prev: "Ankstesnis mėnuo",
           next: "Kitas mėnuo",
+          clearPatient: "Keisti",
         };
+
+  function openCreate() {
+    setOpenForm(true);
+    setPatientQuery("");
+    setForm({
+      patientId: "",
+      time: freeSlotsForDay(all, selected)[0] || "",
+      title: "",
+      mode: "in_person",
+      videoPlatform: "meet",
+    });
+  }
 
   function shiftMonth(delta: number) {
     const [y, m] = anchor.split("-").map(Number);
@@ -121,9 +173,14 @@ export function DoctorCalendarView({
   function saveVisit() {
     const patient = patients.find((p) => p.id === form.patientId);
     if (!patient || !form.time) return;
+    if (!freeSlots.includes(form.time)) return;
     const title =
       form.title.trim() ||
       (locale === "en" ? "Clinic visit" : "Klinikinis vizitas");
+    const video =
+      form.mode === "video"
+        ? VIDEO_LINK_OPTIONS.find((v) => v.id === form.videoPlatform)
+        : undefined;
     const appt: DoctorAppointment = {
       id: `created:${Date.now()}`,
       date: selected,
@@ -136,16 +193,36 @@ export function DoctorCalendarView({
       mode: form.mode,
       status: "upcoming",
       createdByDoctor: true,
-      placeLt: "Kabinetas 12",
-      placeEn: "Room 12",
+      placeLt:
+        form.mode === "in_person"
+          ? "Kabinetas 12"
+          : form.mode === "phone"
+            ? "Skambutis"
+            : video?.label || "Video",
+      placeEn:
+        form.mode === "in_person"
+          ? "Room 12"
+          : form.mode === "phone"
+            ? "Call"
+            : video?.label || "Video",
+      videoPlatform: video?.id,
+      videoUrl: video?.url,
     };
     addCreatedAppointment(appt);
     setCreated(readCreatedAppointments());
     setOpenForm(false);
-    setForm((f) => ({ ...f, title: "" }));
+    setPatientQuery("");
+    setForm({
+      patientId: "",
+      time: "",
+      title: "",
+      mode: "in_person",
+      videoPlatform: "meet",
+    });
   }
 
   const weekdays = locale === "en" ? WEEKDAYS_EN : WEEKDAYS_LT;
+  const canSave = Boolean(form.patientId && form.time && freeSlots.includes(form.time));
 
   return (
     <div className="stack" style={{ gap: 18 }}>
@@ -170,11 +247,7 @@ export function DoctorCalendarView({
           >
             {copy.today}
           </button>
-          <button
-            type="button"
-            className="btn sm"
-            onClick={() => setOpenForm(true)}
-          >
+          <button type="button" className="btn sm" onClick={openCreate}>
             {copy.create}
           </button>
         </div>
@@ -243,62 +316,170 @@ export function DoctorCalendarView({
                 {` · ${dayList.length} ${copy.visits}`}
               </p>
             </div>
-            <button
-              type="button"
-              className="btn sm"
-              onClick={() => setOpenForm(true)}
-            >
-              {copy.create}
-            </button>
+            {!openForm ? (
+              <button type="button" className="btn sm" onClick={openCreate}>
+                {copy.create}
+              </button>
+            ) : null}
           </div>
 
           {openForm ? (
-            <div className="doctor-cal-form stack" style={{ gap: 10 }}>
+            <div className="doctor-cal-form stack" style={{ gap: 12 }}>
               <label className="stack" style={{ gap: 4 }}>
                 <span className="eyebrow">{copy.patient}</span>
-                <select
-                  value={form.patientId}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, patientId: e.target.value }))
-                  }
-                >
-                  {patients.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {locale === "en" ? p.nameEn : p.nameLt}
-                    </option>
-                  ))}
-                </select>
+                {selectedPatient ? (
+                  <div className="doctor-cal-patient-picked">
+                    <div>
+                      <b>
+                        {locale === "en"
+                          ? selectedPatient.nameEn
+                          : selectedPatient.nameLt}
+                      </b>
+                      <span className="xs muted">
+                        {selectedPatient.phone}
+                        {selectedPatient.email
+                          ? ` · ${selectedPatient.email}`
+                          : ""}
+                        {selectedPatient.dob
+                          ? ` · ${selectedPatient.dob}`
+                          : ""}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      className="btn ghost sm"
+                      onClick={() => {
+                        setForm((f) => ({ ...f, patientId: "" }));
+                        setPatientQuery("");
+                      }}
+                    >
+                      {copy.clearPatient}
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <input
+                      type="search"
+                      value={patientQuery}
+                      placeholder={copy.patientSearch}
+                      autoComplete="off"
+                      onChange={(e) => setPatientQuery(e.target.value)}
+                    />
+                    <span className="xs muted">{copy.patientHint}</span>
+                    {patientQuery.trim().length >= 2 ? (
+                      patientHits.length ? (
+                        <ul className="doctor-cal-patient-hits">
+                          {patientHits.map((p) => (
+                            <li key={p.id}>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setForm((f) => ({ ...f, patientId: p.id }));
+                                  setPatientQuery("");
+                                }}
+                              >
+                                <b>
+                                  {locale === "en" ? p.nameEn : p.nameLt}
+                                </b>
+                                <span className="xs muted">
+                                  {p.phone}
+                                  {p.email ? ` · ${p.email}` : ""}
+                                  {p.nationalId
+                                    ? ` · ${p.nationalId}`
+                                    : ""}
+                                  {p.dob ? ` · ${p.dob}` : ""}
+                                </span>
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <div className="empty">{copy.noPatients}</div>
+                      )
+                    ) : null}
+                  </>
+                )}
               </label>
-              <div className="row" style={{ gap: 10 }}>
-                <label className="stack grow" style={{ gap: 4 }}>
-                  <span className="eyebrow">{copy.time}</span>
-                  <input
-                    type="time"
-                    value={form.time}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, time: e.target.value }))
-                    }
-                  />
-                </label>
-                <label className="stack grow" style={{ gap: 4 }}>
-                  <span className="eyebrow">{copy.mode}</span>
-                  <select
-                    value={form.mode}
-                    onChange={(e) =>
-                      setForm((f) => ({
-                        ...f,
-                        mode: e.target.value as DoctorAppointment["mode"],
-                      }))
-                    }
-                  >
-                    <option value="in_person">
-                      {modeLabel("in_person", locale)}
-                    </option>
-                    <option value="video">{modeLabel("video", locale)}</option>
-                    <option value="phone">{modeLabel("phone", locale)}</option>
-                  </select>
-                </label>
+
+              <div className="stack" style={{ gap: 6 }}>
+                <span className="eyebrow">{copy.freeTimes}</span>
+                {freeSlots.length ? (
+                  <div className="doctor-cal-slots" role="listbox" aria-label={copy.time}>
+                    {freeSlots.map((t) => (
+                      <button
+                        key={t}
+                        type="button"
+                        role="option"
+                        aria-selected={form.time === t}
+                        className={
+                          form.time === t
+                            ? "doctor-cal-slot on"
+                            : "doctor-cal-slot"
+                        }
+                        onClick={() => setForm((f) => ({ ...f, time: t }))}
+                      >
+                        {t}
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="empty">{copy.noSlots}</div>
+                )}
               </div>
+
+              <label className="stack" style={{ gap: 4 }}>
+                <span className="eyebrow">{copy.mode}</span>
+                <div className="doctor-cal-modes" role="group">
+                  {(
+                    [
+                      ["phone", modeLabel("phone", locale)],
+                      ["video", modeLabel("video", locale)],
+                      ["in_person", modeLabel("in_person", locale)],
+                    ] as const
+                  ).map(([value, label]) => (
+                    <button
+                      key={value}
+                      type="button"
+                      className={
+                        form.mode === value
+                          ? "doctor-cal-mode on"
+                          : "doctor-cal-mode"
+                      }
+                      onClick={() =>
+                        setForm((f) => ({ ...f, mode: value }))
+                      }
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </label>
+
+              {form.mode === "video" ? (
+                <div className="stack" style={{ gap: 6 }}>
+                  <span className="eyebrow">{copy.videoLinks}</span>
+                  <div className="doctor-cal-video-links">
+                    {VIDEO_LINK_OPTIONS.map((v) => (
+                      <button
+                        key={v.id}
+                        type="button"
+                        className={
+                          form.videoPlatform === v.id
+                            ? "doctor-cal-video on"
+                            : "doctor-cal-video"
+                        }
+                        onClick={() =>
+                          setForm((f) => ({ ...f, videoPlatform: v.id }))
+                        }
+                      >
+                        <b>{v.label}</b>
+                        <span className="xs muted mono">{v.url}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
               <label className="stack" style={{ gap: 4 }}>
                 <span className="eyebrow">{copy.reason}</span>
                 <input
@@ -313,80 +494,89 @@ export function DoctorCalendarView({
                   }
                 />
               </label>
+
               <div className="row" style={{ gap: 8 }}>
-                <button type="button" className="btn" onClick={saveVisit}>
+                <button
+                  type="button"
+                  className="btn"
+                  disabled={!canSave}
+                  onClick={saveVisit}
+                >
                   {copy.save}
                 </button>
                 <button
                   type="button"
                   className="btn ghost"
-                  onClick={() => setOpenForm(false)}
+                  onClick={() => {
+                    setOpenForm(false);
+                    setPatientQuery("");
+                  }}
                 >
                   {copy.cancel}
                 </button>
               </div>
             </div>
-          ) : null}
-
-          <div className="stack mt-3" style={{ gap: 8 }}>
-            {dayList.length ? (
-              dayList.map((a) => (
-                <div key={a.id} className="doctor-appt-row">
-                  <div className="doctor-appt-time">
-                    <b>{a.time}</b>
-                    <span>{modeLabel(a.mode, locale)}</span>
-                  </div>
-                  <div className="doctor-appt-main">
-                    <b>{locale === "en" ? a.titleEn : a.titleLt}</b>
-                    <span className="small muted">
-                      {locale === "en" ? a.patientNameEn : a.patientNameLt}
-                      {a.placeLt
-                        ? ` · ${locale === "en" ? a.placeEn : a.placeLt}`
-                        : ""}
-                    </span>
-                  </div>
-                  <span
-                    className={`pill ${
-                      a.status === "upcoming"
-                        ? "c-acc"
-                        : a.status === "missed" || a.status === "cancelled"
-                          ? "c-none"
-                          : "c-green"
-                    }`}
-                  >
-                    {statusLabel(a.status, locale)}
-                  </span>
-                  {a.patientId ? (
-                    <Link
-                      href={`/doctor/patients/${a.patientId}`}
-                      className="btn ghost sm"
+          ) : (
+            <div className="stack mt-3" style={{ gap: 8 }}>
+              {dayList.length ? (
+                dayList.map((a) => (
+                  <div key={a.id} className="doctor-appt-row">
+                    <div className="doctor-appt-time">
+                      <b>{a.time}</b>
+                      <span>{modeLabel(a.mode, locale)}</span>
+                    </div>
+                    <div className="doctor-appt-main">
+                      <b>{locale === "en" ? a.titleEn : a.titleLt}</b>
+                      <span className="small muted">
+                        {locale === "en" ? a.patientNameEn : a.patientNameLt}
+                        {a.placeLt
+                          ? ` · ${locale === "en" ? a.placeEn : a.placeLt}`
+                          : ""}
+                      </span>
+                      {a.mode === "video" && a.videoUrl ? (
+                        <a
+                          href={a.videoUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="xs"
+                          style={{ color: "var(--accent)" }}
+                        >
+                          {a.videoPlatform === "meet"
+                            ? "Google Meet"
+                            : a.videoPlatform === "zoom"
+                              ? "Zoom"
+                              : a.videoPlatform === "teams"
+                                ? "Teams"
+                                : a.videoUrl}
+                        </a>
+                      ) : null}
+                    </div>
+                    <span
+                      className={`pill ${
+                        a.status === "upcoming"
+                          ? "c-acc"
+                          : a.status === "missed" || a.status === "cancelled"
+                            ? "c-none"
+                            : "c-green"
+                      }`}
                     >
-                      {locale === "en" ? "Chart" : "Kortelė"}
-                    </Link>
-                  ) : null}
-                </div>
-              ))
-            ) : (
-              <div className="empty">{copy.empty}</div>
-            )}
-          </div>
-
-          <div className="row mt-3" style={{ gap: 8, flexWrap: "wrap" }}>
-            {[-1, 0, 1, 2].map((d) => {
-              const iso = addCalendarDays(selected, d);
-              return (
-                <button
-                  key={iso}
-                  type="button"
-                  className={`chip ${iso === selected ? "on" : ""}`}
-                  onClick={() => setSelected(iso)}
-                >
-                  {iso.slice(5)}
-                  {counts[iso] ? ` · ${counts[iso]}` : ""}
-                </button>
-              );
-            })}
-          </div>
+                      {statusLabel(a.status, locale)}
+                    </span>
+                    {a.patientId ? (
+                      <Link
+                        href={`/doctor/patients/${a.patientId}`}
+                        className="btn ghost sm"
+                      >
+                        {locale === "en" ? "Chart" : "Kortelė"}
+                      </Link>
+                    ) : null}
+                  </div>
+                ))
+              ) : (
+                <div className="empty">{copy.empty}</div>
+              )}
+            </div>
+          )}
         </section>
       </div>
     </div>

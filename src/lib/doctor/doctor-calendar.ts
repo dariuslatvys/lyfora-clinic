@@ -11,6 +11,8 @@ import type { Locale } from "@/lib/i18n/dictionary";
 
 export type DoctorApptStatus = VisitStatus | "cancelled" | "done";
 
+export type VideoPlatform = "meet" | "zoom" | "teams";
+
 export type DoctorAppointment = {
   id: string;
   date: string;
@@ -28,15 +30,47 @@ export type DoctorAppointment = {
   placeEn?: string;
   /** True when created from the doctor calendar UI */
   createdByDoctor?: boolean;
+  videoPlatform?: VideoPlatform;
+  videoUrl?: string;
 };
 
 export type DoctorPatientOption = {
   id: string;
   nameLt: string;
   nameEn: string;
+  firstNameLt: string;
+  lastNameLt: string;
+  firstNameEn: string;
+  lastNameEn: string;
   sex: "male" | "female";
   dob: string | null;
+  email: string;
+  phone: string;
+  nationalId: string;
 };
+
+/** Demo video room links shown when mode = Video. */
+export const VIDEO_LINK_OPTIONS: {
+  id: VideoPlatform;
+  label: string;
+  url: string;
+}[] = [
+  {
+    id: "meet",
+    label: "Google Meet",
+    url: "https://meet.google.com/lyf-demo-abc",
+  },
+  {
+    id: "zoom",
+    label: "Zoom",
+    url: "https://zoom.us/j/81234567890",
+  },
+  {
+    id: "teams",
+    label: "Teams",
+    url: "https://teams.microsoft.com/l/meetup-join/lyfora-demo",
+  },
+];
 
 const EXTRA_APPTS: DoctorAppointment[] = [
   {
@@ -64,8 +98,10 @@ const EXTRA_APPTS: DoctorAppointment[] = [
     patientNameEn: "Jane Smith",
     mode: "video",
     status: "upcoming",
-    placeLt: "Nuotolinė",
-    placeEn: "Remote",
+    placeLt: "Google Meet",
+    placeEn: "Google Meet",
+    videoPlatform: "meet",
+    videoUrl: "https://meet.google.com/lyf-demo-abc",
   },
   {
     id: "da-today-3",
@@ -232,9 +268,84 @@ export function modeLabel(
   locale: Locale
 ): string {
   if (locale === "en") {
-    return mode === "video" ? "Video" : mode === "phone" ? "Phone" : "In person";
+    return mode === "video" ? "Video" : mode === "phone" ? "Call" : "In person";
   }
-  return mode === "video" ? "Video" : mode === "phone" ? "Telefonas" : "Gyvai";
+  return mode === "video" ? "Video" : mode === "phone" ? "Skambutis" : "Gyvai";
+}
+
+/** Working-day slots every `stepMin` minutes; excludes already booked times. */
+export function freeSlotsForDay(
+  all: DoctorAppointment[],
+  isoDate: string,
+  stepMin = 20,
+  startHour = 8,
+  endHour = 18
+): string[] {
+  const taken = new Set(
+    appointmentsForDay(all, isoDate)
+      .filter((a) => a.status !== "cancelled")
+      .map((a) => a.time)
+  );
+  const out: string[] = [];
+  for (let h = startHour; h < endHour; h++) {
+    for (let m = 0; m < 60; m += stepMin) {
+      const t = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+      if (!taken.has(t)) out.push(t);
+    }
+  }
+  return out;
+}
+
+function normalizeFragment(s: string) {
+  return s
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .replace(/[^a-z0-9@.+]/g, "");
+}
+
+/** Fragment match across name, email, phone, personal code, DOB. */
+export function searchDoctorPatients(
+  patients: DoctorPatientOption[],
+  query: string,
+  locale: Locale
+): DoctorPatientOption[] {
+  const q = query.trim();
+  if (!q) return [];
+  const nq = normalizeFragment(q);
+  const digits = q.replace(/\D/g, "");
+  return patients.filter((p) => {
+    const name = locale === "en" ? p.nameEn : p.nameLt;
+    const first = locale === "en" ? p.firstNameEn : p.firstNameLt;
+    const last = locale === "en" ? p.lastNameEn : p.lastNameLt;
+    const hay = normalizeFragment(
+      [
+        name,
+        first,
+        last,
+        p.email,
+        p.phone,
+        p.nationalId,
+        p.dob || "",
+        (p.dob || "").replace(/-/g, ""),
+        (p.dob || "").replace(/-/g, "."),
+      ].join(" ")
+    );
+    if (nq && hay.includes(nq)) return true;
+    if (digits.length >= 3) {
+      const phoneDigits = p.phone.replace(/\D/g, "");
+      const idDigits = p.nationalId.replace(/\D/g, "");
+      const dobDigits = (p.dob || "").replace(/\D/g, "");
+      if (
+        phoneDigits.includes(digits) ||
+        idDigits.includes(digits) ||
+        dobDigits.includes(digits)
+      ) {
+        return true;
+      }
+    }
+    return false;
+  });
 }
 
 export function statusLabel(

@@ -26,11 +26,14 @@ export function GlobalSearch({
   placeholder,
   emptyLabel,
   searchingLabel,
+  apiPath = "/api/patient/search",
 }: {
   locale: "lt" | "en";
   placeholder: string;
   emptyLabel: string;
   searchingLabel: string;
+  /** Search API endpoint (patient or doctor). */
+  apiPath?: string;
 }) {
   const router = useRouter();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -55,7 +58,7 @@ export function GlobalSearch({
     setLoading(true);
     try {
       const res = await fetch(
-        `/api/patient/search?q=${encodeURIComponent(query)}&limit=20`,
+        `${apiPath}?q=${encodeURIComponent(query)}&limit=20`,
         { cache: "no-store" }
       );
       if (!res.ok) throw new Error("search_failed");
@@ -71,7 +74,7 @@ export function GlobalSearch({
     } finally {
       if (id === seq.current) setLoading(false);
     }
-  }, []);
+  }, [apiPath]);
 
   useEffect(() => {
     const t = window.setTimeout(() => runSearch(q), 160);

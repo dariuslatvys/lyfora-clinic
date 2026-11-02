@@ -30,6 +30,7 @@ import type { PharmaSnpRow } from "@/components/patient/pharma-genes-tabs";
 const TAB_ORDER: { id: HealthCardTabId; labelKey: keyof Dictionary }[] = [
   { id: "sum", labelKey: "cardSummary" },
   { id: "dx", labelKey: "cardDiagnoses" },
+  { id: "past", labelKey: "cardPastIllnesses" },
   { id: "meds", labelKey: "cardMeds" },
   { id: "vacc", labelKey: "cardVaccines" },
   { id: "proc", labelKey: "cardProcedures" },
@@ -120,6 +121,9 @@ export function HealthCardTabs({
 
       {tab === "sum" ? <SummaryPane locale={locale} card={card} /> : null}
       {tab === "dx" ? <DiagnosesPane locale={locale} card={card} /> : null}
+      {tab === "past" ? (
+        <PastIllnessesPane locale={locale} card={card} />
+      ) : null}
       {tab === "meds" ? (
         <MedsPane
           locale={locale}
@@ -465,52 +469,68 @@ function DiagnosesPane({
           })}
         </div>
       </section>
+    </div>
+  );
+}
 
+function PastIllnessesPane({
+  locale,
+  card,
+}: {
+  locale: "lt" | "en";
+  card: HealthCardModel;
+}) {
+  const empty =
+    locale === "en"
+      ? "No past illness episodes on record."
+      : "Persirgtų ligų epizodų nėra.";
+
+  return (
+    <div className="stack" style={{ gap: 12 }}>
       <section className="card">
-        <h3 className="hc-h3">
-          {locale === "en"
-            ? "Past illnesses (episodes)"
-            : "Persirgtos ligos (epizodai)"}
-        </h3>
-        <div className="list mt-2">
-          {card.episodes.map((e) => {
-            const inner = (
-              <>
-                <span className="mono small" style={{ width: 56 }}>
-                  {e.code}
-                </span>
-                <div className="grow">
-                  <b className="small">
-                    {locale === "en" ? e.nameEn : e.nameLt}
-                  </b>
-                  <span className="xs muted">
-                    {e.from} – {e.to}
-                    {" · "}
+        {card.episodes.length ? (
+          <div className="stack" style={{ gap: 10 }}>
+            {card.episodes.map((e) => {
+              const body = (
+                <>
+                  <div className="hc-dx-head">
+                    <div>
+                      <b className="hc-dx-title">
+                        <code className="mono">{e.code}</code>{" "}
+                        {locale === "en" ? e.nameEn : e.nameLt}
+                      </b>
+                      <p className="small muted m-0 mt-1">
+                        {e.from} – {e.to}
+                      </p>
+                    </div>
+                    <span className="pill c-none">
+                      {locale === "en" ? "Resolved" : "Persirgta"}
+                    </span>
+                  </div>
+                  <p className="small m-0 mt-2">
                     {locale === "en" ? e.noteEn : e.noteLt}
-                  </span>
-                </div>
-              </>
-            );
-            return e.href ? (
-              <Link
-                key={e.code + e.from}
-                href={e.href}
-                className="li click"
-                style={{ alignItems: "flex-start" }}
-              >
-                {inner}
-              </Link>
-            ) : (
-              <div
-                key={e.code + e.from}
-                className="li"
-                style={{ alignItems: "flex-start" }}
-              >
-                {inner}
-              </div>
-            );
-          })}
-        </div>
+                  </p>
+                </>
+              );
+              return e.href ? (
+                <Link
+                  key={e.code + e.from}
+                  href={e.href}
+                  className="hc-dx-card"
+                  style={{ display: "block", textDecoration: "none", color: "inherit" }}
+                >
+                  {body}
+                </Link>
+              ) : (
+                <article key={e.code + e.from} className="hc-dx-card">
+                  {body}
+                </article>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="empty">{empty}</div>
+        )}
       </section>
     </div>
   );

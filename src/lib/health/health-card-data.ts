@@ -4,6 +4,7 @@ import type { QuestionnaireAnswers } from "./questionnaire";
 export type HealthCardTabId =
   | "sum"
   | "dx"
+  | "past"
   | "meds"
   | "vacc"
   | "proc"

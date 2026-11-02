@@ -28,6 +28,7 @@ import {
   listClinicVisitsForPatient,
 } from "@/lib/health/clinic-visits";
 import { ensurePetraitisPatient } from "@/lib/health/petraitis-patient";
+import { DoctorIssuePrescription } from "@/components/doctor/doctor-issue-prescription";
 
 const RANK: Record<RiskColour, number> = {
   grey: 0,
@@ -179,6 +180,12 @@ export default async function DoctorPatientChartPage({
           </p>
         </div>
       </div>
+
+      <DoctorIssuePrescription
+        locale={locale}
+        patientId={id}
+        patientName={name}
+      />
 
       <DoctorPatientChart
         locale={locale}

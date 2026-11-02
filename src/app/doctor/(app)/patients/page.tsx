@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { ensureSchema, getDb } from "@/lib/db";
 import {
   patients,
@@ -12,6 +11,22 @@ import { patientDisplayName } from "@/lib/i18n/patient-name";
 import { loadDigitalTwin } from "@/lib/health/load-twin";
 import { ensurePetraitisPatient } from "@/lib/health/petraitis-patient";
 import { t, type Locale } from "@/lib/i18n/dictionary";
+import type { RiskColour } from "@/lib/health/colours";
+import {
+  PATIENT_SPECIAL_NOTES,
+  birthYearFromDob,
+  countPatientVisits,
+} from "@/lib/doctor/doctor-patients-meta";
+import { DoctorPatientsList } from "@/components/doctor/doctor-patients-list";
+
+const RANK: Record<RiskColour, number> = {
+  grey: 0,
+  green: 1,
+  badge: 1,
+  yellow: 2,
+  orange: 3,
+  red: 4,
+};
 
 export default async function DoctorPatientsPage() {
   ensureSchema();
@@ -23,27 +38,57 @@ export default async function DoctorPatientsPage() {
   const list = db.select().from(patients).all();
 
   const enriched = list.map((p) => {
-    const markers = db
-      .select({ c: sql<number>`count(*)` })
-      .from(markerResults)
-      .where(eq(markerResults.patientId, p.id))
-      .get()?.c;
-    const snps = db
-      .select({ c: sql<number>`count(*)` })
-      .from(snpGenotypes)
-      .where(eq(snpGenotypes.patientId, p.id))
-      .get()?.c;
-    const rare = db
-      .select({ c: sql<number>`count(*)` })
-      .from(rareMutations)
-      .where(eq(rareMutations.patientId, p.id))
-      .get()?.c;
+    const markers =
+      db
+        .select({ c: sql<number>`count(*)` })
+        .from(markerResults)
+        .where(eq(markerResults.patientId, p.id))
+        .get()?.c || 0;
+    const snps =
+      db
+        .select({ c: sql<number>`count(*)` })
+        .from(snpGenotypes)
+        .where(eq(snpGenotypes.patientId, p.id))
+        .get()?.c || 0;
+    const rare =
+      db
+        .select({ c: sql<number>`count(*)` })
+        .from(rareMutations)
+        .where(eq(rareMutations.patientId, p.id))
+        .get()?.c || 0;
     const twin = loadDigitalTwin(p.id, locale);
-    const hot =
+    const categories =
       twin?.categories
-        .filter((c) => c.colour === "red" || c.colour === "orange")
-        .map((c) => labels.categoryNames[c.id] || c.id) || [];
-    return { ...p, markers, snps, rare, hot, twin };
+        .filter((c) => RANK[c.colour] >= 3)
+        .sort((a, b) => RANK[b.colour] - RANK[a.colour])
+        .map((c) => ({
+          id: c.id,
+          title: labels.categoryNames[c.id] || c.id,
+          colour: c.colour as RiskColour,
+          colourLabel: labels.colourLabels[c.colour as RiskColour],
+        })) || [];
+
+    return {
+      id: p.id,
+      name: patientDisplayName(p.sex, locale, p.id),
+      dob: p.dob,
+      birthYear: birthYearFromDob(p.dob),
+      sexLabel:
+        p.sex === "male"
+          ? locale === "en"
+            ? "Male"
+            : "Vyras"
+          : locale === "en"
+            ? "Female"
+            : "Moteris",
+      notes: p.notes,
+      visitCount: countPatientVisits(p.id, locale),
+      markers: Number(markers) || 0,
+      snps: Number(snps) || 0,
+      rare: Number(rare) || 0,
+      categories,
+      specialNotes: PATIENT_SPECIAL_NOTES[p.id] || [],
+    };
   });
 
   return (
@@ -58,57 +103,13 @@ export default async function DoctorPatientsPage() {
           </h1>
           <p className="mt-2 mb-0 max-w-2xl text-sm text-[var(--muted)]">
             {locale === "en"
-              ? "Same anonymised demo patients as the patient portal — labs, DNA and NGS already linked."
-              : "Tie patys anonimizuoti demo pacientai kaip savitarnoje — tyrimai, DNR ir NGS jau susieti."}
+              ? "Searchable list with problem areas, visit counts and special clinical notes."
+              : "Paieška, probleminės sveikatos sritys, vizitų skaičius ir spec. pastabos."}
           </p>
         </div>
       </div>
 
-      <div className="stack" style={{ gap: 12 }}>
-        {enriched.map((p) => (
-          <article key={p.id} className="card">
-            <div className="card-head">
-              <div>
-                <h3 className="font-[family-name:var(--font-display)] text-[1.15rem] font-semibold m-0">
-                  {patientDisplayName(p.sex, locale, p.id)}
-                </h3>
-                <p className="small muted m-0 mt-1">
-                  {p.dob || "—"} ·{" "}
-                  {p.sex === "male"
-                    ? locale === "en"
-                      ? "Male"
-                      : "Vyras"
-                    : locale === "en"
-                      ? "Female"
-                      : "Moteris"}
-                </p>
-              </div>
-              <Link href={`/doctor/patients/${p.id}`} className="btn sm">
-                {locale === "en" ? "Patient chart" : "Paciento kortelė"}
-              </Link>
-            </div>
-            <p className="mt-2 text-sm text-[var(--ink-soft)] mb-0">
-              {p.notes}
-            </p>
-            <div className="mt-3 flex flex-wrap gap-2 text-xs">
-              <span className="detail-chip">
-                {locale === "en" ? "Markers" : "Žymenys"}: {p.markers ?? 0}
-              </span>
-              <span className="detail-chip">SNP: {p.snps ?? 0}</span>
-              <span className="detail-chip">NGS: {p.rare ?? 0}</span>
-            </div>
-            {p.hot.length ? (
-              <div className="hc-link-row mt-3" style={{ gap: 6 }}>
-                {p.hot.map((h) => (
-                  <span key={h} className="pill c-orange">
-                    {h}
-                  </span>
-                ))}
-              </div>
-            ) : null}
-          </article>
-        ))}
-      </div>
+      <DoctorPatientsList locale={locale} patients={enriched} />
     </div>
   );
 }

@@ -10,7 +10,7 @@ import { activeDoctorRequests } from "@/lib/doctor/doctor-requests";
 
 const items: Array<{
   href: string;
-  key: keyof Dictionary | "workday" | "calendar" | "requests";
+  key: keyof Dictionary | "workday" | "calendar" | "requests" | "sickLeave";
   labelLt: string;
   labelEn: string;
   icon: string;
@@ -49,6 +49,14 @@ const items: Array<{
     match: (p) => p.startsWith("/doctor/requests"),
   },
   {
+    href: "/doctor/sick-leave",
+    key: "sickLeave",
+    labelLt: "Nedarbingumo biuleteniai",
+    labelEn: "Sick-leave certificates",
+    icon: "leave",
+    match: (p) => p.startsWith("/doctor/sick-leave"),
+  },
+  {
     href: "/doctor/analytics",
     key: "analytics",
     labelLt: "Analitika",
@@ -81,6 +89,12 @@ const ICONS: Record<string, ReactNode> = {
     </g>
   ),
   chart: <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />,
+  leave: (
+    <g>
+      <path d="M7 3h10v18H7z" />
+      <path d="M10 7h4M10 11h4M10 15h3" />
+    </g>
+  ),
 };
 
 function NavIcon({ name }: { name: string }) {
@@ -148,7 +162,7 @@ export function DoctorRail({
               ? String(labels[item.key])
               : locale === "en"
                 ? item.labelEn
-                : item.labelLt;
+                : item.labelLt; // sickLeave / workday / calendar / requests use labelLt/En
           return (
             <Link
               key={item.href}

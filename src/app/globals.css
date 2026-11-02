@@ -5203,12 +5203,139 @@ a.hc-kpi.clickable:hover {
   font-size: 0.86rem;
 }
 
+.doctor-patients-search {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--ink);
+  padding: 12px 14px;
+  font: inherit;
+}
+
+.doctor-patient-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.doctor-patient-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface) 80%, #000);
+}
+
+.doctor-patient-stat b {
+  font-size: 1.15rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.doctor-patient-stat span {
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.doctor-patient-cats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.doctor-cat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 650;
+  border: 1px solid transparent;
+}
+
+.doctor-cat-pill i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 25%, transparent);
+}
+
+.doctor-cat-pill.colour-red {
+  color: #ffb4b8;
+  background: #5a1d24;
+  border-color: #f0626b;
+}
+
+.doctor-cat-pill.colour-orange {
+  color: #ffd0a8;
+  background: #5a3214;
+  border-color: #f08a47;
+}
+
+.doctor-cat-pill.colour-yellow {
+  color: #ffe9a3;
+  background: #4a3d12;
+  border-color: #e6c35c;
+}
+
+.doctor-patient-notes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.doctor-note-chip {
+  display: inline-flex;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  font-size: 0.8rem;
+}
+
+.doctor-note-chip.kind-disability,
+.doctor-note-chip.kind-vision,
+.doctor-note-chip.kind-mobility {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+}
+
+.doctor-sl-horizon {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.doctor-rx-form input,
+.doctor-rx-form textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  padding: 8px 10px;
+  font: inherit;
+}
+
+.doctor-rx-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 10px;
+}
+
 @media (max-width: 980px) {
   .doctor-cal-grid,
   .doctor-req-split,
   .doctor-home-split,
   .doctor-kpi-grid,
-  .doctor-kpi-grid.g3 {
+  .doctor-kpi-grid.g3,
+  .doctor-patient-stats,
+  .doctor-rx-grid {
     grid-template-columns: 1fr;
   }
 }

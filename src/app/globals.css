@@ -3720,6 +3720,23 @@ a.hc-kpi.clickable:hover {
   border-radius: inherit;
 }
 
+.q-family-section {
+  padding-top: 4px;
+  border-top: 1px solid var(--line);
+  margin-top: 4px;
+}
+
+.q-family-section:first-of-type {
+  border-top: 0;
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.q-family-longevity {
+  margin-top: 8px;
+  padding-top: 16px;
+}
+
 .q-field {
   display: flex;
   flex-direction: column;

@@ -772,22 +772,19 @@ async function main() {
   ): string {
     const a = parseStoredAnswers(raw);
     const isFemale = pid === femaleId || pid === "patient_female";
-    a.values["10_family_history__longevity__relative_lived_to_85"] =
-      a.values["10_family_history__longevity__relative_lived_to_85"] || "Yes";
-    a.values["10_family_history__longevity__relative_lived_to_90"] =
-      a.values["10_family_history__longevity__relative_lived_to_90"] ||
-      (isFemale ? "No" : "Yes");
-    a.values["10_family_history__longevity__relative_lived_to_100"] =
-      a.values["10_family_history__longevity__relative_lived_to_100"] || "No";
-    a.values["10_family_history__longevity__longest_parent_age"] =
-      a.values["10_family_history__longevity__longest_parent_age"] ||
-      (isFemale ? 86 : 88);
-    a.values["10_family_history__longevity__first_degree_past_85"] =
-      a.values["10_family_history__longevity__first_degree_past_85"] || "1";
-    const hasAgedMember = a.familyMembers.some(
-      (m) => typeof m.ageYears === "number" && Number(m.ageYears) > 0
-    );
-    if (!hasAgedMember) {
+    a.values["10_family_history__longevity__lived_past_80"] =
+      a.values["10_family_history__longevity__lived_past_80"] || "Yes";
+
+    // Demo patients: keep diseases and longevity in clearly separate lists
+    a.familyMembers = (a.familyMembers || [])
+      .map((m) => ({
+        id: m.id,
+        relative: m.relative || "",
+        conditions: m.conditions || [],
+        notes: m.notes,
+      }))
+      .filter((m) => (m.conditions || []).length > 0);
+    if (!a.familyMembers.length) {
       a.familyMembers = isFemale
         ? [
             {
@@ -795,24 +792,12 @@ async function main() {
               relative: "Maternal Grandmother",
               conditions: ["Breast Cancer"],
               notes: "",
-              vitalStatus: "Deceased",
-              ageYears: 84,
             },
             {
               id: "fm_seed_f2",
               relative: "Mother",
               conditions: ["High Blood Pressure"],
               notes: "",
-              vitalStatus: "Living",
-              ageYears: 86,
-            },
-            {
-              id: "fm_seed_f3",
-              relative: "Father",
-              conditions: [],
-              notes: "",
-              vitalStatus: "Living",
-              ageYears: 84,
             },
           ]
         : [
@@ -823,25 +808,53 @@ async function main() {
                 "Heart Attack / Myocardial Infarction",
                 "High Blood Pressure",
               ],
-              notes: "MI ~58, later lived to 72",
-              vitalStatus: "Deceased",
-              ageYears: 72,
-            },
-            {
-              id: "fm_seed_m2",
-              relative: "Maternal Grandmother",
-              conditions: [],
-              notes: "Lived to 92",
-              vitalStatus: "Deceased",
-              ageYears: 92,
+              notes: "MI ~58 m.",
             },
             {
               id: "fm_seed_m3",
               relative: "Mother",
               conditions: ["High Blood Pressure"],
               notes: "",
+            },
+          ];
+    }
+
+    if (
+      !a.longevityMembers.some(
+        (m) => typeof m.ageYears === "number" && Number(m.ageYears) >= 80
+      )
+    ) {
+      a.longevityMembers = isFemale
+        ? [
+            {
+              id: "lon_seed_f1",
+              relative: "Mother",
+              vitalStatus: "Living",
+              ageYears: 86,
+              notes: "",
+            },
+            {
+              id: "lon_seed_f2",
+              relative: "Father",
+              vitalStatus: "Living",
+              ageYears: 84,
+              notes: "",
+            },
+          ]
+        : [
+            {
+              id: "lon_seed_m1",
+              relative: "Mother",
               vitalStatus: "Living",
               ageYears: 88,
+              notes: "",
+            },
+            {
+              id: "lon_seed_m2",
+              relative: "Maternal Grandmother",
+              vitalStatus: "Deceased",
+              ageYears: 92,
+              notes: "",
             },
           ];
     }

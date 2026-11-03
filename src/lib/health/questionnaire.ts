@@ -47,15 +47,23 @@ export type ConditionDetail = {
   notes?: string;
 };
 
+/** Relatives listed for disease / condition history (not longevity ages). */
 export type FamilyMember = {
   id: string;
   relative: string;
   conditions: string[];
   notes?: string;
+};
+
+/** Relatives listed for family longevity (age lived / current age). */
+export type LongevityRelative = {
+  id: string;
+  relative: string;
   /** Living / Deceased / Unknown */
   vitalStatus?: string;
   /** Current age if living, or age at death */
   ageYears?: number | null;
+  notes?: string;
 };
 
 export type QuestionnaireAnswers = {
@@ -63,6 +71,7 @@ export type QuestionnaireAnswers = {
   values: Record<string, unknown>;
   conditionDetails: Record<string, ConditionDetail>;
   familyMembers: FamilyMember[];
+  longevityMembers: LongevityRelative[];
   cancer: {
     types: string[];
     status?: string;
@@ -71,6 +80,9 @@ export type QuestionnaireAnswers = {
     info?: string;
   };
 };
+
+export const LONGEVITY_GATE_ID =
+  "10_family_history__longevity__lived_past_80";
 
 const ANSWER_KEY = "health_questionnaire_v1";
 
@@ -81,6 +93,7 @@ export function emptyAnswers(): QuestionnaireAnswers {
     values: {},
     conditionDetails: {},
     familyMembers: [],
+    longevityMembers: [],
     cancer: { types: [], treatment: [] },
   };
 }
@@ -88,13 +101,65 @@ export function emptyAnswers(): QuestionnaireAnswers {
 export function parseStoredAnswers(raw: string | null | undefined): QuestionnaireAnswers {
   if (!raw) return emptyAnswers();
   try {
-    const data = JSON.parse(raw) as QuestionnaireAnswers;
+    type LegacyFamily = {
+      id: string;
+      relative?: string;
+      conditions?: string[];
+      notes?: string;
+      vitalStatus?: string;
+      ageYears?: number | null;
+    };
+    const data = JSON.parse(raw) as {
+      updatedAt?: string | null;
+      values?: Record<string, unknown>;
+      conditionDetails?: Record<string, ConditionDetail>;
+      familyMembers?: LegacyFamily[];
+      longevityMembers?: LongevityRelative[];
+      cancer?: QuestionnaireAnswers["cancer"];
+    };
+    const legacyFamily: LegacyFamily[] = data.familyMembers || [];
+    const familyMembers: FamilyMember[] = legacyFamily.map((m) => ({
+      id: m.id,
+      relative: m.relative || "",
+      conditions: m.conditions || [],
+      notes: m.notes,
+    }));
+    let longevityMembers: LongevityRelative[] = data.longevityMembers || [];
+    // Migrate older mixed cards that stored age on familyMembers
+    if (!longevityMembers.length) {
+      longevityMembers = legacyFamily
+        .filter(
+          (m) =>
+            typeof m.ageYears === "number" || Boolean(m.vitalStatus)
+        )
+        .map((m) => ({
+          id: `lon_${m.id}`,
+          relative: m.relative || "",
+          vitalStatus: m.vitalStatus || "",
+          ageYears: m.ageYears ?? null,
+          notes: m.notes,
+        }));
+    }
+    const values = { ...(data.values || {}) };
+    // Map legacy longevity Yes answers onto the single 80+ gate
+    if (
+      values[LONGEVITY_GATE_ID] == null &&
+      (values["10_family_history__longevity__relative_lived_to_85"] === "Yes" ||
+        values["10_family_history__longevity__relative_lived_to_90"] === "Yes" ||
+        values["10_family_history__longevity__relative_lived_to_100"] === "Yes" ||
+        longevityMembers.some(
+          (m) => typeof m.ageYears === "number" && Number(m.ageYears) >= 80
+        ))
+    ) {
+      values[LONGEVITY_GATE_ID] = "Yes";
+    }
     return {
       ...emptyAnswers(),
       ...data,
-      values: data.values || {},
+      values,
       conditionDetails: data.conditionDetails || {},
-      familyMembers: data.familyMembers || [],
+      familyMembers,
+      longevityMembers,
       cancer: {
         types: data.cancer?.types || [],
         status: data.cancer?.status,
@@ -205,16 +270,8 @@ export const FIELD_LABEL_LT: Record<string, string> = {
   "Living or deceased": "Gyvas ar miręs",
   "Age (current or at death)": "Amžius (dabartinis arba mirties)",
   Notes: "Pastabos",
-  "Has any blood relative lived to age 85 or older?":
-    "Ar kas nors iš kraujo giminaičių nugyveno 85 metus ar daugiau?",
-  "Has any blood relative lived to age 90 or older?":
-    "Ar kas nors iš kraujo giminaičių nugyveno 90 metus ar daugiau?",
-  "Has a parent or grandparent lived to age 100 or older?":
-    "Ar tėvas, motina ar senelis/senelė nugyveno 100 metų ar daugiau?",
-  "Longest-lived parent’s age (current or at death)":
-    "Ilgiausiai gyvenusio tėvo / motinos amžius (dabartinis arba mirties)",
-  "How many first-degree relatives (parents or siblings) lived past 85?":
-    "Kiek pirmos eilės giminaičių (tėvai ar broliai/seserys) nugyveno daugiau nei 85 metus?",
+  "Has any blood relative lived to age 80 or older?":
+    "Ar kas nors iš kraujo giminaičių nugyveno 80 metų ar daugiau?",
 };
 
 export const OPTION_LABEL_LT: Record<string, string> = {
@@ -277,8 +334,11 @@ export function isFieldVisible(
   answers: QuestionnaireAnswers,
   def: QDefinition
 ): boolean {
-  // Repeatable meta-fields are rendered inside special UI blocks
+  // Repeatable / custom family blocks are rendered outside FieldRenderer
   if (field.repeatOf === "conditions" || field.repeatOf === "family") {
+    return false;
+  }
+  if (field.section === "Family longevity") {
     return false;
   }
   if (field.section === "Cancer details") {
@@ -411,5 +471,6 @@ export const STEP_TITLE_LT: Record<string, string> = {
 
 export const SECTION_TITLE_LT: Record<string, string> = {
   "Family longevity": "Šeimos ilgaamžiškumas",
+  "Family diseases": "Šeimos ligos",
   "Family Member Entry (repeatable)": "Šeimos narys (kartojama)",
 };

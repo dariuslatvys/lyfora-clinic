@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   STEP_TITLE_LT,
-  SECTION_TITLE_LT,
+  LONGEVITY_GATE_ID,
   computeBmi,
   computeAge,
   conditionsForSex,
@@ -15,6 +15,7 @@ import {
   type QField,
   type QuestionnaireAnswers,
   type FamilyMember,
+  type LongevityRelative,
   visibleFieldsForStep,
   completionStats,
   biologicalSex,
@@ -255,13 +256,22 @@ export function QuestionnaireForm({
             ) : null}
 
             {step.title.startsWith("10.") ? (
-              <FamilyHistoryBlock
-                def={def}
-                answers={answers}
-                mode={mode}
-                locale={locale}
-                onAnswers={setAnswers}
-              />
+              <>
+                <FamilyDiseaseBlock
+                  def={def}
+                  answers={answers}
+                  mode={mode}
+                  locale={locale}
+                  onAnswers={setAnswers}
+                />
+                <FamilyLongevityBlock
+                  def={def}
+                  answers={answers}
+                  mode={mode}
+                  locale={locale}
+                  onAnswers={setAnswers}
+                />
+              </>
             ) : null}
           </div>
 
@@ -379,21 +389,8 @@ function FieldRenderer({
       ? notesLt[field.notes] || field.notes
       : field.notes;
 
-  const sectionTitle =
-    field.section === "Family longevity"
-      ? locale === "lt"
-        ? SECTION_TITLE_LT[field.section] || field.section
-        : field.section
-      : null;
-
   return (
     <div className="q-field">
-      {sectionTitle &&
-      field.id === "10_family_history__longevity__relative_lived_to_85" ? (
-        <h3 className="overview-subhead m-0" style={{ marginBottom: 4 }}>
-          {sectionTitle}
-        </h3>
-      ) : null}
       <div className="q-field-head">
         <label className="q-label" htmlFor={`q-${field.id}`}>
           {title}
@@ -920,7 +917,7 @@ function CancerBlock({
   );
 }
 
-function FamilyHistoryBlock({
+function FamilyDiseaseBlock({
   def,
   answers,
   mode,
@@ -949,11 +946,23 @@ function FamilyHistoryBlock({
   }
 
   return (
-    <div className="stack" style={{ gap: 12 }}>
-      <div className="row between">
+    <div className="stack q-family-section" style={{ gap: 12 }}>
+      <div>
         <h3 className="overview-subhead m-0">
-          {locale === "en" ? "Family members" : "Šeimos nariai"}
+          {locale === "en"
+            ? "1. Family diseases"
+            : "1. Šeimos ligos"}
         </h3>
+        <p className="small muted m-0 mt-1">
+          {locale === "en"
+            ? "Which illnesses did parents, grandparents, brothers or sisters have? Add one relative per card and mark their conditions."
+            : "Kokomis ligomis sirgo tėvai, seneliai, broliai ar seserys? Kiekvienam giminaičiui atskira kortelė — pažymėkite ligas."}
+        </p>
+      </div>
+      <div className="row between">
+        <span className="eyebrow m-0">
+          {locale === "en" ? "Relatives with conditions" : "Giminaičiai ir ligos"}
+        </span>
         {!readOnly ? (
           <button
             type="button"
@@ -968,8 +977,6 @@ function FamilyHistoryBlock({
                     relative: "",
                     conditions: [],
                     notes: "",
-                    vitalStatus: "",
-                    ageYears: null,
                   },
                 ],
               }))
@@ -982,27 +989,36 @@ function FamilyHistoryBlock({
       {!answers.familyMembers.length ? (
         <div className="empty">
           {locale === "en"
-            ? "No family members added yet."
-            : "Šeimos narių dar nepridėta."}
+            ? "No disease history added yet."
+            : "Ligos anamnezė dar neužpildyta."}
         </div>
       ) : null}
       {answers.familyMembers.map((m) => (
         <div key={m.id} className="q-cond-card">
-          <div className="row between">
-            <select
-              disabled={readOnly}
-              value={m.relative}
-              onChange={(e) => updateMember(m.id, { relative: e.target.value })}
-            >
-              <option value="">
-                {locale === "en" ? "Relative…" : "Giminaitis…"}
-              </option>
-              {relativeItems.map((r) => (
-                <option key={r} value={r}>
-                  {optionLabel(r, locale)}
+          <div className="row between" style={{ gap: 8, flexWrap: "wrap" }}>
+            <label className="stack" style={{ gap: 4, flex: 1, minWidth: 160 }}>
+              <span className="xs muted">
+                {locale === "en" ? "Who?" : "Kas?"}
+              </span>
+              <select
+                disabled={readOnly}
+                value={m.relative}
+                onChange={(e) =>
+                  updateMember(m.id, { relative: e.target.value })
+                }
+              >
+                <option value="">
+                  {locale === "en"
+                    ? "Parent / grandparent / sibling…"
+                    : "Tėvas / motina / senelis / brolis…"}
                 </option>
-              ))}
-            </select>
+                {relativeItems.map((r) => (
+                  <option key={r} value={r}>
+                    {optionLabel(r, locale)}
+                  </option>
+                ))}
+              </select>
+            </label>
             {!readOnly ? (
               <button
                 type="button"
@@ -1018,61 +1034,276 @@ function FamilyHistoryBlock({
               </button>
             ) : null}
           </div>
-          <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
-            <select
+          <div className="stack" style={{ gap: 4 }}>
+            <span className="xs muted">
+              {locale === "en"
+                ? "Conditions they had / have"
+                : "Ligos, kuriomis sirgo / serga"}
+            </span>
+            <MultiSelect
               disabled={readOnly}
-              value={m.vitalStatus || ""}
-              onChange={(e) =>
-                updateMember(m.id, { vitalStatus: e.target.value })
-              }
-              aria-label={
-                locale === "en" ? "Living or deceased" : "Gyvas ar miręs"
-              }
-            >
-              <option value="">
-                {locale === "en" ? "Status…" : "Būsena…"}
-              </option>
-              {(["Living", "Deceased", "Unknown"] as const).map((s) => (
-                <option key={s} value={s}>
-                  {optionLabel(s, locale)}
-                </option>
-              ))}
-            </select>
-            <input
-              disabled={readOnly}
-              type="number"
-              min={0}
-              max={120}
-              placeholder={
-                locale === "en"
-                  ? "Age (current or at death)"
-                  : "Amžius (dabartinis / mirties)"
-              }
-              value={m.ageYears == null ? "" : String(m.ageYears)}
-              onChange={(e) =>
-                updateMember(m.id, {
-                  ageYears:
-                    e.target.value === "" ? null : Number(e.target.value),
-                })
-              }
-              style={{ maxWidth: 220 }}
+              value={m.conditions}
+              options={[]}
+              grouped={famList || null}
+              onChange={(next) => updateMember(m.id, { conditions: next })}
             />
           </div>
-          <MultiSelect
-            disabled={readOnly}
-            value={m.conditions}
-            options={[]}
-            grouped={famList || null}
-            onChange={(next) => updateMember(m.id, { conditions: next })}
-          />
           <input
             disabled={readOnly}
-            placeholder={locale === "en" ? "Notes" : "Pastabos"}
+            placeholder={
+              locale === "en"
+                ? "Notes (optional, e.g. age at diagnosis)"
+                : "Pastabos (nebūtina, pvz. amžius diagnozės metu)"
+            }
             value={m.notes || ""}
             onChange={(e) => updateMember(m.id, { notes: e.target.value })}
           />
         </div>
       ))}
+    </div>
+  );
+}
+
+function FamilyLongevityBlock({
+  def,
+  answers,
+  mode,
+  locale,
+  onAnswers,
+}: {
+  def: QDefinition;
+  answers: QuestionnaireAnswers;
+  mode: Mode;
+  locale: "lt" | "en";
+  onAnswers: React.Dispatch<React.SetStateAction<QuestionnaireAnswers>>;
+}) {
+  const readOnly = mode === "view";
+  const relatives = def.lists["Relatives"];
+  const relativeItems =
+    relatives && !relatives.grouped ? relatives.items : [];
+  const gate = String(answers.values[LONGEVITY_GATE_ID] || "");
+  const showPeople = /^yes$/i.test(gate);
+
+  function updatePerson(id: string, patch: Partial<LongevityRelative>) {
+    onAnswers((p) => ({
+      ...p,
+      longevityMembers: p.longevityMembers.map((m) =>
+        m.id === id ? { ...m, ...patch } : m
+      ),
+    }));
+  }
+
+  function setGate(next: string) {
+    onAnswers((p) => {
+      const nextMembers =
+        /^yes$/i.test(next) && !p.longevityMembers.length
+          ? [
+              {
+                id: uid(),
+                relative: "",
+                vitalStatus: "",
+                ageYears: null,
+                notes: "",
+              },
+            ]
+          : p.longevityMembers;
+      return {
+        ...p,
+        values: { ...p.values, [LONGEVITY_GATE_ID]: next || null },
+        longevityMembers: nextMembers,
+      };
+    });
+  }
+
+  return (
+    <div
+      className="stack q-family-section q-family-longevity"
+      style={{ gap: 12 }}
+    >
+      <div>
+        <h3 className="overview-subhead m-0">
+          {locale === "en"
+            ? "2. Family longevity"
+            : "2. Šeimos ilgaamžiškumas"}
+        </h3>
+        <p className="small muted m-0 mt-1">
+          {locale === "en"
+            ? "Separate from diseases: how long close relatives lived. This helps the longevity model."
+            : "Atskirai nuo ligų: kiek ilgai gyveno artimi giminaičiai. Tai naudojama ilgaamžiškumo modeliui."}
+        </p>
+      </div>
+
+      <label className="stack" style={{ gap: 6 }}>
+        <span className="q-label">
+          {locale === "en"
+            ? "Has any blood relative lived to age 80 or older?"
+            : "Ar kas nors iš kraujo giminaičių nugyveno 80 metų ar daugiau?"}
+        </span>
+        <select
+          disabled={readOnly}
+          className="q-select"
+          value={gate}
+          onChange={(e) => setGate(e.target.value)}
+        >
+          <option value="">
+            {locale === "en" ? "Select…" : "Pasirinkite…"}
+          </option>
+          {(["Yes", "No", "Unknown"] as const).map((o) => (
+            <option key={o} value={o}>
+              {optionLabel(o, locale)}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      {showPeople ? (
+        <div className="stack" style={{ gap: 10 }}>
+          <div className="row between">
+            <p className="small muted m-0">
+              {locale === "en"
+                ? "Add who reached 80+, and their age at death — or current age if still living."
+                : "Nurodykite, kas nugyveno 80+, ir amžių mirties metu — arba dabartinį amžių, jei dar gyvas."}
+            </p>
+            {!readOnly ? (
+              <button
+                type="button"
+                className="btn ghost sm"
+                onClick={() =>
+                  onAnswers((p) => ({
+                    ...p,
+                    longevityMembers: [
+                      ...p.longevityMembers,
+                      {
+                        id: uid(),
+                        relative: "",
+                        vitalStatus: "",
+                        ageYears: null,
+                        notes: "",
+                      },
+                    ],
+                  }))
+                }
+              >
+                {locale === "en" ? "Add person" : "Pridėti asmenį"}
+              </button>
+            ) : null}
+          </div>
+
+          {answers.longevityMembers.map((m) => {
+            const living = /^living$/i.test(m.vitalStatus || "");
+            const deceased = /^deceased$/i.test(m.vitalStatus || "");
+            return (
+              <div key={m.id} className="q-cond-card">
+                <div
+                  className="row"
+                  style={{ gap: 8, flexWrap: "wrap", alignItems: "flex-end" }}
+                >
+                  <label
+                    className="stack"
+                    style={{ gap: 4, flex: "1 1 160px" }}
+                  >
+                    <span className="xs muted">
+                      {locale === "en" ? "Relation" : "Giminystė"}
+                    </span>
+                    <select
+                      disabled={readOnly}
+                      value={m.relative}
+                      onChange={(e) =>
+                        updatePerson(m.id, { relative: e.target.value })
+                      }
+                    >
+                      <option value="">
+                        {locale === "en" ? "Who…" : "Kas…"}
+                      </option>
+                      {relativeItems.map((r) => (
+                        <option key={r} value={r}>
+                          {optionLabel(r, locale)}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label
+                    className="stack"
+                    style={{ gap: 4, flex: "1 1 140px" }}
+                  >
+                    <span className="xs muted">
+                      {locale === "en" ? "Status" : "Būsena"}
+                    </span>
+                    <select
+                      disabled={readOnly}
+                      value={m.vitalStatus || ""}
+                      onChange={(e) =>
+                        updatePerson(m.id, { vitalStatus: e.target.value })
+                      }
+                    >
+                      <option value="">
+                        {locale === "en" ? "Select…" : "Pasirinkite…"}
+                      </option>
+                      {(["Living", "Deceased", "Unknown"] as const).map(
+                        (s) => (
+                          <option key={s} value={s}>
+                            {optionLabel(s, locale)}
+                          </option>
+                        )
+                      )}
+                    </select>
+                  </label>
+                  <label
+                    className="stack"
+                    style={{ gap: 4, flex: "1 1 140px" }}
+                  >
+                    <span className="xs muted">
+                      {living
+                        ? locale === "en"
+                          ? "Current age"
+                          : "Dabartinis amžius"
+                        : deceased
+                          ? locale === "en"
+                            ? "Age at death"
+                            : "Amžius mirties metu"
+                          : locale === "en"
+                            ? "Age (years)"
+                            : "Amžius (metais)"}
+                    </span>
+                    <input
+                      disabled={readOnly}
+                      type="number"
+                      min={80}
+                      max={120}
+                      placeholder="80+"
+                      value={m.ageYears == null ? "" : String(m.ageYears)}
+                      onChange={(e) =>
+                        updatePerson(m.id, {
+                          ageYears:
+                            e.target.value === ""
+                              ? null
+                              : Number(e.target.value),
+                        })
+                      }
+                    />
+                  </label>
+                  {!readOnly ? (
+                    <button
+                      type="button"
+                      className="btn ghost sm"
+                      onClick={() =>
+                        onAnswers((p) => ({
+                          ...p,
+                          longevityMembers: p.longevityMembers.filter(
+                            (x) => x.id !== m.id
+                          ),
+                        }))
+                      }
+                    >
+                      {locale === "en" ? "Remove" : "Pašalinti"}
+                    </button>
+                  ) : null}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : null}
     </div>
   );
 }

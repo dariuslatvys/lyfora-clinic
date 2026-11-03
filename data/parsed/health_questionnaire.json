@@ -143,14 +143,8 @@
       "fields": [
         "10_family_history__family_member_entry_repeatable__relative",
         "10_family_history__family_member_entry_repeatable__medical_conditions",
-        "10_family_history__family_member_entry_repeatable__vital_status",
-        "10_family_history__family_member_entry_repeatable__age_years",
         "10_family_history__family_member_entry_repeatable__notes",
-        "10_family_history__longevity__relative_lived_to_85",
-        "10_family_history__longevity__relative_lived_to_90",
-        "10_family_history__longevity__relative_lived_to_100",
-        "10_family_history__longevity__longest_parent_age",
-        "10_family_history__longevity__first_degree_past_85"
+        "10_family_history__longevity__lived_past_80"
       ]
     }
   ],
@@ -1645,42 +1639,6 @@
     },
     {
       "nr": 82,
-      "id": "10_family_history__family_member_entry_repeatable__vital_status",
-      "step": "10. Family History",
-      "section": "Family Member Entry (repeatable)",
-      "label": "Living or deceased",
-      "required": false,
-      "auto": false,
-      "type": "select",
-      "options": [
-        "Living",
-        "Deceased",
-        "Unknown"
-      ],
-      "listRef": null,
-      "showWhen": "Family member added",
-      "notes": "Used for family longevity scoring",
-      "repeatOf": "family",
-      "unit": null
-    },
-    {
-      "nr": 83,
-      "id": "10_family_history__family_member_entry_repeatable__age_years",
-      "step": "10. Family History",
-      "section": "Family Member Entry (repeatable)",
-      "label": "Age (current or at death)",
-      "required": false,
-      "auto": false,
-      "type": "number",
-      "options": null,
-      "listRef": null,
-      "showWhen": "Family member added",
-      "notes": "Current age if living, or age at death",
-      "repeatOf": "family",
-      "unit": "years"
-    },
-    {
-      "nr": 84,
       "id": "10_family_history__family_member_entry_repeatable__notes",
       "step": "10. Family History",
       "section": "Family Member Entry (repeatable)",
@@ -1696,11 +1654,11 @@
       "unit": null
     },
     {
-      "nr": 85,
-      "id": "10_family_history__longevity__relative_lived_to_85",
+      "nr": 83,
+      "id": "10_family_history__longevity__lived_past_80",
       "step": "10. Family History",
       "section": "Family longevity",
-      "label": "Has any blood relative lived to age 85 or older?",
+      "label": "Has any blood relative lived to age 80 or older?",
       "required": false,
       "auto": false,
       "type": "select",
@@ -1711,84 +1669,7 @@
       ],
       "listRef": null,
       "showWhen": "Visada",
-      "notes": "Exceptional longevity (~top 10–15% of a birth cohort) clusters in families",
-      "repeatOf": null,
-      "unit": null
-    },
-    {
-      "nr": 86,
-      "id": "10_family_history__longevity__relative_lived_to_90",
-      "step": "10. Family History",
-      "section": "Family longevity",
-      "label": "Has any blood relative lived to age 90 or older?",
-      "required": false,
-      "auto": false,
-      "type": "select",
-      "options": [
-        "Yes",
-        "No",
-        "Unknown"
-      ],
-      "listRef": null,
-      "showWhen": "Visada",
-      "notes": "Stronger familial longevity signal than age 85 alone",
-      "repeatOf": null,
-      "unit": null
-    },
-    {
-      "nr": 87,
-      "id": "10_family_history__longevity__relative_lived_to_100",
-      "step": "10. Family History",
-      "section": "Family longevity",
-      "label": "Has a parent or grandparent lived to age 100 or older?",
-      "required": false,
-      "auto": false,
-      "type": "select",
-      "options": [
-        "Yes",
-        "No",
-        "Unknown"
-      ],
-      "listRef": null,
-      "showWhen": "Visada",
-      "notes": "Centenarian offspring show lower mortality and later CVD in cohort studies",
-      "repeatOf": null,
-      "unit": null
-    },
-    {
-      "nr": 88,
-      "id": "10_family_history__longevity__longest_parent_age",
-      "step": "10. Family History",
-      "section": "Family longevity",
-      "label": "Longest-lived parent’s age (current or at death)",
-      "required": false,
-      "auto": false,
-      "type": "number",
-      "options": null,
-      "listRef": null,
-      "showWhen": "Visada",
-      "notes": "Parental lifespan above ~80–85 years shows stronger resemblance in offspring",
-      "repeatOf": null,
-      "unit": "years"
-    },
-    {
-      "nr": 89,
-      "id": "10_family_history__longevity__first_degree_past_85",
-      "step": "10. Family History",
-      "section": "Family longevity",
-      "label": "How many first-degree relatives (parents or siblings) lived past 85?",
-      "required": false,
-      "auto": false,
-      "type": "select",
-      "options": [
-        "0",
-        "1",
-        "2 or more",
-        "Unknown"
-      ],
-      "listRef": null,
-      "showWhen": "Visada",
-      "notes": "Having multiple longevous first-degree relatives strengthens the familial signal",
+      "notes": "If Yes, add who and their age (current or at death)",
       "repeatOf": null,
       "unit": null
     }

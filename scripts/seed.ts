@@ -819,45 +819,40 @@ async function main() {
           ];
     }
 
-    // Keep only credible 80+ longevity rows; otherwise install clean demo ages
-    a.longevityMembers = (a.longevityMembers || []).filter(
-      (m) => typeof m.ageYears === "number" && Number(m.ageYears) >= 80 && Number(m.ageYears) <= 120
-    );
-    if (!a.longevityMembers.length) {
-      a.longevityMembers = isFemale
-        ? [
-            {
-              id: "lon_seed_f1",
-              relative: "Mother",
-              vitalStatus: "Living",
-              ageYears: 86,
-              notes: "",
-            },
-            {
-              id: "lon_seed_f2",
-              relative: "Father",
-              vitalStatus: "Living",
-              ageYears: 84,
-              notes: "",
-            },
-          ]
-        : [
-            {
-              id: "lon_seed_m1",
-              relative: "Mother",
-              vitalStatus: "Living",
-              ageYears: 88,
-              notes: "",
-            },
-            {
-              id: "lon_seed_m2",
-              relative: "Maternal Grandmother",
-              vitalStatus: "Deceased",
-              ageYears: 92,
-              notes: "",
-            },
-          ];
-    }
+    // Demo longevity list (separate from disease cards)
+    a.longevityMembers = isFemale
+      ? [
+          {
+            id: "lon_seed_f1",
+            relative: "Mother",
+            vitalStatus: "Living",
+            ageYears: 86,
+            notes: "",
+          },
+          {
+            id: "lon_seed_f2",
+            relative: "Father",
+            vitalStatus: "Living",
+            ageYears: 84,
+            notes: "",
+          },
+        ]
+      : [
+          {
+            id: "lon_seed_m1",
+            relative: "Mother",
+            vitalStatus: "Living",
+            ageYears: 88,
+            notes: "",
+          },
+          {
+            id: "lon_seed_m2",
+            relative: "Maternal Grandmother",
+            vitalStatus: "Deceased",
+            ageYears: 92,
+            notes: "",
+          },
+        ];
     a.updatedAt = a.updatedAt || new Date().toISOString();
     return JSON.stringify(a);
   }

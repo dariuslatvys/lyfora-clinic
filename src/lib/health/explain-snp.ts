@@ -24,7 +24,7 @@ function colourWord(locale: Locale, colour: RiskColour | null): string {
     yellow: "stebėti",
     orange: "dėmesio",
     red: "kritiška",
-    badge: "genetinis žymuo",
+    badge: "Low",
   };
   const en: Record<RiskColour, string> = {
     grey: "insufficient data",
@@ -32,7 +32,7 @@ function colourWord(locale: Locale, colour: RiskColour | null): string {
     yellow: "watch",
     orange: "attention",
     red: "critical",
-    badge: "genetic badge",
+    badge: "Low",
   };
   return locale === "en" ? en[colour] : lt[colour];
 }

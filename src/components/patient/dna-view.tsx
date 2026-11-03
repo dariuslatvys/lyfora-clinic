@@ -39,7 +39,7 @@ function colourTitle(colour: string, locale: "lt" | "en") {
     locale === "en"
       ? {
           green: "No risk",
-          badge: "Genetic marker",
+          badge: "Low",
           yellow: "Low",
           orange: "Elevated",
           red: "Significant",
@@ -47,7 +47,7 @@ function colourTitle(colour: string, locale: "lt" | "en") {
         }
       : {
           green: "No risk",
-          badge: "Genetinis žymuo",
+          badge: "Low",
           yellow: "Nedidelė",
           orange: "Padidėjusi",
           red: "Ženkli",
@@ -115,7 +115,7 @@ export function DnaView({
               "Genetics shows predisposition, not a diagnosis. Most risks change a lot with lifestyle and timely tests.",
             book: "Genetics consult",
             kpiGreen: "No risk",
-            kpiBadge: "Marker without clinical effect",
+            kpiBadge: "Low",
             kpiYellow: "Low",
             kpiOrange: "Elevated",
             search: "Search rsID, gene or keyword…",
@@ -168,7 +168,7 @@ export function DnaView({
               "Genetika rodo polinkį, o ne diagnozę. Daugumą rizikų stipriai keičia gyvensena ir laiku atlikti tyrimai.",
             book: "Genetiko konsultacija",
             kpiGreen: "No risk",
-            kpiBadge: "Žymuo be klinikinio poveikio",
+            kpiBadge: "Low",
             kpiYellow: "Nedidelė",
             kpiOrange: "Padidėjusi",
             search: "Ieškoti pagal rsID, geną ar raktinį žodį…",

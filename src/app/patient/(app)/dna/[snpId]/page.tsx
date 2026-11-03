@@ -25,7 +25,7 @@ function colourTitle(colour: DnaResultColour, locale: "lt" | "en") {
     locale === "en"
       ? {
           green: "No risk",
-          badge: "Genetic marker",
+          badge: "Low",
           yellow: "Low",
           orange: "Elevated",
           red: "Significant",
@@ -33,7 +33,7 @@ function colourTitle(colour: DnaResultColour, locale: "lt" | "en") {
         }
       : {
           green: "No risk",
-          badge: "Genetinis žymuo",
+          badge: "Low",
           yellow: "Nedidelė",
           orange: "Padidėjusi",
           red: "Ženkli",

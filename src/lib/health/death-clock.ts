@@ -58,9 +58,9 @@ const ALGORITHM_RULES: DeathClockAlgorithmRule[] = [
     titleLt: "Skaitmeninio dvynio spalvos",
     titleEn: "Digital-twin colours",
     bodyLt:
-      "Kategorijų spalvos: žalia +4, geltona −12, oranžinė −28, raudona −55, genetinis žymuo −8 sav. už kiekvieną sritį.",
+      "Kategorijų spalvos: žalia +4, geltona −12, oranžinė −28, raudona −55, Low (badge) −8 sav. už kiekvieną sritį.",
     bodyEn:
-      "Category colours: green +4, yellow −12, orange −28, red −55, genetic badge −8 weeks per area.",
+      "Category colours: green +4, yellow −12, orange −28, red −55, Low (badge) −8 weeks per area.",
   },
   {
     id: "nks",
@@ -266,21 +266,30 @@ export function loadDeathClock(
     });
   }
 
-  // SNP risk allele load (orange/red matches)
-  let snpRisk = 0;
+  // SNP panel: count markers with 1 vs 2 risk alleles (patient-friendly label)
+  let snpOneCopy = 0;
+  let snpBothCopies = 0;
   for (const c of twin.categories) {
     for (const s of c.snps || []) {
-      if (s.matchCount >= 2) snpRisk += 1;
-      else if (s.matchCount === 1) snpRisk += 0.4;
+      if (s.matchCount >= 2) snpBothCopies += 1;
+      else if (s.matchCount === 1) snpOneCopy += 1;
     }
   }
+  const snpRisk = snpOneCopy * 0.4 + snpBothCopies;
   if (snpRisk > 0) {
     const hit = -Math.min(140, Math.round(snpRisk * 4));
     delta += hit;
+    const snpMarkerTotal = snpOneCopy + snpBothCopies;
     drivers.push({
       id: "snp-load",
-      labelLt: `SNP rizikos alelių apkrova (~${snpRisk.toFixed(1)})`,
-      labelEn: `SNP risk-allele load (~${snpRisk.toFixed(1)})`,
+      labelLt:
+        snpBothCopies > 0
+          ? `Bazinis SNP tyrimas: ${snpMarkerTotal} žymenų su rizikos aleliu (${snpBothCopies} — abi kopijos)`
+          : `Bazinis SNP tyrimas: ${snpMarkerTotal} žymenų su rizikos aleliu (po vieną kopiją)`,
+      labelEn:
+        snpBothCopies > 0
+          ? `Basic SNP test: ${snpMarkerTotal} markers with a risk allele (${snpBothCopies} — both copies)`
+          : `Basic SNP test: ${snpMarkerTotal} markers with a risk allele (one copy each)`,
       deltaWeeks: hit,
       kind: "risk",
     });

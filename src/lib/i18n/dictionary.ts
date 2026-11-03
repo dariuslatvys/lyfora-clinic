@@ -138,16 +138,16 @@ export const dict = {
       yellow: "Stebėti",
       orange: "Dėmesio",
       red: "Kritiška",
-      badge: "Genetinis žymuo",
+      badge: "Low",
     } as Record<string, string>,
-    /** Labels used only when colour refers to genes / SNP / NGS. */
+    /** Labels used only when colour refers to genes / SNP / NKS. */
     geneColourLabels: {
       grey: "Nėra duomenų",
       green: "No risk",
       yellow: "Nedidelė",
       orange: "Padidėjusi",
       red: "Ženkli",
-      badge: "Genetinis žymuo",
+      badge: "Low",
     } as Record<string, string>,
   },
   en: {
@@ -287,7 +287,7 @@ export const dict = {
       yellow: "Watch",
       orange: "Attention",
       red: "Critical",
-      badge: "Genetic marker",
+      badge: "Low",
     } as Record<string, string>,
     /** Labels used only when colour refers to genes / SNP / NGS. */
     geneColourLabels: {
@@ -296,7 +296,7 @@ export const dict = {
       yellow: "Low",
       orange: "Elevated",
       red: "Significant",
-      badge: "Genetic marker",
+      badge: "Low",
     } as Record<string, string>,
   },
 } as const;

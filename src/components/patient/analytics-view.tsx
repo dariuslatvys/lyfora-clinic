@@ -101,7 +101,7 @@ export function AnalyticsView({
       yellow: "Stebėti",
       orange: "Dėmesio",
       red: "Kritiška",
-      badge: "Genetinis žymuo",
+      badge: "Low",
     };
     const en: Record<RiskColour, string> = {
       grey: "No data",
@@ -109,7 +109,7 @@ export function AnalyticsView({
       yellow: "Watch",
       orange: "Attention",
       red: "Critical",
-      badge: "Genetic marker",
+      badge: "Low",
     };
     return locale === "en" ? en[c] : lt[c];
   };
@@ -122,7 +122,7 @@ export function AnalyticsView({
       yellow: "Nedidelė",
       orange: "Padidėjusi",
       red: "Ženkli",
-      badge: "Genetinis žymuo",
+      badge: "Low",
     };
     const en: Record<RiskColour, string> = {
       grey: "No data",
@@ -130,7 +130,7 @@ export function AnalyticsView({
       yellow: "Low",
       orange: "Elevated",
       red: "Significant",
-      badge: "Genetic marker",
+      badge: "Low",
     };
     return locale === "en" ? en[c] : lt[c];
   };

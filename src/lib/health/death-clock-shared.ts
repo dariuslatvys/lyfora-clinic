@@ -23,6 +23,12 @@ export type DeathClockRecommendation = {
   labelEn: string;
   detailLt: string;
   detailEn: string;
+  /** Why this matters — shown in the detail panel. */
+  explainLt?: string;
+  explainEn?: string;
+  /** Concrete action steps for the detail panel. */
+  actionsLt?: string[];
+  actionsEn?: string[];
   /** Extra life weeks if the person commits to this action. */
   gainWeeks: number;
   category: "lifestyle" | "clinical" | "monitoring";

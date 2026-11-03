@@ -87,7 +87,7 @@ export function PrescriptionsView({
     orange: locale === "en" ? "Moderate" : "Vidutinė",
     red: locale === "en" ? "Critical" : "Kritiška",
     grey: locale === "en" ? "No data" : "Nėra duomenų",
-    badge: locale === "en" ? "Genetic marker" : "Genetinis žymuo",
+    badge: "Low",
   };
 
   const copy = useMemo(

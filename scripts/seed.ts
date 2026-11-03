@@ -819,11 +819,11 @@ async function main() {
           ];
     }
 
-    if (
-      !a.longevityMembers.some(
-        (m) => typeof m.ageYears === "number" && Number(m.ageYears) >= 80
-      )
-    ) {
+    // Keep only credible 80+ longevity rows; otherwise install clean demo ages
+    a.longevityMembers = (a.longevityMembers || []).filter(
+      (m) => typeof m.ageYears === "number" && Number(m.ageYears) >= 80 && Number(m.ageYears) <= 120
+    );
+    if (!a.longevityMembers.length) {
       a.longevityMembers = isFemale
         ? [
             {

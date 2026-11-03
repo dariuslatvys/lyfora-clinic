@@ -947,22 +947,17 @@ function FamilyDiseaseBlock({
 
   return (
     <div className="stack q-family-section" style={{ gap: 12 }}>
-      <div>
-        <h3 className="overview-subhead m-0">
-          {locale === "en"
-            ? "1. Family diseases"
-            : "1. Šeimos ligos"}
-        </h3>
-        <p className="small muted m-0 mt-1">
-          {locale === "en"
-            ? "Which illnesses did parents, grandparents, brothers or sisters have? Add one relative per card and mark their conditions."
-            : "Kokomis ligomis sirgo tėvai, seneliai, broliai ar seserys? Kiekvienam giminaičiui atskira kortelė — pažymėkite ligas."}
-        </p>
-      </div>
-      <div className="row between">
-        <span className="eyebrow m-0">
-          {locale === "en" ? "Relatives with conditions" : "Giminaičiai ir ligos"}
-        </span>
+      <div className="row between" style={{ alignItems: "flex-start", gap: 12 }}>
+        <div>
+          <h3 className="overview-subhead m-0">
+            {locale === "en" ? "1. Family diseases" : "1. Šeimos ligos"}
+          </h3>
+          <p className="small muted m-0 mt-1">
+            {locale === "en"
+              ? "Choose the relative, then mark the diseases they had. Add another person for each relative."
+              : "Pasirinkite giminystės ryšį ir pažymėkite žinomas ligas. Kiekvienam žmogui — atskiras įrašas."}
+          </p>
+        </div>
         {!readOnly ? (
           <button
             type="button"
@@ -972,53 +967,28 @@ function FamilyDiseaseBlock({
                 ...p,
                 familyMembers: [
                   ...p.familyMembers,
-                  {
-                    id: uid(),
-                    relative: "",
-                    conditions: [],
-                    notes: "",
-                  },
+                  { id: uid(), relative: "", conditions: [] },
                 ],
               }))
             }
           >
-            {locale === "en" ? "Add relative" : "Pridėti giminaitį"}
+            {locale === "en" ? "Add person" : "Pridėti asmenį"}
           </button>
         ) : null}
       </div>
       {!answers.familyMembers.length ? (
         <div className="empty">
           {locale === "en"
-            ? "No disease history added yet."
-            : "Ligos anamnezė dar neužpildyta."}
+            ? "No relatives added yet. Use “Add person”."
+            : "Dar nieko nepridėta. Spauskite „Pridėti asmenį“."}
         </div>
       ) : null}
-      {answers.familyMembers.map((m) => (
+      {answers.familyMembers.map((m, idx) => (
         <div key={m.id} className="q-cond-card">
-          <div className="row between" style={{ gap: 8, flexWrap: "wrap" }}>
-            <label className="stack" style={{ gap: 4, flex: 1, minWidth: 160 }}>
-              <span className="xs muted">
-                {locale === "en" ? "Who?" : "Kas?"}
-              </span>
-              <select
-                disabled={readOnly}
-                value={m.relative}
-                onChange={(e) =>
-                  updateMember(m.id, { relative: e.target.value })
-                }
-              >
-                <option value="">
-                  {locale === "en"
-                    ? "Parent / grandparent / sibling…"
-                    : "Tėvas / motina / senelis / brolis…"}
-                </option>
-                {relativeItems.map((r) => (
-                  <option key={r} value={r}>
-                    {optionLabel(r, locale)}
-                  </option>
-                ))}
-              </select>
-            </label>
+          <div className="row between" style={{ gap: 8, alignItems: "center" }}>
+            <span className="eyebrow m-0">
+              {locale === "en" ? `Person ${idx + 1}` : `Asmuo ${idx + 1}`}
+            </span>
             {!readOnly ? (
               <button
                 type="button"
@@ -1034,11 +1004,33 @@ function FamilyDiseaseBlock({
               </button>
             ) : null}
           </div>
+          <label className="stack" style={{ gap: 4 }}>
+            <span className="q-label">
+              {locale === "en" ? "Family relation" : "Giminystės ryšys"}
+            </span>
+            <select
+              disabled={readOnly}
+              className="q-select"
+              value={m.relative}
+              onChange={(e) =>
+                updateMember(m.id, { relative: e.target.value })
+              }
+            >
+              <option value="">
+                {locale === "en" ? "Select…" : "Pasirinkite…"}
+              </option>
+              {relativeItems.map((r) => (
+                <option key={r} value={r}>
+                  {optionLabel(r, locale)}
+                </option>
+              ))}
+            </select>
+          </label>
           <div className="stack" style={{ gap: 4 }}>
-            <span className="xs muted">
+            <span className="q-label">
               {locale === "en"
-                ? "Conditions they had / have"
-                : "Ligos, kuriomis sirgo / serga"}
+                ? "Known diseases"
+                : "Žinomos ligos"}
             </span>
             <MultiSelect
               disabled={readOnly}
@@ -1048,16 +1040,6 @@ function FamilyDiseaseBlock({
               onChange={(next) => updateMember(m.id, { conditions: next })}
             />
           </div>
-          <input
-            disabled={readOnly}
-            placeholder={
-              locale === "en"
-                ? "Notes (optional, e.g. age at diagnosis)"
-                : "Pastabos (nebūtina, pvz. amžius diagnozės metu)"
-            }
-            value={m.notes || ""}
-            onChange={(e) => updateMember(m.id, { notes: e.target.value })}
-          />
         </div>
       ))}
     </div>

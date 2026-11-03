@@ -775,49 +775,35 @@ async function main() {
     a.values["10_family_history__longevity__lived_past_80"] =
       a.values["10_family_history__longevity__lived_past_80"] || "Yes";
 
-    // Demo patients: keep diseases and longevity in clearly separate lists
-    a.familyMembers = (a.familyMembers || [])
-      .map((m) => ({
-        id: m.id,
-        relative: m.relative || "",
-        conditions: m.conditions || [],
-        notes: m.notes,
-      }))
-      .filter((m) => (m.conditions || []).length > 0);
-    if (!a.familyMembers.length) {
-      a.familyMembers = isFemale
-        ? [
-            {
-              id: "fm_seed_f1",
-              relative: "Maternal Grandmother",
-              conditions: ["Breast Cancer"],
-              notes: "",
-            },
-            {
-              id: "fm_seed_f2",
-              relative: "Mother",
-              conditions: ["High Blood Pressure"],
-              notes: "",
-            },
-          ]
-        : [
-            {
-              id: "fm_seed_m1",
-              relative: "Father",
-              conditions: [
-                "Heart Attack / Myocardial Infarction",
-                "High Blood Pressure",
-              ],
-              notes: "MI ~58 m.",
-            },
-            {
-              id: "fm_seed_m3",
-              relative: "Mother",
-              conditions: ["High Blood Pressure"],
-              notes: "",
-            },
-          ];
-    }
+    // Demo disease anamnesis: relation + known diseases only (no free-text notes)
+    a.familyMembers = isFemale
+      ? [
+          {
+            id: "fm_seed_f1",
+            relative: "Maternal Grandmother",
+            conditions: ["Breast Cancer"],
+          },
+          {
+            id: "fm_seed_f2",
+            relative: "Mother",
+            conditions: ["High Blood Pressure"],
+          },
+        ]
+      : [
+          {
+            id: "fm_seed_m1",
+            relative: "Father",
+            conditions: [
+              "Heart Attack / Myocardial Infarction",
+              "High Blood Pressure",
+            ],
+          },
+          {
+            id: "fm_seed_m3",
+            relative: "Mother",
+            conditions: ["High Blood Pressure"],
+          },
+        ];
 
     // Demo longevity list (separate from disease cards)
     a.longevityMembers = isFemale

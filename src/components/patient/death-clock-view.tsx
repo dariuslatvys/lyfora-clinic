@@ -431,6 +431,31 @@ export function DeathClockView({ data }: { data: DeathClockPayload }) {
           </div>
 
           <TimelineBar pct={livedPct} endLabel={endLabelCurrent} />
+
+          <div className="death-clock-recs-launch">
+            <button
+              type="button"
+              className="btn"
+              onClick={() => {
+                setRecsOpen((v) => {
+                  const next = !v;
+                  if (next) {
+                    window.requestAnimationFrame(() => {
+                      document
+                        .getElementById("death-clock-recs")
+                        ?.scrollIntoView({
+                          behavior: "smooth",
+                          block: "start",
+                        });
+                    });
+                  }
+                  return next;
+                });
+              }}
+            >
+              {recsOpen ? copy.hideRecs : copy.openRecs}
+            </button>
+          </div>
         </section>
 
         {showProjection ? (
@@ -565,16 +590,6 @@ export function DeathClockView({ data }: { data: DeathClockPayload }) {
             ))}
           </div>
         </section>
-      </div>
-
-      <div className="death-clock-recs-launch">
-        <button
-          type="button"
-          className="btn"
-          onClick={() => setRecsOpen((v) => !v)}
-        >
-          {recsOpen ? copy.hideRecs : copy.openRecs}
-        </button>
       </div>
 
       {recsOpen ? (

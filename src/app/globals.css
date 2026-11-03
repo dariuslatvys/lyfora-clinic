@@ -2061,6 +2061,8 @@ a.who.on {
 .death-clock-recs-launch {
   display: flex;
   justify-content: flex-start;
+  padding-top: 4px;
+  margin-top: 2px;
 }
 
 .death-clock-recs-footer {

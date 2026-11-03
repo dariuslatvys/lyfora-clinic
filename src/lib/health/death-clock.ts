@@ -73,12 +73,12 @@ const ALGORITHM_RULES: DeathClockAlgorithmRule[] = [
   },
   {
     id: "snp",
-    titleLt: "SNP rizikos alelių apkrova",
-    titleEn: "SNP risk-allele load",
+    titleLt: "Bazinis SNP tyrimas (rizikos aleliai)",
+    titleEn: "Basic SNP test (risk alleles)",
     bodyLt:
-      "Kiekvienas rizikos alelis (~0,4 už heterozigotą, 1 už homozigotą) × −4 sav., riba −140.",
+      "Skaičiuojame, kiek SNP žymenų turi rizikos alelį: viena kopija (heterozigota) = 0,4 taško, abi kopijos (homozigota) = 1 taškas. Suma × −4 sav. (riba −140). Tai ne diagnozė — tik bendras polinkių „svoris“ iš SNP panelės.",
     bodyEn:
-      "Each risk allele (~0.4 hetero, 1 homo) × −4 weeks, capped at −140.",
+      "We count how many SNP markers carry a risk allele: one copy (heterozygous) = 0.4 points, both copies (homozygous) = 1 point. Sum × −4 weeks (cap −140). Not a diagnosis — just the combined predisposition weight from the SNP panel.",
   },
   {
     id: "labs",
@@ -99,13 +99,22 @@ const ALGORITHM_RULES: DeathClockAlgorithmRule[] = [
       "Smoking −220 / non-smoker +25; heavy alcohol −90; activity +55 / low −40; sleep 7–9 h +20 / short −35; family history (heart/oncology) −70.",
   },
   {
-    id: "clamp",
-    titleLt: "Ribos ir rekomendacijos",
-    titleEn: "Bounds and recommendations",
+    id: "recs",
+    titleLt: "Rekomendacijos (gyvensena, mityba, stebėsena)",
+    titleEn: "Recommendations (lifestyle, diet, monitoring)",
     bodyLt:
-      "Galutinė trukmė apribojama 2200–5200 sav. Rekomendacijos — tik keičiami veiksmai; pažymėjus jas, prie bazinio įverčio pridedamos teigiamos savaitės ir perskaičiuojama projekcija.",
+      "Pažymėtos rekomendacijos prideda savaites prie dabartinio įverčio (pvz. Viduržemio mityba, druska, žingsniai, miegas, alkoholis, lipidai). Jos veikia ir tada, kai bazėje nėra „raudonos“ baudos — modeliuoja papildomą prevencinį efektą.",
     bodyEn:
-      "Final span is clamped to 2200–5200 weeks. Recommendations are modifiable actions only; checking them adds positive weeks to the baseline estimate and recalculates the projection.",
+      "Checked recommendations add weeks to the current estimate (e.g. Mediterranean diet, salt, steps, sleep, alcohol, lipids). They apply even without a red baseline penalty — modelling extra prevention.",
+  },
+  {
+    id: "clamp",
+    titleLt: "Ribos",
+    titleEn: "Bounds",
+    bodyLt:
+      "Galutinė trukmė apribojama 2200–5200 sav., kad demo suaugusiems liktų teigiama likusi trukmė.",
+    bodyEn:
+      "Final span is clamped to 2200–5200 weeks so demo adults keep a positive remaining span.",
   },
 ];
 
@@ -464,7 +473,7 @@ export function loadDeathClock(
   };
 
   const smokeDriver = driverById.get("smoke");
-  if (smokeDriver && smokeDriver.kind === "risk") {
+  if (smokeDriver?.kind === "risk") {
     pushRec({
       id: "quit-smoke",
       labelLt: "Mesti rūkyti / atsisakyti nikotino",
@@ -476,109 +485,222 @@ export function loadDeathClock(
       gainWeeks: Math.min(200, Math.abs(smokeDriver.deltaWeeks)),
       category: "lifestyle",
     });
+  } else {
+    pushRec({
+      id: "stay-smoke-free",
+      labelLt: "Išlikti be nikotino (įskaitant vapingą)",
+      labelEn: "Stay nicotine-free (including vaping)",
+      detailLt:
+        "Net jei dabar nerūkote — jokio grįžimo prie cigarečių, snuso ar e-cigarečių.",
+      detailEn:
+        "Even if you do not smoke now — no return to cigarettes, snus or e-cigarettes.",
+      gainWeeks: 30,
+      category: "lifestyle",
+    });
   }
 
   const alcoholDriver = driverById.get("alcohol");
-  if (alcoholDriver && alcoholDriver.kind === "risk") {
-    pushRec({
-      id: "cut-alcohol",
-      labelLt: "Sumažinti alkoholį iki retų / saikingų dozių",
-      labelEn: "Cut alcohol to rare / moderate amounts",
-      detailLt:
-        "Apribokite savaitinį alkoholio kiekį — modelis grąžina alkoholio riziką.",
-      detailEn:
-        "Limit weekly alcohol intake — the model restores the alcohol risk offset.",
-      gainWeeks: Math.abs(alcoholDriver.deltaWeeks),
-      category: "lifestyle",
-    });
-  }
+  pushRec({
+    id: "cut-alcohol",
+    labelLt: "Alkoholis — ne daugiau kaip 1–2 dozės / savaitę",
+    labelEn: "Alcohol — at most 1–2 drinks per week",
+    detailLt:
+      "Sumažinkite savaitinį alkoholį arba laikykite „be alkoholio“ savaites. Tai veikia kraujospūdį, miegą ir kepenis.",
+    detailEn:
+      "Cut weekly alcohol or keep alcohol-free weeks. Helps blood pressure, sleep and liver.",
+    gainWeeks:
+      alcoholDriver?.kind === "risk" ? Math.abs(alcoholDriver.deltaWeeks) : 40,
+    category: "lifestyle",
+  });
 
   const exerciseDriver = driverById.get("exercise");
-  if (!exerciseDriver || exerciseDriver.kind === "risk") {
-    pushRec({
-      id: "exercise-3x",
-      labelLt: "Fizinis aktyvumas ≥3 kartus per savaitę",
-      labelEn: "Exercise ≥3 times per week",
-      detailLt:
-        "Bent 150 min. vidutinio intensyvumo judėjimo per savaitę (ėjimas, jėga, aerobika).",
-      detailEn:
-        "At least 150 minutes of moderate activity per week (walking, strength, cardio).",
-      gainWeeks: exerciseDriver?.kind === "risk" ? 95 : 55,
-      category: "lifestyle",
-    });
-  }
+  pushRec({
+    id: "exercise-3x",
+    labelLt: "Fizinis aktyvumas ≥150 min. / savaitę",
+    labelEn: "Physical activity ≥150 min / week",
+    detailLt:
+      "Vidutinio intensyvumo judėjimas (ėjimas, dviratis, plaukimas) + 2 jėgos treniruotės.",
+    detailEn:
+      "Moderate movement (walking, bike, swim) plus 2 strength sessions.",
+    gainWeeks: exerciseDriver?.kind === "risk" ? 95 : 55,
+    category: "lifestyle",
+  });
+
+  pushRec({
+    id: "daily-steps",
+    labelLt: "≥8 000 žingsnių daugumą dienų",
+    labelEn: "≥8,000 steps on most days",
+    detailLt:
+      "Kasdienis ėjimas mažina metabolinę ir širdies riziką — net jei jau sportuojate 2–3 k./sav.",
+    detailEn:
+      "Daily walking lowers metabolic and heart risk — even if you already train 2–3×/week.",
+    gainWeeks: 35,
+    category: "lifestyle",
+  });
+
+  pushRec({
+    id: "strength-2x",
+    labelLt: "Jėgos treniruotės 2× / savaitę",
+    labelEn: "Strength training 2× / week",
+    detailLt:
+      "Didžiųjų raumenų grupių pratimai (kojos, nugaros, krūtinė) — raumenų masė siejama su ilgaamžiškumu.",
+    detailEn:
+      "Major muscle-group work (legs, back, chest) — muscle mass links to longevity.",
+    gainWeeks: 28,
+    category: "lifestyle",
+  });
 
   const sleepDriver = driverById.get("sleep");
-  if (!sleepDriver || sleepDriver.kind === "risk") {
-    pushRec({
-      id: "sleep-7",
-      labelLt: "Miegas 7–9 val. daugumą naktų",
-      labelEn: "Sleep 7–9 hours most nights",
-      detailLt:
-        "Stabilus miego režimas sumažina širdies ir metabolinę riziką.",
-      detailEn:
-        "A stable sleep pattern reduces cardiovascular and metabolic risk.",
-      gainWeeks: sleepDriver?.kind === "risk" ? 55 : 20,
-      category: "lifestyle",
-    });
-  }
+  pushRec({
+    id: "sleep-7",
+    labelLt: "Miegas 7–9 val. daugumą naktų",
+    labelEn: "Sleep 7–9 hours most nights",
+    detailLt:
+      "Fiksuotas miego / kėlimosi laikas, mažiau ekranų vakare — širdis ir metabolizmas atsigauna.",
+    detailEn:
+      "Fixed sleep/wake times, fewer late screens — heart and metabolism recover.",
+    gainWeeks: sleepDriver?.kind === "risk" ? 55 : 32,
+    category: "lifestyle",
+  });
+
+  pushRec({
+    id: "stress-routine",
+    labelLt: "Kasdienė streso / atsigavimo rutina (10–15 min.)",
+    labelEn: "Daily stress / recovery routine (10–15 min)",
+    detailLt:
+      "Kvėpavimas, meditacija ar ramus pasivaikščiojimas — gerina HRV ir kraujospūdį.",
+    detailEn:
+      "Breathing, meditation or a calm walk — improves HRV and blood pressure.",
+    gainWeeks: driverById.get("hrv")?.kind === "risk" ? 45 : 25,
+    category: "lifestyle",
+  });
+
+  // Diet / nutrition — always offered
+  pushRec({
+    id: "med-diet",
+    labelLt: "Viduržemio tipo mityba (daržovės, žuvis, alyvuogių aliejus)",
+    labelEn: "Mediterranean-style diet (veg, fish, olive oil)",
+    detailLt:
+      "Daugiau daržovių, ankštinių, riešutų, žuvies; mažiau raudonos / perdirbtos mėsos. Stiprus širdies ir onko prevencijos signalas.",
+    detailEn:
+      "More vegetables, legumes, nuts, fish; less red / processed meat. Strong heart and cancer-prevention signal.",
+    gainWeeks: 70,
+    category: "lifestyle",
+  });
+
+  pushRec({
+    id: "cut-ultra-processed",
+    labelLt: "Mažiau ultraprocessuoto maisto ir cukraus gėrimų",
+    labelEn: "Less ultra-processed food and sugary drinks",
+    detailLt:
+      "Saldūs gėrimai, greitas maistas, saldumynai — ne dažniau kaip retas malonumas.",
+    detailEn:
+      "Sugary drinks, fast food, sweets — keep as rare treats only.",
+    gainWeeks: 45,
+    category: "lifestyle",
+  });
+
+  pushRec({
+    id: "fibre-30",
+    labelLt: "Skaidulos ≥30 g / dieną",
+    labelEn: "Fibre ≥30 g / day",
+    detailLt:
+      "Viso grūdo produktai, ankštinės, daržovės — palaiko lipidus, gliukozę ir žarnyno sveikatą.",
+    detailEn:
+      "Whole grains, legumes, vegetables — supports lipids, glucose and gut health.",
+    gainWeeks: 30,
+    category: "lifestyle",
+  });
+
+  pushRec({
+    id: "salt-5g",
+    labelLt: "Druska <5 g / dieną",
+    labelEn: "Salt under 5 g / day",
+    detailLt:
+      "Mažiau sūdytų užkandžių ir gatavų patiekalų — tiesiogiai veikia kraujospūdį.",
+    detailEn:
+      "Fewer salty snacks and ready meals — directly affects blood pressure.",
+    gainWeeks: driverById.get("bp")?.kind === "risk" ? 50 : 28,
+    category: "lifestyle",
+  });
+
+  pushRec({
+    id: "weight-stable",
+    labelLt: "Kūno svoris ar juosmens apimtis link tikslo",
+    labelEn: "Body weight or waist toward target",
+    detailLt:
+      "Jei antsvoris — −5–10 % svorio; jei norma — išlaikyti. Mažina spaudimą, lipidus ir diabeto riziką.",
+    detailEn:
+      "If overweight — lose 5–10%; if already in range — maintain. Lowers BP, lipids and diabetes risk.",
+    gainWeeks: 50,
+    category: "lifestyle",
+  });
 
   const ldlDriver = driverById.get("ldl");
-  if (ldlDriver && ldlDriver.kind === "risk") {
-    pushRec({
-      id: "lower-ldl",
-      labelLt: "Sumažinti LDL (mityba / gydytojo planas)",
-      labelEn: "Lower LDL (diet / clinician plan)",
-      detailLt:
-        "Aptarkite lipidų tikslą su gydytoju: mityba, statinai ar kiti vaistai pagal indikacijas.",
-      detailEn:
-        "Agree an LDL target with your clinician: diet, statin or other therapy as indicated.",
-      gainWeeks: Math.min(120, Math.abs(ldlDriver.deltaWeeks)),
-      category: "clinical",
-    });
-  }
+  pushRec({
+    id: "lower-ldl",
+    labelLt: "LDL / lipidų tikslas (mityba + gydytojo planas)",
+    labelEn: "LDL / lipid target (diet + clinician plan)",
+    detailLt:
+      "Riebalų kokybė maiste, skaidulos; jei reikia — statinai ar kiti vaistai pagal indikacijas.",
+    detailEn:
+      "Fat quality and fibre in food; statin or other therapy if indicated.",
+    gainWeeks: ldlDriver?.kind === "risk"
+      ? Math.min(120, Math.abs(ldlDriver.deltaWeeks))
+      : 40,
+    category: "clinical",
+  });
 
   const bpDriver = driverById.get("bp");
-  if (bpDriver && bpDriver.kind === "risk") {
-    pushRec({
-      id: "control-bp",
-      labelLt: "Kontroliuoti kraujospūdį <140 mmHg",
-      labelEn: "Keep blood pressure under 140 mmHg",
-      detailLt:
-        "Reguliarūs matavimai, druskos mažinimas, vaistai jei paskirta — modelis grąžina spaudimo baudą.",
-      detailEn:
-        "Regular readings, less salt, medication if prescribed — the model restores the BP penalty.",
-      gainWeeks: Math.abs(bpDriver.deltaWeeks) + 15,
-      category: "clinical",
-    });
-  }
+  pushRec({
+    id: "control-bp",
+    labelLt: "Kraujospūdis <130/80 namuose",
+    labelEn: "Home blood pressure <130/80",
+    detailLt:
+      "Reguliarūs matavimai, druska, aktyvumas, vaistai jei paskirta.",
+    detailEn:
+      "Regular readings, salt, activity, medication if prescribed.",
+    gainWeeks:
+      bpDriver?.kind === "risk" ? Math.abs(bpDriver.deltaWeeks) + 20 : 35,
+    category: "clinical",
+  });
 
   const vo2Driver = driverById.get("vo2");
-  if (!vo2Driver || vo2Driver.kind === "risk") {
-    pushRec({
-      id: "raise-vo2",
-      labelLt: "Kelti VO₂max (aerobinė ištvermė)",
-      labelEn: "Raise VO₂max (cardio fitness)",
-      detailLt:
-        "2–3 intervalinės / ilgų žingsnių treniruotės per savaitę — tikslas VO₂max ≥40.",
-      detailEn:
-        "2–3 interval or long-walk sessions per week — aim for VO₂max ≥40.",
-      gainWeeks: vo2Driver?.kind === "risk" ? 75 : 35,
-      category: "lifestyle",
-    });
-  }
+  pushRec({
+    id: "raise-vo2",
+    labelLt: "Kelti VO₂max (aerobinė ištvermė)",
+    labelEn: "Raise VO₂max (cardio fitness)",
+    detailLt:
+      "1–2 intervalinės sesijos + ilgesni žingsniai / savaitę — net jei dabartinis VO₂max jau geras.",
+    detailEn:
+      "1–2 interval sessions plus longer walks weekly — even if current VO₂max is already good.",
+    gainWeeks: vo2Driver?.kind === "risk" ? 75 : vo2Driver ? 22 : 40,
+    category: "lifestyle",
+  });
 
-  const hrvDriver = driverById.get("hrv");
-  if (hrvDriver && hrvDriver.kind === "risk") {
+  const glucose = latestMarker(markers, "GLUCOSE");
+  if (glucose?.value != null && glucose.value >= 5.6) {
     pushRec({
-      id: "raise-hrv",
-      labelLt: "Gerinti HRV (streso / atsigavimo režimas)",
-      labelEn: "Improve HRV (stress / recovery routine)",
+      id: "glucose-control",
+      labelLt: "Gliukozės / HbA1c kontrolė (mityba + judėjimas)",
+      labelEn: "Glucose / HbA1c control (diet + movement)",
       detailLt:
-        "Kvėpavimo pratimai, mažiau vakaro ekranų, reguliarus miegas — tikslas HRV ≥50 ms.",
+        "Mažiau greitųjų angliavandenių, daugiau judėjimo po valgio; aptarkite su gydytoju.",
       detailEn:
-        "Breathing drills, fewer late screens, steady sleep — aim for HRV ≥50 ms.",
-      gainWeeks: Math.abs(hrvDriver.deltaWeeks) + 20,
+        "Fewer refined carbs, more post-meal movement; discuss with your clinician.",
+      gainWeeks: 48,
+      category: "clinical",
+    });
+  } else {
+    pushRec({
+      id: "glucose-steady",
+      labelLt: "Stabilizuoti cukraus svyravimus (be saldžių gėrimų)",
+      labelEn: "Steady glucose swings (no sugary drinks)",
+      detailLt:
+        "Baltymų / skaidulų pusryčiai, vaikščiojimas po pietų — prevencija metabolinei rizikai.",
+      detailEn:
+        "Protein/fibre breakfasts, walk after lunch — prevention for metabolic risk.",
+      gainWeeks: 22,
       category: "lifestyle",
     });
   }
@@ -611,23 +733,37 @@ export function loadDeathClock(
     });
   }
 
-  // Always offer lipid recheck if cardio/metabolic is hot
   const cardioHot =
     twin.categories.find((c) => c.id === "cardiovascular")?.colour === "red" ||
-    twin.categories.find((c) => c.id === "cardiovascular")?.colour === "orange";
-  if (cardioHot) {
-    pushRec({
-      id: "cardio-labs",
-      labelLt: "Pakartoti lipidų / širdies žymenų panelę",
-      labelEn: "Repeat lipid / heart marker panel",
-      detailLt:
-        "Kas 3–6 mėn. lipidai, gliukozė, kraujospūdis — kad modelis ir gydymas remtųsi šviežiais duomenimis.",
-      detailEn:
-        "Every 3–6 months: lipids, glucose, blood pressure — so the model and care use fresh data.",
-      gainWeeks: 25,
-      category: "monitoring",
-    });
-  }
+    twin.categories.find((c) => c.id === "cardiovascular")?.colour ===
+      "orange";
+  const metaHot =
+    twin.categories.find((c) => c.id === "metabolic")?.colour === "red" ||
+    twin.categories.find((c) => c.id === "metabolic")?.colour === "orange";
+
+  pushRec({
+    id: "cardio-labs",
+    labelLt: "Pakartoti lipidų / širdies žymenų panelę",
+    labelEn: "Repeat lipid / heart marker panel",
+    detailLt:
+      "Kas 3–6 mėn. lipidai, gliukozė, kraujospūdis — kad modelis ir gydymas remtųsi šviežiais duomenimis.",
+    detailEn:
+      "Every 3–6 months: lipids, glucose, blood pressure — so the model and care use fresh data.",
+    gainWeeks: cardioHot || metaHot ? 28 : 18,
+    category: "monitoring",
+  });
+
+  pushRec({
+    id: "annual-check",
+    labelLt: "Metinė profilaktinė apžiūra + skiepai pagal amžių",
+    labelEn: "Annual check-up + age-appropriate vaccines",
+    detailLt:
+      "Šeimos gydytojo vizitas, vėžio atranka pagal amžių, gripas / kitos vakcinos.",
+    detailEn:
+      "GP visit, age-based cancer screening, flu / other vaccines.",
+    gainWeeks: 20,
+    category: "monitoring",
+  });
 
   recommendations.sort((a, b) => b.gainWeeks - a.gainWeeks);
 
@@ -698,7 +834,7 @@ export function loadDeathClock(
     birthMs,
     causes,
     drivers: drivers.slice(0, 12),
-    recommendations: recommendations.slice(0, 8),
+    recommendations: recommendations.slice(0, 16),
     algorithmRules: ALGORITHM_RULES,
     disclaimerLt:
       "Tai iliustratyvus modelis pagal jūsų Lyfora duomenis (žymenys, genetika, klausimynas, fiziniai rodikliai). Tai nėra medicininė prognozė ar diagnozė.",

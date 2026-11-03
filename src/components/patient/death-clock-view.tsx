@@ -33,6 +33,15 @@ function formatDeathDate(iso: string, locale: "lt" | "en") {
   });
 }
 
+function formatDeathDay(iso: string, locale: "lt" | "en") {
+  return new Date(iso).toLocaleDateString(locale === "en" ? "en-GB" : "lt-LT", {
+    timeZone: DISPLAY_TZ,
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
 function formatBigNumber(n: number, unit: DeathClockUnit, locale: "lt" | "en") {
   if (unit === "years") {
     return n.toLocaleString(locale === "en" ? "en-GB" : "lt-LT", {
@@ -64,8 +73,10 @@ export function DeathClockView({ data }: { data: DeathClockPayload }) {
         ? {
             eyebrow: "Mortality model · demo",
             title: "Death Clock",
-            blurb:
-              "An illustrative countdown from your labs (including history), genetics, rare VCF findings, family history, questionnaire and physical metrics — anchored to ~4000 weeks of life.",
+            blurbs: [
+              "An illustrative countdown from your labs (including history), genetics, rare VCF DNA changes, family history, questionnaire and physical metrics.",
+              "Anchored to about 4000 weeks of life.",
+            ],
             expectancy: "Modelled life expectancy",
             years: "years",
             weeks: "weeks",
@@ -80,6 +91,9 @@ export function DeathClockView({ data }: { data: DeathClockPayload }) {
             timeline: "Life timeline",
             lived: "Lived",
             left: "Remaining",
+            now: "Now",
+            start: "Birth",
+            end: "Projected end",
             causes: "Potential causes of death",
             drivers: "What moved the estimate",
             base: "Baseline",
@@ -101,8 +115,10 @@ export function DeathClockView({ data }: { data: DeathClockPayload }) {
         : {
             eyebrow: "Mirtingumo modelis · demo",
             title: "Death Clock",
-            blurb:
-              "Iliustratyvus atgalinis laikrodis pagal tyrimus (įskaitant istoriją), genetiką, retus VCF DNR pokyčius, šeimos anamnezę, klausimyną ir fizinius rodiklius — remiantis ~4000 savaičių gyvenimu.",
+            blurbs: [
+              "Iliustratyvus atgalinis laikrodis pagal tyrimus (įskaitant istoriją), genetiką, retus VCF DNR pokyčius, šeimos anamnezę, klausimyną ir fizinius rodiklius.",
+              "Remiasi ~4000 savaičių gyvenimo modeliu.",
+            ],
             expectancy: "Modeliuojama gyvenimo trukmė",
             years: "metų",
             weeks: "savaičių",
@@ -117,6 +133,9 @@ export function DeathClockView({ data }: { data: DeathClockPayload }) {
             timeline: "Gyvenimo juosta",
             lived: "Pragyventa",
             left: "Liko",
+            now: "Dabar",
+            start: "Gimimas",
+            end: "Prognozės pabaiga",
             causes: "Galimos mirties priežastys",
             drivers: "Kas pakoregavo įvertį",
             base: "Bazė",
@@ -190,17 +209,81 @@ export function DeathClockView({ data }: { data: DeathClockPayload }) {
     });
   }
 
+  const birthLabel = data.dob
+    ? new Date(`${data.dob}T12:00:00`).toLocaleDateString(
+        locale === "en" ? "en-GB" : "lt-LT",
+        { timeZone: DISPLAY_TZ, year: "numeric", month: "short", day: "numeric" }
+      )
+    : copy.start;
+
+  const endLabelCurrent = formatDeathDay(data.projectedDeathIso, locale);
+  const endLabelProj = formatDeathDay(withRecs.projectedDeathIso, locale);
+
+  function TimelineBar({
+    pct,
+    endLabel,
+    variant,
+  }: {
+    pct: number;
+    endLabel: string;
+    variant?: "proj";
+  }) {
+    const safe = Math.min(100, Math.max(0, pct));
+    return (
+      <div className="death-clock-timeline">
+        <div className="row between" style={{ alignItems: "baseline", gap: 8 }}>
+          <span className="eyebrow">{copy.timeline}</span>
+          <span className="xs muted">
+            {copy.lived} {safe.toFixed(1)}% · {copy.left}{" "}
+            {(100 - safe).toFixed(1)}%
+          </span>
+        </div>
+        <div
+          className={`death-clock-track${variant === "proj" ? " proj" : ""}`}
+          role="img"
+          aria-label={`${copy.now}: ${safe.toFixed(1)}%`}
+        >
+          <div className="death-clock-track-fill" aria-hidden="true" />
+          <span
+            className="death-clock-now"
+            style={{ left: `${safe}%` }}
+            title={copy.now}
+          >
+            <i />
+            <em>{copy.now}</em>
+          </span>
+        </div>
+        <div className="death-clock-ends">
+          <span>
+            <b>{copy.start}</b>
+            <small>{birthLabel}</small>
+          </span>
+          <span className="death-clock-ends-now">
+            <b>{copy.now}</b>
+            <small>{safe.toFixed(1)}%</small>
+          </span>
+          <span className="end">
+            <b>{copy.end}</b>
+            <small>{endLabel}</small>
+          </span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="stack death-clock" style={{ gap: 18 }}>
-      <div className="page-head">
+      <div className="page-head death-clock-head">
         <div>
           <span className="eyebrow">{copy.eyebrow}</span>
           <h1 className="font-[family-name:var(--font-display)] text-[1.9rem] font-bold tracking-[-0.01em] m-0">
             {copy.title}
           </h1>
-          <p className="mt-2 mb-0 max-w-2xl text-sm text-[var(--muted)]">
-            {copy.blurb}
-          </p>
+          <div className="death-clock-blurb">
+            {copy.blurbs.map((s) => (
+              <p key={s}>{s}</p>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -253,18 +336,7 @@ export function DeathClockView({ data }: { data: DeathClockPayload }) {
             </div>
           </div>
 
-          <div className="death-clock-timeline">
-            <div className="row between">
-              <span className="eyebrow">{copy.timeline}</span>
-              <span className="xs muted">
-                {copy.lived} {livedPct.toFixed(1)}% · {copy.left}{" "}
-                {(100 - livedPct).toFixed(1)}%
-              </span>
-            </div>
-            <div className="death-clock-bar" aria-hidden="true">
-              <i style={{ width: `${livedPct}%` }} />
-            </div>
-          </div>
+          <TimelineBar pct={livedPct} endLabel={endLabelCurrent} />
         </section>
 
         <section
@@ -302,18 +374,11 @@ export function DeathClockView({ data }: { data: DeathClockPayload }) {
                   <span>{unitLabel[unit]}</span>
                 </div>
               </div>
-              <div className="death-clock-timeline">
-                <div className="row between">
-                  <span className="eyebrow">{copy.timeline}</span>
-                  <span className="xs muted">
-                    {copy.lived} {livedPctProj.toFixed(1)}% · {copy.left}{" "}
-                    {(100 - livedPctProj).toFixed(1)}%
-                  </span>
-                </div>
-                <div className="death-clock-bar death-clock-bar-proj" aria-hidden="true">
-                  <i style={{ width: `${livedPctProj}%` }} />
-                </div>
-              </div>
+              <TimelineBar
+                pct={livedPctProj}
+                endLabel={endLabelProj}
+                variant="proj"
+              />
             </>
           ) : (
             <p className="muted small m-0 mt-3">{copy.noneSelected}</p>

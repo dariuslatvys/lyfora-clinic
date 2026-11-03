@@ -3,10 +3,14 @@ import { ensureSchema, getDb } from "@/lib/db";
 import { questionnaire } from "@/lib/db/schema";
 import { loadDigitalTwin } from "@/lib/health/load-twin";
 import {
-  LONGEVITY_GATE_ID,
   parseStoredAnswers,
   questionnaireStorageKey,
 } from "@/lib/health/questionnaire";
+import {
+  familyMemberAgeYears,
+  isFirstDegreeRelative,
+  isParentRelative,
+} from "@/lib/health/family-history";
 import { todayIsoDate } from "@/lib/health/demo-visits";
 import { t, type Locale } from "@/lib/i18n/dictionary";
 import type { RiskColour } from "@/lib/health/colours";
@@ -105,9 +109,9 @@ const ALGORITHM_RULES: DeathClockAlgorithmRule[] = [
     titleLt: "Šeimos ilgaamžiškumas (klausimynas)",
     titleEn: "Family longevity (questionnaire)",
     bodyLt:
-      "Remiamės kohortų duomenimis (JAMA Network Open, Nature Communications, NECS). Klausimyne ligos ir ilgaamžiškumas atskiri. Jei kas nors nugyveno 80+, prašome ryšio ir amžiaus (dabartinio arba mirties). Modelis: tėvas/motina 80+ → +35, 85+ → +50, 90+ → +90, 100+ → +160 sav.; ≥2 pirmos eilės 80+ → dar +40; seneliai silpniau; vien „Taip“ be amžių → +30; ankstyva tėvų mirtis <60 → −55. Pliusas iki +220 sav.",
+      "Remiamės kohortų duomenimis (JAMA Network Open, Nature Communications, NECS). Iš klausimyno šeimos narių (gimimo / mirties metai) skaičiuojame amžių. Modelis: tėvas/motina 80+ → +35, 85+ → +50, 90+ → +90, 100+ → +160 sav.; ≥2 pirmos eilės 80+ → dar +40; seneliai silpniau; ankstyva tėvų mirtis <60 → −55. Pliusas iki +220 sav. Šeimos ligos taip pat kelia atitinkamų sričių spalvas skaitmeniniame dvynyje.",
     bodyEn:
-      "Based on cohort evidence (JAMA Network Open, Nature Communications, NECS). Questionnaire keeps diseases and longevity separate. If anyone lived past 80, we ask relation and age (current or at death). Model: parent 80+ → +35, 85+ → +50, 90+ → +90, 100+ → +160 weeks; ≥2 first-degree 80+ → +40 more; grandparents weaker; Yes without ages → +30; parental death <60 → −55. Bonus capped at +220 weeks.",
+      "Based on cohort evidence (JAMA Network Open, Nature Communications, NECS). Ages come from questionnaire relatives (birth / death years). Model: parent 80+ → +35, 85+ → +50, 90+ → +90, 100+ → +160 weeks; ≥2 first-degree 80+ → +40 more; grandparents weaker; parental death <60 → −55. Bonus capped at +220 weeks. Family diseases also raise matching digital-twin category colours.",
   },
   {
     id: "recs",
@@ -477,23 +481,23 @@ export function loadDeathClock(
     });
   }
 
-  // Family longevity — ages from the dedicated longevity section
-  // Evidence: JAMA Netw Open (centenarian offspring ~HR 0.58, ~+3.1 y);
-  // Nature Comm (top 10% survival transmits); heritability 12–25% ordinary,
-  // stronger above ~80–85 (longevity threshold).
-  const isParent = (rel: string) => /^(mother|father|motina|tėvas)$/i.test(rel);
-  const isFirstDegree = (rel: string) =>
-    /^(mother|father|sister|brother|motina|tėvas|sesuo|brolis)$/i.test(rel);
-  const longevityPeople = answers.longevityMembers || [];
-  const parentAges = longevityPeople
-    .filter((m) => isParent(m.relative || "") && typeof m.ageYears === "number")
-    .map((m) => Number(m.ageYears));
-  const otherAges = longevityPeople
-    .filter((m) => !isParent(m.relative || "") && typeof m.ageYears === "number")
+  // Family longevity — ages from birth/death years on family members
+  // Evidence: JAMA Netw Open; Nature Comm; heritability stronger above ~80–85.
+  const agedMembers = familyMembers
     .map((m) => ({
-      age: Number(m.ageYears),
-      first: isFirstDegree(m.relative || ""),
-    }));
+      m,
+      age: familyMemberAgeYears(m),
+      parent: isParentRelative(m.relative || ""),
+      first: isFirstDegreeRelative(m.relative || ""),
+    }))
+    .filter((x) => x.age != null) as Array<{
+    m: (typeof familyMembers)[number];
+    age: number;
+    parent: boolean;
+    first: boolean;
+  }>;
+  const parentAges = agedMembers.filter((x) => x.parent).map((x) => x.age);
+  const otherAged = agedMembers.filter((x) => !x.parent);
 
   let longevityBonus = 0;
   const longevityBits: string[] = [];
@@ -516,13 +520,13 @@ export function loadDeathClock(
   const parentsPast80 = parentAges.filter((a) => a >= 80).length;
   const multiFirstDegree =
     parentsPast80 >= 2 ||
-    otherAges.filter((o) => o.first && o.age >= 80).length + parentsPast80 >= 2;
+    otherAged.filter((o) => o.first && o.age >= 80).length + parentsPast80 >= 2;
   if (multiFirstDegree && longevityBonus > 0) {
     longevityBonus += 40;
     longevityBits.push("≥2 first-degree 80+");
   }
 
-  const maxOther = Math.max(0, ...otherAges.map((o) => o.age));
+  const maxOther = Math.max(0, ...otherAged.map((o) => o.age));
   if (maxOther >= 100 && maxParentAge < 100) {
     longevityBonus += 70;
     longevityBits.push("other≥100");
@@ -537,13 +541,6 @@ export function loadDeathClock(
     longevityBits.push("other≥80");
   }
 
-  // Gate "Yes" without concrete ages → modest protective signal
-  const livedPast80 = String(v[LONGEVITY_GATE_ID] || "");
-  if (longevityBonus === 0 && /^yes$/i.test(livedPast80)) {
-    longevityBonus += 30;
-    longevityBits.push("Q: relative 80+");
-  }
-
   longevityBonus = Math.min(220, longevityBonus);
   if (longevityBonus > 0) {
     delta += longevityBonus;
@@ -556,14 +553,12 @@ export function loadDeathClock(
     });
   }
 
-  // Early parental death from longevity cards (if status + age known)
-  const earlyParentDeath = longevityPeople.some(
-    (m) =>
-      isParent(m.relative || "") &&
-      typeof m.ageYears === "number" &&
-      Number(m.ageYears) > 0 &&
-      Number(m.ageYears) < 60 &&
-      /^deceased$/i.test(m.vitalStatus || "")
+  const earlyParentDeath = agedMembers.some(
+    (x) =>
+      x.parent &&
+      x.age > 0 &&
+      x.age < 60 &&
+      /^deceased$/i.test(x.m.vitalStatus || "")
   );
   if (earlyParentDeath) {
     delta -= 55;

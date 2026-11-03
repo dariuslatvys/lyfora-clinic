@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   STEP_TITLE_LT,
-  LONGEVITY_GATE_ID,
   computeBmi,
   computeAge,
   conditionsForSex,
@@ -15,11 +14,11 @@ import {
   type QField,
   type QuestionnaireAnswers,
   type FamilyMember,
-  type LongevityRelative,
   visibleFieldsForStep,
   completionStats,
   biologicalSex,
 } from "@/lib/health/questionnaire";
+import { familyMemberAgeYears } from "@/lib/health/family-history";
 import { MedicationPicker } from "@/components/patient/medication-picker";
 import { formatDateTime } from "@/lib/utils";
 
@@ -256,22 +255,13 @@ export function QuestionnaireForm({
             ) : null}
 
             {step.title.startsWith("10.") ? (
-              <>
-                <FamilyDiseaseBlock
-                  def={def}
-                  answers={answers}
-                  mode={mode}
-                  locale={locale}
-                  onAnswers={setAnswers}
-                />
-                <FamilyLongevityBlock
-                  def={def}
-                  answers={answers}
-                  mode={mode}
-                  locale={locale}
-                  onAnswers={setAnswers}
-                />
-              </>
+              <FamilyHistoryBlock
+                def={def}
+                answers={answers}
+                mode={mode}
+                locale={locale}
+                onAnswers={setAnswers}
+              />
             ) : null}
           </div>
 
@@ -917,7 +907,7 @@ function CancerBlock({
   );
 }
 
-function FamilyDiseaseBlock({
+function FamilyHistoryBlock({
   def,
   answers,
   mode,
@@ -935,6 +925,7 @@ function FamilyDiseaseBlock({
   const relativeItems =
     relatives && !relatives.grouped ? relatives.items : [];
   const famList = def.lists["Family History Conditions"];
+  const thisYear = new Date().getFullYear();
 
   function updateMember(id: string, patch: Partial<FamilyMember>) {
     onAnswers((p) => ({
@@ -950,12 +941,12 @@ function FamilyDiseaseBlock({
       <div className="row between" style={{ alignItems: "flex-start", gap: 12 }}>
         <div>
           <h3 className="overview-subhead m-0">
-            {locale === "en" ? "1. Family diseases" : "1. Šeimos ligos"}
+            {locale === "en" ? "Family history" : "Šeimos anamnezė"}
           </h3>
           <p className="small muted m-0 mt-1">
             {locale === "en"
-              ? "Choose the relative, then mark the diseases they had. Add another person for each relative."
-              : "Pasirinkite giminystės ryšį ir pažymėkite žinomas ligas. Kiekvienam žmogui — atskiras įrašas."}
+              ? "Add each relative: relation, year of birth, living or deceased, and known diseases. Age is calculated and saved automatically."
+              : "Pridėkite kiekvieną giminaitį: ryšį, gimimo metus, ar gyvas/miręs, ir žinomas ligas. Amžius skaičiuojamas ir išsaugomas automatiškai."}
           </p>
         </div>
         {!readOnly ? (
@@ -967,7 +958,14 @@ function FamilyDiseaseBlock({
                 ...p,
                 familyMembers: [
                   ...p.familyMembers,
-                  { id: uid(), relative: "", conditions: [] },
+                  {
+                    id: uid(),
+                    relative: "",
+                    conditions: [],
+                    birthYear: null,
+                    vitalStatus: "",
+                    deathYear: null,
+                  },
                 ],
               }))
             }
@@ -983,309 +981,167 @@ function FamilyDiseaseBlock({
             : "Dar nieko nepridėta. Spauskite „Pridėti asmenį“."}
         </div>
       ) : null}
-      {answers.familyMembers.map((m, idx) => (
-        <div key={m.id} className="q-cond-card">
-          <div className="row between" style={{ gap: 8, alignItems: "center" }}>
-            <span className="eyebrow m-0">
-              {locale === "en" ? `Person ${idx + 1}` : `Asmuo ${idx + 1}`}
-            </span>
-            {!readOnly ? (
-              <button
-                type="button"
-                className="btn ghost sm"
-                onClick={() =>
-                  onAnswers((p) => ({
-                    ...p,
-                    familyMembers: p.familyMembers.filter((x) => x.id !== m.id),
-                  }))
-                }
-              >
-                {locale === "en" ? "Remove" : "Pašalinti"}
-              </button>
-            ) : null}
-          </div>
-          <label className="stack" style={{ gap: 4 }}>
-            <span className="q-label">
-              {locale === "en" ? "Family relation" : "Giminystės ryšys"}
-            </span>
-            <select
-              disabled={readOnly}
-              className="q-select"
-              value={m.relative}
-              onChange={(e) =>
-                updateMember(m.id, { relative: e.target.value })
-              }
-            >
-              <option value="">
-                {locale === "en" ? "Select…" : "Pasirinkite…"}
-              </option>
-              {relativeItems.map((r) => (
-                <option key={r} value={r}>
-                  {optionLabel(r, locale)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <div className="stack" style={{ gap: 4 }}>
-            <span className="q-label">
-              {locale === "en"
-                ? "Known diseases"
-                : "Žinomos ligos"}
-            </span>
-            <MultiSelect
-              disabled={readOnly}
-              value={m.conditions}
-              options={[]}
-              grouped={famList || null}
-              onChange={(next) => updateMember(m.id, { conditions: next })}
-            />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function FamilyLongevityBlock({
-  def,
-  answers,
-  mode,
-  locale,
-  onAnswers,
-}: {
-  def: QDefinition;
-  answers: QuestionnaireAnswers;
-  mode: Mode;
-  locale: "lt" | "en";
-  onAnswers: React.Dispatch<React.SetStateAction<QuestionnaireAnswers>>;
-}) {
-  const readOnly = mode === "view";
-  const relatives = def.lists["Relatives"];
-  const relativeItems =
-    relatives && !relatives.grouped ? relatives.items : [];
-  const gate = String(answers.values[LONGEVITY_GATE_ID] || "");
-  const showPeople = /^yes$/i.test(gate);
-
-  function updatePerson(id: string, patch: Partial<LongevityRelative>) {
-    onAnswers((p) => ({
-      ...p,
-      longevityMembers: p.longevityMembers.map((m) =>
-        m.id === id ? { ...m, ...patch } : m
-      ),
-    }));
-  }
-
-  function setGate(next: string) {
-    onAnswers((p) => {
-      const nextMembers =
-        /^yes$/i.test(next) && !p.longevityMembers.length
-          ? [
-              {
-                id: uid(),
-                relative: "",
-                vitalStatus: "",
-                ageYears: null,
-                notes: "",
-              },
-            ]
-          : p.longevityMembers;
-      return {
-        ...p,
-        values: { ...p.values, [LONGEVITY_GATE_ID]: next || null },
-        longevityMembers: nextMembers,
-      };
-    });
-  }
-
-  return (
-    <div
-      className="stack q-family-section q-family-longevity"
-      style={{ gap: 12 }}
-    >
-      <div>
-        <h3 className="overview-subhead m-0">
-          {locale === "en"
-            ? "2. Family longevity"
-            : "2. Šeimos ilgaamžiškumas"}
-        </h3>
-        <p className="small muted m-0 mt-1">
-          {locale === "en"
-            ? "Separate from diseases: how long close relatives lived. This helps the longevity model."
-            : "Atskirai nuo ligų: kiek ilgai gyveno artimi giminaičiai. Tai naudojama ilgaamžiškumo modeliui."}
-        </p>
-      </div>
-
-      <label className="stack" style={{ gap: 6 }}>
-        <span className="q-label">
-          {locale === "en"
-            ? "Has any blood relative lived to age 80 or older?"
-            : "Ar kas nors iš kraujo giminaičių nugyveno 80 metų ar daugiau?"}
-        </span>
-        <select
-          disabled={readOnly}
-          className="q-select"
-          value={gate}
-          onChange={(e) => setGate(e.target.value)}
-        >
-          <option value="">
-            {locale === "en" ? "Select…" : "Pasirinkite…"}
-          </option>
-          {(["Yes", "No", "Unknown"] as const).map((o) => (
-            <option key={o} value={o}>
-              {optionLabel(o, locale)}
-            </option>
-          ))}
-        </select>
-      </label>
-
-      {showPeople ? (
-        <div className="stack" style={{ gap: 10 }}>
-          <div className="row between">
-            <p className="small muted m-0">
-              {locale === "en"
-                ? "Add who reached 80+, and their age at death — or current age if still living."
-                : "Nurodykite, kas nugyveno 80+, ir amžių mirties metu — arba dabartinį amžių, jei dar gyvas."}
-            </p>
-            {!readOnly ? (
-              <button
-                type="button"
-                className="btn ghost sm"
-                onClick={() =>
-                  onAnswers((p) => ({
-                    ...p,
-                    longevityMembers: [
-                      ...p.longevityMembers,
-                      {
-                        id: uid(),
-                        relative: "",
-                        vitalStatus: "",
-                        ageYears: null,
-                        notes: "",
-                      },
-                    ],
-                  }))
-                }
-              >
-                {locale === "en" ? "Add person" : "Pridėti asmenį"}
-              </button>
-            ) : null}
-          </div>
-
-          {answers.longevityMembers.map((m) => {
-            const living = /^living$/i.test(m.vitalStatus || "");
-            const deceased = /^deceased$/i.test(m.vitalStatus || "");
-            return (
-              <div key={m.id} className="q-cond-card">
-                <div
-                  className="row"
-                  style={{ gap: 8, flexWrap: "wrap", alignItems: "flex-end" }}
+      {answers.familyMembers.map((m, idx) => {
+        const living = /^living$/i.test(m.vitalStatus || "");
+        const deceased = /^deceased$/i.test(m.vitalStatus || "");
+        const age = familyMemberAgeYears(m, thisYear);
+        return (
+          <div key={m.id} className="q-cond-card">
+            <div className="row between" style={{ gap: 8, alignItems: "center" }}>
+              <span className="eyebrow m-0">
+                {locale === "en" ? `Person ${idx + 1}` : `Asmuo ${idx + 1}`}
+              </span>
+              {!readOnly ? (
+                <button
+                  type="button"
+                  className="btn ghost sm"
+                  onClick={() =>
+                    onAnswers((p) => ({
+                      ...p,
+                      familyMembers: p.familyMembers.filter(
+                        (x) => x.id !== m.id
+                      ),
+                    }))
+                  }
                 >
-                  <label
-                    className="stack"
-                    style={{ gap: 4, flex: "1 1 160px" }}
-                  >
-                    <span className="xs muted">
-                      {locale === "en" ? "Relation" : "Giminystė"}
-                    </span>
-                    <select
-                      disabled={readOnly}
-                      value={m.relative}
-                      onChange={(e) =>
-                        updatePerson(m.id, { relative: e.target.value })
-                      }
-                    >
-                      <option value="">
-                        {locale === "en" ? "Who…" : "Kas…"}
-                      </option>
-                      {relativeItems.map((r) => (
-                        <option key={r} value={r}>
-                          {optionLabel(r, locale)}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <label
-                    className="stack"
-                    style={{ gap: 4, flex: "1 1 140px" }}
-                  >
-                    <span className="xs muted">
-                      {locale === "en" ? "Status" : "Būsena"}
-                    </span>
-                    <select
-                      disabled={readOnly}
-                      value={m.vitalStatus || ""}
-                      onChange={(e) =>
-                        updatePerson(m.id, { vitalStatus: e.target.value })
-                      }
-                    >
-                      <option value="">
-                        {locale === "en" ? "Select…" : "Pasirinkite…"}
-                      </option>
-                      {(["Living", "Deceased", "Unknown"] as const).map(
-                        (s) => (
-                          <option key={s} value={s}>
-                            {optionLabel(s, locale)}
-                          </option>
-                        )
-                      )}
-                    </select>
-                  </label>
-                  <label
-                    className="stack"
-                    style={{ gap: 4, flex: "1 1 140px" }}
-                  >
-                    <span className="xs muted">
-                      {living
+                  {locale === "en" ? "Remove" : "Pašalinti"}
+                </button>
+              ) : null}
+            </div>
+
+            <label className="stack" style={{ gap: 4 }}>
+              <span className="q-label">
+                {locale === "en" ? "Family relation" : "Giminystės ryšys"}
+              </span>
+              <select
+                disabled={readOnly}
+                className="q-select"
+                value={m.relative}
+                onChange={(e) =>
+                  updateMember(m.id, { relative: e.target.value })
+                }
+              >
+                <option value="">
+                  {locale === "en" ? "Select…" : "Pasirinkite…"}
+                </option>
+                {relativeItems.map((r) => (
+                  <option key={r} value={r}>
+                    {optionLabel(r, locale)}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <div
+              className="row"
+              style={{ gap: 10, flexWrap: "wrap", alignItems: "flex-end" }}
+            >
+              <label className="stack" style={{ gap: 4, flex: "1 1 120px" }}>
+                <span className="q-label">
+                  {locale === "en" ? "Year of birth" : "Gimimo metai"}
+                </span>
+                <input
+                  disabled={readOnly}
+                  type="number"
+                  min={1850}
+                  max={thisYear}
+                  placeholder="e.g. 1940"
+                  value={m.birthYear == null ? "" : String(m.birthYear)}
+                  onChange={(e) =>
+                    updateMember(m.id, {
+                      birthYear:
+                        e.target.value === ""
+                          ? null
+                          : Number(e.target.value),
+                    })
+                  }
+                />
+              </label>
+              <label className="stack" style={{ gap: 4, flex: "1 1 140px" }}>
+                <span className="q-label">
+                  {locale === "en" ? "Status" : "Būsena"}
+                </span>
+                <select
+                  disabled={readOnly}
+                  className="q-select"
+                  value={m.vitalStatus || ""}
+                  onChange={(e) =>
+                    updateMember(m.id, {
+                      vitalStatus: e.target.value,
+                      deathYear: /^deceased$/i.test(e.target.value)
+                        ? m.deathYear ?? null
+                        : null,
+                    })
+                  }
+                >
+                  <option value="">
+                    {locale === "en" ? "Select…" : "Pasirinkite…"}
+                  </option>
+                  {(["Living", "Deceased", "Unknown"] as const).map((s) => (
+                    <option key={s} value={s}>
+                      {optionLabel(s, locale)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              {deceased ? (
+                <label className="stack" style={{ gap: 4, flex: "1 1 120px" }}>
+                  <span className="q-label">
+                    {locale === "en" ? "Year of death" : "Mirties metai"}
+                  </span>
+                  <input
+                    disabled={readOnly}
+                    type="number"
+                    min={Number(m.birthYear) || 1850}
+                    max={thisYear}
+                    placeholder="e.g. 2018"
+                    value={m.deathYear == null ? "" : String(m.deathYear)}
+                    onChange={(e) =>
+                      updateMember(m.id, {
+                        deathYear:
+                          e.target.value === ""
+                            ? null
+                            : Number(e.target.value),
+                      })
+                    }
+                  />
+                </label>
+              ) : null}
+              {age != null ? (
+                <div className="stack" style={{ gap: 4, flex: "1 1 120px" }}>
+                  <span className="q-label">
+                    {living
+                      ? locale === "en"
+                        ? "Current age"
+                        : "Dabartinis amžius"
+                      : deceased
                         ? locale === "en"
-                          ? "Current age"
-                          : "Dabartinis amžius"
-                        : deceased
-                          ? locale === "en"
-                            ? "Age at death"
-                            : "Amžius mirties metu"
-                          : locale === "en"
-                            ? "Age (years)"
-                            : "Amžius (metais)"}
-                    </span>
-                    <input
-                      disabled={readOnly}
-                      type="number"
-                      min={80}
-                      max={120}
-                      placeholder="80+"
-                      value={m.ageYears == null ? "" : String(m.ageYears)}
-                      onChange={(e) =>
-                        updatePerson(m.id, {
-                          ageYears:
-                            e.target.value === ""
-                              ? null
-                              : Number(e.target.value),
-                        })
-                      }
-                    />
-                  </label>
-                  {!readOnly ? (
-                    <button
-                      type="button"
-                      className="btn ghost sm"
-                      onClick={() =>
-                        onAnswers((p) => ({
-                          ...p,
-                          longevityMembers: p.longevityMembers.filter(
-                            (x) => x.id !== m.id
-                          ),
-                        }))
-                      }
-                    >
-                      {locale === "en" ? "Remove" : "Pašalinti"}
-                    </button>
-                  ) : null}
+                          ? "Age at death"
+                          : "Amžius mirties metu"
+                        : locale === "en"
+                          ? "Age"
+                          : "Amžius"}
+                  </span>
+                  <b className="q-family-age">{age}</b>
                 </div>
-              </div>
-            );
-          })}
-        </div>
-      ) : null}
+              ) : null}
+            </div>
+
+            <div className="stack" style={{ gap: 4 }}>
+              <span className="q-label">
+                {locale === "en" ? "Known diseases" : "Žinomos ligos"}
+              </span>
+              <MultiSelect
+                disabled={readOnly}
+                value={m.conditions}
+                options={[]}
+                grouped={famList || null}
+                onChange={(next) => updateMember(m.id, { conditions: next })}
+              />
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }

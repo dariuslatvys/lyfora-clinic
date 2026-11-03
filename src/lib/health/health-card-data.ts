@@ -1,5 +1,7 @@
 import { pastVisits, type DemoVisit } from "./demo-visits";
 import type { QuestionnaireAnswers } from "./questionnaire";
+import { formatFamilyMemberSummary } from "./family-history";
+import { optionLabel } from "./questionnaire";
 
 export type HealthCardTabId =
   | "sum"
@@ -819,34 +821,20 @@ export function buildHealthCard(input: {
   const sleepQual = String(v["7_lifestyle__sleep_quality"] || "");
 
   const family: { lt: string; en: string; href?: string }[] = [];
-  const members =
-    (
-      input.answers as {
-        familyMembers?: {
-          relative?: string;
-          conditions?: string[];
-          notes?: string;
-        }[];
-      }
-    ).familyMembers || [];
+  const members = input.answers.familyMembers || [];
   for (const m of members) {
-    const conds = (m.conditions || []).join(", ");
-    if (!conds) continue;
+    if (!(m.conditions || []).length && m.birthYear == null) continue;
+    const withLtRel = {
+      ...m,
+      relative: optionLabel(m.relative || "", "lt") || m.relative,
+    };
+    const withEnRel = {
+      ...m,
+      relative: optionLabel(m.relative || "", "en") || m.relative,
+    };
     family.push({
-      lt: `${m.relative || "Šeimos narys"} — ${conds}`,
-      en: `${m.relative || "Family member"} — ${conds}`,
-      href: qFamily,
-    });
-  }
-  family.push({
-    lt: "Tėvas — miokardo infarktas (~58 m.)",
-    en: "Father — myocardial infarction (~age 58)",
-    href: qFamily,
-  });
-  if (!family.some((f) => /hipertenz/i.test(f.lt))) {
-    family.push({
-      lt: "Motina — hipertenzija",
-      en: "Mother — hypertension",
+      lt: formatFamilyMemberSummary(withLtRel, "lt"),
+      en: formatFamilyMemberSummary(withEnRel, "en"),
       href: qFamily,
     });
   }

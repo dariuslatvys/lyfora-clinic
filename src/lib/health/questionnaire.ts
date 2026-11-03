@@ -47,22 +47,17 @@ export type ConditionDetail = {
   notes?: string;
 };
 
-/** Relatives listed for disease / condition history (not longevity ages). */
+/** One relative: relation, lifespan years, and known diseases. */
 export type FamilyMember = {
   id: string;
   relative: string;
   conditions: string[];
-  notes?: string;
-};
-
-/** Relatives listed for family longevity (age lived / current age). */
-export type LongevityRelative = {
-  id: string;
-  relative: string;
+  /** Year of birth */
+  birthYear?: number | null;
   /** Living / Deceased / Unknown */
   vitalStatus?: string;
-  /** Current age if living, or age at death */
-  ageYears?: number | null;
+  /** Year of death when deceased */
+  deathYear?: number | null;
   notes?: string;
 };
 
@@ -71,7 +66,6 @@ export type QuestionnaireAnswers = {
   values: Record<string, unknown>;
   conditionDetails: Record<string, ConditionDetail>;
   familyMembers: FamilyMember[];
-  longevityMembers: LongevityRelative[];
   cancer: {
     types: string[];
     status?: string;
@@ -81,11 +75,8 @@ export type QuestionnaireAnswers = {
   };
 };
 
-export const LONGEVITY_GATE_ID =
-  "10_family_history__longevity__lived_past_80";
-
 const ANSWER_KEY = "health_questionnaire_v1";
-
+const CURRENT_YEAR = () => new Date().getFullYear();
 
 export function emptyAnswers(): QuestionnaireAnswers {
   return {
@@ -93,73 +84,114 @@ export function emptyAnswers(): QuestionnaireAnswers {
     values: {},
     conditionDetails: {},
     familyMembers: [],
-    longevityMembers: [],
     cancer: { types: [], treatment: [] },
+  };
+}
+
+function normalizeMember(m: {
+  id?: string;
+  relative?: string;
+  conditions?: string[];
+  birthYear?: number | null;
+  vitalStatus?: string;
+  deathYear?: number | null;
+  ageYears?: number | null;
+  notes?: string;
+}): FamilyMember {
+  const year = CURRENT_YEAR();
+  let birthYear =
+    typeof m.birthYear === "number" && Number.isFinite(m.birthYear)
+      ? m.birthYear
+      : null;
+  let deathYear =
+    typeof m.deathYear === "number" && Number.isFinite(m.deathYear)
+      ? m.deathYear
+      : null;
+  const vitalStatus = m.vitalStatus || "";
+  // Migrate legacy ageYears → approximate birth/death years
+  if (
+    birthYear == null &&
+    typeof m.ageYears === "number" &&
+    Number.isFinite(m.ageYears)
+  ) {
+    if (/^deceased$/i.test(vitalStatus)) {
+      deathYear = deathYear ?? year;
+      birthYear = deathYear - Math.round(m.ageYears);
+    } else {
+      birthYear = year - Math.round(m.ageYears);
+    }
+  }
+  return {
+    id: m.id || `fm_${Math.random().toString(36).slice(2, 9)}`,
+    relative: m.relative || "",
+    conditions: m.conditions || [],
+    birthYear,
+    vitalStatus,
+    deathYear: /^deceased$/i.test(vitalStatus) ? deathYear : null,
+    notes: m.notes,
   };
 }
 
 export function parseStoredAnswers(raw: string | null | undefined): QuestionnaireAnswers {
   if (!raw) return emptyAnswers();
   try {
-    type LegacyFamily = {
-      id: string;
+    type LegacyLongevity = {
+      id?: string;
       relative?: string;
-      conditions?: string[];
-      notes?: string;
       vitalStatus?: string;
       ageYears?: number | null;
+      notes?: string;
     };
     const data = JSON.parse(raw) as {
       updatedAt?: string | null;
       values?: Record<string, unknown>;
       conditionDetails?: Record<string, ConditionDetail>;
-      familyMembers?: LegacyFamily[];
-      longevityMembers?: LongevityRelative[];
+      familyMembers?: Array<Parameters<typeof normalizeMember>[0]>;
+      longevityMembers?: LegacyLongevity[];
       cancer?: QuestionnaireAnswers["cancer"];
     };
-    const legacyFamily: LegacyFamily[] = data.familyMembers || [];
-    const familyMembers: FamilyMember[] = legacyFamily.map((m) => ({
-      id: m.id,
-      relative: m.relative || "",
-      conditions: m.conditions || [],
-      notes: m.notes,
-    }));
-    let longevityMembers: LongevityRelative[] = data.longevityMembers || [];
-    // Migrate older mixed cards that stored age on familyMembers
-    if (!longevityMembers.length) {
-      longevityMembers = legacyFamily
-        .filter(
-          (m) =>
-            typeof m.ageYears === "number" || Boolean(m.vitalStatus)
-        )
-        .map((m) => ({
-          id: `lon_${m.id}`,
-          relative: m.relative || "",
-          vitalStatus: m.vitalStatus || "",
-          ageYears: m.ageYears ?? null,
-          notes: m.notes,
-        }));
+    const byKey = new Map<string, FamilyMember>();
+    for (const rawMember of data.familyMembers || []) {
+      const m = normalizeMember(rawMember);
+      byKey.set(m.id, m);
+    }
+    // Fold legacy separate longevity list into the same cards
+    for (const lon of data.longevityMembers || []) {
+      const rel = lon.relative || "";
+      const existing = [...byKey.values()].find(
+        (m) => m.relative && rel && m.relative === rel
+      );
+      if (existing) {
+        const merged = normalizeMember({
+          ...existing,
+          vitalStatus: existing.vitalStatus || lon.vitalStatus,
+          ageYears:
+            existing.birthYear != null ? undefined : lon.ageYears ?? undefined,
+        });
+        byKey.set(existing.id, merged);
+      } else if (rel || lon.ageYears != null) {
+        const m = normalizeMember({
+          id: lon.id || `fm_lon_${Math.random().toString(36).slice(2, 7)}`,
+          relative: rel,
+          conditions: [],
+          vitalStatus: lon.vitalStatus,
+          ageYears: lon.ageYears,
+          notes: lon.notes,
+        });
+        byKey.set(m.id, m);
+      }
     }
     const values = { ...(data.values || {}) };
-    // Map legacy longevity Yes answers onto the single 80+ gate
-    if (
-      values[LONGEVITY_GATE_ID] == null &&
-      (values["10_family_history__longevity__relative_lived_to_85"] === "Yes" ||
-        values["10_family_history__longevity__relative_lived_to_90"] === "Yes" ||
-        values["10_family_history__longevity__relative_lived_to_100"] === "Yes" ||
-        longevityMembers.some(
-          (m) => typeof m.ageYears === "number" && Number(m.ageYears) >= 80
-        ))
-    ) {
-      values[LONGEVITY_GATE_ID] = "Yes";
+    // Drop obsolete longevity gate keys from values
+    for (const k of Object.keys(values)) {
+      if (k.startsWith("10_family_history__longevity__")) delete values[k];
     }
     return {
       ...emptyAnswers(),
-      ...data,
+      updatedAt: data.updatedAt ?? null,
       values,
       conditionDetails: data.conditionDetails || {},
-      familyMembers,
-      longevityMembers,
+      familyMembers: [...byKey.values()],
       cancer: {
         types: data.cancer?.types || [],
         status: data.cancer?.status,
@@ -171,6 +203,27 @@ export function parseStoredAnswers(raw: string | null | undefined): Questionnair
   } catch {
     return emptyAnswers();
   }
+}
+
+/** Normalize client payload before persisting. */
+export function normalizeQuestionnaireAnswers(
+  input: QuestionnaireAnswers
+): QuestionnaireAnswers {
+  return {
+    ...emptyAnswers(),
+    ...input,
+    values: input.values || {},
+    conditionDetails: input.conditionDetails || {},
+    familyMembers: (input.familyMembers || []).map((m) => normalizeMember(m)),
+    cancer: {
+      types: input.cancer?.types || [],
+      status: input.cancer?.status,
+      year: input.cancer?.year,
+      treatment: input.cancer?.treatment || [],
+      info: input.cancer?.info,
+    },
+    updatedAt: input.updatedAt ?? new Date().toISOString(),
+  };
 }
 
 export function questionnaireStorageKey() {
@@ -336,9 +389,6 @@ export function isFieldVisible(
 ): boolean {
   // Repeatable / custom family blocks are rendered outside FieldRenderer
   if (field.repeatOf === "conditions" || field.repeatOf === "family") {
-    return false;
-  }
-  if (field.section === "Family longevity") {
     return false;
   }
   if (field.section === "Cancer details") {

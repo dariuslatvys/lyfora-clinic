@@ -4,7 +4,7 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { ensureSchema, getDb } from "@/lib/db";
 import { questionnaire } from "@/lib/db/schema";
 import {
-  emptyAnswers,
+  normalizeQuestionnaireAnswers,
   parseStoredAnswers,
   questionnaireStorageKey,
   type QuestionnaireAnswers,
@@ -64,11 +64,10 @@ export async function PUT(req: Request) {
     return NextResponse.json({ error: "answers required" }, { status: 400 });
   }
 
-  const answers: QuestionnaireAnswers = {
-    ...emptyAnswers(),
+  const answers: QuestionnaireAnswers = normalizeQuestionnaireAnswers({
     ...body.answers,
     updatedAt: new Date().toISOString(),
-  };
+  });
 
   ensureSchema();
   const db = getDb();

@@ -11,6 +11,10 @@ import {
 } from "@/lib/db/schema";
 import { evaluateDigitalTwin, summarizeCategory } from "./evaluate";
 import { markerAllowedForSex } from "./marker-sex";
+import {
+  parseStoredAnswers,
+  questionnaireStorageKey,
+} from "./questionnaire";
 import type { Locale } from "@/lib/i18n/dictionary";
 
 export function loadDigitalTwin(patientId: string, locale: Locale) {
@@ -87,16 +91,21 @@ export function loadDigitalTwin(patientId: string, locale: Locale) {
     .where(eq(questionnaire.patientId, patientId))
     .all();
 
+  const qKey = questionnaireStorageKey();
+  const qRow = questions.find((q) => q.key === qKey);
+  const familyMembers = parseStoredAnswers(qRow?.value).familyMembers;
+
   const categories = evaluateDigitalTwin({
     sex,
     snpRows,
     genotypes,
     markers: results,
     rare,
+    familyMembers,
   }).map((c) => ({
     ...c,
     summary: summarizeCategory(c, locale),
   }));
 
-  return { patient, categories, rare, questions, markers: results };
+  return { patient, categories, rare, questions, markers: results, familyMembers };
 }

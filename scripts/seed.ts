@@ -766,27 +766,39 @@ async function main() {
   insertQ.run(femaleId, "family_breast_cancer", "močiutė");
   insertQ.run(femaleId, "menstrual_regular", "taip");
 
-  function withFamilyLongevityDemo(
+  function withFamilyHistoryDemo(
     pid: string,
     raw: string | null | undefined
   ): string {
     const a = parseStoredAnswers(raw);
     const isFemale = pid === femaleId || pid === "patient_female";
-    a.values["10_family_history__longevity__lived_past_80"] =
-      a.values["10_family_history__longevity__lived_past_80"] || "Yes";
-
-    // Demo disease anamnesis: relation + known diseases only (no free-text notes)
+    const year = new Date().getFullYear();
+    // Unified cards: relation + birth/death years + diseases
     a.familyMembers = isFemale
       ? [
           {
             id: "fm_seed_f1",
             relative: "Maternal Grandmother",
             conditions: ["Breast Cancer"],
+            birthYear: year - 84,
+            vitalStatus: "Deceased",
+            deathYear: year - 1,
           },
           {
             id: "fm_seed_f2",
             relative: "Mother",
             conditions: ["High Blood Pressure"],
+            birthYear: year - 86,
+            vitalStatus: "Living",
+            deathYear: null,
+          },
+          {
+            id: "fm_seed_f3",
+            relative: "Father",
+            conditions: [],
+            birthYear: year - 84,
+            vitalStatus: "Living",
+            deathYear: null,
           },
         ]
       : [
@@ -797,46 +809,25 @@ async function main() {
               "Heart Attack / Myocardial Infarction",
               "High Blood Pressure",
             ],
+            birthYear: 1950,
+            vitalStatus: "Deceased",
+            deathYear: 2022,
           },
           {
             id: "fm_seed_m3",
             relative: "Mother",
             conditions: ["High Blood Pressure"],
-          },
-        ];
-
-    // Demo longevity list (separate from disease cards)
-    a.longevityMembers = isFemale
-      ? [
-          {
-            id: "lon_seed_f1",
-            relative: "Mother",
+            birthYear: year - 88,
             vitalStatus: "Living",
-            ageYears: 86,
-            notes: "",
+            deathYear: null,
           },
           {
-            id: "lon_seed_f2",
-            relative: "Father",
-            vitalStatus: "Living",
-            ageYears: 84,
-            notes: "",
-          },
-        ]
-      : [
-          {
-            id: "lon_seed_m1",
-            relative: "Mother",
-            vitalStatus: "Living",
-            ageYears: 88,
-            notes: "",
-          },
-          {
-            id: "lon_seed_m2",
+            id: "fm_seed_m2",
             relative: "Maternal Grandmother",
+            conditions: [],
+            birthYear: 1928,
             vitalStatus: "Deceased",
-            ageYears: 92,
-            notes: "",
+            deathYear: 2020,
           },
         ];
     a.updatedAt = a.updatedAt || new Date().toISOString();
@@ -849,7 +840,7 @@ async function main() {
       row.patient_id === "patient_female" ? femaleId : patientId;
     const value =
       row.key === "health_questionnaire_v1"
-        ? withFamilyLongevityDemo(pid, row.value)
+        ? withFamilyHistoryDemo(pid, row.value)
         : row.value;
     insertQ.run(pid, row.key, value);
   }
@@ -860,7 +851,7 @@ async function main() {
         row.patient_id === "patient_female" ? femaleId : patientId;
       const value =
         row.key === "health_questionnaire_v1"
-          ? withFamilyLongevityDemo(pid, row.value)
+          ? withFamilyHistoryDemo(pid, row.value)
           : row.value;
       syncQuestionnaireMetrics(pid, parseStoredAnswers(value), def);
     }

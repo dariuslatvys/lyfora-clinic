@@ -7,6 +7,11 @@ import {
 } from "./categories";
 import { rareGeneCategory, rareMutationForcesRed } from "./rare-genes";
 import { splitMarkersByKind } from "./physical-metrics";
+import type { FamilyMember } from "./questionnaire";
+import {
+  applyFamilyHistoryColour,
+  familyHistoryCategorySignals,
+} from "./family-history";
 
 export type SnpRiskRow = {
   gene: string;
@@ -230,10 +235,12 @@ export function evaluateDigitalTwin(input: {
   genotypes: Genotype[];
   markers: MarkerResult[];
   rare?: RareVariant[];
+  familyMembers?: FamilyMember[];
 }): CategoryEvaluation[] {
   const genoMap = new Map(input.genotypes.map((g) => [g.snpId.toLowerCase(), g]));
   const cats = categoriesForSex(input.sex);
   const rare = input.rare ?? [];
+  const familySignals = familyHistoryCategorySignals(input.familyMembers || []);
   /** Base rsID when risk rows disambiguate duplicate SNPs as rsID__tag. */
   const baseSnpId = (snpId: string) => snpId.split("__")[0]!.toLowerCase();
 
@@ -269,9 +276,14 @@ export function evaluateDigitalTwin(input: {
 
     // NGS rare pathogenic findings force the category to red
     const hasRedRare = catRare.some((v) => rareMutationForcesRed(v.gene));
+    const withFamily = applyFamilyHistoryColour(
+      cat.id,
+      combined.colour,
+      familySignals
+    );
     const colour = hasRedRare
-      ? maxColour([combined.colour, "red"])
-      : combined.colour;
+      ? maxColour([withFamily, "red"])
+      : withFamily;
 
     const latestByKey = new Map<string, MarkerResult>();
     for (const m of markers) latestByKey.set(m.markerKey, m);

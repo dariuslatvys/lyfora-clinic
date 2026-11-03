@@ -143,8 +143,7 @@
       "fields": [
         "10_family_history__family_member_entry_repeatable__relative",
         "10_family_history__family_member_entry_repeatable__medical_conditions",
-        "10_family_history__family_member_entry_repeatable__notes",
-        "10_family_history__longevity__lived_past_80"
+        "10_family_history__family_member_entry_repeatable__notes"
       ]
     }
   ],
@@ -1651,26 +1650,6 @@
       "showWhen": "Family member added",
       "notes": null,
       "repeatOf": "family",
-      "unit": null
-    },
-    {
-      "nr": 83,
-      "id": "10_family_history__longevity__lived_past_80",
-      "step": "10. Family History",
-      "section": "Family longevity",
-      "label": "Has any blood relative lived to age 80 or older?",
-      "required": false,
-      "auto": false,
-      "type": "select",
-      "options": [
-        "Yes",
-        "No",
-        "Unknown"
-      ],
-      "listRef": null,
-      "showWhen": "Visada",
-      "notes": "If Yes, add who and their age (current or at death)",
-      "repeatOf": null,
       "unit": null
     }
   ],

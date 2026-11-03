@@ -46,8 +46,8 @@ function colourTitle(colour: string, locale: "lt" | "en") {
           grey: "No data",
         }
       : {
-          green: "No risk",
-          badge: "Low",
+          green: "Nėra rizikos",
+          badge: "Nedidelė",
           yellow: "Nedidelė",
           orange: "Padidėjusi",
           red: "Ženkli",
@@ -167,8 +167,8 @@ export function DnaView({
             blurb:
               "Genetika rodo polinkį, o ne diagnozę. Daugumą rizikų stipriai keičia gyvensena ir laiku atlikti tyrimai.",
             book: "Genetiko konsultacija",
-            kpiGreen: "No risk",
-            kpiBadge: "Low",
+            kpiGreen: "Nėra rizikos",
+            kpiBadge: "Nedidelė",
             kpiYellow: "Nedidelė",
             kpiOrange: "Padidėjusi",
             search: "Ieškoti pagal rsID, geną ar raktinį žodį…",

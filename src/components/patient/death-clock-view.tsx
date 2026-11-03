@@ -10,6 +10,8 @@ import {
   remainingInUnit,
 } from "@/lib/health/death-clock-shared";
 
+type DriverSort = "cuts" | "adds" | "abs";
+
 const UNITS: DeathClockUnit[] = [
   "years",
   "weeks",
@@ -60,6 +62,8 @@ export function DeathClockView({ data }: { data: DeathClockPayload }) {
   const [now, setNow] = useState(data.builtAtMs);
   const [selected, setSelected] = useState<Set<string>>(() => new Set());
   const [algoOpen, setAlgoOpen] = useState(false);
+  const [driverSort, setDriverSort] = useState<DriverSort>("cuts");
+  const [openRecId, setOpenRecId] = useState<string | null>(null);
 
   useEffect(() => {
     setNow(Date.now());
@@ -111,6 +115,17 @@ export function DeathClockView({ data }: { data: DeathClockPayload }) {
             catLifestyle: "Lifestyle",
             catClinical: "Clinical",
             catMonitoring: "Monitoring",
+            selectAll: "Select all",
+            clearAll: "Clear all",
+            sortCuts: "Biggest cuts",
+            sortAdds: "Biggest gains",
+            sortAbs: "By impact",
+            openPlan: "Open plan",
+            closePlan: "Close",
+            whyTitle: "Why this matters",
+            planTitle: "Action plan",
+            applyRec: "I will follow this",
+            removeRec: "Uncheck",
           }
         : {
             eyebrow: "Mirtingumo modelis · demo",
@@ -153,6 +168,17 @@ export function DeathClockView({ data }: { data: DeathClockPayload }) {
             catLifestyle: "Gyvensena",
             catClinical: "Klinikinė",
             catMonitoring: "Stebėsena",
+            selectAll: "Pažymėti visas",
+            clearAll: "Nuimti visas",
+            sortCuts: "Daugiausiai atima",
+            sortAdds: "Daugiausiai prideda",
+            sortAbs: "Pagal poveikį",
+            openPlan: "Atidaryti planą",
+            closePlan: "Uždaryti",
+            whyTitle: "Kodėl tai svarbu",
+            planTitle: "Veiksmų planas",
+            applyRec: "Laikysiuosi šios",
+            removeRec: "Nuimti žymėjimą",
           },
     [locale]
   );
@@ -208,6 +234,31 @@ export function DeathClockView({ data }: { data: DeathClockPayload }) {
       return next;
     });
   }
+
+  function selectAllRecs() {
+    setSelected(new Set(data.recommendations.map((r) => r.id)));
+  }
+
+  function clearAllRecs() {
+    setSelected(new Set());
+  }
+
+  const allSelected =
+    data.recommendations.length > 0 &&
+    data.recommendations.every((r) => selected.has(r.id));
+
+  const sortedDrivers = useMemo(() => {
+    const rows = [...data.drivers];
+    if (driverSort === "adds") {
+      rows.sort((a, b) => b.deltaWeeks - a.deltaWeeks);
+    } else if (driverSort === "cuts") {
+      rows.sort((a, b) => a.deltaWeeks - b.deltaWeeks);
+    } else {
+      rows.sort((a, b) => Math.abs(b.deltaWeeks) - Math.abs(a.deltaWeeks));
+    }
+    return rows;
+  }, [data.drivers, driverSort]);
+
 
   const birthLabel = data.dob
     ? new Date(`${data.dob}T12:00:00`).toLocaleDateString(
@@ -392,38 +443,104 @@ export function DeathClockView({ data }: { data: DeathClockPayload }) {
             <h3 className="m-0">{copy.recs}</h3>
             <p className="small muted m-0 mt-1">{copy.recsBlurb}</p>
           </div>
-          {selectedGain > 0 ? (
-            <span className="pill c-green">
-              +{selectedGain} {copy.weeks}
-            </span>
-          ) : null}
+          <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
+            <button
+              type="button"
+              className="btn ghost sm"
+              onClick={allSelected ? clearAllRecs : selectAllRecs}
+            >
+              {allSelected ? copy.clearAll : copy.selectAll}
+            </button>
+            {selectedGain > 0 ? (
+              <span className="pill c-green">
+                +{selectedGain} {copy.weeks}
+              </span>
+            ) : null}
+          </div>
         </div>
         <div className="stack death-clock-recs" style={{ gap: 10 }}>
           {data.recommendations.map((r) => {
             const on = selected.has(r.id);
+            const isOpen = openRecId === r.id;
             return (
-              <label
+              <div
                 key={r.id}
-                className={`death-clock-rec${on ? " on" : ""}`}
+                className={`death-clock-rec${on ? " on" : ""}${
+                  isOpen ? " open" : ""
+                }`}
               >
-                <input
-                  type="checkbox"
-                  checked={on}
-                  onChange={() => toggleRec(r.id)}
-                />
-                <div className="grow">
-                  <div className="row between" style={{ gap: 8 }}>
-                    <b>{locale === "en" ? r.labelEn : r.labelLt}</b>
-                    <span className="pill c-green">
-                      +{r.gainWeeks} {copy.weeks}
+                <div className="death-clock-rec-main">
+                  <label className="death-clock-rec-check">
+                    <input
+                      type="checkbox"
+                      checked={on}
+                      onChange={() => toggleRec(r.id)}
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    className="death-clock-rec-body"
+                    onClick={() =>
+                      setOpenRecId((prev) => (prev === r.id ? null : r.id))
+                    }
+                    aria-expanded={isOpen}
+                  >
+                    <div className="row between" style={{ gap: 8 }}>
+                      <b>{locale === "en" ? r.labelEn : r.labelLt}</b>
+                      <span className="pill c-green">
+                        +{r.gainWeeks} {copy.weeks}
+                      </span>
+                    </div>
+                    <p className="small muted m-0 mt-1">
+                      {locale === "en" ? r.detailEn : r.detailLt}
+                    </p>
+                    <span className="xs muted">
+                      {catLabel[r.category]} ·{" "}
+                      {isOpen ? copy.closePlan : copy.openPlan}
                     </span>
-                  </div>
-                  <p className="small muted m-0 mt-1">
-                    {locale === "en" ? r.detailEn : r.detailLt}
-                  </p>
-                  <span className="xs muted">{catLabel[r.category]}</span>
+                  </button>
                 </div>
-              </label>
+                {isOpen ? (
+                  <div className="death-clock-rec-detail">
+                    <p className="eyebrow m-0">{copy.whyTitle}</p>
+                    <p className="small m-0 mt-1">
+                      {locale === "en"
+                        ? r.explainEn || r.detailEn
+                        : r.explainLt || r.detailLt}
+                    </p>
+                    <p className="eyebrow m-0 mt-3">{copy.planTitle}</p>
+                    <ol className="death-clock-rec-actions">
+                      {(locale === "en"
+                        ? r.actionsEn || []
+                        : r.actionsLt || []
+                      ).map((step) => (
+                        <li key={step}>{step}</li>
+                      ))}
+                    </ol>
+                    <div className="row mt-3" style={{ gap: 8 }}>
+                      <button
+                        type="button"
+                        className="btn sm"
+                        onClick={() => {
+                          if (!on) toggleRec(r.id);
+                        }}
+                      >
+                        {copy.applyRec}
+                      </button>
+                      {on ? (
+                        <button
+                          type="button"
+                          className="btn ghost sm"
+                          onClick={() => toggleRec(r.id)}
+                        >
+                          {copy.removeRec}
+                        </button>
+                      ) : null}
+                    </div>
+                  </div>
+                ) : null}
+              </div>
             );
           })}
         </div>
@@ -455,11 +572,32 @@ export function DeathClockView({ data }: { data: DeathClockPayload }) {
         </section>
 
         <section className="card">
-          <div className="card-head">
+          <div
+            className="card-head"
+            style={{ alignItems: "flex-start", gap: 10 }}
+          >
             <h3 className="m-0">{copy.drivers}</h3>
+            <div className="death-clock-sort" role="group">
+              {(
+                [
+                  ["cuts", copy.sortCuts],
+                  ["adds", copy.sortAdds],
+                  ["abs", copy.sortAbs],
+                ] as const
+              ).map(([id, label]) => (
+                <button
+                  key={id}
+                  type="button"
+                  className={driverSort === id ? "on" : undefined}
+                  onClick={() => setDriverSort(id)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
           <div className="stack" style={{ gap: 8 }}>
-            {data.drivers.map((d) => (
+            {sortedDrivers.map((d) => (
               <div key={d.id} className="doctor-appt-row">
                 <div className="doctor-appt-main">
                   <b>{locale === "en" ? d.labelEn : d.labelLt}</b>

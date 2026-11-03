@@ -20,11 +20,11 @@ function colourWord(locale: Locale, colour: RiskColour | null): string {
   if (!colour) return locale === "en" ? "no colour signal" : "be spalvos signalo";
   const lt: Record<RiskColour, string> = {
     grey: "nepakanka duomenų",
-    green: "gerai / ramu",
-    yellow: "stebėti",
-    orange: "dėmesio",
-    red: "kritiška",
-    badge: "Low",
+    green: "nėra rizikos",
+    yellow: "nedidelė",
+    orange: "padidėjusi",
+    red: "ženkli",
+    badge: "nedidelė",
   };
   const en: Record<RiskColour, string> = {
     grey: "insufficient data",

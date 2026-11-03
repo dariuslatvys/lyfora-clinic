@@ -127,7 +127,7 @@ export function DoctorAnalyticsView({
           attentionLbl: "Dėmesio",
           watch: "Stebėti",
           good: "Gerai",
-          genetic: "Low",
+          genetic: "Nedidelė",
           clinic: "Klinikoje",
           video: "Video",
           written: "Raštu",

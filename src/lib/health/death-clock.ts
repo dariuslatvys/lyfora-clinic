@@ -20,6 +20,7 @@ import {
   clampLifeWeeks,
   projectFromWeeks,
 } from "@/lib/health/death-clock-shared";
+import { enrichRecDetail } from "@/lib/health/death-clock-rec-details";
 
 export type {
   DeathClockCause,
@@ -58,7 +59,7 @@ const ALGORITHM_RULES: DeathClockAlgorithmRule[] = [
     titleLt: "Skaitmeninio dvynio spalvos",
     titleEn: "Digital-twin colours",
     bodyLt:
-      "Kategorijų spalvos: žalia +4, geltona −12, oranžinė −28, raudona −55, Low (badge) −8 sav. už kiekvieną sritį.",
+      "Kategorijų spalvos: žalia +4, geltona −12, oranžinė −28, raudona −55, nedidelė (badge) −8 sav. už kiekvieną sritį.",
     bodyEn:
       "Category colours: green +4, yellow −12, orange −28, red −55, Low (badge) −8 weeks per area.",
   },
@@ -476,9 +477,15 @@ export function loadDeathClock(
   const recommendations: DeathClockRecommendation[] = [];
   const driverById = new Map(drivers.map((d) => [d.id, d]));
 
-  const pushRec = (rec: DeathClockRecommendation) => {
+  const pushRec = (
+    rec: Omit<
+      DeathClockRecommendation,
+      "explainLt" | "explainEn" | "actionsLt" | "actionsEn"
+    >
+  ) => {
     if (recommendations.some((r) => r.id === rec.id)) return;
-    recommendations.push(rec);
+    const extra = enrichRecDetail(rec.id, rec.detailLt, rec.detailEn);
+    recommendations.push({ ...rec, ...extra });
   };
 
   const smokeDriver = driverById.get("smoke");

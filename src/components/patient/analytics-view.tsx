@@ -101,7 +101,7 @@ export function AnalyticsView({
       yellow: "Stebėti",
       orange: "Dėmesio",
       red: "Kritiška",
-      badge: "Low",
+      badge: "Nedidelė",
     };
     const en: Record<RiskColour, string> = {
       grey: "No data",
@@ -118,11 +118,11 @@ export function AnalyticsView({
     if (!c || c === "none") return locale === "en" ? "No data" : "Nėra duomenų";
     const lt: Record<RiskColour, string> = {
       grey: "Nėra duomenų",
-      green: "No risk",
+      green: "Nėra rizikos",
       yellow: "Nedidelė",
       orange: "Padidėjusi",
       red: "Ženkli",
-      badge: "Low",
+      badge: "Nedidelė",
     };
     const en: Record<RiskColour, string> = {
       grey: "No data",

@@ -32,8 +32,8 @@ function colourTitle(colour: DnaResultColour, locale: "lt" | "en") {
           grey: "No data",
         }
       : {
-          green: "No risk",
-          badge: "Low",
+          green: "Nėra rizikos",
+          badge: "Nedidelė",
           yellow: "Nedidelė",
           orange: "Padidėjusi",
           red: "Ženkli",

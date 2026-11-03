@@ -3733,6 +3733,16 @@ a.hc-kpi.clickable:hover {
   justify-content: space-between;
   gap: 16px;
   flex-wrap: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 10px 0 8px;
+  margin-top: -4px;
+  background: linear-gradient(
+    180deg,
+    var(--surface-raised, var(--surface)) 70%,
+    transparent
+  );
 }
 
 .q-family-head-copy {

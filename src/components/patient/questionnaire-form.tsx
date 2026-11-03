@@ -168,15 +168,21 @@ export function QuestionnaireForm({
   }, [answers, def, setValue]);
 
   const save = useCallback(
-    async (opts?: { finish?: boolean; silent?: boolean }) => {
+    async (opts?: {
+      finish?: boolean;
+      silent?: boolean;
+      answers?: QuestionnaireAnswers;
+    }) => {
       setSaving(true);
       setError(null);
       if (!opts?.silent) setSaveFlash(null);
+      const payload = opts?.answers ?? answersRef.current;
+      answersRef.current = payload;
       try {
         const res = await fetch("/api/patient/questionnaire", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ answers: answersRef.current }),
+          body: JSON.stringify({ answers: payload }),
           cache: "no-store",
         });
         if (!res.ok) throw new Error("save failed");
@@ -222,6 +228,11 @@ export function QuestionnaireForm({
   function stepTitle(title: string) {
     if (locale === "lt") return STEP_TITLE_LT[title] || title;
     return title;
+  }
+
+  /** Drop leading "10. " so the tab number badge is not duplicated. */
+  function stepLabel(title: string) {
+    return stepTitle(title).replace(/^\s*\d+\.\s*/, "").trim();
   }
 
   return (
@@ -286,7 +297,7 @@ export function QuestionnaireForm({
             onClick={() => setStepIdx(i)}
           >
             <span className="q-step-num">{i + 1}</span>
-            <span className="q-step-label">{stepTitle(s.title)}</span>
+            <span className="q-step-label">{stepLabel(s.title)}</span>
           </button>
         ))}
       </div>
@@ -296,7 +307,9 @@ export function QuestionnaireForm({
       {step ? (
         <section className="card q-panel">
           <div className="card-head">
-            <h2>{stepTitle(step.title)}</h2>
+            <h2>
+              {stepIdx + 1}. {stepLabel(step.title)}
+            </h2>
             <span className="small muted">
               {stepIdx + 1} / {steps.length}
             </span>
@@ -334,6 +347,9 @@ export function QuestionnaireForm({
                 mode={mode}
                 locale={locale}
                 onAnswers={setAnswers}
+                onPersist={(snapshot) =>
+                  void save({ silent: true, answers: snapshot })
+                }
               />
             ) : null}
           </div>
@@ -991,12 +1007,14 @@ function FamilyHistoryBlock({
   mode,
   locale,
   onAnswers,
+  onPersist,
 }: {
   def: QDefinition;
   answers: QuestionnaireAnswers;
   mode: Mode;
   locale: "lt" | "en";
   onAnswers: React.Dispatch<React.SetStateAction<QuestionnaireAnswers>>;
+  onPersist?: (snapshot: QuestionnaireAnswers) => void;
 }) {
   const readOnly = mode === "view";
   const relatives = def.lists["Relatives"];
@@ -1004,6 +1022,8 @@ function FamilyHistoryBlock({
     relatives && !relatives.grouped ? relatives.items : [];
   const famList = def.lists["Family History Conditions"];
   const thisYear = new Date().getFullYear();
+  const listRef = useRef<HTMLDivElement>(null);
+  const focusIdRef = useRef<string | null>(null);
 
   function updateMember(id: string, patch: Partial<FamilyMember>) {
     onAnswers((p) => ({
@@ -1015,21 +1035,42 @@ function FamilyHistoryBlock({
   }
 
   function addPerson() {
-    onAnswers((p) => ({
-      ...p,
-      familyMembers: [
-        ...p.familyMembers,
-        {
-          id: uid(),
-          relative: "",
-          conditions: [],
-          birthYear: null,
-          vitalStatus: "Living",
-          deathYear: null,
-        },
-      ],
-    }));
+    const id = uid();
+    focusIdRef.current = id;
+    onAnswers((p) => {
+      const next: QuestionnaireAnswers = {
+        ...p,
+        // Newest person first — stays under the Add button, old ones shift down.
+        familyMembers: [
+          {
+            id,
+            relative: "",
+            conditions: [],
+            birthYear: null,
+            vitalStatus: "Living",
+            deathYear: null,
+          },
+          ...p.familyMembers,
+        ],
+      };
+      // Persist the exact snapshot so a reload keeps the new card.
+      queueMicrotask(() => onPersist?.(next));
+      return next;
+    });
   }
+
+  useEffect(() => {
+    const id = focusIdRef.current;
+    if (!id) return;
+    focusIdRef.current = null;
+    const card = listRef.current?.querySelector(
+      `[data-family-id="${id}"]`
+    ) as HTMLElement | null;
+    if (!card) return;
+    card.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    const select = card.querySelector("select") as HTMLSelectElement | null;
+    select?.focus();
+  }, [answers.familyMembers]);
 
   return (
     <div className="q-family-section">
@@ -1063,7 +1104,7 @@ function FamilyHistoryBlock({
         </div>
       ) : null}
 
-      <div className="q-family-list">
+      <div className="q-family-list" ref={listRef}>
         {answers.familyMembers.map((m, idx) => {
           const living = /^living$/i.test(m.vitalStatus || "");
           const deceased = /^deceased$/i.test(m.vitalStatus || "");
@@ -1074,21 +1115,29 @@ function FamilyHistoryBlock({
               ? `Person ${idx + 1}`
               : `Asmuo ${idx + 1}`;
           return (
-            <article key={m.id} className="q-family-card">
+            <article
+              key={m.id}
+              className="q-family-card"
+              data-family-id={m.id}
+            >
               <header className="q-family-card-head">
                 <b>{title}</b>
                 {!readOnly ? (
                   <button
                     type="button"
                     className="btn ghost sm"
-                    onClick={() =>
-                      onAnswers((p) => ({
-                        ...p,
-                        familyMembers: p.familyMembers.filter(
-                          (x) => x.id !== m.id
-                        ),
-                      }))
-                    }
+                    onClick={() => {
+                      onAnswers((p) => {
+                        const next: QuestionnaireAnswers = {
+                          ...p,
+                          familyMembers: p.familyMembers.filter(
+                            (x) => x.id !== m.id
+                          ),
+                        };
+                        queueMicrotask(() => onPersist?.(next));
+                        return next;
+                      });
+                    }}
                   >
                     {locale === "en" ? "Remove" : "Pašalinti"}
                   </button>

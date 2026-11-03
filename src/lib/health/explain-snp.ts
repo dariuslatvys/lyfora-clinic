@@ -2,10 +2,12 @@ import type { Locale } from "@/lib/i18n/dictionary";
 import type { RiskColour } from "./colours";
 import type { EvaluatedSnp } from "./evaluate";
 import mechanismLtMap from "./snp_mechanism_lt.json";
+import mechanismEnMap from "./snp_mechanism_en.json";
 import { humanizeMechanism } from "./plain-mechanism";
 import { pharmaSubcategoryLabel } from "./pharma-plain";
 
 const LT_MAP = mechanismLtMap as Record<string, string>;
+const EN_MAP = mechanismEnMap as Record<string, string>;
 
 export type SnpExplanation = {
   title: string;
@@ -142,12 +144,23 @@ export function explainSnp(snp: EvaluatedSnp, locale: Locale): SnpExplanation {
     ? `${snp.allele1}/${snp.allele2}`
     : null;
 
+  const baseId = displaySnpId(snp.snpId);
   const raw =
     locale === "lt"
-      ? LT_MAP[snp.snpId]?.trim() || snp.mechanism?.trim() || ""
-      : snp.mechanism?.trim() || "";
+      ? LT_MAP[baseId]?.trim() ||
+        LT_MAP[snp.snpId]?.trim() ||
+        snp.mechanism?.trim() ||
+        ""
+      : EN_MAP[baseId]?.trim() ||
+        EN_MAP[snp.snpId]?.trim() ||
+        snp.mechanism?.trim() ||
+        "";
 
-  const mechCtx = { gene: snp.gene, subcategory: snp.subcategory };
+  const mechCtx = {
+    gene: snp.gene,
+    subcategory: snp.subcategory,
+    matchCount: snp.genotypeAvailable ? snp.matchCount : null,
+  };
   const focusLabel = pharmaSubcategoryLabel(snp.subcategory, locale);
 
   if (locale === "en") {

@@ -8,6 +8,7 @@ import {
   dnaPrimaryToCategoryId,
   type DnaResultColour,
 } from "@/lib/health/dna-panel";
+import { explainDnaSnp } from "@/lib/health/explain-dna-snp";
 import { t } from "@/lib/i18n/dictionary";
 import {
   COLOUR_HEX,
@@ -79,15 +80,7 @@ export default async function DnaSnpDetailPage({
   const colour: RiskColour =
     row.colour === "none" ? "grey" : (row.colour as RiskColour);
   const catId = dnaPrimaryToCategoryId(row.primaryCategoryEn, panel.sex);
-  const meaning = locale === "en" ? row.infoEn : row.infoLt;
-  const alleleLine =
-    row.matchCount == null
-      ? locale === "en"
-        ? "Genotype not determined in the uploaded file."
-        : "Genotipas faile nenustatytas."
-      : locale === "en"
-        ? `Genotype ${row.genotype} · risk alleles ${row.matchCount}/2 (effect allele ${row.effectAllele1}).`
-        : `Genotipas ${row.genotype} · rizikos aleliai ${row.matchCount}/2 (efekto alelis ${row.effectAllele1}).`;
+  const expl = explainDnaSnp(row, locale);
 
   return (
     <div className="stack" style={{ gap: 16 }}>
@@ -123,8 +116,8 @@ export default async function DnaSnpDetailPage({
               label={labels.askAi}
               question={
                 locale === "en"
-                  ? `Explain ${row.gene} ${row.snpId} genotype ${row.genotype ?? "unknown"} from my DNA panel in plain language`
-                  : `Paaiškink ${row.gene} ${row.snpId} genotipą ${row.genotype ?? "nenustatyta"} pagal mano DNR panelę paprasta kalba`
+                  ? `Explain ${row.gene} ${row.snpId} genotype ${row.genotype ?? "unknown"} from my DNA panel in plain language, including what it means for me personally`
+                  : `Paaiškink ${row.gene} ${row.snpId} genotipą ${row.genotype ?? "nenustatyta"} pagal mano DNR panelę paprasta kalba ir ką tai reiškia man asmeniškai`
               }
             />
           </div>
@@ -133,7 +126,10 @@ export default async function DnaSnpDetailPage({
         <div className="stack" style={{ gap: 14 }}>
           <div className="rounded-[var(--radius-s)] border border-[var(--line)] bg-[var(--surface-raised)] px-4 py-3">
             <p className="text-sm font-semibold text-[var(--ink)] m-0">
-              {alleleLine}
+              {expl.genotypeLine}
+            </p>
+            <p className="mt-2 text-sm leading-relaxed text-[var(--ink-soft)] mb-0">
+              {expl.whyColour}
             </p>
             <p className="mt-2 text-sm leading-relaxed text-[var(--ink-soft)] mb-0">
               {locale === "en"
@@ -146,10 +142,26 @@ export default async function DnaSnpDetailPage({
             <p className="eyebrow mb-2">
               {locale === "en" ? "In plain language" : "Paprastai tariant"}
             </p>
-            <p className="text-[0.98rem] leading-relaxed text-[var(--ink)] m-0">
-              {meaning}
-            </p>
+            <div className="space-y-3 text-[0.98rem] leading-relaxed text-[var(--ink)]">
+              {expl.plainParas.map((para, i) => (
+                <p
+                  key={i}
+                  className={
+                    i === expl.plainParas.length - 1 &&
+                    /Ką tai gali reikšti|What this may mean/i.test(para)
+                      ? "rounded-[var(--radius-s)] bg-[var(--accent-soft)]/55 px-3 py-2.5 font-medium text-[var(--ink)] mb-0"
+                      : "m-0"
+                  }
+                >
+                  {para}
+                </p>
+              ))}
+            </div>
           </div>
+
+          <p className="text-xs leading-relaxed text-[var(--muted)] m-0">
+            {expl.disclaimer}
+          </p>
 
           <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
             <Link

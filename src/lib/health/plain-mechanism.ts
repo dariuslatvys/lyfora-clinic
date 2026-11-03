@@ -85,67 +85,130 @@ function applyGlossary(text: string, terms: [RegExp, string][]): string {
   return out.replace(/\uE000(\d+)\uE001/g, (_, i) => slots[Number(i)]!);
 }
 
+function copiesCueLt(matchCount: number | null | undefined): string {
+  if (matchCount === 0) {
+    return "Šioje pozicijoje rizikos alelių neturite — genetinis signalas čia ramus.";
+  }
+  if (matchCount === 1) {
+    return "Turite vieną rizikos alelį (vieną kopiją) — tai dažniausiai švelnesnis polinkio signalas.";
+  }
+  if (matchCount != null && matchCount >= 2) {
+    return "Turite abu rizikos alelius (dvi kopijas) — polinkio signalas čia ryškesnis nei turint vieną kopiją.";
+  }
+  return "Kai genotipas žinomas, šis žymuo padeda suprasti asmeninį polinkį.";
+}
+
+function copiesCueEn(matchCount: number | null | undefined): string {
+  if (matchCount === 0) {
+    return "You carry no risk alleles here — the genetic signal at this spot is calm.";
+  }
+  if (matchCount === 1) {
+    return "You carry one risk allele (one copy) — usually a milder predisposition signal.";
+  }
+  if (matchCount != null && matchCount >= 2) {
+    return "You carry both risk alleles (two copies) — the predisposition signal is stronger than with one copy.";
+  }
+  return "When the genotype is known, this marker helps describe your personal predisposition.";
+}
+
 function personalMeaningLt(
   raw: string,
-  ctx?: { gene?: string | null; subcategory?: string | null }
+  ctx?: MechanismContext
 ): string {
   const pharma = pharmaPersonalMeaning(raw, "lt", ctx);
   if (pharma) return pharma;
 
   const t = `${ctx?.gene || ""} ${ctx?.subcategory || ""} ${raw}`.toLowerCase();
+  const copies = copiesCueLt(ctx?.matchCount);
+  const prefix = `Ką tai gali reikšti jums: ${copies} `;
+
   if (/shbg|testosteron|androgen/.test(t)) {
-    return "Ką tai gali reikšti jums: dalis testosterono kraujyje gali būti „surišta“ ir mažiau prieinama raumenims, kaulams, nuotaikai ir libido — todėl kai kuriems žmonėms svarbu stebėti hormonų tyrimus ir savijautą, o ne tik bendrą testosterono skaičių.";
+    return `${prefix}Dalis testosterono kraujyje gali būti „surišta“ ir mažiau prieinama raumenims, kaulams, nuotaikai ir libido — stebėkite hormonų tyrimus ir savijautą, o ne tik bendrą testosterono skaičių.`;
   }
-  if (/apoe|ldl|apob|cholesterol|ateroskler|vainikini|arterij/.test(t)) {
-    return "Ką tai gali reikšti jums: jūsų organizmas gali linkti kaupti daugiau cholesterolio arterijų sienelėse. Tai nėra diagnozė, bet signalas stebėti lipidų tyrimus, kraujospūdį, mitybą ir judėjimą.";
+  if (/lpa|lp\(a\)|lipoprotein\(a\)/.test(t)) {
+    return `${prefix}Lp(a) beveik nepriklauso nuo mitybos. Verta bent kartą išsitirti Lp(a) ir kartu stebėti kitus lipidus bei kraujospūdį — tai polinkis, ne diagnozė.`;
   }
-  if (/diabet|insulin|gliukoz|tcf7l2|β-ląst|beta-ląst/.test(t)) {
-    return "Ką tai gali reikšti jums: cukraus apykaita gali būti jautresnė — verta stebėti gliukozę, HbA1c ir mitybos įpročius, ypač jei šeimoje yra cukrinis diabetas.";
+  if (/cdkn|anril|9p21/.test(t)) {
+    return `${prefix}Šiek tiek didesnis polinkis į širdies arterijų problemas ilgainiui. Svarbiausia — stebėti cholesterolį, kraujospūdį, nerūkyti ir judėti.`;
+  }
+  if (/agtr1|angiotenzin|a1166c|add1|agt\b|nos3|edn1|endotelin|kraujospūd|drusk|raas|natrio sulaik/.test(t)) {
+    return `${prefix}Kraujospūdžio ir kraujagyslių tonuso sistema gali būti jautresnė. Praktiškai: reguliariai matuokite kraujospūdį, saikingai vartokite druską, judėkite ir nerūkykite. Tai nėra hipertenzijos diagnozė.`;
+  }
+  if (/sort1|apoc3|triglicerid|apoe|ldl|apob|cholesterol|ateroskler|vainikini|arterij|pon1|paraokson|mmp9/.test(t)) {
+    return `${prefix}Lipidų ir arterijų rizika ilgainiui gali būti kiek didesnė. Stebėkite lipidų tyrimus (MTL, trigliceridus), kraujospūdį, mitybą ir judėjimą — polinkio signalas, ne liga.`;
+  }
+  if (/f2\b|f5\b|protrombin|leiden|tromboz|krešėj/.test(t)) {
+    return `${prefix}Venų trombozės rizika gali būti didesnė, ypač keliaujant ilgas valandas, po operacijų, nėštumo metu ar vartojant hormoninius vaistus. Aptarkite su gydytoju, ar reikia papildomų atsargumo priemonių.`;
+  }
+  if (/diabet|insulin|gliukoz|tcf7l2|β-ląst|beta-ląst|kcnj|slc30a8|leptin|lepr|mc4r|fto|sotum|apetito/.test(t)) {
+    return `${prefix}Cukraus, svorio ar sotumo reguliacija gali būti jautresnė. Verta stebėti gliukozę / HbA1c (jei tiriami), mitybą, miegą ir judėjimą — ypač jei šeimoje yra 2 tipo diabetas ar antsvoris.`;
   }
   if (/mthfr|folio|homocistein|b12|metilin/.test(t)) {
-    return "Ką tai gali reikšti jums: organizmas gali prasčiau „įjungti“ folio rūgštį (B9). Praktikoje tai dažnai reiškia rūpintis B vitaminų statusu ir stebėti homocisteiną, jei gydytojas rekomenduoja.";
+    return `${prefix}Organizmas gali prasčiau „įjungti“ folio rūgštį (B9). Praktikoje dažnai reiškia rūpintis B vitaminų statusu ir stebėti homocisteiną, jei gydytojas rekomenduoja.`;
   }
   if (/comt|dopamin|katecholamin|stres|emocij|pažinimo/.test(t)) {
-    return "Ką tai gali reikšti jums: streso ir nuotaikos chemija smegenyse gali veikti kiek kitaip — kai kam jautriau reaguoja į stresą ar kofeiną. Tai polinkis, ne diagnozė.";
+    return `${prefix}Streso ir nuotaikos chemija smegenyse gali veikti kiek kitaip — kai kam jautriau reaguoja į stresą ar kofeiną. Tai polinkis, ne diagnozė.`;
   }
-  if (/cdkn|anril|9p21|širdies arter|vainikinių/.test(t)) {
-    return "Ką tai gali reikšti jums: šiek tiek didesnis polinkis į širdies arterijų problemas ilgainiui. Svarbiausia — stebėti cholesterolį, kraujospūdį, nerūkyti ir judėti.";
+  if (/uždegim|crp|imun|il-?6|il6/.test(t)) {
+    return `${prefix}Uždegimo ar imuniteto reakcijos gali būti kiek jautresnės — verta stebėti savijautą ir susijusius kraujo žymenis (pvz. CRP), jei jie tiriami.`;
   }
-  if (/uždegim|crp|imun/.test(t)) {
-    return "Ką tai gali reikšti jums: uždegimo ar imuniteto reakcijos gali būti kiek jautresnės — verta stebėti savijautą ir susijusius kraujo žymenis, jei jie tiriami.";
+  if (/cyp2c19|cyp2c9|vkorc|warfarin|varfarin|klopidogrel|statin|slco1b1|farmakogen/.test(t)) {
+    return `${prefix}Tai svarbiausia tada, kai skiriami konkretūs vaistai (pvz. kraują skystinantys ar cholesterolio). Parodykite rezultatą gydytojui prieš dozuojant — patys dozės nekeiskite.`;
   }
-  return "Ką tai gali reikšti jums: tai genetinis polinkio signalas, o ne liga. Jis padeda suprasti, ką stebėti tyrimuose ir gyvenimo būde; sprendimus dėl gydymo priima tik gydytojas.";
+  return `${prefix}Tai genetinis polinkio signalas, o ne liga. Jis padeda suprasti, ką stebėti tyrimuose ir gyvenimo būde; sprendimus dėl gydymo priima tik gydytojas.`;
 }
 
 function personalMeaningEn(
   raw: string,
-  ctx?: { gene?: string | null; subcategory?: string | null }
+  ctx?: MechanismContext
 ): string {
   const pharma = pharmaPersonalMeaning(raw, "en", ctx);
   if (pharma) return pharma;
 
   const t = `${ctx?.gene || ""} ${ctx?.subcategory || ""} ${raw}`.toLowerCase();
+  const copies = copiesCueEn(ctx?.matchCount);
+  const prefix = `What this may mean for you: ${copies} `;
+
   if (/shbg|testosterone|androgen/.test(t)) {
-    return "What this may mean for you: more testosterone in blood may be “bound” and less available to tissues that need it (muscle, mood, libido). It is a reason to watch hormone labs with your clinician — not a diagnosis.";
+    return `${prefix}More testosterone in blood may be “bound” and less available to tissues that need it (muscle, mood, libido). Watch hormone labs with your clinician — not a diagnosis.`;
   }
-  if (/apoe|ldl|apob|cholesterol|atheroscler|coronary/.test(t)) {
-    return "What this may mean for you: your body may tend to carry more cholesterol in the arteries over time. Watch lipid panels, blood pressure, diet and activity — this is a predisposition signal, not a disease label.";
+  if (/lpa|lp\(a\)|lipoprotein\(a\)/.test(t)) {
+    return `${prefix}Lp(a) barely changes with diet. It is worth measuring Lp(a) at least once and watching other lipids and blood pressure — predisposition, not a disease label.`;
   }
-  if (/diabet|insulin|glucose|tcf7l2/.test(t)) {
-    return "What this may mean for you: blood-sugar handling may be more sensitive. It is useful to monitor glucose / HbA1c and eating habits, especially with a family history of type 2 diabetes.";
+  if (/cdkn|anril|9p21/.test(t)) {
+    return `${prefix}A somewhat higher long-term tendency toward coronary artery problems. Focus on cholesterol, blood pressure, not smoking and staying active.`;
+  }
+  if (/agtr1|angiotensin|a1166c|add1|agt\b|nos3|edn1|endothelin|blood.?pressure|salt|raas|sodium retention/.test(t)) {
+    return `${prefix}Blood-pressure and vessel-tone regulation may be more sensitive. In practice: check blood pressure regularly, go easy on salt, stay active and do not smoke. This is not a hypertension diagnosis.`;
+  }
+  if (/sort1|apoc3|triglyceride|apoe|ldl|apob|cholesterol|atheroscler|coronary|pon1|paraoxon|mmp9/.test(t)) {
+    return `${prefix}Long-term lipid and artery risk may run a bit higher. Watch lipid panels (LDL, triglycerides), blood pressure, diet and activity — a predisposition signal, not a disease.`;
+  }
+  if (/f2\b|f5\b|prothrombin|leiden|thrombos|clot/.test(t)) {
+    return `${prefix}Venous thrombosis risk may be higher — especially on long flights, after surgery, in pregnancy or on hormonal medicines. Ask your clinician whether extra precautions are needed.`;
+  }
+  if (/diabet|insulin|glucose|tcf7l2|kcnj|slc30a8|leptin|lepr|mc4r|fto|satiety|appetite/.test(t)) {
+    return `${prefix}Blood-sugar, weight or satiety regulation may be more sensitive. Monitor glucose / HbA1c when tested, and watch diet, sleep and activity — especially with a family history of type 2 diabetes or weight gain.`;
   }
   if (/mthfr|folate|homocysteine/.test(t)) {
-    return "What this may mean for you: your body may process folate (vitamin B9) less efficiently. In practice this often means checking B-vitamin status and, if advised, homocysteine.";
+    return `${prefix}Your body may process folate (vitamin B9) less efficiently. In practice this often means checking B-vitamin status and, if advised, homocysteine.`;
   }
   if (/comt|dopamine|catecholamine|stress|mood/.test(t)) {
-    return "What this may mean for you: stress and mood chemistry in the brain may work a bit differently — some people feel more sensitive to stress or caffeine. Predisposition, not a diagnosis.";
+    return `${prefix}Stress and mood chemistry in the brain may work a bit differently — some people feel more sensitive to stress or caffeine. Predisposition, not a diagnosis.`;
   }
-  return "What this may mean for you: this is a genetic predisposition signal, not a disease. Use it to guide what to watch in labs and lifestyle; treatment decisions belong with your clinician.";
+  if (/inflam|crp|immun|il-?6|il6/.test(t)) {
+    return `${prefix}Inflammation or immune responses may be a bit more reactive — worth watching how you feel and related blood markers (e.g. CRP) when they are tested.`;
+  }
+  if (/cyp2c19|cyp2c9|vkorc|warfarin|clopidogrel|statin|slco1b1|pharmacogen/.test(t)) {
+    return `${prefix}This matters most when specific medicines are prescribed (e.g. blood thinners or cholesterol drugs). Show the result to your clinician before dosing changes — do not adjust doses yourself.`;
+  }
+  return `${prefix}This is a genetic predisposition signal, not a disease. Use it to guide what to watch in labs and lifestyle; treatment decisions belong with your clinician.`;
 }
 
 export type MechanismContext = {
   gene?: string | null;
   subcategory?: string | null;
+  matchCount?: number | null;
 };
 
 export function humanizeMechanism(
@@ -170,6 +233,13 @@ export function humanizeMechanism(
     /^rs\d+\s+[ACGT]\s+allele\s+/i,
     "This risk allele "
   );
+  // Strand-note removal can leave a dangling comma after the allele phrase
+  body = body
+    .replace(/\balelis\s+,/gi, "alelis")
+    .replace(/\ballele\s+,/gi, "allele")
+    .replace(/\s+,/g, ",")
+    .replace(/\s{2,}/g, " ")
+    .trim();
 
   // Soften “activity score” jargon for patients
   if (locale === "lt") {

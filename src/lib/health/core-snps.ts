@@ -212,8 +212,10 @@ export const CORE_SNPS: CoreSnpDef[] = [
     match1: "badge",
     match2: "yellow",
     group: 2,
-    infoLt: "Natrio sulaikymas inkstuose. Siejamas su jautrumu druskai.",
-    infoEn: "Sodium retention in the kidneys. Linked to salt sensitivity.",
+    infoLt:
+      "Natrio sulaikymas inkstuose (ADD1). Rizikos alelis siejamas su didesniu jautrumu druskai ir kraujospūdžiui.",
+    infoEn:
+      "Sodium retention in the kidneys (ADD1). The risk allele is linked to greater salt sensitivity and blood-pressure response.",
   },
   {
     gene: "AGTR1",
@@ -229,9 +231,9 @@ export const CORE_SNPS: CoreSnpDef[] = [
     match2: "yellow",
     group: 2,
     infoLt:
-      "Angiotenzino II receptorius. Siejamas su kraujospūdžio reguliacija.",
+      "Angiotenzino II 1 tipo receptorius (A1166C). Rizikos alelis siejamas su jautresne kraujospūdžio reguliacija ir kraujagyslių tonusu.",
     infoEn:
-      "Angiotensin II receptor. Linked to blood-pressure regulation.",
+      "Angiotensin II type 1 receptor (A1166C). The risk allele is linked to more sensitive blood-pressure regulation and vessel tone.",
   },
   {
     gene: "MTHFR",
@@ -264,8 +266,10 @@ export const CORE_SNPS: CoreSnpDef[] = [
     match1: "badge",
     match2: "yellow",
     group: 3,
-    infoLt: "C reaktyviojo baltymo bazinis lygis organizme.",
-    infoEn: "Baseline C-reactive protein level in the body.",
+    infoLt:
+      "Bazinis C reaktyviojo baltymo (CRP) lygis – uždegimo žymuo, susijęs su širdies rizika ilgainiui.",
+    infoEn:
+      "Baseline C-reactive protein (CRP) — an inflammation marker linked with long-term heart risk.",
   },
   {
     gene: "PHACTR1 / EDN1",
@@ -280,8 +284,10 @@ export const CORE_SNPS: CoreSnpDef[] = [
     match1: "badge",
     match2: "yellow",
     group: 3,
-    infoLt: "Kraujagyslių sienelės funkcija (endotelinas-1).",
-    infoEn: "Vessel-wall function (endothelin-1).",
+    infoLt:
+      "Kraujagyslių sienelės funkcija per endoteliną-1 – siejama su kraujagyslių tonusu ir vainikinių arterijų rizika.",
+    infoEn:
+      "Vessel-wall function via endothelin-1 — linked to vascular tone and coronary artery risk.",
   },
   {
     gene: "PON1",
@@ -296,8 +302,10 @@ export const CORE_SNPS: CoreSnpDef[] = [
     match1: "badge",
     match2: "yellow",
     group: 3,
-    infoLt: "Paraoksonazė – antioksidacinė MTL apsauga.",
-    infoEn: "Paraoxonase — antioxidant protection of LDL.",
+    infoLt:
+      "Paraoksonazė-1 (PON1) – antioksidacinė MTL apsauga; silpnesnė veikla siejama su ateroskleroze.",
+    infoEn:
+      "Paraoxonase-1 (PON1) — antioxidant protection of LDL; lower activity is linked with atherosclerosis.",
   },
   {
     gene: "MMP9",
@@ -312,8 +320,10 @@ export const CORE_SNPS: CoreSnpDef[] = [
     match1: "badge",
     match2: "yellow",
     group: 3,
-    infoLt: "Kraujagyslių audinio remodeliavimas (MMP-9).",
-    infoEn: "Vascular tissue remodelling (MMP-9).",
+    infoLt:
+      "Kraujagyslių audinio remodeliavimas (MMP-9) – siejamas su arterijų sienelės pokyčiais ir plokštelių nestabilumu.",
+    infoEn:
+      "Vascular tissue remodelling (MMP-9) — linked to artery-wall changes and plaque instability.",
   },
   {
     gene: "F5",
@@ -364,8 +374,10 @@ export const CORE_SNPS: CoreSnpDef[] = [
     match1: "badge",
     match2: "yellow",
     group: 3,
-    infoLt: "IL-6 receptorius – uždegimo signalizacija.",
-    infoEn: "IL-6 receptor — inflammation signalling.",
+    infoLt:
+      "IL-6 receptorius – uždegimo signalizacija, susijusi su chronišku uždegimu ir širdies rizika.",
+    infoEn:
+      "IL-6 receptor — inflammation signalling linked with chronic inflammation and heart risk.",
   },
   {
     gene: "TCF7L2",
@@ -398,8 +410,10 @@ export const CORE_SNPS: CoreSnpDef[] = [
     match1: "badge",
     match2: "yellow",
     group: 4,
-    infoLt: "Cinko pernaša kasos β ląstelėse, insulino gamyba.",
-    infoEn: "Zinc transport in pancreatic β cells; insulin production.",
+    infoLt:
+      "Cinko pernaša kasos β ląstelėse – veikia insulino gamybą ir cukraus apykaitos polinkį.",
+    infoEn:
+      "Zinc transport in pancreatic β cells — affects insulin production and blood-sugar predisposition.",
   },
   {
     gene: "KCNJ11",
@@ -414,8 +428,10 @@ export const CORE_SNPS: CoreSnpDef[] = [
     match1: "badge",
     match2: "yellow",
     group: 4,
-    infoLt: "Kalio kanalas, valdantis insulino išsiskyrimą.",
-    infoEn: "Potassium channel that controls insulin release.",
+    infoLt:
+      "Kalio kanalas (KCNJ11), valdantis insulino išsiskyrimą – siejamas su 2 tipo diabeto polinkiu.",
+    infoEn:
+      "Potassium channel (KCNJ11) controlling insulin release — linked to type 2 diabetes predisposition.",
   },
   {
     gene: "FTO",
@@ -448,8 +464,10 @@ export const CORE_SNPS: CoreSnpDef[] = [
     match1: "badge",
     match2: "yellow",
     group: 4,
-    infoLt: "Leptino receptorius – sotumo jausmas.",
-    infoEn: "Leptin receptor — satiety signalling.",
+    infoLt:
+      "Leptino receptorius (LEPR) – sotumo signalas smegenyse; variantas siejamas su apetito ir svorio polinkiu.",
+    infoEn:
+      "Leptin receptor (LEPR) — satiety signalling in the brain; the variant is linked to appetite and weight predisposition.",
   },
   {
     gene: "MC4R",
@@ -464,8 +482,10 @@ export const CORE_SNPS: CoreSnpDef[] = [
     match1: "badge",
     match2: "yellow",
     group: 4,
-    infoLt: "Apetito reguliacija smegenyse.",
-    infoEn: "Appetite regulation in the brain.",
+    infoLt:
+      "Apetito reguliacija smegenyse (MC4R) – rizikos alelis siejamas su didesniu polinkiu priaugti svorio.",
+    infoEn:
+      "Appetite regulation in the brain (MC4R) — the risk allele is linked to a greater tendency to gain weight.",
   },
   {
     gene: "SLCO1B1",
@@ -498,8 +518,10 @@ export const CORE_SNPS: CoreSnpDef[] = [
     match1: "yellow",
     match2: "orange",
     group: 5,
-    infoLt: "CYP2C19*2. Sumažėjęs klopidogrelio aktyvavimas.",
-    infoEn: "CYP2C19*2. Reduced clopidogrel activation.",
+    infoLt:
+      "CYP2C19*2 – sumažėjęs klopidogrelio aktyvavimas; gali silpninti antitrombocitinį poveikį.",
+    infoEn:
+      "CYP2C19*2 — reduced clopidogrel activation; may weaken the antiplatelet effect.",
   },
   {
     gene: "CYP2C19",
@@ -514,8 +536,10 @@ export const CORE_SNPS: CoreSnpDef[] = [
     match1: "yellow",
     match2: "orange",
     group: 5,
-    infoLt: "CYP2C19*3. Sumažėjęs klopidogrelio aktyvavimas.",
-    infoEn: "CYP2C19*3. Reduced clopidogrel activation.",
+    infoLt:
+      "CYP2C19*3 – sumažėjęs klopidogrelio aktyvavimas; gali silpninti antitrombocitinį poveikį.",
+    infoEn:
+      "CYP2C19*3 — reduced clopidogrel activation; may weaken the antiplatelet effect.",
   },
   {
     gene: "ABCG2",
@@ -548,8 +572,10 @@ export const CORE_SNPS: CoreSnpDef[] = [
     match1: "yellow",
     match2: "orange",
     group: 5,
-    infoLt: "CYP2C19*17. Greitesnis kai kurių vaistų metabolizmas.",
-    infoEn: "CYP2C19*17. Faster metabolism of some medicines.",
+    infoLt:
+      "CYP2C19*17 – greitesnis kai kurių vaistų metabolizmas; dozę parenka gydytojas.",
+    infoEn:
+      "CYP2C19*17 — faster metabolism of some medicines; dosing is decided by a clinician.",
   },
   {
     gene: "VKORC1",
@@ -564,8 +590,10 @@ export const CORE_SNPS: CoreSnpDef[] = [
     match1: "yellow",
     match2: "orange",
     group: 5,
-    infoLt: "Jautrumas varfarinui – gali prireikti mažesnės dozės.",
-    infoEn: "Warfarin sensitivity — a lower dose may be needed.",
+    infoLt:
+      "Jautrumas varfarinui (VKORC1) – dažnai reikia mažesnės dozės; dozę parenka tik gydytojas.",
+    infoEn:
+      "Warfarin sensitivity (VKORC1) — a lower dose is often needed; only a clinician sets the dose.",
   },
   {
     gene: "CYP2C9",

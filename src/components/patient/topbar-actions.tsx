@@ -127,6 +127,7 @@ export function TopbarActions({ locale }: { locale: "lt" | "en" }) {
           empty: "No notifications",
           cart: "Shopping cart",
           openCart: "Open cart",
+          deathClock: "Death Clock",
         }
       : {
           notices: "Pranešimai",
@@ -134,6 +135,7 @@ export function TopbarActions({ locale }: { locale: "lt" | "en" }) {
           empty: "Pranešimų nėra",
           cart: "Pirkinių krepšelis",
           openCart: "Atidaryti krepšelį",
+          deathClock: "Death Clock",
         };
 
   return (
@@ -244,6 +246,28 @@ export function TopbarActions({ locale }: { locale: "lt" | "en" }) {
             {cartCount > 9 ? "9+" : cartCount}
           </span>
         ) : null}
+      </Link>
+
+      <Link
+        href="/patient/death-clock"
+        className="topbar-icon-btn"
+        aria-label={copy.deathClock}
+        title={copy.deathClock}
+      >
+        <svg
+          viewBox="0 0 24 24"
+          width="20"
+          height="20"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <circle cx="12" cy="13" r="8" />
+          <path d="M12 9v4l2.5 1.5M9 3h6" />
+        </svg>
       </Link>
     </div>
   );

@@ -103,6 +103,9 @@ export function DeathClockView({ data }: { data: DeathClockPayload }) {
             base: "Baseline",
             of: "of",
             current: "Current situation",
+            forPatient: "Calculated for",
+            sexMale: "Male",
+            sexFemale: "Female",
             projection: "With selected recommendations",
             recs: "Recommendations",
             recsBlurb:
@@ -156,6 +159,9 @@ export function DeathClockView({ data }: { data: DeathClockPayload }) {
             base: "Bazė",
             of: "iš",
             current: "Dabartinė situacija",
+            forPatient: "Skaičiuojama",
+            sexMale: "Vyras",
+            sexFemale: "Moteris",
             projection: "Su pažymėtomis rekomendacijomis",
             recs: "Rekomendacijos",
             recsBlurb:
@@ -335,6 +341,12 @@ export function DeathClockView({ data }: { data: DeathClockPayload }) {
               <p key={s}>{s}</p>
             ))}
           </div>
+          <p className="death-clock-who m-0 mt-2">
+            {copy.forPatient}: <b>{data.patientName}</b>
+            {" · "}
+            {data.sex === "female" ? copy.sexFemale : copy.sexMale}
+            {data.ageYears != null ? ` · ${data.ageYears}` : ""}
+          </p>
         </div>
       </div>
 

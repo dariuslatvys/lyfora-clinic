@@ -221,6 +221,29 @@ export function TopbarActions({ locale }: { locale: "lt" | "en" }) {
       </div>
 
       <Link
+        href="/patient/death-clock"
+        className="topbar-icon-btn"
+        aria-label={copy.deathClock}
+        title={copy.deathClock}
+        data-death-clock="1"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          width="20"
+          height="20"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <circle cx="12" cy="13" r="8" />
+          <path d="M12 9v4l2.5 1.5M9 3h6" />
+        </svg>
+      </Link>
+
+      <Link
         href="/patient/marketplace?cart=1"
         className="topbar-icon-btn"
         aria-label={copy.cart}
@@ -246,28 +269,6 @@ export function TopbarActions({ locale }: { locale: "lt" | "en" }) {
             {cartCount > 9 ? "9+" : cartCount}
           </span>
         ) : null}
-      </Link>
-
-      <Link
-        href="/patient/death-clock"
-        className="topbar-icon-btn"
-        aria-label={copy.deathClock}
-        title={copy.deathClock}
-      >
-        <svg
-          viewBox="0 0 24 24"
-          width="20"
-          height="20"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.8"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
-        >
-          <circle cx="12" cy="13" r="8" />
-          <path d="M12 9v4l2.5 1.5M9 3h6" />
-        </svg>
       </Link>
     </div>
   );

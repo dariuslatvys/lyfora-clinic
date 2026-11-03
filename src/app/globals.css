@@ -593,6 +593,20 @@ a.who.on {
   align-items: center;
   gap: 4px;
   flex: 0 0 auto;
+  flex-shrink: 0;
+}
+
+.topbar-actions .topbar-icon-btn {
+  flex-shrink: 0;
+}
+
+.death-clock-who {
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+}
+
+.death-clock-who b {
+  color: var(--ink);
 }
 
 .topbar-notice {

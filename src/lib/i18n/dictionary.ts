@@ -20,6 +20,7 @@ export const dict = {
     uploads: "Duomenų įkėlimas",
     labs: "Tyrimai",
     myDna: "Mano DNR",
+    deathClock: "Death Clock",
     visits: "Vizitai",
     referrals: "Siuntimai",
     referralsBlurb:
@@ -169,6 +170,7 @@ export const dict = {
     uploads: "Data upload",
     labs: "Labs",
     myDna: "My DNA",
+    deathClock: "Death Clock",
     visits: "Visits",
     referrals: "Referrals",
     referralsBlurb:

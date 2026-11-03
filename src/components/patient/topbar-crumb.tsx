@@ -24,7 +24,7 @@ export function TopbarCrumb({ labels }: { labels: Dictionary }) {
     if (pathname.startsWith("/patient/urgent")) return labels.urgentConsult;
     if (pathname.startsWith("/patient/questions")) return labels.questions;
     if (pathname.startsWith("/patient/digital-twin")) return labels.overview;
-    if (pathname.startsWith("/patient/death-clock")) return "Death Clock";
+    if (pathname.startsWith("/patient/death-clock")) return labels.deathClock;
     if (pathname.startsWith("/patient/snp")) return labels.genes;
     if (pathname.startsWith("/patient/marker")) return labels.markers;
     return labels.overview;

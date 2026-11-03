@@ -12,6 +12,7 @@ const items = [
   { href: "/patient/health-card", key: "healthCard" as const, icon: "card" },
   { href: "/patient/labs", key: "labs" as const, icon: "flask" },
   { href: "/patient/dna", key: "myDna" as const, icon: "dna" },
+  { href: "/patient/death-clock", key: "deathClock" as const, icon: "clock" },
   { href: "/patient/consultations", key: "consultations" as const, icon: "consult" },
   { href: "/patient/visits", key: "visits" as const, icon: "cal" },
   { href: "/patient/referrals", key: "referrals" as const, icon: "send" },
@@ -85,6 +86,12 @@ const ICONS: Record<string, ReactNode> = {
       <path d="M7 4c4 4 6 8 10 16" />
       <path d="M17 4c-4 4-6 8-10 16" />
       <path d="M8.5 8.5h7M7.5 12h9M8.5 15.5h7" />
+    </g>
+  ),
+  clock: (
+    <g>
+      <circle cx="12" cy="13" r="8" />
+      <path d="M12 9v4l2.5 1.5M9 3h6" />
     </g>
   ),
   shield: (

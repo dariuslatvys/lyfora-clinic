@@ -2222,19 +2222,19 @@ a.who.on {
 }
 
 .death-clock-blurb {
-  margin-top: 10px;
-  max-width: 72ch;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.death-clock-blurb p {
-  margin: 0;
+  margin: 10px 0 0;
+  max-width: none !important;
+  width: 100%;
   font-size: 0.92rem;
   line-height: 1.45;
   color: var(--muted);
-  white-space: normal;
+}
+
+.death-clock .page-head,
+.death-clock .death-clock-head,
+.death-clock .death-clock-head > div {
+  width: 100%;
+  max-width: none;
 }
 
 .death-clock-timeline {

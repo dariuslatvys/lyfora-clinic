@@ -336,11 +336,9 @@ export function DeathClockView({ data }: { data: DeathClockPayload }) {
           <h1 className="font-[family-name:var(--font-display)] text-[1.9rem] font-bold tracking-[-0.01em] m-0">
             {copy.title}
           </h1>
-          <div className="death-clock-blurb">
-            {copy.blurbs.map((s) => (
-              <p key={s}>{s}</p>
-            ))}
-          </div>
+          <p className="death-clock-blurb">
+            {copy.blurbs.join(" ")}
+          </p>
           <p className="death-clock-who m-0 mt-2">
             {copy.forPatient}: <b>{data.patientName}</b>
             {" · "}

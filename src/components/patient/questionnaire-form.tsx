@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   STEP_TITLE_LT,
+  SECTION_TITLE_LT,
   computeBmi,
   computeAge,
   conditionsForSex,
@@ -378,8 +379,21 @@ function FieldRenderer({
       ? notesLt[field.notes] || field.notes
       : field.notes;
 
+  const sectionTitle =
+    field.section === "Family longevity"
+      ? locale === "lt"
+        ? SECTION_TITLE_LT[field.section] || field.section
+        : field.section
+      : null;
+
   return (
     <div className="q-field">
+      {sectionTitle &&
+      field.id === "10_family_history__longevity__relative_lived_to_85" ? (
+        <h3 className="overview-subhead m-0" style={{ marginBottom: 4 }}>
+          {sectionTitle}
+        </h3>
+      ) : null}
       <div className="q-field-head">
         <label className="q-label" htmlFor={`q-${field.id}`}>
           {title}
@@ -949,7 +963,14 @@ function FamilyHistoryBlock({
                 ...p,
                 familyMembers: [
                   ...p.familyMembers,
-                  { id: uid(), relative: "", conditions: [], notes: "" },
+                  {
+                    id: uid(),
+                    relative: "",
+                    conditions: [],
+                    notes: "",
+                    vitalStatus: "",
+                    ageYears: null,
+                  },
                 ],
               }))
             }
@@ -978,7 +999,7 @@ function FamilyHistoryBlock({
               </option>
               {relativeItems.map((r) => (
                 <option key={r} value={r}>
-                  {r}
+                  {optionLabel(r, locale)}
                 </option>
               ))}
             </select>
@@ -996,6 +1017,46 @@ function FamilyHistoryBlock({
                 {locale === "en" ? "Remove" : "Pašalinti"}
               </button>
             ) : null}
+          </div>
+          <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
+            <select
+              disabled={readOnly}
+              value={m.vitalStatus || ""}
+              onChange={(e) =>
+                updateMember(m.id, { vitalStatus: e.target.value })
+              }
+              aria-label={
+                locale === "en" ? "Living or deceased" : "Gyvas ar miręs"
+              }
+            >
+              <option value="">
+                {locale === "en" ? "Status…" : "Būsena…"}
+              </option>
+              {(["Living", "Deceased", "Unknown"] as const).map((s) => (
+                <option key={s} value={s}>
+                  {optionLabel(s, locale)}
+                </option>
+              ))}
+            </select>
+            <input
+              disabled={readOnly}
+              type="number"
+              min={0}
+              max={120}
+              placeholder={
+                locale === "en"
+                  ? "Age (current or at death)"
+                  : "Amžius (dabartinis / mirties)"
+              }
+              value={m.ageYears == null ? "" : String(m.ageYears)}
+              onChange={(e) =>
+                updateMember(m.id, {
+                  ageYears:
+                    e.target.value === "" ? null : Number(e.target.value),
+                })
+              }
+              style={{ maxWidth: 220 }}
+            />
           </div>
           <MultiSelect
             disabled={readOnly}

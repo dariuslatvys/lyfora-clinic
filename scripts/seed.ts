@@ -766,18 +766,109 @@ async function main() {
   insertQ.run(femaleId, "family_breast_cancer", "močiutė");
   insertQ.run(femaleId, "menstrual_regular", "taip");
 
+  function withFamilyLongevityDemo(
+    pid: string,
+    raw: string | null | undefined
+  ): string {
+    const a = parseStoredAnswers(raw);
+    const isFemale = pid === femaleId || pid === "patient_female";
+    a.values["10_family_history__longevity__relative_lived_to_85"] =
+      a.values["10_family_history__longevity__relative_lived_to_85"] || "Yes";
+    a.values["10_family_history__longevity__relative_lived_to_90"] =
+      a.values["10_family_history__longevity__relative_lived_to_90"] ||
+      (isFemale ? "No" : "Yes");
+    a.values["10_family_history__longevity__relative_lived_to_100"] =
+      a.values["10_family_history__longevity__relative_lived_to_100"] || "No";
+    a.values["10_family_history__longevity__longest_parent_age"] =
+      a.values["10_family_history__longevity__longest_parent_age"] ||
+      (isFemale ? 86 : 88);
+    a.values["10_family_history__longevity__first_degree_past_85"] =
+      a.values["10_family_history__longevity__first_degree_past_85"] || "1";
+    const hasAgedMember = a.familyMembers.some(
+      (m) => typeof m.ageYears === "number" && Number(m.ageYears) > 0
+    );
+    if (!hasAgedMember) {
+      a.familyMembers = isFemale
+        ? [
+            {
+              id: "fm_seed_f1",
+              relative: "Maternal Grandmother",
+              conditions: ["Breast Cancer"],
+              notes: "",
+              vitalStatus: "Deceased",
+              ageYears: 84,
+            },
+            {
+              id: "fm_seed_f2",
+              relative: "Mother",
+              conditions: ["High Blood Pressure"],
+              notes: "",
+              vitalStatus: "Living",
+              ageYears: 86,
+            },
+            {
+              id: "fm_seed_f3",
+              relative: "Father",
+              conditions: [],
+              notes: "",
+              vitalStatus: "Living",
+              ageYears: 84,
+            },
+          ]
+        : [
+            {
+              id: "fm_seed_m1",
+              relative: "Father",
+              conditions: [
+                "Heart Attack / Myocardial Infarction",
+                "High Blood Pressure",
+              ],
+              notes: "MI ~58, later lived to 72",
+              vitalStatus: "Deceased",
+              ageYears: 72,
+            },
+            {
+              id: "fm_seed_m2",
+              relative: "Maternal Grandmother",
+              conditions: [],
+              notes: "Lived to 92",
+              vitalStatus: "Deceased",
+              ageYears: 92,
+            },
+            {
+              id: "fm_seed_m3",
+              relative: "Mother",
+              conditions: ["High Blood Pressure"],
+              notes: "",
+              vitalStatus: "Living",
+              ageYears: 88,
+            },
+          ];
+    }
+    a.updatedAt = a.updatedAt || new Date().toISOString();
+    return JSON.stringify(a);
+  }
+
   // Restore patient-entered questionnaire and push vitals into markers
   for (const row of preservedQ) {
     const pid =
       row.patient_id === "patient_female" ? femaleId : patientId;
-    insertQ.run(pid, row.key, row.value);
+    const value =
+      row.key === "health_questionnaire_v1"
+        ? withFamilyLongevityDemo(pid, row.value)
+        : row.value;
+    insertQ.run(pid, row.key, value);
   }
   if (preservedQ.length) {
     const def = await loadQuestionnaireDefinition();
     for (const row of preservedQ) {
       const pid =
         row.patient_id === "patient_female" ? femaleId : patientId;
-      syncQuestionnaireMetrics(pid, parseStoredAnswers(row.value), def);
+      const value =
+        row.key === "health_questionnaire_v1"
+          ? withFamilyLongevityDemo(pid, row.value)
+          : row.value;
+      syncQuestionnaireMetrics(pid, parseStoredAnswers(value), def);
     }
     // Keep wearable-imported series (Apple Health / Oura) as the latest
     // for those keys — questionnaire restore must not overwrite them.

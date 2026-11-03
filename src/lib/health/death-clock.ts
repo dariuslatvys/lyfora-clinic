@@ -100,6 +100,15 @@ const ALGORITHM_RULES: DeathClockAlgorithmRule[] = [
       "Smoking −220 / non-smoker +25; heavy alcohol −90; activity +55 / low −40; sleep 7–9 h +20 / short −35; family history (heart/oncology) −70.",
   },
   {
+    id: "family-longevity",
+    titleLt: "Šeimos ilgaamžiškumas (klausimynas)",
+    titleEn: "Family longevity (questionnaire)",
+    bodyLt:
+      "Remiamės kohortų duomenimis (JAMA Network Open, Nature Communications, NECS): paprasta gyvenimo trukmė silpnai paveldima (~12–25 %), bet išskirtinis ilgaamžiškumas (~top 10–15 %, ~85+ m.) kaupiasi šeimose. Tėvų/centenarų palikuonys — mažesnė mirtingumo HR (~0,58) ir ~+3 m. mirtingumo atidėjimas. Modelis: tėvas/motina 85+ → +50 sav., 90+ → +90, 100+ → +160; abu tėvai 85+ → dar +40; seneliai/broliai-seserys silpniau; klausimyno „Taip“ atsakymai, jei nėra amžių; ankstyva tėvų mirtis <60 m. → −55. Bendras pliusas ribojamas +220 sav.",
+    bodyEn:
+      "Based on cohort evidence (JAMA Network Open, Nature Communications, NECS): ordinary lifespan is weakly heritable (~12–25%), but exceptional longevity (~top 10–15%, ~85+) clusters in families. Offspring of longevous/centenarian parents show lower mortality HR (~0.58) and ~+3 years delayed death. Model: parent 85+ → +50 weeks, 90+ → +90, 100+ → +160; both parents 85+ → +40 more; grandparents/siblings weaker; questionnaire Yes answers if ages missing; parental death <60 → −55. Total bonus capped at +220 weeks.",
+  },
+  {
     id: "recs",
     titleLt: "Rekomendacijos (gyvensena, mityba, stebėsena)",
     titleEn: "Recommendations (lifestyle, diet, monitoring)",
@@ -204,7 +213,7 @@ export function loadDeathClock(
     )
     .get();
   const answers = parseStoredAnswers(row?.value);
-  const v = answers as Record<string, unknown>;
+  const v = answers.values;
 
   const asOf = todayIsoDate();
   const dob = twin.patient.dob;
@@ -365,10 +374,12 @@ export function loadDeathClock(
   }
 
   // Lifestyle from questionnaire
-  const smoke = String(
-    v["7_lifestyle__do_you_smoke_or_use_nicotine_products"] || ""
-  ).toLowerCase();
-  if (/yes|taip|daily|kasdien|smoke/.test(smoke)) {
+  const smokeRaw = v["7_lifestyle__do_you_smoke_or_use_nicotine_products"];
+  const smoke = String(smokeRaw || "").toLowerCase().trim();
+  const smokeCurrent = /^(current|daily|kasdien)/.test(smoke) || smoke === "yes" || smoke === "taip";
+  const smokeFormerOrNever =
+    /former|never|non-?smoker|buvęs|^no$|^ne$/.test(smoke) || Boolean(smoke);
+  if (smokeCurrent) {
     delta -= 220;
     drivers.push({
       id: "smoke",
@@ -377,12 +388,16 @@ export function loadDeathClock(
       deltaWeeks: -220,
       kind: "risk",
     });
-  } else if (smoke) {
+  } else if (smokeFormerOrNever) {
     delta += 25;
     drivers.push({
       id: "smoke",
-      labelLt: "Nerūko (klausimynas)",
-      labelEn: "Non-smoker (questionnaire)",
+      labelLt: /former|buvęs/.test(smoke)
+        ? "Buvęs rūkalius (klausimynas)"
+        : "Nerūko (klausimynas)",
+      labelEn: /former/.test(smoke)
+        ? "Former smoker (questionnaire)"
+        : "Non-smoker (questionnaire)",
       deltaWeeks: 25,
       kind: "protect",
     });
@@ -442,24 +457,146 @@ export function loadDeathClock(
     });
   }
 
-  // Family history
-  const familyBlock = (v["10_family_history"] || {}) as {
-    familyMembers?: Array<{
-      conditions?: string[];
-      relation?: string;
-    }>;
-  };
-  const familyConds = (familyBlock.familyMembers || []).flatMap(
-    (m) => m.conditions || []
-  );
+  // Family disease history (conditions listed on relatives)
+  const familyMembers = answers.familyMembers || [];
+  const familyConds = familyMembers.flatMap((m) => m.conditions || []);
   const familyText = familyConds.join(" ").toLowerCase();
-  if (/cancer|vėž|oncolog|heart|šird|infarkt|stroke|insult/.test(familyText)) {
+  if (
+    /cancer|vėž|oncolog|heart|šird|infarkt|stroke|insult|myocardial|coronary|sudden cardiac/.test(
+      familyText
+    )
+  ) {
     delta -= 70;
     drivers.push({
       id: "family",
       labelLt: "Šeimos anamnezė (širdis / onkologija)",
       labelEn: "Family history (heart / oncology)",
       deltaWeeks: -70,
+      kind: "risk",
+    });
+  }
+
+  // Family longevity — exceptional parental/relative lifespan
+  // Evidence: JAMA Netw Open (centenarian offspring ~HR 0.58, ~+3.1 y);
+  // Nature Comm (top 10% survival transmits); heritability 12–25% ordinary,
+  // stronger above ~80–85 (longevity threshold).
+  const isParent = (rel: string) => /^(mother|father|motina|tėvas)$/i.test(rel);
+  const isFirstDegree = (rel: string) =>
+    /^(mother|father|sister|brother|motina|tėvas|sesuo|brolis)$/i.test(rel);
+  const parentAges = familyMembers
+    .filter((m) => isParent(m.relative || "") && typeof m.ageYears === "number")
+    .map((m) => Number(m.ageYears));
+  const otherAges = familyMembers
+    .filter((m) => !isParent(m.relative || "") && typeof m.ageYears === "number")
+    .map((m) => ({
+      age: Number(m.ageYears),
+      first: isFirstDegree(m.relative || ""),
+    }));
+
+  let longevityBonus = 0;
+  const longevityBits: string[] = [];
+
+  const maxParentAge = Math.max(
+    0,
+    ...parentAges,
+    Number(v["10_family_history__longevity__longest_parent_age"] || 0) || 0
+  );
+  if (maxParentAge >= 100) {
+    longevityBonus += 160;
+    longevityBits.push("parent≥100");
+  } else if (maxParentAge >= 90) {
+    longevityBonus += 90;
+    longevityBits.push("parent≥90");
+  } else if (maxParentAge >= 85) {
+    longevityBonus += 50;
+    longevityBits.push("parent≥85");
+  }
+
+  const parentsPast85 = parentAges.filter((a) => a >= 85).length;
+  const firstDegreePast85Ans = String(
+    v["10_family_history__longevity__first_degree_past_85"] || ""
+  );
+  const multiFirstDegree =
+    parentsPast85 >= 2 ||
+    /2|more|daug/i.test(firstDegreePast85Ans) ||
+    otherAges.filter((o) => o.first && o.age >= 85).length + parentsPast85 >= 2;
+  if (multiFirstDegree && longevityBonus > 0) {
+    longevityBonus += 40;
+    longevityBits.push("≥2 first-degree 85+");
+  }
+
+  const maxOther = Math.max(0, ...otherAges.map((o) => o.age));
+  if (maxOther >= 100 && maxParentAge < 100) {
+    longevityBonus += 70;
+    longevityBits.push("other≥100");
+  } else if (maxOther >= 90 && maxParentAge < 90) {
+    longevityBonus += 40;
+    longevityBits.push("other≥90");
+  } else if (maxOther >= 85 && maxParentAge < 85) {
+    longevityBonus += 20;
+    longevityBits.push("other≥85");
+  }
+
+  // Questionnaire Yes flags when concrete ages are thin
+  const lived85 = String(
+    v["10_family_history__longevity__relative_lived_to_85"] || ""
+  );
+  const lived90 = String(
+    v["10_family_history__longevity__relative_lived_to_90"] || ""
+  );
+  const lived100 = String(
+    v["10_family_history__longevity__relative_lived_to_100"] || ""
+  );
+  if (longevityBonus === 0) {
+    if (/^yes$/i.test(lived100)) {
+      longevityBonus += 140;
+      longevityBits.push("Q: relative 100+");
+    } else if (/^yes$/i.test(lived90)) {
+      longevityBonus += 70;
+      longevityBits.push("Q: relative 90+");
+    } else if (/^yes$/i.test(lived85)) {
+      longevityBonus += 40;
+      longevityBits.push("Q: relative 85+");
+    }
+  } else {
+    // Mild uplift if questionnaire confirms a higher tier than ages alone
+    if (/^yes$/i.test(lived100) && maxParentAge < 100 && maxOther < 100) {
+      longevityBonus += 40;
+      longevityBits.push("Q: confirms 100+");
+    } else if (/^yes$/i.test(lived90) && maxParentAge < 90 && maxOther < 90) {
+      longevityBonus += 20;
+      longevityBits.push("Q: confirms 90+");
+    }
+  }
+
+  longevityBonus = Math.min(220, longevityBonus);
+  if (longevityBonus > 0) {
+    delta += longevityBonus;
+    drivers.push({
+      id: "family-longevity",
+      labelLt: `Šeimos ilgaamžiškumas (${longevityBits.join(", ") || "klausimynas"})`,
+      labelEn: `Family longevity (${longevityBits.join(", ") || "questionnaire"})`,
+      deltaWeeks: longevityBonus,
+      kind: "protect",
+    });
+  }
+
+  // Early parental death — opposing signal to longevity clustering
+  const earlyParentDeath = familyMembers.some(
+    (m) =>
+      isParent(m.relative || "") &&
+      typeof m.ageYears === "number" &&
+      Number(m.ageYears) > 0 &&
+      Number(m.ageYears) < 60 &&
+      /^deceased$/i.test(m.vitalStatus || "")
+  );
+  if (earlyParentDeath) {
+    delta -= 55;
+    drivers.push({
+      id: "family-early-death",
+      labelLt: "Ankstyva tėvų mirtis (<60 m.)",
+      labelEn: "Early parental death (<60 y)",
+      deltaWeeks: -55,
       kind: "risk",
     });
   }
@@ -849,7 +986,7 @@ export function loadDeathClock(
     builtAtMs,
     birthMs,
     causes,
-    drivers: drivers.slice(0, 12),
+    drivers: drivers.slice(0, 18),
     recommendations: recommendations.slice(0, 16),
     algorithmRules: ALGORITHM_RULES,
     disclaimerLt:

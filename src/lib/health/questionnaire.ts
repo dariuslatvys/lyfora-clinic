@@ -52,6 +52,10 @@ export type FamilyMember = {
   relative: string;
   conditions: string[];
   notes?: string;
+  /** Living / Deceased / Unknown */
+  vitalStatus?: string;
+  /** Current age if living, or age at death */
+  ageYears?: number | null;
 };
 
 export type QuestionnaireAnswers = {
@@ -196,6 +200,21 @@ export const FIELD_LABEL_LT: Record<string, string> = {
   "Are you currently taking any supplements?":
     "Ar šiuo metu vartojate maisto papildus?",
   Supplements: "Papildai",
+  Relative: "Giminaitis",
+  "Medical Conditions": "Ligos",
+  "Living or deceased": "Gyvas ar miręs",
+  "Age (current or at death)": "Amžius (dabartinis arba mirties)",
+  Notes: "Pastabos",
+  "Has any blood relative lived to age 85 or older?":
+    "Ar kas nors iš kraujo giminaičių nugyveno 85 metus ar daugiau?",
+  "Has any blood relative lived to age 90 or older?":
+    "Ar kas nors iš kraujo giminaičių nugyveno 90 metus ar daugiau?",
+  "Has a parent or grandparent lived to age 100 or older?":
+    "Ar tėvas, motina ar senelis/senelė nugyveno 100 metų ar daugiau?",
+  "Longest-lived parent’s age (current or at death)":
+    "Ilgiausiai gyvenusio tėvo / motinos amžius (dabartinis arba mirties)",
+  "How many first-degree relatives (parents or siblings) lived past 85?":
+    "Kiek pirmos eilės giminaičių (tėvai ar broliai/seserys) nugyveno daugiau nei 85 metus?",
 };
 
 export const OPTION_LABEL_LT: Record<string, string> = {
@@ -208,6 +227,20 @@ export const OPTION_LABEL_LT: Record<string, string> = {
   Active: "Aktyvus",
   Remission: "Remisija",
   Resolved: "Išspręsta",
+  Living: "Gyvas",
+  Deceased: "Miręs",
+  Unknown: "Nežinau",
+  "2 or more": "2 ar daugiau",
+  Mother: "Motina",
+  Father: "Tėvas",
+  Sister: "Sesuo",
+  Brother: "Brolis",
+  Daughter: "Dukra",
+  Son: "Sūnus",
+  "Maternal Grandmother": "Senelė (motinos pusė)",
+  "Maternal Grandfather": "Senelis (motinos pusė)",
+  "Paternal Grandmother": "Senelė (tėvo pusė)",
+  "Paternal Grandfather": "Senelis (tėvo pusė)",
 };
 
 export function fieldLabel(field: QField, locale: "lt" | "en") {
@@ -374,4 +407,9 @@ export const STEP_TITLE_LT: Record<string, string> = {
   "8. Environment & Social Support": "8. Aplinka ir socialinė parama",
   "9. Psychological & Emotional Health": "9. Psichologinė ir emocinė sveikata",
   "10. Family History": "10. Šeimos anamnezė",
+};
+
+export const SECTION_TITLE_LT: Record<string, string> = {
+  "Family longevity": "Šeimos ilgaamžiškumas",
+  "Family Member Entry (repeatable)": "Šeimos narys (kartojama)",
 };

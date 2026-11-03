@@ -46,7 +46,7 @@ export function SnpDetailPanel({
         </div>
         <div className="row" style={{ gap: 8 }}>
           <span className={`pill ${PILL_CLASS[colour]}`}>
-            {labels.colourLabels[colour]}
+            {labels.geneColourLabels[colour]}
           </span>
           <AskAiButton
             label={labels.askAi}

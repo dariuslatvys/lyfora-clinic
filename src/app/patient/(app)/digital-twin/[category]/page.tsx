@@ -231,7 +231,7 @@ export default async function CategoryDetailPage({
                   className="rare-finding-card block scroll-mt-24 rounded-lg border border-[var(--r-red)]/30 bg-[var(--r-red-bg)]/40 p-4 transition hover:border-[var(--r-red)]"
                 >
                   <div className="flex flex-wrap items-center gap-2">
-                    <Pill colour="red" label={labels.colourLabels.red} />
+                    <Pill colour="red" label={labels.geneColourLabels.red} />
                     <h4
                       className="text-lg font-semibold"
                       style={{ color: COLOUR_HEX.red }}
@@ -439,8 +439,8 @@ export default async function CategoryDetailPage({
                     colour={geneticColour}
                     label={
                       cat.geneticColour
-                        ? labels.colourLabels[geneticColour]
-                        : labels.colourLabels.grey
+                        ? labels.geneColourLabels[geneticColour]
+                        : labels.geneColourLabels.grey
                     }
                   />
                 )}
@@ -475,7 +475,7 @@ export default async function CategoryDetailPage({
                       subcategory: s.subcategory,
                     }))}
                     selectedSnpId={selectedSnpId}
-                    colourLabels={labels.colourLabels}
+                    colourLabels={labels.geneColourLabels}
                     awaitingDna={labels.awaitingDna}
                   />
                 ) : (
@@ -532,8 +532,8 @@ export default async function CategoryDetailPage({
                               colour={c}
                               label={
                                 s.colour
-                                  ? labels.colourLabels[s.colour]
-                                  : labels.colourLabels.grey
+                                  ? labels.geneColourLabels[s.colour]
+                                  : labels.geneColourLabels.grey
                               }
                             />
                           </div>

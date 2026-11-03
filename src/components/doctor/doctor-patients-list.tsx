@@ -60,7 +60,7 @@ export function DoctorPatientsList({
           visits: "Vizitai",
           markers: "Žymenys",
           snp: "SNP",
-          ngs: "NGS",
+          ngs: "NKS",
           open: "Atidaryti kortelę",
           cats: "Probleminės sritys",
           notes: "Spec. pastabos",

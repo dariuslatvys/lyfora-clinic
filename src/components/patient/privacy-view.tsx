@@ -150,7 +150,7 @@ const DEMO_PENDING: PendingConsent[] = [
     fromLt: "dr. Eglė Navickienė · genetika",
     fromEn: "Dr Eglė Navickienė · genetics",
     detailLt:
-      "Prašoma matyti jūsų SNP / NGS santrauką prieš planuojamą genetiko konsultaciją.",
+      "Prašoma matyti jūsų SNP / NKS santrauką prieš planuojamą genetiko konsultaciją.",
     detailEn:
       "Request to view your SNP / NGS summary before a planned genetics consult.",
     requestedAt: "2026-10-28",

@@ -10,23 +10,104 @@ import { todayIsoDate } from "@/lib/health/demo-visits";
 import { t, type Locale } from "@/lib/i18n/dictionary";
 import type { RiskColour } from "@/lib/health/colours";
 import type {
+  DeathClockAlgorithmRule,
   DeathClockCause,
   DeathClockDriver,
   DeathClockPayload,
+  DeathClockRecommendation,
+} from "@/lib/health/death-clock-shared";
+import {
+  clampLifeWeeks,
+  projectFromWeeks,
 } from "@/lib/health/death-clock-shared";
 
 export type {
   DeathClockCause,
   DeathClockDriver,
   DeathClockPayload,
+  DeathClockRecommendation,
   DeathClockUnit,
 } from "@/lib/health/death-clock-shared";
 export { remainingInUnit } from "@/lib/health/death-clock-shared";
 
 /** Oliver Burkeman framing: ~4000 weeks in an average life. */
 export const BASE_LIFE_WEEKS = 4000;
-const MS_PER_WEEK = 7 * 24 * 60 * 60 * 1000;
 const MS_PER_YEAR = 365.2425 * 24 * 60 * 60 * 1000; // used for age fallback birth estimate
+
+const ALGORITHM_RULES: DeathClockAlgorithmRule[] = [
+  {
+    id: "base",
+    titleLt: "Bazė — 4000 savaičių",
+    titleEn: "Baseline — 4000 weeks",
+    bodyLt:
+      "Pradedame nuo ~4000 savaičių (Oliver Burkeman modelis) kaip vidutinės gyvenimo trukmės iliustracijos. Tai ne demografijos lentelė — tai skaidrus atskaitos taškas.",
+    bodyEn:
+      "We start from ~4000 weeks (Oliver Burkeman framing) as an illustrative average lifespan. Not a demographic life table — a transparent baseline.",
+  },
+  {
+    id: "sex",
+    titleLt: "Lytis",
+    titleEn: "Sex",
+    bodyLt:
+      "Moterims +80 sav., vyrams −40 sav. — populiacinis skirtumas, ne asmeninė prognozė.",
+    bodyEn:
+      "Female +80 weeks, male −40 weeks — a population offset, not a personal forecast.",
+  },
+  {
+    id: "colours",
+    titleLt: "Skaitmeninio dvynio spalvos",
+    titleEn: "Digital-twin colours",
+    bodyLt:
+      "Kategorijų spalvos: žalia +4, geltona −12, oranžinė −28, raudona −55, genetinis žymuo −8 sav. už kiekvieną sritį.",
+    bodyEn:
+      "Category colours: green +4, yellow −12, orange −28, red −55, genetic badge −8 weeks per area.",
+  },
+  {
+    id: "nks",
+    titleLt: "NKS / VCF DNR pokyčiai",
+    titleEn: "NGS / VCF DNA changes",
+    bodyLt:
+      "Reti NKS radiniai (pvz. MYBPC3, PALB2, MSH2) −60…−120 sav. — stipresnis signalas nei SNP panelė.",
+    bodyEn:
+      "Rare NGS findings (e.g. MYBPC3, PALB2, MSH2) −60…−120 weeks — stronger than the SNP panel load.",
+  },
+  {
+    id: "snp",
+    titleLt: "SNP rizikos alelių apkrova",
+    titleEn: "SNP risk-allele load",
+    bodyLt:
+      "Kiekvienas rizikos alelis (~0,4 už heterozigotą, 1 už homozigotą) × −4 sav., riba −140.",
+    bodyEn:
+      "Each risk allele (~0.4 hetero, 1 homo) × −4 weeks, capped at −140.",
+  },
+  {
+    id: "labs",
+    titleLt: "Žymenys ir tendencijos",
+    titleEn: "Markers and trends",
+    bodyLt:
+      "LDL virš 3 mmol/L, spaudimas ≥140, VO₂max, HRV ir istorinės tendencijos (LDL, gliukozė, eGFR) prideda arba atima savaites.",
+    bodyEn:
+      "LDL above 3 mmol/L, BP ≥140, VO₂max, HRV and history trends (LDL, glucose, eGFR) add or subtract weeks.",
+  },
+  {
+    id: "lifestyle",
+    titleLt: "Klausimynas (gyvensena)",
+    titleEn: "Questionnaire (lifestyle)",
+    bodyLt:
+      "Rūkymas −220 / nerūkymas +25; gausus alkoholis −90; aktyvumas +55 / mažas −40; miegas 7–9 h +20 / trumpas −35; šeimos anamnezė (širdis/onkologija) −70.",
+    bodyEn:
+      "Smoking −220 / non-smoker +25; heavy alcohol −90; activity +55 / low −40; sleep 7–9 h +20 / short −35; family history (heart/oncology) −70.",
+  },
+  {
+    id: "clamp",
+    titleLt: "Ribos ir rekomendacijos",
+    titleEn: "Bounds and recommendations",
+    bodyLt:
+      "Galutinė trukmė apribojama 2200–5200 sav. Rekomendacijos — tik keičiami veiksmai; pažymėjus jas, prie bazinio įverčio pridedamos teigiamos savaitės ir perskaičiuojama projekcija.",
+    bodyEn:
+      "Final span is clamped to 2200–5200 weeks. Recommendations are modifiable actions only; checking them adds positive weeks to the baseline estimate and recalculates the projection.",
+  },
+];
 
 const COLOUR_WEEK_HIT: Record<RiskColour, number> = {
   grey: 0,
@@ -169,7 +250,7 @@ export function loadDeathClock(
     delta += hit;
     drivers.push({
       id: `rare-${gene}`,
-      labelLt: `NGS / VCF: ${gene}`,
+      labelLt: `NKS / VCF: ${gene}`,
       labelEn: `NGS / VCF: ${gene}`,
       deltaWeeks: hit,
       kind: "risk",
@@ -365,17 +446,190 @@ export function loadDeathClock(
   }
 
   // Clamp adjusted life so remaining stays positive for demo adults
-  let lifeWeeks = BASE_LIFE_WEEKS + delta;
-  lifeWeeks = Math.max(2200, Math.min(5200, lifeWeeks));
+  const lifeWeeks = clampLifeWeeks(BASE_LIFE_WEEKS + delta);
 
   const birthMs = dob
     ? new Date(`${dob}T12:00:00`).getTime()
     : Date.now() - (age ?? 45) * MS_PER_YEAR;
-  const deathMs = birthMs + lifeWeeks * MS_PER_WEEK;
+  const projection = projectFromWeeks(birthMs, lifeWeeks);
   const builtAtMs = Date.now();
-  const remainingMsAtBuild = Math.max(0, deathMs - builtAtMs);
-  const projected = new Date(deathMs);
-  const projectedDeathIso = projected.toISOString();
+  const remainingMsAtBuild = Math.max(0, projection.projectedDeathMs - builtAtMs);
+
+  const recommendations: DeathClockRecommendation[] = [];
+  const driverById = new Map(drivers.map((d) => [d.id, d]));
+
+  const pushRec = (rec: DeathClockRecommendation) => {
+    if (recommendations.some((r) => r.id === rec.id)) return;
+    recommendations.push(rec);
+  };
+
+  const smokeDriver = driverById.get("smoke");
+  if (smokeDriver && smokeDriver.kind === "risk") {
+    pushRec({
+      id: "quit-smoke",
+      labelLt: "Mesti rūkyti / atsisakyti nikotino",
+      labelEn: "Quit smoking / nicotine",
+      detailLt:
+        "Nutraukite rūkymą ar nikotino produktus. Modelis grąžina didžiąją dalį rūkymo baudos.",
+      detailEn:
+        "Stop smoking or nicotine products. The model restores most of the smoking penalty.",
+      gainWeeks: Math.min(200, Math.abs(smokeDriver.deltaWeeks)),
+      category: "lifestyle",
+    });
+  }
+
+  const alcoholDriver = driverById.get("alcohol");
+  if (alcoholDriver && alcoholDriver.kind === "risk") {
+    pushRec({
+      id: "cut-alcohol",
+      labelLt: "Sumažinti alkoholį iki retų / saikingų dozių",
+      labelEn: "Cut alcohol to rare / moderate amounts",
+      detailLt:
+        "Apribokite savaitinį alkoholio kiekį — modelis grąžina alkoholio riziką.",
+      detailEn:
+        "Limit weekly alcohol intake — the model restores the alcohol risk offset.",
+      gainWeeks: Math.abs(alcoholDriver.deltaWeeks),
+      category: "lifestyle",
+    });
+  }
+
+  const exerciseDriver = driverById.get("exercise");
+  if (!exerciseDriver || exerciseDriver.kind === "risk") {
+    pushRec({
+      id: "exercise-3x",
+      labelLt: "Fizinis aktyvumas ≥3 kartus per savaitę",
+      labelEn: "Exercise ≥3 times per week",
+      detailLt:
+        "Bent 150 min. vidutinio intensyvumo judėjimo per savaitę (ėjimas, jėga, aerobika).",
+      detailEn:
+        "At least 150 minutes of moderate activity per week (walking, strength, cardio).",
+      gainWeeks: exerciseDriver?.kind === "risk" ? 95 : 55,
+      category: "lifestyle",
+    });
+  }
+
+  const sleepDriver = driverById.get("sleep");
+  if (!sleepDriver || sleepDriver.kind === "risk") {
+    pushRec({
+      id: "sleep-7",
+      labelLt: "Miegas 7–9 val. daugumą naktų",
+      labelEn: "Sleep 7–9 hours most nights",
+      detailLt:
+        "Stabilus miego režimas sumažina širdies ir metabolinę riziką.",
+      detailEn:
+        "A stable sleep pattern reduces cardiovascular and metabolic risk.",
+      gainWeeks: sleepDriver?.kind === "risk" ? 55 : 20,
+      category: "lifestyle",
+    });
+  }
+
+  const ldlDriver = driverById.get("ldl");
+  if (ldlDriver && ldlDriver.kind === "risk") {
+    pushRec({
+      id: "lower-ldl",
+      labelLt: "Sumažinti LDL (mityba / gydytojo planas)",
+      labelEn: "Lower LDL (diet / clinician plan)",
+      detailLt:
+        "Aptarkite lipidų tikslą su gydytoju: mityba, statinai ar kiti vaistai pagal indikacijas.",
+      detailEn:
+        "Agree an LDL target with your clinician: diet, statin or other therapy as indicated.",
+      gainWeeks: Math.min(120, Math.abs(ldlDriver.deltaWeeks)),
+      category: "clinical",
+    });
+  }
+
+  const bpDriver = driverById.get("bp");
+  if (bpDriver && bpDriver.kind === "risk") {
+    pushRec({
+      id: "control-bp",
+      labelLt: "Kontroliuoti kraujospūdį <140 mmHg",
+      labelEn: "Keep blood pressure under 140 mmHg",
+      detailLt:
+        "Reguliarūs matavimai, druskos mažinimas, vaistai jei paskirta — modelis grąžina spaudimo baudą.",
+      detailEn:
+        "Regular readings, less salt, medication if prescribed — the model restores the BP penalty.",
+      gainWeeks: Math.abs(bpDriver.deltaWeeks) + 15,
+      category: "clinical",
+    });
+  }
+
+  const vo2Driver = driverById.get("vo2");
+  if (!vo2Driver || vo2Driver.kind === "risk") {
+    pushRec({
+      id: "raise-vo2",
+      labelLt: "Kelti VO₂max (aerobinė ištvermė)",
+      labelEn: "Raise VO₂max (cardio fitness)",
+      detailLt:
+        "2–3 intervalinės / ilgų žingsnių treniruotės per savaitę — tikslas VO₂max ≥40.",
+      detailEn:
+        "2–3 interval or long-walk sessions per week — aim for VO₂max ≥40.",
+      gainWeeks: vo2Driver?.kind === "risk" ? 75 : 35,
+      category: "lifestyle",
+    });
+  }
+
+  const hrvDriver = driverById.get("hrv");
+  if (hrvDriver && hrvDriver.kind === "risk") {
+    pushRec({
+      id: "raise-hrv",
+      labelLt: "Gerinti HRV (streso / atsigavimo režimas)",
+      labelEn: "Improve HRV (stress / recovery routine)",
+      detailLt:
+        "Kvėpavimo pratimai, mažiau vakaro ekranų, reguliarus miegas — tikslas HRV ≥50 ms.",
+      detailEn:
+        "Breathing drills, fewer late screens, steady sleep — aim for HRV ≥50 ms.",
+      gainWeeks: Math.abs(hrvDriver.deltaWeeks) + 20,
+      category: "lifestyle",
+    });
+  }
+
+  if (rareGenes.length) {
+    pushRec({
+      id: "genetics-followup",
+      labelLt: "Genetiko + specialisto kontrolė dėl NKS radinių",
+      labelEn: "Genetics + specialist follow-up for NGS findings",
+      detailLt:
+        "Užsisakykite genetiko konsultaciją ir šeimos / organų patikrą pagal radinį (pvz. Echo, onko-prevencija).",
+      detailEn:
+        "Book a genetics consult and organ / family screening matched to the finding (e.g. Echo, cancer prevention).",
+      gainWeeks: 40,
+      category: "monitoring",
+    });
+  }
+
+  if (driverById.get("family")?.kind === "risk") {
+    pushRec({
+      id: "family-screening",
+      labelLt: "Šeimos rizikos prevencinis planas",
+      labelEn: "Family-risk prevention plan",
+      detailLt:
+        "Su šeimos gydytoju sudarykite ankstyvos patikros grafiką pagal šeimos anamnezę.",
+      detailEn:
+        "Agree an earlier screening schedule with your GP based on family history.",
+      gainWeeks: 35,
+      category: "monitoring",
+    });
+  }
+
+  // Always offer lipid recheck if cardio/metabolic is hot
+  const cardioHot =
+    twin.categories.find((c) => c.id === "cardiovascular")?.colour === "red" ||
+    twin.categories.find((c) => c.id === "cardiovascular")?.colour === "orange";
+  if (cardioHot) {
+    pushRec({
+      id: "cardio-labs",
+      labelLt: "Pakartoti lipidų / širdies žymenų panelę",
+      labelEn: "Repeat lipid / heart marker panel",
+      detailLt:
+        "Kas 3–6 mėn. lipidai, gliukozė, kraujospūdis — kad modelis ir gydymas remtųsi šviežiais duomenimis.",
+      detailEn:
+        "Every 3–6 months: lipids, glucose, blood pressure — so the model and care use fresh data.",
+      gainWeeks: 25,
+      category: "monitoring",
+    });
+  }
+
+  recommendations.sort((a, b) => b.gainWeeks - a.gainWeeks);
 
   const causes: DeathClockCause[] = [];
   const cardio = twin.categories.find((c) => c.id === "cardiovascular");
@@ -397,7 +651,7 @@ export function loadDeathClock(
       labelLt: "Onkologinės ligos",
       labelEn: "Cancer",
       weight: onco?.colour === "red" ? 0.32 : 0.22,
-      noteLt: "NGS / šeimos anamnezė ir onkologijos kategorijos spalva.",
+      noteLt: "NKS / šeimos anamnezė ir onkologijos kategorijos spalva.",
       noteEn: "NGS / family history and oncology category colour.",
     });
   }
@@ -435,14 +689,17 @@ export function loadDeathClock(
     dob,
     ageYears: age,
     baseLifeWeeks: BASE_LIFE_WEEKS,
-    adjustedLifeWeeks: Math.round(lifeWeeks),
-    expectancyYears: Math.round((lifeWeeks / 52.1775) * 10) / 10,
-    projectedDeathIso,
-    projectedDeathMs: deathMs,
+    adjustedLifeWeeks: projection.adjustedLifeWeeks,
+    expectancyYears: projection.expectancyYears,
+    projectedDeathIso: projection.projectedDeathIso,
+    projectedDeathMs: projection.projectedDeathMs,
     remainingMsAtBuild,
     builtAtMs,
+    birthMs,
     causes,
     drivers: drivers.slice(0, 12),
+    recommendations: recommendations.slice(0, 8),
+    algorithmRules: ALGORITHM_RULES,
     disclaimerLt:
       "Tai iliustratyvus modelis pagal jūsų Lyfora duomenis (žymenys, genetika, klausimynas, fiziniai rodikliai). Tai nėra medicininė prognozė ar diagnozė.",
     disclaimerEn:

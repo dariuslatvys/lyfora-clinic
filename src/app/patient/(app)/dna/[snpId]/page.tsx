@@ -18,25 +18,28 @@ import {
 import { AskAiButton } from "@/components/patient/ask-ai-button";
 
 function colourTitle(colour: DnaResultColour, locale: "lt" | "en") {
-  const lt: Record<string, string> = {
-    green: "Gerai",
-    badge: "Genetinis žymuo",
-    yellow: "Stebėti",
-    orange: "Dėmesio",
-    red: "Kritiška",
-    none: "Nenustatyta",
-    grey: "Nėra duomenų",
-  };
-  const en: Record<string, string> = {
-    green: "Good",
-    badge: "Genetic marker",
-    yellow: "Watch",
-    orange: "Attention",
-    red: "Critical",
-    none: "Not determined",
-    grey: "No data",
-  };
-  return (locale === "en" ? en : lt)[colour] || colour;
+  if (colour === "none") {
+    return locale === "en" ? "Not determined" : "Nenustatyta";
+  }
+  const labels =
+    locale === "en"
+      ? {
+          green: "No risk",
+          badge: "Genetic marker",
+          yellow: "Low",
+          orange: "Elevated",
+          red: "Significant",
+          grey: "No data",
+        }
+      : {
+          green: "No risk",
+          badge: "Genetinis žymuo",
+          yellow: "Nedidelė",
+          orange: "Padidėjusi",
+          red: "Ženkli",
+          grey: "Nėra duomenų",
+        };
+  return (labels as Record<string, string>)[colour] || colour;
 }
 
 function impactLabel(impact: string, locale: "lt" | "en") {

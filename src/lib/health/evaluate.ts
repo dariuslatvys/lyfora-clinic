@@ -352,7 +352,7 @@ export function summarizeCategory(
     }
     if (evaluation.rare.length) {
       parts.push(
-        `NGS (išsamus genetinio kodo sekoskaitos tyrimas) rado ${evaluation.rare.length} retą(-as) mutaciją(-as): ${evaluation.rare
+        `Naujos kartos sekoskaita (NKS) rado ${evaluation.rare.length} retą(-us) DNR pokytį(-čius): ${evaluation.rare
           .map((r) => r.gene)
           .join(", ")}. Tai kelia kategorijos signalą į raudoną — aptarkite su gydytoju genetiku.`
       );
@@ -403,7 +403,7 @@ export function summarizeCategory(
   }
   if (evaluation.rare.length) {
     parts.push(
-      `NGS found ${evaluation.rare.length} rare mutation(s): ${evaluation.rare
+      `NGS found ${evaluation.rare.length} rare DNA change(s): ${evaluation.rare
         .map((r) => r.gene)
         .join(", ")}. This raises the category signal to red — discuss with a clinical geneticist.`
     );

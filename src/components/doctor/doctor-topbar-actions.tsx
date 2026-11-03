@@ -69,7 +69,7 @@ function demoNotices(locale: "lt" | "en"): Notice[] {
         {
           id: "dn3",
           title: "Kritinis signalas — MYBPC3",
-          body: "Jono Jonaičio NGS radinys reikalauja peržiūros.",
+          body: "Jono Jonaičio NKS radinys reikalauja peržiūros.",
           when: "prieš 3 val.",
           href: "/doctor/patients/patient_male",
           unread: true,

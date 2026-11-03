@@ -132,7 +132,7 @@ const genetics: MarketItem[] = [
     summaryEn:
       "CeGaT Gene Set HRT01 — 58 genes linked to dilated cardiomyopathy.",
     detailLt:
-      "NGS skydelio (ExomeXtra® tipo) genų rinkinys dilatuotai kardiomiopatijai. Analizuojami visi žinomi su DCM susiję genai; ataskaitoje — ACMG 3/4/5 klasės variantai. Mėginys: EDTA kraujas arba genominė DNR. Tipinis atlikimo laikas 2–4 sav.",
+      "NKS skydelio (ExomeXtra® tipo) genų rinkinys dilatuotai kardiomiopatijai. Analizuojami visi žinomi su DCM susiję genai; ataskaitoje — ACMG 3/4/5 klasės variantai. Mėginys: EDTA kraujas arba genominė DNR. Tipinis atlikimo laikas 2–4 sav.",
     detailEn:
       "NGS panel (ExomeXtra®-style) gene set for dilated cardiomyopathy. All known DCM-associated genes are analysed; report includes ACMG class 3/4/5 variants. Sample: EDTA blood or genomic DNA. Typical turnaround 2–4 weeks.",
     priceEur: 890,
@@ -397,7 +397,7 @@ const genetics: MarketItem[] = [
     category: "genetics",
     kind: "package",
     code: "HRT-FULL",
-    nameLt: "Pilnas širdies ligų NGS skydelis",
+    nameLt: "Pilnas širdies ligų NKS skydelis",
     nameEn: "Full Cardiac Diseases NGS Panel",
     summaryLt:
       "Visas Cardiac Diseases skydelis (~257 genai): kardiomiopatijos, aritmijos, lipidai, įgimtos ydos.",
@@ -474,19 +474,19 @@ const genetics: MarketItem[] = [
     id: "gen-ngs-exome",
     category: "genetics",
     kind: "package",
-    code: "NGS",
-    nameLt: "Išsamus genetinio kodo sekoskaitos tyrimas (NGS)",
-    nameEn: "Next-Generation Sequencing (NGS) Test",
+    code: "NKS",
+    nameLt: "Naujos kartos sekoskaita (NKS)",
+    nameEn: "Next-generation sequencing (NGS)",
     summaryLt:
-      "Retų genų mutacijų ir paveldimų ligų rizikos paieška nuskaitant giliąją DNR seką (ExomeXtra® tipo).",
+      "Didelio gylio DNR sekoskaitos tyrimas, skirtas aptikti retus genetinius variantus, susijusius su paveldimomis ligomis ir padidėjusia jų rizika (ExomeXtra® tipo).",
     summaryEn:
-      "Deep DNA sequencing to detect rare genetic mutations and hereditary disease risks (ExomeXtra®-style).",
+      "Deep DNA sequencing to detect rare genetic variants linked with hereditary conditions and elevated risk (ExomeXtra®-style).",
     detailLt:
-      "Išsamus NGS (ExomeXtra® tipo) — baltymus koduojančios sritys ir žinomos patogeninės introninės / intergeninės vietos. Tinka platesnei paveldimų ligų diagnostikai.",
+      "Išsamus NKS (ExomeXtra® tipo) — baltymus koduojančios sritys ir žinomos patogeninės introninės / intergeninės vietos. Tinka platesnei paveldimų ligų diagnostikai.",
     detailEn:
       "Comprehensive NGS (ExomeXtra®-style) — protein-coding regions plus known pathogenic intronic / intergenic sites. For broader hereditary disease diagnostics.",
     priceEur: 1890,
-    badgeLt: "Išsamus NGS",
+    badgeLt: "Išsamus NKS",
     badgeEn: "Comprehensive NGS",
   },
 ];
@@ -550,7 +550,7 @@ const consultations: MarketItem[] = [
     kind: "single",
     nameLt: "Klinikinio genetiiko konsultacija",
     nameEn: "Clinical geneticist consultation",
-    summaryLt: "NGS / SNP rezultatų išaiškinimas ir šeimos rizikos planas.",
+    summaryLt: "NKS / SNP rezultatų išaiškinimas ir šeimos rizikos planas.",
     summaryEn: "NGS / SNP result counselling and family-risk plan.",
     priceEur: 160,
     durationMin: 60,
@@ -874,7 +874,7 @@ export const MARKET_CATEGORIES: {
     id: "genetics",
     lt: "Genetiniai tyrimai",
     en: "Genetic tests",
-    blurbLt: "CeGaT Cardiac Diseases gene sets, SNP, NGS ir PGX.",
+    blurbLt: "CeGaT Cardiac Diseases gene sets, SNP, NKS ir PGX.",
     blurbEn: "CeGaT Cardiac Diseases gene sets, SNP, NGS and PGX.",
   },
   {

@@ -216,7 +216,7 @@ const RYR1 = {
 };
 
 const CLOSING_LT =
-  "NGS radinys pats savaime nėra diagnozė ir nekeičia gydymo be gydytojo. Būtinai pasikonsultuokite su gydytoju genetiku.";
+  "NKS radinys pats savaime nėra diagnozė ir nekeičia gydymo be gydytojo. Būtinai pasikonsultuokite su gydytoju genetiku.";
 const CLOSING_EN =
   "An NGS finding alone is not a diagnosis and does not change treatment without a clinician. Always consult a clinical geneticist.";
 

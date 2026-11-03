@@ -39,8 +39,8 @@ export default async function RareDetailPage({
     locale === "lt" ? expl.cancersLt : expl.cancersEn;
   const ask =
     locale === "en"
-      ? `Explain my NGS finding ${variant.gene} (${variant.hgvs}) in plain language for a ${sex} patient, including which cancers or conditions it is linked with`
-      : `Paaiškink mano NGS radinį ${variant.gene} (${variant.hgvs}) paprasta kalba ${
+      ? `Explain my NGS DNA finding ${variant.gene} (${variant.hgvs}) in plain language for a ${sex} patient, including which cancers or conditions it is linked with`
+      : `Paaiškink mano NKS DNR pokytį ${variant.gene} (${variant.hgvs}) paprasta kalba ${
           sex === "female" ? "moters" : "vyro"
         } atveju — įskaitant, su kokiais vėžiais ar ligomis tai siejama`;
 
@@ -86,7 +86,7 @@ export default async function RareDetailPage({
           </div>
           <div className="row" style={{ gap: 8 }}>
             <span className={`pill ${PILL_CLASS.red}`}>
-              {labels.colourLabels.red}
+              {labels.geneColourLabels.red}
             </span>
             <AskAiButton label={labels.askAi} question={ask} />
           </div>
@@ -105,7 +105,7 @@ export default async function RareDetailPage({
         <p className="disclaim mt-3">
           {locale === "en"
             ? "NGS findings are for clinical discussion — not a diagnosis or prescription change on their own. Always consult a doctor / clinical geneticist."
-            : "NGS radiniai skirti aptarti su gydytoju — patys savaime nėra diagnozė ar gydymo keitimas. Būtinai pasikonsultuokite su gydytoju / genetiku."}
+            : "NKS radiniai skirti aptarti su gydytoju — patys savaime nėra diagnozė ar gydymo keitimas. Būtinai pasikonsultuokite su gydytoju / genetiku."}
         </p>
       </section>
     </div>

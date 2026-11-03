@@ -163,7 +163,7 @@ export function searchKindLabel(kind: SearchKind, locale: Locale): string {
     prescription: "Receptas",
     lab: "Tyrimas",
     gene: "Genas",
-    rare: "Reta mutacija",
+    rare: "Retas DNR pokytis",
     condition: "Diagnozė",
     medication: "Vaistas",
     vaccine: "Skiepas",
@@ -444,7 +444,7 @@ export function buildPatientSearchIndex(input: {
           v.significance,
           v.hgvs,
           v.transcript,
-          "ngs rare mutation reta mutacija"
+          "ngs nks rare mutation reta mutacija dnr pokytis"
         ),
       });
     }

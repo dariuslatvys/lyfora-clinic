@@ -71,17 +71,17 @@ function vcfFileMeta(
       sex === "female"
         ? "Lyfora_NGS_RK_2026.vcf"
         : "VCF_sample_synthetic_hg19_noXY-men.vcf",
-    labNameLt: "Lyfora NGS / sekoskaitos laboratorija",
+    labNameLt: "Lyfora NKS / sekoskaitos laboratorija",
     labNameEn: "Lyfora NGS sequencing laboratory",
     testedAt: sex === "female" ? "2026-08-14" : "2026-07-30",
     statusLt:
       rareCount > 0
-        ? `${rareCount} retos mutacijos iš VCF`
-        : "VCF įkeltas · retų mutacijų nerasta",
+        ? `${rareCount} reti DNR pokyčiai iš VCF`
+        : "VCF įkeltas · retų DNR pokyčių nerasta",
     statusEn:
       rareCount > 0
-        ? `${rareCount} rare mutations from VCF`
-        : "VCF uploaded · no rare mutations found",
+        ? `${rareCount} rare DNA changes from VCF`
+        : "VCF uploaded · no rare DNA changes found",
   };
 }
 

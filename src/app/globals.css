@@ -2033,16 +2033,108 @@ a.who.on {
   z-index: 4;
 }
 
+.death-clock-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  align-items: stretch;
+}
+
 .death-clock-hero {
   display: flex;
   flex-direction: column;
   gap: 18px;
 }
 
+.death-clock-proj {
+  border-style: dashed;
+  opacity: 0.88;
+}
+
+.death-clock-proj.on {
+  border-style: solid;
+  opacity: 1;
+  border-color: color-mix(in srgb, #6bcf9b 45%, var(--line));
+  background: linear-gradient(
+    165deg,
+    color-mix(in srgb, #6bcf9b 12%, var(--surface)),
+    var(--surface) 50%
+  );
+}
+
+.death-clock-delta {
+  color: color-mix(in srgb, #2f8f5b 80%, var(--ink));
+  font-weight: 650;
+}
+
 .death-clock-kpis {
   display: grid;
   grid-template-columns: 1.1fr 1fr;
   gap: 16px;
+}
+
+.death-clock-recs {
+  margin-top: 4px;
+}
+
+.death-clock-rec {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  cursor: pointer;
+  background: var(--surface);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.death-clock-rec:hover {
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--line));
+}
+
+.death-clock-rec.on {
+  border-color: color-mix(in srgb, #6bcf9b 55%, var(--line));
+  background: color-mix(in srgb, #6bcf9b 10%, var(--surface));
+}
+
+.death-clock-rec input {
+  margin-top: 4px;
+  width: 18px;
+  height: 18px;
+  accent-color: #2f8f5b;
+  flex-shrink: 0;
+}
+
+.death-clock-algo-toggle {
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+}
+
+.death-clock-algo-list {
+  margin: 14px 0 0;
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.death-clock-bar-proj i {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, #6bcf9b 80%, var(--accent)),
+    color-mix(in srgb, #6bcf9b 55%, #f0c36a)
+  );
 }
 
 .death-clock-num {
@@ -2140,7 +2232,8 @@ a.who.on {
 
 @media (max-width: 900px) {
   .death-clock-kpis,
-  .death-clock-split {
+  .death-clock-split,
+  .death-clock-compare {
     grid-template-columns: 1fr;
   }
 }

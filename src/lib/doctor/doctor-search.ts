@@ -69,7 +69,7 @@ export function doctorKindLabel(
     prescription: "Receptas",
     lab: "Tyrimas",
     gene: "Genas",
-    rare: "Reta mutacija",
+    rare: "Retas DNR pokytis",
     category: "Sritis",
   };
   const en: Record<string, string> = {

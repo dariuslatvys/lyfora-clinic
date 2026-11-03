@@ -487,7 +487,7 @@ export function buildHealthCard(input: {
       links: [
         {
           href: "/patient/rare/PALB2",
-          labelLt: "NGS radinys",
+          labelLt: "NKS radinys",
           labelEn: "NGS finding",
         },
       ],

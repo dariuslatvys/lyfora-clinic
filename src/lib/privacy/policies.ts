@@ -68,7 +68,7 @@ export const PRIVACY_POLICIES: PolicyDoc[] = [
         headingEn: "2. What data we collect",
         bodyLt: [
           "Identifikaciniai ir kontakto duomenys: vardas, el. paštas, prisijungimo duomenys, kalbos nustatymai.",
-          "Sveikatos duomenys (ypatingų kategorijų): laboratoriniai žymenys, genetikos rezultatai (SNP / NGS), diagnozės, vaistai, skiepai, vizitų ir konsultacijų įrašai, įkelti dokumentai, klausimyno atsakymai, fiziniai rodikliai.",
+          "Sveikatos duomenys (ypatingų kategorijų): laboratoriniai žymenys, genetikos rezultatai (SNP / NKS), diagnozės, vaistai, skiepai, vizitų ir konsultacijų įrašai, įkelti dokumentai, klausimyno atsakymai, fiziniai rodikliai.",
           "Techniniai duomenys: IP adresas, įrenginio / naršyklės tipas, sesijos identifikatoriai, žurnalai saugumo ir veikimo užtikrinimui.",
           "Integracijų duomenys (tik su jūsų sutikimu): Apple Health, Oura ir kitų prijungtų šaltinių santraukos.",
         ],
@@ -235,7 +235,7 @@ export const PRIVACY_POLICIES: PolicyDoc[] = [
         headingLt: "Kodėl tai ypatinga kategorija",
         headingEn: "Why this is a special category",
         bodyLt: [
-          "Laboratoriniai rezultatai, diagnozės, vaistai, skiepai, vaizdiniai tyrimai ir genetikos duomenys (SNP microarray, NGS / VCF) yra sveikatos duomenys pagal BDAR 9 str.",
+          "Laboratoriniai rezultatai, diagnozės, vaistai, skiepai, vaizdiniai tyrimai ir genetikos duomenys (SNP microarray, NKS / VCF) yra sveikatos duomenys pagal BDAR 9 str.",
         ],
         bodyEn: [
           "Lab results, diagnoses, medications, vaccines, imaging and genetics (SNP microarray, NGS / VCF) are health data under GDPR Art. 9.",
@@ -259,7 +259,7 @@ export const PRIVACY_POLICIES: PolicyDoc[] = [
         headingLt: "Genetika",
         headingEn: "Genetics",
         bodyLt: [
-          "SNP ir NGS rezultatai naudojami rizikos signalų ir paaiškinimų rodymui. Tai nėra diagnozė. Rezultatai matomi jums ir jūsų gydytojo komandai.",
+          "SNP ir NKS rezultatai naudojami rizikos signalų ir paaiškinimų rodymui. Tai nėra diagnozė. Rezultatai matomi jums ir jūsų gydytojo komandai.",
           "Genetikos failų neperduodame trečiosioms šalims moksliniams tyrimams be atskiro rašytinio sutikimo.",
         ],
         bodyEn: [

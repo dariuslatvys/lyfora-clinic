@@ -77,10 +77,16 @@ export function buildPatientAiReply(input: {
 
   if (geneHit) {
     const catName = labels.categoryNames[geneHit.cat.id] || geneHit.cat.id;
+    const geneSignal =
+      geneHit.kind === "rare"
+        ? labels.geneColourLabels.red
+        : labels.geneColourLabels[
+            (geneHit.snp.colour || "grey") as keyof typeof labels.geneColourLabels
+          ] || labels.geneColourLabels.grey;
     if (locale === "en") {
       return {
         reply: [
-          `About **${geneHit.title}** (category: ${catName}, signal: ${labels.colourLabels[geneHit.cat.colour]}):`,
+          `About **${geneHit.title}** (category: ${catName}, gene signal: ${geneSignal}):`,
           "",
           geneHit.text || "No detailed mechanism text is available.",
           "",
@@ -93,12 +99,12 @@ export function buildPatientAiReply(input: {
     }
     return {
       reply: [
-        `Apie **${geneHit.title}** (kategorija: ${catName}, signalas: ${labels.colourLabels[geneHit.cat.colour]}):`,
+        `Apie **${geneHit.title}** (kategorija: ${catName}, geno signalas: ${geneSignal}):`,
         "",
         geneHit.text || "Detalesnis Mechanism paaiškinimas šiuo metu neprieinamas.",
         "",
         geneHit.kind === "rare"
-          ? "Tai signalas iš jūsų NGS (išsamios sekoskaitos) failo. Tai nėra diagnozė — verta aptarti su gydytoju ar genetiku."
+          ? "Tai signalas iš jūsų NKS (naujos kartos sekoskaitos) failo. Tai nėra diagnozė — verta aptarti su gydytoju ar genetiku."
           : "Tai paaiškinimas pagal bazinį SNP tyrimą ir rizikos lentelės Mechanism stulpelį. Tai nėra diagnozė.",
       ].join("\n"),
       disclaimer,
@@ -106,7 +112,7 @@ export function buildPatientAiReply(input: {
   }
 
   // DNA / genetics overview
-  if (/dnr|dna|gen|snp|ngs|mutac/.test(ql)) {
+  if (/dnr|dna|gen|snp|ngs|nks|mutac|pokyč/.test(ql)) {
     const rareLines = twin.rare.map((r) => {
       const expl = explainRareVariant(
         r,
@@ -121,7 +127,7 @@ export function buildPatientAiReply(input: {
         .filter((s) => s.colour && colourRank(s.colour) >= 3)
         .map((s) => {
           const expl = explainSnp(s, locale);
-          return `- **${s.gene}** ${s.snpId} (${s.allele1}/${s.allele2}, ${labels.colourLabels[s.colour!]}): ${expl.plainBody}`;
+          return `- **${s.gene}** ${s.snpId} (${s.allele1}/${s.allele2}, ${labels.geneColourLabels[s.colour!]}): ${expl.plainBody}`;
         })
     );
     if (locale === "en") {
@@ -145,8 +151,8 @@ export function buildPatientAiReply(input: {
         "Iš jūsų genetinių duomenų (be diagnozės):",
         "",
         rareLines.length
-          ? "**NGS retos mutacijos:**\n" + rareLines.join("\n")
-          : "**NGS:** retų mutacijų nerasta / neįkelta.",
+          ? "**NKS reti DNR pokyčiai:**\n" + rareLines.join("\n")
+          : "**NKS:** retų DNR pokyčių nerasta / neįkelta.",
         "",
         snpDrivers.length
           ? "**SNP pozicijos su stipresniu spalvos signalu:**\n" + snpDrivers.slice(0, 8).join("\n")
@@ -305,7 +311,10 @@ export function buildPatientAiReply(input: {
   const catLines = twin.categories.map((c) => {
     const name = labels.categoryNames[c.id] || c.id;
     const bits: string[] = [labels.colourLabels[c.colour]];
-    if (c.rare.length) bits.push(`NGS: ${c.rare.map((r) => r.gene).join(", ")}`);
+    if (c.rare.length)
+      bits.push(
+        `${locale === "en" ? "NGS" : "NKS"}: ${c.rare.map((r) => r.gene).join(", ")}`
+      );
     const topSnps = c.snps
       .filter((s) => s.colour && colourRank(s.colour) >= 3)
       .slice(0, 2)

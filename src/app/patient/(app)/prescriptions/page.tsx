@@ -40,7 +40,7 @@ export default async function PrescriptionsPage({
       history={historicalPrescriptions()}
       initialRxId={sp.rx || null}
       pharmaSnps={pharmaSnps}
-      colourLabels={labels.colourLabels as Record<import("@/lib/health/colours").RiskColour, string>}
+      colourLabels={labels.geneColourLabels as Record<import("@/lib/health/colours").RiskColour, string>}
     />
   );
 }

@@ -100,7 +100,7 @@ const EXTRA_REQUESTS: DoctorRequest[] = [
     patientId: "patient_male",
     patientNameLt: "Jonas Jonaitis",
     patientNameEn: "John Doe",
-    subjectLt: "NGS MYBPC3 — šeimos patikra",
+    subjectLt: "NKS MYBPC3 — šeimos patikra",
     subjectEn: "NGS MYBPC3 — family screening",
     previewLt: "Ar rekomenduoti Echo šeimos nariams?",
     previewEn: "Recommend Echo for relatives?",
@@ -112,10 +112,10 @@ const EXTRA_REQUESTS: DoctorRequest[] = [
     createdAt: hoursAgo(30),
     updatedAt: hoursAgo(30),
     slaHours: 48,
-    tagsLt: ["NGS", "Kardiologija", "Siuntimas"],
+    tagsLt: ["NKS", "Kardiologija", "Siuntimas"],
     tagsEn: ["NGS", "Cardiology", "Referral"],
     questionLt:
-      "Po NGS tyrimo radote MYBPC3 variantą. Ar mano tėvams, broliui ir vaikams reikia Echo / EKG? Kaip greitai turėčiau juos siųsti?",
+      "Po NKS tyrimo radote MYBPC3 variantą. Ar mano tėvams, broliui ir vaikams reikia Echo / EKG? Kaip greitai turėčiau juos siųsti?",
     questionEn:
       "After NGS you found a MYBPC3 variant. Do my parents, brother and children need Echo/ECG? How soon should they be referred?",
   },

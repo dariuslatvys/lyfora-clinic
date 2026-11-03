@@ -81,7 +81,7 @@ export const dict = {
     howCalculated: "Kaip apskaičiuota spalva",
     fromMarkers: "Iš žymenų",
     fromGenetics: "Iš genų (SNP)",
-    fromNgs: "Iš NGS (retos mutacijos)",
+    fromNgs: "Iš NKS (reti DNR pokyčiai)",
     colourDrivers: "Kas kelia kategorijos spalvą",
     askAi: "Ask AI",
     globalSearchPlaceholder: "Ieškoti vizitų, receptų, tyrimų, genų…",
@@ -95,11 +95,11 @@ export const dict = {
     physicalMetricsHint:
       "Kraujo spaudimas, HRV, VO₂max, aktyvumas ir kiti funkciniai matavimai — ne laboratoriniai biomarkeriai, bet daro įtaką kategorijos signalui.",
     genes: "Genai (SNP)",
-    rareMutations: "Retos genetinės mutacijos",
-    rareShort: "Retos mutacijos",
-    ngsTitle: "Išsamus genetinio kodo sekoskaitos tyrimas (NGS)",
+    rareMutations: "Reti DNR pokyčiai",
+    rareShort: "DNR pokyčiai",
+    ngsTitle: "Naujos kartos sekoskaita (NKS)",
     ngsBlurb:
-      "Retų genų mutacijų ir paveldimų ligų rizikos paieška nuskaitant giliąją DNR seką. Šis tyrimas išsamiai nuskaito DNR kodo seką ir ieško retų mutacijų, susijusių su ligomis.",
+      "Didelio gylio DNR sekoskaitos tyrimas, skirtas aptikti retus genetinius variantus, susijusius su paveldimomis ligomis ir padidėjusia jų rizika.",
     snpTestTitle: "Bazinis genetinis genotipavimo tyrimas (SNP)",
     snpTestBlurb:
       "Mikro matricų tyrimas, kuris tikrina dažnesnius genetinius taškus (SNP) ir padeda suprasti polinkius sveikatos srityse.",
@@ -138,6 +138,15 @@ export const dict = {
       yellow: "Stebėti",
       orange: "Dėmesio",
       red: "Kritiška",
+      badge: "Genetinis žymuo",
+    } as Record<string, string>,
+    /** Labels used only when colour refers to genes / SNP / NGS. */
+    geneColourLabels: {
+      grey: "Nėra duomenų",
+      green: "No risk",
+      yellow: "Nedidelė",
+      orange: "Padidėjusi",
+      red: "Ženkli",
       badge: "Genetinis žymuo",
     } as Record<string, string>,
   },
@@ -221,7 +230,7 @@ export const dict = {
     howCalculated: "How the colour is calculated",
     fromMarkers: "From markers",
     fromGenetics: "From genes (SNP)",
-    fromNgs: "From NGS (rare mutations)",
+    fromNgs: "From NGS (rare DNA changes)",
     colourDrivers: "What drives the category colour",
     askAi: "Ask AI",
     globalSearchPlaceholder: "Search visits, prescriptions, labs, genes…",
@@ -235,11 +244,11 @@ export const dict = {
     physicalMetricsHint:
       "Blood pressure, HRV, VO₂max, activity and other functional readings — not lab biomarkers, but they still affect the category signal.",
     genes: "Genes (SNP)",
-    rareMutations: "Rare genetic mutations",
-    rareShort: "Rare mutations",
-    ngsTitle: "Next-Generation Sequencing (NGS) Test",
+    rareMutations: "Rare DNA changes",
+    rareShort: "DNA changes",
+    ngsTitle: "Next-generation sequencing (NGS)",
     ngsBlurb:
-      "Deep DNA sequencing to detect rare genetic mutations and hereditary disease risks.",
+      "Deep DNA sequencing to detect rare genetic variants linked with hereditary conditions and elevated risk.",
     snpTestTitle: "Microarray SNP Genotyping Test",
     snpTestBlurb:
       "A microarray test that checks common genetic positions (SNPs) to understand predispositions across health areas.",
@@ -280,6 +289,15 @@ export const dict = {
       red: "Critical",
       badge: "Genetic marker",
     } as Record<string, string>,
+    /** Labels used only when colour refers to genes / SNP / NGS. */
+    geneColourLabels: {
+      grey: "No data",
+      green: "No risk",
+      yellow: "Low",
+      orange: "Elevated",
+      red: "Significant",
+      badge: "Genetic marker",
+    } as Record<string, string>,
   },
 } as const;
 
@@ -287,4 +305,14 @@ export type Dictionary = (typeof dict)["lt"] | (typeof dict)["en"];
 
 export function t(locale: Locale): Dictionary {
   return dict[locale] || dict.lt;
+}
+
+/** Colour wording for genes / SNP / NGS only — not labs or category risk. */
+export function geneColourLabel(
+  locale: Locale,
+  colour: string | null | undefined
+): string {
+  const labels = t(locale).geneColourLabels as Record<string, string>;
+  if (!colour) return labels.grey || "—";
+  return labels[colour] || colour;
 }

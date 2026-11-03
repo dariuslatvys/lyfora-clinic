@@ -114,6 +114,27 @@ export function AnalyticsView({
     return locale === "en" ? en[c] : lt[c];
   };
 
+  const geneColourLabel = (c: RiskColour | null | "none") => {
+    if (!c || c === "none") return locale === "en" ? "No data" : "Nėra duomenų";
+    const lt: Record<RiskColour, string> = {
+      grey: "Nėra duomenų",
+      green: "No risk",
+      yellow: "Nedidelė",
+      orange: "Padidėjusi",
+      red: "Ženkli",
+      badge: "Genetinis žymuo",
+    };
+    const en: Record<RiskColour, string> = {
+      grey: "No data",
+      green: "No risk",
+      yellow: "Low",
+      orange: "Elevated",
+      red: "Significant",
+      badge: "Genetic marker",
+    };
+    return locale === "en" ? en[c] : lt[c];
+  };
+
   return (
     <div className="stack analytics-page" style={{ gap: 16 }}>
       <header className="dna-page-head">
@@ -204,7 +225,7 @@ export function AnalyticsView({
                         PILL_CLASS[c.geneticColour || "grey"]
                       }`}
                     >
-                      {colourLabel(c.geneticColour)}
+                      {geneColourLabel(c.geneticColour)}
                     </span>
                   </td>
                   <td>

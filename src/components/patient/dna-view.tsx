@@ -32,25 +32,28 @@ function impactLabel(impact: string, locale: "lt" | "en") {
 }
 
 function colourTitle(colour: string, locale: "lt" | "en") {
-  const lt: Record<string, string> = {
-    green: "Gerai",
-    badge: "Genetinis žymuo",
-    yellow: "Stebėti",
-    orange: "Dėmesio",
-    red: "Kritiška",
-    none: "Nenustatyta",
-    grey: "Nėra duomenų",
-  };
-  const en: Record<string, string> = {
-    green: "Good",
-    badge: "Genetic marker",
-    yellow: "Watch",
-    orange: "Attention",
-    red: "Critical",
-    none: "Not determined",
-    grey: "No data",
-  };
-  return (locale === "en" ? en : lt)[colour] || colour;
+  if (colour === "none") {
+    return locale === "en" ? "Not determined" : "Nenustatyta";
+  }
+  const labels =
+    locale === "en"
+      ? {
+          green: "No risk",
+          badge: "Genetic marker",
+          yellow: "Low",
+          orange: "Elevated",
+          red: "Significant",
+          grey: "No data",
+        }
+      : {
+          green: "No risk",
+          badge: "Genetinis žymuo",
+          yellow: "Nedidelė",
+          orange: "Padidėjusi",
+          red: "Ženkli",
+          grey: "Nėra duomenų",
+        };
+  return (labels as Record<string, string>)[colour] || colour;
 }
 
 function pillClassFor(colour: string) {
@@ -111,10 +114,10 @@ export function DnaView({
             blurb:
               "Genetics shows predisposition, not a diagnosis. Most risks change a lot with lifestyle and timely tests.",
             book: "Genetics consult",
-            kpiGreen: "No risk alleles",
+            kpiGreen: "No risk",
             kpiBadge: "Marker without clinical effect",
-            kpiYellow: "Watch",
-            kpiOrange: "Attention",
+            kpiYellow: "Low",
+            kpiOrange: "Elevated",
             search: "Search rsID, gene or keyword…",
             fAll: "All",
             fRisk: "With risk allele",
@@ -139,7 +142,7 @@ export function DnaView({
               "2 risk alleles — both copies match (homozygous). Often a stronger signal for that marker.",
               "Your profile here combines two uploaded genetic files: (1) SNP genotyping and (2) a VCF from next-generation sequencing (NGS).",
               "SNP genotyping from saliva: a cheek/saliva sample is used to check many common DNA points (SNPs) across the genome — like a wide checklist of known variants. It is good for frequent predispositions (e.g. drug response, lipids) but does not read every letter of every gene.",
-              "Next-generation sequencing (NGS / VCF): reads DNA much more deeply, letter by letter in selected genes or large regions. It can find rarer changes that a standard SNP chip may miss (e.g. some cardiomyopathy or cancer-risk variants).",
+              "Next-generation sequencing (NGS / VCF): reads DNA much more deeply, letter by letter in selected genes or large regions. It can find rarer DNA changes that a standard SNP chip may miss (e.g. some cardiomyopathy or cancer-risk variants).",
             ],
             criteria:
               "Genetics shows predisposition and discussion points for your clinician — it does not replace lab tests, examination or a diagnosis.",
@@ -150,24 +153,24 @@ export function DnaView({
             snpKind: "SNP genotyping",
             vcfKind: "NGS / VCF",
             snpSection: "SNP panel",
-            rareTitle: "Rare mutations (NGS / VCF)",
+            rareTitle: "Rare DNA changes (NGS / VCF)",
             rareBlurb:
-              "Findings from your sequencing VCF — rarer gene changes that a standard SNP chip may miss.",
-            rareEmpty: "No rare mutations in the uploaded VCF.",
+              "Findings from your sequencing VCF — rarer DNA changes that a standard SNP chip may miss.",
+            rareEmpty: "No rare DNA changes in the uploaded VCF.",
             rareOpen: "Open",
             transcript: "Transcript",
             variant: "Variant",
           }
         : {
-            eyebrow: `Genetinis tyrimas · ${panel.totalCount} SNP + ${panel.rare.length} NGS`,
+            eyebrow: `Genetinis tyrimas · ${panel.totalCount} SNP + ${panel.rare.length} NKS`,
             title: "Mano DNR",
             blurb:
               "Genetika rodo polinkį, o ne diagnozę. Daugumą rizikų stipriai keičia gyvensena ir laiku atlikti tyrimai.",
             book: "Genetiko konsultacija",
-            kpiGreen: "Rizikos alelių nėra",
+            kpiGreen: "No risk",
             kpiBadge: "Žymuo be klinikinio poveikio",
-            kpiYellow: "Stebėti",
-            kpiOrange: "Dėmesio",
+            kpiYellow: "Nedidelė",
+            kpiOrange: "Padidėjusi",
             search: "Ieškoti pagal rsID, geną ar raktinį žodį…",
             fAll: "Visi",
             fRisk: "Su rizikos aleliu",
@@ -190,9 +193,9 @@ export function DnaView({
               "0 rizikos alelių — nė viena kopija nesutampa su rizikos versija (paprastai žalia / palanku).",
               "1 rizikos alelis — sutampa viena iš dviejų kopijų (heterozigota). Dažnai švelnesnis arba „stebėti“ signalas.",
               "2 rizikos aleliai — sutampa abi kopijos (homozigota). Dažnai stipresnis signalas tam žymenui.",
-              "Čia matote informaciją iš dviejų įkeltų genetinių failų: (1) SNP genotipavimo ir (2) VCF failo iš naujos kartos sekoskaitos (NGS).",
+              "Čia matote informaciją iš dviejų įkeltų genetinių failų: (1) SNP genotipavimo ir (2) VCF failo iš naujos kartos sekoskaitos (NKS).",
               "SNP genotipavimas iš seilių: iš seilių / skruosto tepinėlio patikrinama daugybė dažnų DNR taškų (SNP) po visą genomą — tarsi platus žinomų variantų kontrolinis sąrašas. Gerai tinka dažniems polinkiams (pvz. vaistų atsako, lipidų), bet neskaito kiekvienos geno raidės.",
-              "Naujos kartos sekoskaita (NGS / VCF): DNR skaitoma gerokai giliau, raidė po raidės pasirinktuose genuose ar didesnėse atkarpose. Gali aptikti retesnius pokyčius, kurių paprastas SNP lustas gali nepamatyti (pvz. kai kurios kardiomiopatijos ar onkologinės rizikos mutacijos).",
+              "Naujos kartos sekoskaita (NKS): didelio gylio DNR sekoskaitos tyrimas, skirtas aptikti retus genetinius variantus, susijusius su paveldimomis ligomis ir padidėjusia jų rizika. Gali aptikti retesnius DNR pokyčius, kurių paprastas SNP lustas gali nepamatyti.",
             ],
             criteria:
               "Genetika rodo polinkį ir temas pokalbiui su gydytoju — ji nepakeičia tyrimų, apžiūros ir diagnozės.",
@@ -201,12 +204,12 @@ export function DnaView({
             markers: "žymenų",
             filesTitle: "Įkelti genetiniai failai",
             snpKind: "SNP genotipavimas",
-            vcfKind: "NGS / VCF",
+            vcfKind: "NKS / VCF",
             snpSection: "SNP panelė",
-            rareTitle: "Retos mutacijos (NGS / VCF)",
+            rareTitle: "Reti DNR pokyčiai (NKS / VCF)",
             rareBlurb:
-              "Radiniai iš jūsų sekoskaitos VCF — retesni geno pokyčiai, kurių paprastas SNP lustas gali nepamatyti.",
-            rareEmpty: "Įkeltame VCF retų mutacijų nerasta.",
+              "Radiniai iš jūsų NKS sekoskaitos VCF — retesni DNR pokyčiai, kurių paprastas SNP lustas gali nepamatyti.",
+            rareEmpty: "Įkeltame VCF retų DNR pokyčių nerasta.",
             rareOpen: "Atidaryti",
             transcript: "Transkriptas",
             variant: "Variantas",
@@ -378,7 +381,7 @@ export function DnaView({
                   <div className="row" style={{ gap: 8, alignItems: "center" }}>
                     <b>{r.gene}</b>
                     <span className="pill c-red">
-                      {locale === "en" ? "Rare / NGS" : "Reta / NGS"}
+                      {locale === "en" ? "Rare / NGS" : "Reta / NKS"}
                     </span>
                   </div>
                   <span className="small muted">
@@ -404,8 +407,8 @@ export function DnaView({
                     label={copy.explain}
                     question={
                       locale === "en"
-                        ? `Explain my NGS rare finding ${r.gene} (${r.hgvs || ""}) in plain language`
-                        : `Paaiškink mano NGS retą radinį ${r.gene} (${r.hgvs || ""}) paprasta kalba`
+                        ? `Explain my NGS rare DNA finding ${r.gene} (${r.hgvs || ""}) in plain language`
+                        : `Paaiškink mano NKS retą DNR pokytį ${r.gene} (${r.hgvs || ""}) paprasta kalba`
                     }
                   />
                 </div>

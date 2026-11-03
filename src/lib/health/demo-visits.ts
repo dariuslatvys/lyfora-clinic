@@ -458,7 +458,7 @@ export const DEMO_VISITS: DemoVisit[] = [
     id: "v-2025-12-16",
     date: "2025-12-16",
     time: "13:20",
-    titleLt: "Genetiko konsultacija (NGS)",
+    titleLt: "Genetiko konsultacija (NKS)",
     titleEn: "Clinical genetics (NGS) consult",
     doctorLt: "Dr. Eglė Navickaitė",
     doctorEn: "Dr. Eglė Navickaitė",
@@ -469,7 +469,7 @@ export const DEMO_VISITS: DemoVisit[] = [
     status: "past",
     relatedLabDates: ["2025-12-08"],
     notesLt:
-      "Aptarta MYBPC3 / NGS radiniai ir šeimos anamnezė. Rekomenduota kardiogenetikos kontrolė.",
+      "Aptarta MYBPC3 / NKS radiniai ir šeimos anamnezė. Rekomenduota kardiogenetikos kontrolė.",
     notesEn:
       "Reviewed MYBPC3 / NGS findings and family history. Cardiology–genetics follow-up advised.",
     referrals: [

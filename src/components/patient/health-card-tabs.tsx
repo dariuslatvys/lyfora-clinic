@@ -129,7 +129,7 @@ export function HealthCardTabs({
           locale={locale}
           card={card}
           pharmaSnps={pharmaSnps}
-          colourLabels={labels.colourLabels}
+          colourLabels={labels.geneColourLabels}
           awaitingDna={labels.awaitingDna}
         />
       ) : null}

@@ -544,6 +544,24 @@ export function DnaView({
         </ol>
         <p className="xs muted mb-0">{copy.criteria}</p>
       </details>
+
+      <div className="card dna-files-card">
+        <p className="eyebrow m-0 mb-2">{copy.filesTitle}</p>
+        <div className="dna-files">
+          {panel.files.map((f) => (
+            <div key={f.fileName} className="dna-file">
+              <span className="pill plain c-acc">
+                {f.kind === "vcf" ? copy.vcfKind : copy.snpKind}
+              </span>
+              <b>{f.fileName}</b>
+              <div className="muted xs">
+                {locale === "en" ? f.labNameEn : f.labNameLt} · {f.testedAt} ·{" "}
+                {locale === "en" ? f.statusEn : f.statusLt}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

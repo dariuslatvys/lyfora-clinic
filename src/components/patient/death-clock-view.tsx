@@ -60,7 +60,11 @@ export function DeathClockView({ data }: { data: DeathClockPayload }) {
   const [unit, setUnit] = useState<DeathClockUnit>("weeks");
   // Seed from server snapshot so first paint matches SSR; tick only after mount.
   const [now, setNow] = useState(data.builtAtMs);
+  /** Draft ticks in the recommendations picker. */
   const [selected, setSelected] = useState<Set<string>>(() => new Set());
+  /** Committed ticks after “New forecast” — drives the dual comparison. */
+  const [applied, setApplied] = useState<Set<string> | null>(null);
+  const [recsOpen, setRecsOpen] = useState(false);
   const [algoOpen, setAlgoOpen] = useState(false);
   const [driverSort, setDriverSort] = useState<DriverSort>("cuts");
   const [openRecId, setOpenRecId] = useState<string | null>(null);
@@ -99,20 +103,24 @@ export function DeathClockView({ data }: { data: DeathClockPayload }) {
             start: "Birth",
             end: "Projected end",
             causes: "Potential causes of death",
-            drivers: "What moved the estimate",
+            drivers: "What influences the estimate",
             base: "Baseline",
             of: "of",
             current: "Current situation",
             forPatient: "Calculated for",
             sexMale: "Male",
             sexFemale: "Female",
-            projection: "With selected recommendations",
+            projection: "Updated forecast from recommendations",
+            openRecs: "Recommendations (how to improve the forecast)",
+            hideRecs: "Hide recommendations",
             recs: "Recommendations",
             recsBlurb:
-              "Tick the changes you will follow — the projection updates immediately.",
+              "Tick the changes you will follow, then run a new forecast.",
             gain: "gain",
-            noneSelected: "No recommendations selected yet",
+            noneSelected: "Select at least one recommendation",
             delta: "Difference vs current",
+            newForecast: "New forecast",
+            appliedRecs: "Selected recommendations",
             algo: "Calculation algorithm",
             algoHint: "Show the rules used for this estimate",
             catLifestyle: "Lifestyle",
@@ -155,20 +163,24 @@ export function DeathClockView({ data }: { data: DeathClockPayload }) {
             start: "Gimimas",
             end: "Prognozės pabaiga",
             causes: "Galimos mirties priežastys",
-            drivers: "Kas pakoregavo įvertį",
+            drivers: "Kas turi įtakos įvertinimui",
             base: "Bazė",
             of: "iš",
             current: "Dabartinė situacija",
             forPatient: "Skaičiuojama",
             sexMale: "Vyras",
             sexFemale: "Moteris",
-            projection: "Su pažymėtomis rekomendacijomis",
+            projection: "Atnaujinta prognozė pagal rekomendacijas",
+            openRecs: "Rekomendacijos (kaip pagerinti prognozes)",
+            hideRecs: "Slėpti rekomendacijas",
             recs: "Rekomendacijos",
             recsBlurb:
-              "Pažymėkite, ko laikysitės — projekcija perskaičiuojama iš karto.",
+              "Pažymėkite, ko laikysitės, ir spauskite „Nauja prognozė“.",
             gain: "priedas",
-            noneSelected: "Dar nepažymėta jokių rekomendacijų",
+            noneSelected: "Pažymėkite bent vieną rekomendaciją",
             delta: "Skirtumas nuo dabartinės",
+            newForecast: "Nauja prognozė",
+            appliedRecs: "Pasirinktos rekomendacijos",
             algo: "Apskaičiavimo algoritmas",
             algoHint: "Parodyti taisykles, kaip skaičiuojama",
             catLifestyle: "Gyvensena",
@@ -203,7 +215,7 @@ export function DeathClockView({ data }: { data: DeathClockPayload }) {
     monitoring: copy.catMonitoring,
   } as const;
 
-  const selectedGain = useMemo(() => {
+  const draftGain = useMemo(() => {
     let sum = 0;
     for (const r of data.recommendations) {
       if (selected.has(r.id)) sum += r.gainWeeks;
@@ -211,10 +223,29 @@ export function DeathClockView({ data }: { data: DeathClockPayload }) {
     return sum;
   }, [data.recommendations, selected]);
 
+  const appliedGain = useMemo(() => {
+    if (!applied) return 0;
+    let sum = 0;
+    for (const r of data.recommendations) {
+      if (applied.has(r.id)) sum += r.gainWeeks;
+    }
+    return sum;
+  }, [data.recommendations, applied]);
+
+  const appliedRecs = useMemo(
+    () =>
+      applied
+        ? data.recommendations.filter((r) => applied.has(r.id))
+        : [],
+    [data.recommendations, applied]
+  );
+
+  const showProjection = applied != null && appliedGain > 0;
+
   const withRecs = useMemo(
     () =>
-      projectFromWeeks(data.birthMs, data.adjustedLifeWeeks + selectedGain),
-    [data.birthMs, data.adjustedLifeWeeks, selectedGain]
+      projectFromWeeks(data.birthMs, data.adjustedLifeWeeks + appliedGain),
+    [data.birthMs, data.adjustedLifeWeeks, appliedGain]
   );
 
   const remainingMs = Math.max(0, data.projectedDeathMs - now);
@@ -348,7 +379,9 @@ export function DeathClockView({ data }: { data: DeathClockPayload }) {
         </div>
       </div>
 
-      <div className="death-clock-compare">
+      <div
+        className={`death-clock-compare${showProjection ? "" : " single"}`}
+      >
         <section className="card death-clock-hero">
           <span className="eyebrow">{copy.current}</span>
           <div className="death-clock-kpis">
@@ -400,161 +433,65 @@ export function DeathClockView({ data }: { data: DeathClockPayload }) {
           <TimelineBar pct={livedPct} endLabel={endLabelCurrent} />
         </section>
 
-        <section
-          className={`card death-clock-hero death-clock-proj${
-            selectedGain > 0 ? " on" : ""
-          }`}
-        >
-          <span className="eyebrow">{copy.projection}</span>
-          {selectedGain > 0 ? (
-            <>
-              <div className="death-clock-kpis">
-                <div>
-                  <span className="eyebrow">{copy.expectancy}</span>
-                  <b className="death-clock-num">
-                    {withRecs.expectancyYears}{" "}
-                    <small>
-                      {copy.years} · {withRecs.adjustedLifeWeeks} {copy.weeks}
-                    </small>
-                  </b>
-                  <p className="small m-0 mt-1 death-clock-delta">
-                    {copy.delta}: +{selectedGain} {copy.weeks}
-                  </p>
-                </div>
-                <div>
-                  <span className="eyebrow">{copy.deathDate}</span>
-                  <b className="death-clock-date">
-                    {formatDeathDate(withRecs.projectedDeathIso, locale)}
-                  </b>
-                </div>
+        {showProjection ? (
+          <section className="card death-clock-hero death-clock-proj on">
+            <span className="eyebrow">{copy.projection}</span>
+            <div className="death-clock-kpis">
+              <div>
+                <span className="eyebrow">{copy.expectancy}</span>
+                <b className="death-clock-num">
+                  {withRecs.expectancyYears}{" "}
+                  <small>
+                    {copy.years} · {withRecs.adjustedLifeWeeks} {copy.weeks}
+                  </small>
+                </b>
+                <p className="small m-0 mt-1 death-clock-delta">
+                  {copy.delta}: +{appliedGain} {copy.weeks}
+                </p>
               </div>
-              <div className="death-clock-countdown">
-                <span className="eyebrow">{copy.remaining}</span>
-                <div className="death-clock-remain">
-                  {formatBigNumber(remainingProj, unit, locale)}
-                  <span>{unitLabel[unit]}</span>
-                </div>
+              <div>
+                <span className="eyebrow">{copy.deathDate}</span>
+                <b className="death-clock-date">
+                  {formatDeathDate(withRecs.projectedDeathIso, locale)}
+                </b>
               </div>
-              <TimelineBar
-                pct={livedPctProj}
-                endLabel={endLabelProj}
-                variant="proj"
-              />
-            </>
-          ) : (
-            <p className="muted small m-0 mt-3">{copy.noneSelected}</p>
-          )}
-        </section>
+            </div>
+            <div className="death-clock-countdown">
+              <span className="eyebrow">{copy.remaining}</span>
+              <div className="death-clock-remain">
+                {formatBigNumber(remainingProj, unit, locale)}
+                <span>{unitLabel[unit]}</span>
+              </div>
+            </div>
+            <TimelineBar
+              pct={livedPctProj}
+              endLabel={endLabelProj}
+              variant="proj"
+            />
+          </section>
+        ) : null}
       </div>
 
-      <section className="card">
-        <div className="card-head" style={{ alignItems: "flex-start" }}>
-          <div>
-            <h3 className="m-0">{copy.recs}</h3>
-            <p className="small muted m-0 mt-1">{copy.recsBlurb}</p>
+      {showProjection && appliedRecs.length ? (
+        <section className="card death-clock-applied">
+          <div className="card-head">
+            <h3 className="m-0">{copy.appliedRecs}</h3>
+            <span className="pill c-green">
+              +{appliedGain} {copy.weeks}
+            </span>
           </div>
-          <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
-            <button
-              type="button"
-              className="btn ghost sm"
-              onClick={allSelected ? clearAllRecs : selectAllRecs}
-            >
-              {allSelected ? copy.clearAll : copy.selectAll}
-            </button>
-            {selectedGain > 0 ? (
-              <span className="pill c-green">
-                +{selectedGain} {copy.weeks}
-              </span>
-            ) : null}
-          </div>
-        </div>
-        <div className="stack death-clock-recs" style={{ gap: 10 }}>
-          {data.recommendations.map((r) => {
-            const on = selected.has(r.id);
-            const isOpen = openRecId === r.id;
-            return (
-              <div
-                key={r.id}
-                className={`death-clock-rec${on ? " on" : ""}${
-                  isOpen ? " open" : ""
-                }`}
-              >
-                <div className="death-clock-rec-main">
-                  <label className="death-clock-rec-check">
-                    <input
-                      type="checkbox"
-                      checked={on}
-                      onChange={() => toggleRec(r.id)}
-                      onClick={(e) => e.stopPropagation()}
-                    />
-                  </label>
-                  <button
-                    type="button"
-                    className="death-clock-rec-body"
-                    onClick={() =>
-                      setOpenRecId((prev) => (prev === r.id ? null : r.id))
-                    }
-                    aria-expanded={isOpen}
-                  >
-                    <div className="row between" style={{ gap: 8 }}>
-                      <b>{locale === "en" ? r.labelEn : r.labelLt}</b>
-                      <span className="pill c-green">
-                        +{r.gainWeeks} {copy.weeks}
-                      </span>
-                    </div>
-                    <p className="small muted m-0 mt-1">
-                      {locale === "en" ? r.detailEn : r.detailLt}
-                    </p>
-                    <span className="xs muted">
-                      {catLabel[r.category]} ·{" "}
-                      {isOpen ? copy.closePlan : copy.openPlan}
-                    </span>
-                  </button>
-                </div>
-                {isOpen ? (
-                  <div className="death-clock-rec-detail">
-                    <p className="eyebrow m-0">{copy.whyTitle}</p>
-                    <p className="small m-0 mt-1">
-                      {locale === "en"
-                        ? r.explainEn || r.detailEn
-                        : r.explainLt || r.detailLt}
-                    </p>
-                    <p className="eyebrow m-0 mt-3">{copy.planTitle}</p>
-                    <ol className="death-clock-rec-actions">
-                      {(locale === "en"
-                        ? r.actionsEn || []
-                        : r.actionsLt || []
-                      ).map((step) => (
-                        <li key={step}>{step}</li>
-                      ))}
-                    </ol>
-                    <div className="row mt-3" style={{ gap: 8 }}>
-                      <button
-                        type="button"
-                        className="btn sm"
-                        onClick={() => {
-                          if (!on) toggleRec(r.id);
-                        }}
-                      >
-                        {copy.applyRec}
-                      </button>
-                      {on ? (
-                        <button
-                          type="button"
-                          className="btn ghost sm"
-                          onClick={() => toggleRec(r.id)}
-                        >
-                          {copy.removeRec}
-                        </button>
-                      ) : null}
-                    </div>
-                  </div>
-                ) : null}
-              </div>
-            );
-          })}
-        </div>
-      </section>
+          <ul className="death-clock-applied-list">
+            {appliedRecs.map((r) => (
+              <li key={r.id}>
+                <span>{locale === "en" ? r.labelEn : r.labelLt}</span>
+                <b>
+                  +{r.gainWeeks} {copy.weeks}
+                </b>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       <div className="death-clock-split">
         <section className="card">
@@ -629,6 +566,153 @@ export function DeathClockView({ data }: { data: DeathClockPayload }) {
           </div>
         </section>
       </div>
+
+      <div className="death-clock-recs-launch">
+        <button
+          type="button"
+          className="btn"
+          onClick={() => setRecsOpen((v) => !v)}
+        >
+          {recsOpen ? copy.hideRecs : copy.openRecs}
+        </button>
+      </div>
+
+      {recsOpen ? (
+        <section className="card" id="death-clock-recs">
+          <div className="card-head" style={{ alignItems: "flex-start" }}>
+            <div>
+              <h3 className="m-0">{copy.recs}</h3>
+              <p className="small muted m-0 mt-1">{copy.recsBlurb}</p>
+            </div>
+            <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
+              <button
+                type="button"
+                className="btn ghost sm"
+                onClick={allSelected ? clearAllRecs : selectAllRecs}
+              >
+                {allSelected ? copy.clearAll : copy.selectAll}
+              </button>
+              {draftGain > 0 ? (
+                <span className="pill c-green">
+                  +{draftGain} {copy.weeks}
+                </span>
+              ) : null}
+            </div>
+          </div>
+          <div className="stack death-clock-recs" style={{ gap: 10 }}>
+            {data.recommendations.map((r) => {
+              const on = selected.has(r.id);
+              const isOpen = openRecId === r.id;
+              return (
+                <div
+                  key={r.id}
+                  className={`death-clock-rec${on ? " on" : ""}${
+                    isOpen ? " open" : ""
+                  }`}
+                >
+                  <div className="death-clock-rec-main">
+                    <label className="death-clock-rec-check">
+                      <input
+                        type="checkbox"
+                        checked={on}
+                        onChange={() => toggleRec(r.id)}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    </label>
+                    <button
+                      type="button"
+                      className="death-clock-rec-body"
+                      onClick={() =>
+                        setOpenRecId((prev) => (prev === r.id ? null : r.id))
+                      }
+                      aria-expanded={isOpen}
+                    >
+                      <div className="row between" style={{ gap: 8 }}>
+                        <b>{locale === "en" ? r.labelEn : r.labelLt}</b>
+                        <span className="pill c-green">
+                          +{r.gainWeeks} {copy.weeks}
+                        </span>
+                      </div>
+                      <p className="small muted m-0 mt-1">
+                        {locale === "en" ? r.detailEn : r.detailLt}
+                      </p>
+                      <span className="xs muted">
+                        {catLabel[r.category]} ·{" "}
+                        {isOpen ? copy.closePlan : copy.openPlan}
+                      </span>
+                    </button>
+                  </div>
+                  {isOpen ? (
+                    <div className="death-clock-rec-detail">
+                      <p className="eyebrow m-0">{copy.whyTitle}</p>
+                      <p className="small m-0 mt-1">
+                        {locale === "en"
+                          ? r.explainEn || r.detailEn
+                          : r.explainLt || r.detailLt}
+                      </p>
+                      <p className="eyebrow m-0 mt-3">{copy.planTitle}</p>
+                      <ol className="death-clock-rec-actions">
+                        {(locale === "en"
+                          ? r.actionsEn || []
+                          : r.actionsLt || []
+                        ).map((step) => (
+                          <li key={step}>{step}</li>
+                        ))}
+                      </ol>
+                      <div className="row mt-3" style={{ gap: 8 }}>
+                        <button
+                          type="button"
+                          className="btn sm"
+                          onClick={() => {
+                            if (!on) toggleRec(r.id);
+                          }}
+                        >
+                          {copy.applyRec}
+                        </button>
+                        {on ? (
+                          <button
+                            type="button"
+                            className="btn ghost sm"
+                            onClick={() => toggleRec(r.id)}
+                          >
+                            {copy.removeRec}
+                          </button>
+                        ) : null}
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+          <div className="death-clock-recs-footer">
+            <button
+              type="button"
+              className="btn"
+              disabled={draftGain <= 0}
+              onClick={() => {
+                if (draftGain <= 0) return;
+                setApplied(new Set(selected));
+                setRecsOpen(false);
+                window.requestAnimationFrame(() => {
+                  document
+                    .querySelector(".death-clock-compare")
+                    ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                });
+              }}
+            >
+              {copy.newForecast}
+            </button>
+            {draftGain <= 0 ? (
+              <p className="small muted m-0">{copy.noneSelected}</p>
+            ) : (
+              <p className="small muted m-0">
+                +{draftGain} {copy.weeks}
+              </p>
+            )}
+          </div>
+        </section>
+      ) : null}
 
       <section className="card death-clock-algo">
         <button

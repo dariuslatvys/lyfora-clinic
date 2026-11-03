@@ -2054,6 +2054,50 @@ a.who.on {
   align-items: stretch;
 }
 
+.death-clock-compare.single {
+  grid-template-columns: 1fr;
+}
+
+.death-clock-recs-launch {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.death-clock-recs-footer {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.death-clock-applied-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.death-clock-applied-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--accent-soft) 35%, var(--surface));
+}
+
+.death-clock-applied-list b {
+  color: color-mix(in srgb, #2f8f5b 85%, var(--ink));
+  white-space: nowrap;
+}
+
 .death-clock-hero {
   display: flex;
   flex-direction: column;

@@ -18,9 +18,13 @@ const UNITS: DeathClockUnit[] = [
   "seconds",
 ];
 
+/** Fixed zone so SSR (UTC host) and browser match — Lyfora clinic is LT-based. */
+const DISPLAY_TZ = "Europe/Vilnius";
+
 function formatDeathDate(iso: string, locale: "lt" | "en") {
   const d = new Date(iso);
   return d.toLocaleString(locale === "en" ? "en-GB" : "lt-LT", {
+    timeZone: DISPLAY_TZ,
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -43,11 +47,13 @@ function formatBigNumber(n: number, unit: DeathClockUnit, locale: "lt" | "en") {
 export function DeathClockView({ data }: { data: DeathClockPayload }) {
   const locale = data.locale;
   const [unit, setUnit] = useState<DeathClockUnit>("weeks");
-  const [now, setNow] = useState(() => Date.now());
+  // Seed from server snapshot so first paint matches SSR; tick only after mount.
+  const [now, setNow] = useState(data.builtAtMs);
   const [selected, setSelected] = useState<Set<string>>(() => new Set());
   const [algoOpen, setAlgoOpen] = useState(false);
 
   useEffect(() => {
+    setNow(Date.now());
     const id = window.setInterval(() => setNow(Date.now()), 1000);
     return () => window.clearInterval(id);
   }, []);

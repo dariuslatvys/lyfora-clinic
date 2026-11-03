@@ -88,26 +88,39 @@ export function emptyAnswers(): QuestionnaireAnswers {
   };
 }
 
+function coerceYear(value: unknown): number | null {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return Math.round(value);
+  }
+  if (typeof value === "string" && value.trim() !== "") {
+    const n = Number(value);
+    if (Number.isFinite(n)) return Math.round(n);
+  }
+  return null;
+}
+
+function normalizeVitalStatus(raw: unknown): string {
+  const s = String(raw || "").trim();
+  if (/^(living|gyvas|alive)$/i.test(s)) return "Living";
+  if (/^(deceased|miręs|mires|dead)$/i.test(s)) return "Deceased";
+  if (/^(unknown|nežinoma|nezinoma)$/i.test(s)) return "Unknown";
+  return s;
+}
+
 function normalizeMember(m: {
   id?: string;
   relative?: string;
   conditions?: string[];
-  birthYear?: number | null;
+  birthYear?: number | string | null;
   vitalStatus?: string;
-  deathYear?: number | null;
+  deathYear?: number | string | null;
   ageYears?: number | null;
   notes?: string;
 }): FamilyMember {
   const year = CURRENT_YEAR();
-  let birthYear =
-    typeof m.birthYear === "number" && Number.isFinite(m.birthYear)
-      ? m.birthYear
-      : null;
-  let deathYear =
-    typeof m.deathYear === "number" && Number.isFinite(m.deathYear)
-      ? m.deathYear
-      : null;
-  const vitalStatus = m.vitalStatus || "";
+  let birthYear = coerceYear(m.birthYear);
+  let deathYear = coerceYear(m.deathYear);
+  const vitalStatus = normalizeVitalStatus(m.vitalStatus);
   // Migrate legacy ageYears → approximate birth/death years
   if (
     birthYear == null &&
@@ -121,10 +134,23 @@ function normalizeMember(m: {
       birthYear = year - Math.round(m.ageYears);
     }
   }
+  if (birthYear != null && (birthYear < 1850 || birthYear > year)) {
+    birthYear = null;
+  }
+  if (
+    deathYear != null &&
+    (deathYear < 1850 ||
+      deathYear > year ||
+      (birthYear != null && deathYear < birthYear))
+  ) {
+    deathYear = null;
+  }
   return {
     id: m.id || `fm_${Math.random().toString(36).slice(2, 9)}`,
     relative: m.relative || "",
-    conditions: m.conditions || [],
+    conditions: Array.isArray(m.conditions)
+      ? m.conditions.filter((c) => typeof c === "string" && c.trim())
+      : [],
     birthYear,
     vitalStatus,
     deathYear: /^deceased$/i.test(vitalStatus) ? deathYear : null,
@@ -351,6 +377,45 @@ export const OPTION_LABEL_LT: Record<string, string> = {
   "Maternal Grandfather": "Senelis (motinos pusė)",
   "Paternal Grandmother": "Senelė (tėvo pusė)",
   "Paternal Grandfather": "Senelis (tėvo pusė)",
+  Cardiovascular: "Širdis ir kraujagyslės",
+  Metabolic: "Medžiagų apykaita",
+  Cancer: "Vėžys",
+  Neurological: "Neurologija",
+  Autoimmune: "Autoimuninės",
+  "Other Hereditary Risks": "Kitos paveldimos rizikos",
+  "Heart Attack / Myocardial Infarction": "Infarktas",
+  "Stroke / TIA": "Insultas / TIA",
+  "High Blood Pressure": "Padidėjęs kraujospūdis",
+  "High Cholesterol": "Padidėjęs cholesterolis",
+  "Heart Failure": "Širdies nepakankamumas",
+  Arrhythmia: "Aritmija",
+  "Sudden Cardiac Death": "Staigi širdies mirtis",
+  "Type 2 Diabetes": "2 tipo cukrinis diabetas",
+  "Type 1 Diabetes": "1 tipo cukrinis diabetas",
+  Obesity: "Nutukimas",
+  "Thyroid Disease": "Skydliaukės liga",
+  "Breast Cancer": "Krūties vėžys",
+  "Ovarian Cancer": "Kiaušidžių vėžys",
+  "Prostate Cancer": "Prostatos vėžys",
+  "Colon Cancer": "Storosos žarnos vėžys",
+  "Lung Cancer": "Plaučių vėžys",
+  Melanoma: "Melanoma",
+  "Other Cancer": "Kitas vėžys",
+  "Alzheimer's / Dementia": "Alzheimeris / demencija",
+  "Parkinson's Disease": "Parkinsono liga",
+  "Multiple Sclerosis": "Išsėtinė sklerozė",
+  Epilepsy: "Epilepsija",
+  "Rheumatoid Arthritis": "Reumatoidinis artritas",
+  Lupus: "Vilklige",
+  "Inflammatory Bowel Disease": "Uždegiminė žarnų liga",
+  Psoriasis: "Psoriazė",
+  "Celiac Disease": "Celiakija",
+  "Blood Clotting Disorder": "Krešėjimo sutrikimas",
+  "Kidney Disease": "Inkstų liga",
+  "Liver Disease": "Kepenų liga",
+  Asthma: "Astma",
+  "Early Hearing Loss": "Ankstyvas klausos praradimas",
+  "Macular Degeneration": "Geltonosios dėmės degeneracija",
 };
 
 export function fieldLabel(field: QField, locale: "lt" | "en") {

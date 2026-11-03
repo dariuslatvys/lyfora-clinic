@@ -28,13 +28,52 @@ function uid() {
   return `fm_${Math.random().toString(36).slice(2, 9)}`;
 }
 
+const Q_STORAGE_PREFIX = "lyfora_questionnaire_v1:";
+
+function readLocalAnswers(patientId: string): QuestionnaireAnswers | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(Q_STORAGE_PREFIX + patientId);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as QuestionnaireAnswers;
+    if (!parsed || typeof parsed !== "object") return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function writeLocalAnswers(patientId: string, answers: QuestionnaireAnswers) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(
+      Q_STORAGE_PREFIX + patientId,
+      JSON.stringify(answers)
+    );
+  } catch {
+    /* quota / private mode — ignore */
+  }
+}
+
+function newerAnswers(
+  a: QuestionnaireAnswers,
+  b: QuestionnaireAnswers | null
+): QuestionnaireAnswers {
+  if (!b) return a;
+  const at = Date.parse(a.updatedAt || "") || 0;
+  const bt = Date.parse(b.updatedAt || "") || 0;
+  return bt > at ? b : a;
+}
+
 export function QuestionnaireForm({
   locale,
+  patientId,
   initialDefinition,
   initialAnswers,
   initialStep = 0,
 }: {
   locale: "lt" | "en";
+  patientId: string;
   initialDefinition: QDefinition;
   initialAnswers: QuestionnaireAnswers;
   initialStep?: number;
@@ -55,6 +94,33 @@ export function QuestionnaireForm({
   );
   const [saveFlash, setSaveFlash] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Prefer newer browser copy when serverless /tmp DB was reset.
+  useEffect(() => {
+    const local = readLocalAnswers(patientId);
+    const best = newerAnswers(initialAnswers, local);
+    if (best !== initialAnswers) {
+      setAnswers(best);
+      answersRef.current = best;
+      setSavedAt(best.updatedAt);
+      // Push browser copy back to server so Death Clock / twin see it too.
+      void fetch("/api/patient/questionnaire", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ answers: best }),
+        cache: "no-store",
+      })
+        .then(async (res) => {
+          if (!res.ok) return;
+          const data = (await res.json()) as { answers: QuestionnaireAnswers };
+          setAnswers(data.answers);
+          answersRef.current = data.answers;
+          setSavedAt(data.answers.updatedAt);
+          writeLocalAnswers(patientId, data.answers);
+        })
+        .catch(() => undefined);
+    }
+  }, [patientId, initialAnswers]);
 
   const sex = biologicalSex(answers, def);
   const steps = useMemo(() => {
@@ -118,6 +184,7 @@ export function QuestionnaireForm({
         setAnswers(data.answers);
         answersRef.current = data.answers;
         setSavedAt(data.answers.updatedAt);
+        writeLocalAnswers(patientId, data.answers);
         setMode(opts?.finish ? "view" : "edit");
         if (!opts?.silent) {
           setSaveFlash(
@@ -133,17 +200,23 @@ export function QuestionnaireForm({
         router.refresh();
         return true;
       } catch {
+        // Still keep a local copy so a reload can restore answers.
+        const draft = {
+          ...answersRef.current,
+          updatedAt: new Date().toISOString(),
+        };
+        writeLocalAnswers(patientId, draft);
         setError(
           locale === "en"
-            ? "Could not save. Please try again."
-            : "Nepavyko išsaugoti. Bandykite dar kartą."
+            ? "Could not save to the server. A local copy was kept — try again."
+            : "Nepavyko išsaugoti serveryje. Vietinė kopija išsaugota — bandykite dar kartą."
         );
         return false;
       } finally {
         setSaving(false);
       }
     },
-    [locale, router]
+    [locale, patientId, router]
   );
 
   function stepTitle(title: string) {
@@ -569,6 +642,7 @@ function FieldRenderer({
                 ? def.lists[field.listRef]
                 : null
           }
+          locale={locale}
           onChange={(next) => onChange(field.id, next)}
         />
       ) : null}
@@ -610,12 +684,14 @@ function MultiSelect({
   options,
   grouped,
   disabled,
+  locale,
   onChange,
 }: {
   value: string[];
   options: string[];
   grouped: ReturnType<typeof conditionsForSex> | QDefinition["lists"][string] | null;
   disabled: boolean;
+  locale: "lt" | "en";
   onChange: (next: string[]) => void;
 }) {
   function toggle(item: string) {
@@ -629,12 +705,12 @@ function MultiSelect({
       <div className="q-multi" role="group">
         {grouped.groups.map((g) => (
           <div key={g.name} className="q-multi-group">
-            <div className="q-multi-title">{g.name}</div>
+            <div className="q-multi-title">{optionLabel(g.name, locale)}</div>
             <div className="q-chips">
               {g.items.map((item) => (
                 <ChipOption
                   key={item}
-                  item={item}
+                  item={optionLabel(item, locale)}
                   on={value.includes(item)}
                   disabled={disabled}
                   onToggle={() => toggle(item)}
@@ -652,7 +728,7 @@ function MultiSelect({
       {options.map((item) => (
         <ChipOption
           key={item}
-          item={item}
+          item={optionLabel(item, locale)}
           on={value.includes(item)}
           disabled={disabled}
           onToggle={() => toggle(item)}
@@ -845,6 +921,7 @@ function CancerBlock({
         value={answers.cancer.types}
         options={typeItems}
         grouped={null}
+        locale={locale}
         onChange={(next) =>
           onAnswers((p) => ({ ...p, cancer: { ...p.cancer, types: next } }))
         }
@@ -884,6 +961,7 @@ function CancerBlock({
         value={answers.cancer.treatment}
         options={treatItems}
         grouped={null}
+        locale={locale}
         onChange={(next) =>
           onAnswers((p) => ({
             ...p,
@@ -936,169 +1014,125 @@ function FamilyHistoryBlock({
     }));
   }
 
+  function addPerson() {
+    onAnswers((p) => ({
+      ...p,
+      familyMembers: [
+        ...p.familyMembers,
+        {
+          id: uid(),
+          relative: "",
+          conditions: [],
+          birthYear: null,
+          vitalStatus: "Living",
+          deathYear: null,
+        },
+      ],
+    }));
+  }
+
   return (
-    <div className="stack q-family-section" style={{ gap: 12 }}>
-      <div className="row between" style={{ alignItems: "flex-start", gap: 12 }}>
-        <div>
+    <div className="q-family-section">
+      <div className="q-family-head">
+        <div className="q-family-head-copy">
           <h3 className="overview-subhead m-0">
             {locale === "en" ? "Family history" : "Šeimos anamnezė"}
           </h3>
           <p className="small muted m-0 mt-1">
             {locale === "en"
-              ? "Add each relative: relation, year of birth, living or deceased, and known diseases. Age is calculated and saved automatically."
-              : "Pridėkite kiekvieną giminaitį: ryšį, gimimo metus, ar gyvas/miręs, ir žinomas ligas. Amžius skaičiuojamas ir išsaugomas automatiškai."}
+              ? "Add each relative: relation, year of birth, living or deceased (tick one). If deceased, enter year of death. Age is calculated automatically and saved with the form."
+              : "Pridėkite giminaitį: ryšį, gimimo metus, būseną (gyvas ar miręs — pažymėkite varnele). Jei miręs — įveskite mirties metus. Amžių skaičiuojame patys ir išsaugome kartu su forma."}
           </p>
         </div>
         {!readOnly ? (
           <button
             type="button"
-            className="btn ghost sm"
-            onClick={() =>
-              onAnswers((p) => ({
-                ...p,
-                familyMembers: [
-                  ...p.familyMembers,
-                  {
-                    id: uid(),
-                    relative: "",
-                    conditions: [],
-                    birthYear: null,
-                    vitalStatus: "",
-                    deathYear: null,
-                  },
-                ],
-              }))
-            }
+            className="btn ghost sm q-family-add"
+            onClick={addPerson}
           >
-            {locale === "en" ? "Add person" : "Pridėti asmenį"}
+            {locale === "en" ? "+ Add person" : "+ Pridėti asmenį"}
           </button>
         ) : null}
       </div>
+
       {!answers.familyMembers.length ? (
         <div className="empty">
           {locale === "en"
-            ? "No relatives added yet. Use “Add person”."
-            : "Dar nieko nepridėta. Spauskite „Pridėti asmenį“."}
+            ? "No relatives yet. Use “Add person” on the right."
+            : "Dar nieko nepridėta. Spauskite „Pridėti asmenį“ dešinėje."}
         </div>
       ) : null}
-      {answers.familyMembers.map((m, idx) => {
-        const living = /^living$/i.test(m.vitalStatus || "");
-        const deceased = /^deceased$/i.test(m.vitalStatus || "");
-        const age = familyMemberAgeYears(m, thisYear);
-        return (
-          <div key={m.id} className="q-cond-card">
-            <div className="row between" style={{ gap: 8, alignItems: "center" }}>
-              <span className="eyebrow m-0">
-                {locale === "en" ? `Person ${idx + 1}` : `Asmuo ${idx + 1}`}
-              </span>
-              {!readOnly ? (
-                <button
-                  type="button"
-                  className="btn ghost sm"
-                  onClick={() =>
-                    onAnswers((p) => ({
-                      ...p,
-                      familyMembers: p.familyMembers.filter(
-                        (x) => x.id !== m.id
-                      ),
-                    }))
-                  }
-                >
-                  {locale === "en" ? "Remove" : "Pašalinti"}
-                </button>
-              ) : null}
-            </div>
 
-            <label className="stack" style={{ gap: 4 }}>
-              <span className="q-label">
-                {locale === "en" ? "Family relation" : "Giminystės ryšys"}
-              </span>
-              <select
-                disabled={readOnly}
-                className="q-select"
-                value={m.relative}
-                onChange={(e) =>
-                  updateMember(m.id, { relative: e.target.value })
-                }
-              >
-                <option value="">
-                  {locale === "en" ? "Select…" : "Pasirinkite…"}
-                </option>
-                {relativeItems.map((r) => (
-                  <option key={r} value={r}>
-                    {optionLabel(r, locale)}
-                  </option>
-                ))}
-              </select>
-            </label>
+      <div className="q-family-list">
+        {answers.familyMembers.map((m, idx) => {
+          const living = /^living$/i.test(m.vitalStatus || "");
+          const deceased = /^deceased$/i.test(m.vitalStatus || "");
+          const age = familyMemberAgeYears(m, thisYear);
+          const title = m.relative
+            ? optionLabel(m.relative, locale)
+            : locale === "en"
+              ? `Person ${idx + 1}`
+              : `Asmuo ${idx + 1}`;
+          return (
+            <article key={m.id} className="q-family-card">
+              <header className="q-family-card-head">
+                <b>{title}</b>
+                {!readOnly ? (
+                  <button
+                    type="button"
+                    className="btn ghost sm"
+                    onClick={() =>
+                      onAnswers((p) => ({
+                        ...p,
+                        familyMembers: p.familyMembers.filter(
+                          (x) => x.id !== m.id
+                        ),
+                      }))
+                    }
+                  >
+                    {locale === "en" ? "Remove" : "Pašalinti"}
+                  </button>
+                ) : null}
+              </header>
 
-            <div
-              className="row"
-              style={{ gap: 10, flexWrap: "wrap", alignItems: "flex-end" }}
-            >
-              <label className="stack" style={{ gap: 4, flex: "1 1 120px" }}>
-                <span className="q-label">
-                  {locale === "en" ? "Year of birth" : "Gimimo metai"}
-                </span>
-                <input
-                  disabled={readOnly}
-                  type="number"
-                  min={1850}
-                  max={thisYear}
-                  placeholder="e.g. 1940"
-                  value={m.birthYear == null ? "" : String(m.birthYear)}
-                  onChange={(e) =>
-                    updateMember(m.id, {
-                      birthYear:
-                        e.target.value === ""
-                          ? null
-                          : Number(e.target.value),
-                    })
-                  }
-                />
-              </label>
-              <label className="stack" style={{ gap: 4, flex: "1 1 140px" }}>
-                <span className="q-label">
-                  {locale === "en" ? "Status" : "Būsena"}
-                </span>
-                <select
-                  disabled={readOnly}
-                  className="q-select"
-                  value={m.vitalStatus || ""}
-                  onChange={(e) =>
-                    updateMember(m.id, {
-                      vitalStatus: e.target.value,
-                      deathYear: /^deceased$/i.test(e.target.value)
-                        ? m.deathYear ?? null
-                        : null,
-                    })
-                  }
-                >
-                  <option value="">
-                    {locale === "en" ? "Select…" : "Pasirinkite…"}
-                  </option>
-                  {(["Living", "Deceased", "Unknown"] as const).map((s) => (
-                    <option key={s} value={s}>
-                      {optionLabel(s, locale)}
+              <div className="q-family-grid">
+                <label className="q-family-field">
+                  <span className="q-family-field-label">
+                    {locale === "en" ? "Relation" : "Giminystės ryšys"}
+                  </span>
+                  <select
+                    disabled={readOnly}
+                    className="q-select"
+                    value={m.relative}
+                    onChange={(e) =>
+                      updateMember(m.id, { relative: e.target.value })
+                    }
+                  >
+                    <option value="">
+                      {locale === "en" ? "Select…" : "Pasirinkite…"}
                     </option>
-                  ))}
-                </select>
-              </label>
-              {deceased ? (
-                <label className="stack" style={{ gap: 4, flex: "1 1 120px" }}>
-                  <span className="q-label">
-                    {locale === "en" ? "Year of death" : "Mirties metai"}
+                    {relativeItems.map((r) => (
+                      <option key={r} value={r}>
+                        {optionLabel(r, locale)}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label className="q-family-field">
+                  <span className="q-family-field-label">
+                    {locale === "en" ? "Year of birth" : "Gimimo metai"}
                   </span>
                   <input
                     disabled={readOnly}
                     type="number"
-                    min={Number(m.birthYear) || 1850}
+                    min={1850}
                     max={thisYear}
-                    placeholder="e.g. 2018"
-                    value={m.deathYear == null ? "" : String(m.deathYear)}
+                    placeholder={locale === "en" ? "e.g. 1940" : "pvz. 1940"}
+                    value={m.birthYear == null ? "" : String(m.birthYear)}
                     onChange={(e) =>
                       updateMember(m.id, {
-                        deathYear:
+                        birthYear:
                           e.target.value === ""
                             ? null
                             : Number(e.target.value),
@@ -1106,42 +1140,114 @@ function FamilyHistoryBlock({
                     }
                   />
                 </label>
-              ) : null}
-              {age != null ? (
-                <div className="stack" style={{ gap: 4, flex: "1 1 120px" }}>
-                  <span className="q-label">
-                    {living
-                      ? locale === "en"
-                        ? "Current age"
-                        : "Dabartinis amžius"
-                      : deceased
-                        ? locale === "en"
-                          ? "Age at death"
-                          : "Amžius mirties metu"
-                        : locale === "en"
-                          ? "Age"
-                          : "Amžius"}
-                  </span>
-                  <b className="q-family-age">{age}</b>
-                </div>
-              ) : null}
-            </div>
 
-            <div className="stack" style={{ gap: 4 }}>
-              <span className="q-label">
-                {locale === "en" ? "Known diseases" : "Žinomos ligos"}
-              </span>
-              <MultiSelect
-                disabled={readOnly}
-                value={m.conditions}
-                options={[]}
-                grouped={famList || null}
-                onChange={(next) => updateMember(m.id, { conditions: next })}
-              />
-            </div>
-          </div>
-        );
-      })}
+                <div className="q-family-field q-family-field-span2">
+                  <span className="q-family-field-label">
+                    {locale === "en" ? "Status" : "Būsena"}
+                  </span>
+                  <div className="q-family-status" role="group">
+                    <label
+                      className={
+                        living ? "q-family-check on" : "q-family-check"
+                      }
+                    >
+                      <input
+                        type="checkbox"
+                        disabled={readOnly}
+                        checked={living}
+                        onChange={() =>
+                          updateMember(m.id, {
+                            vitalStatus: "Living",
+                            deathYear: null,
+                          })
+                        }
+                      />
+                      <span className="q-family-check-mark" aria-hidden="true">
+                        {living ? "✓" : ""}
+                      </span>
+                      <span>{locale === "en" ? "Living" : "Gyvas"}</span>
+                    </label>
+                    <label
+                      className={
+                        deceased ? "q-family-check on" : "q-family-check"
+                      }
+                    >
+                      <input
+                        type="checkbox"
+                        disabled={readOnly}
+                        checked={deceased}
+                        onChange={() =>
+                          updateMember(m.id, {
+                            vitalStatus: "Deceased",
+                            deathYear: m.deathYear ?? null,
+                          })
+                        }
+                      />
+                      <span className="q-family-check-mark" aria-hidden="true">
+                        {deceased ? "✓" : ""}
+                      </span>
+                      <span>{locale === "en" ? "Deceased" : "Miręs"}</span>
+                    </label>
+                  </div>
+                </div>
+
+                {deceased ? (
+                  <label className="q-family-field">
+                    <span className="q-family-field-label">
+                      {locale === "en" ? "Year of death" : "Mirties metai"}
+                    </span>
+                    <input
+                      disabled={readOnly}
+                      type="number"
+                      min={Number(m.birthYear) || 1850}
+                      max={thisYear}
+                      placeholder={locale === "en" ? "e.g. 2018" : "pvz. 2018"}
+                      value={m.deathYear == null ? "" : String(m.deathYear)}
+                      onChange={(e) =>
+                        updateMember(m.id, {
+                          deathYear:
+                            e.target.value === ""
+                              ? null
+                              : Number(e.target.value),
+                        })
+                      }
+                    />
+                  </label>
+                ) : null}
+
+                <div className="q-family-field">
+                  <span className="q-family-field-label">
+                    {deceased
+                      ? locale === "en"
+                        ? "Age at death"
+                        : "Amžius mirties metu"
+                      : locale === "en"
+                        ? "Current age"
+                        : "Dabartinis amžius"}
+                  </span>
+                  <b className="q-family-age">{age != null ? age : "—"}</b>
+                </div>
+              </div>
+
+              <div className="q-family-field q-family-diseases">
+                <span className="q-family-field-label">
+                  {locale === "en" ? "Known diseases" : "Žinomos ligos"}
+                </span>
+                <MultiSelect
+                  disabled={readOnly}
+                  value={m.conditions}
+                  options={[]}
+                  grouped={famList || null}
+                  locale={locale}
+                  onChange={(next) =>
+                    updateMember(m.id, { conditions: next })
+                  }
+                />
+              </div>
+            </article>
+          );
+        })}
+      </div>
     </div>
   );
 }

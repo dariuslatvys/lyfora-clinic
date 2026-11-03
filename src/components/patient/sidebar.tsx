@@ -12,7 +12,6 @@ const items = [
   { href: "/patient/health-card", key: "healthCard" as const, icon: "card" },
   { href: "/patient/labs", key: "labs" as const, icon: "flask" },
   { href: "/patient/dna", key: "myDna" as const, icon: "dna" },
-  { href: "/patient/death-clock", key: "deathClock" as const, icon: "clock" },
   { href: "/patient/consultations", key: "consultations" as const, icon: "consult" },
   { href: "/patient/visits", key: "visits" as const, icon: "cal" },
   { href: "/patient/referrals", key: "referrals" as const, icon: "send" },

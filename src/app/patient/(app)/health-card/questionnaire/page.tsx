@@ -53,6 +53,7 @@ export default async function QuestionnairePage({
   return (
     <QuestionnaireForm
       locale={locale}
+      patientId={current.patient.id}
       initialDefinition={def}
       initialAnswers={answers}
       initialStep={initialStep}

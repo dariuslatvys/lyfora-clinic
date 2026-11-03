@@ -3721,28 +3721,189 @@ a.hc-kpi.clickable:hover {
 }
 
 .q-family-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
   padding-top: 4px;
-  border-top: 1px solid var(--line);
-  margin-top: 4px;
 }
 
-.q-family-section:first-of-type {
-  border-top: 0;
-  margin-top: 0;
-  padding-top: 0;
+.q-family-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: nowrap;
+}
+
+.q-family-head-copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.q-family-add {
+  flex: 0 0 auto;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.q-family-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.q-family-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface-raised, var(--surface-2));
+}
+
+.q-family-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: nowrap;
+}
+
+.q-family-card-head b {
+  font-family: var(--font-display), Manrope, sans-serif;
+  font-size: 1.02rem;
+  font-weight: 700;
+}
+
+.q-family-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 14px;
+}
+
+.q-family-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.q-family-field-span2 {
+  grid-column: 1 / -1;
+}
+
+.q-family-field-label {
+  font-size: 0.78rem;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+}
+
+.q-family-field input,
+.q-family-field select,
+.q-family-diseases .q-control {
+  width: 100%;
+}
+
+.q-family-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.q-family-check {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 12px 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  cursor: pointer;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  user-select: none;
+}
+
+.q-family-check input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 1px;
+  height: 1px;
+}
+
+.q-family-check-mark {
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  border: 1.5px solid var(--line-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  line-height: 1;
+  color: var(--accent-ink, #062);
+  background: transparent;
+  flex: 0 0 auto;
+}
+
+.q-family-check.on {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--line));
+  background: color-mix(in srgb, var(--accent-soft) 70%, var(--surface));
+  color: var(--ink);
+}
+
+.q-family-check.on .q-family-check-mark {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 22%, white);
+}
+
+.q-family-diseases {
+  border-top: 1px solid color-mix(in srgb, var(--line) 80%, transparent);
+  margin-top: 2px;
+  padding-top: 12px;
 }
 
 .q-family-age {
   display: inline-flex;
   align-items: center;
-  min-height: 40px;
-  padding: 0 12px;
+  justify-content: flex-start;
+  min-height: 42px;
+  padding: 0 14px;
   border-radius: 10px;
   border: 1px solid var(--line);
-  background: color-mix(in srgb, var(--accent) 10%, var(--surface-raised));
-  font-size: 1.05rem;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  font-size: 1.08rem;
   font-weight: 700;
   color: var(--ink);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 720px) {
+  .q-family-head {
+    flex-wrap: wrap;
+  }
+
+  .q-family-add {
+    margin-left: 0;
+    margin-right: 0;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .q-family-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .q-family-field-span2 {
+    grid-column: auto;
+  }
 }
 
 .q-field {

@@ -1765,18 +1765,19 @@ a.who.on {
   gap: 10px;
   padding: 22px;
   border-radius: 18px;
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(15, 31, 27, 0.12);
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(10px);
   box-shadow: var(--shadow);
   transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
   text-decoration: none;
-  color: inherit;
+  /* Light cards on landing — dark text (global --ink is for dark UI) */
+  color: #0f1f1b;
 }
 
 .env-card:hover {
   transform: translateY(-3px);
-  border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
+  border-color: color-mix(in srgb, var(--accent) 45%, rgba(15, 31, 27, 0.18));
   box-shadow: 0 12px 28px rgba(15, 31, 27, 0.1);
 }
 
@@ -1786,15 +1787,15 @@ a.who.on {
   border-radius: 12px;
   display: grid;
   place-items: center;
-  background: var(--accent-soft);
-  color: var(--accent);
+  background: #173a32;
+  color: #5cc9a7;
 }
 
 .env-card .eyebrow {
   font-size: 0.72rem;
   letter-spacing: 0.09em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: #5a6f68;
   font-weight: 600;
 }
 
@@ -1802,11 +1803,11 @@ a.who.on {
   font-family: var(--font-display), Manrope, sans-serif;
   font-size: 1.35rem;
   font-weight: 650;
-  color: var(--ink);
+  color: #0f1f1b;
 }
 
 .env-card p {
-  color: var(--muted);
+  color: #4a5f58;
   font-size: 0.95rem;
   line-height: 1.5;
   flex: 1;

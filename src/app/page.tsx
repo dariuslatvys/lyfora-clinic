@@ -59,8 +59,8 @@ export default function HomePage() {
             <span className="eyebrow">Specialistams</span>
             <h2>Gydytojo darbo vieta</h2>
             <p>
-              Pacientų apžvalga, skaitmeninis dvynys ir rami klinikos darbo
-              erdvė.
+              Tai gydytojo darbo vieta: pacientų apžvalga, skaitmeninis dvynys
+              ir rami klinikos erdvė.
             </p>
             <span className="env-cta">Prisijungti</span>
           </Link>

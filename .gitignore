@@ -43,6 +43,7 @@ next-env.d.ts
 # local database
 /data/db/*.sqlite
 /data/db/*.sqlite-*
+/data/db/.session-secret
 
 # patient-uploaded files (local /tmp on Vercel)
 /data/uploads/

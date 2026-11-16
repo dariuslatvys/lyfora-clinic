@@ -4,17 +4,13 @@ import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
 import { ensureSchema, getDb } from "@/lib/db";
 import { users, patients } from "@/lib/db/schema";
+import { sessionSigningSecret } from "@/lib/auth/secrets";
 
 export const sessionCookieName = "lyfora_session";
 const TTL_MS = 1000 * 60 * 60 * 24 * 14;
 
-/** Demo-safe secret; override with SESSION_SECRET in production if desired. */
 function secret() {
-  return (
-    process.env.SESSION_SECRET ||
-    process.env.LYFORA_SESSION_SECRET ||
-    "lyfora-demo-session-v1"
-  );
+  return sessionSigningSecret();
 }
 
 function sign(payload: string) {

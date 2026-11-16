@@ -23,28 +23,35 @@ UI niekur nerodo tikrų asmenų. Demo pacientai:
 - Sveikatos kategorijų spalvos pagal žymenis + SNP rizikos matricą + NGS (pvz. MYBPC3, MSH2)
 - Gydytojo pacientų santrauka
 
-## Demo prisijungimai
+## Demo prisijungimai (tik lokalus seed)
 
-| Rolė | El. paštas | Slaptažodis |
-|------|------------|-------------|
-| Pacientas (vyras) | `pacientas@lyfora.lt` | `lyfora2026` |
-| Pacientė (moteris) | `paciente@lyfora.lt` | `lyfora2026` |
-| Gydytojas | `gydytojas@lyfora.lt` | `lyfora2026` |
+Po `DEMO_PASSWORD=… npm run db:seed` galima jungtis kaip:
+
+| Rolė | El. paštas |
+|------|------------|
+| Pacientas (vyras) | `pacientas@lyfora.lt` |
+| Pacientė (moteris) | `paciente@lyfora.lt` |
+| Gydytojas | `gydytojas@lyfora.lt` |
+
+Slaptažodis — tik tas, kurį pateikėte `DEMO_PASSWORD`. Į repo įtrauktame `data/demo/lyfora.sqlite` nėra žinomų prisijungimo slaptažodžių.
 
 ## Paleidimas
 
 ```bash
 npm install
-npm run db:seed
+DEMO_PASSWORD='your-local-password' npm run db:seed
+export SESSION_SECRET="$(openssl rand -base64 48)"
 npm run dev -- -p 43123 -H 127.0.0.1
 ```
+
+Lokalioje aplinkoje be `SESSION_SECRET` raktas generuojamas į `data/db/.session-secret` (gitignored). Publikuotoje aplinkoje privalomas `SESSION_SECRET`.
 
 Atidarykite [http://127.0.0.1:43123](http://127.0.0.1:43123).
 
 ## Viešas demo (Vercel free)
 
 Prototipui pakanka nemokamo `*.vercel.app` adreso. SQLite demo DB yra
-`data/demo/lyfora.sqlite` (Vercel’e kopijuojama į `/tmp`).
+`data/demo/lyfora.sqlite` (Vercel’e kopijuojama į `/tmp`). Nustatykite `SESSION_SECRET` (ir, jei reikia prisijungti, `DEMO_PASSWORD` prieš seed).
 
 ### Jūsų žingsniai
 
@@ -55,9 +62,8 @@ Prototipui pakanka nemokamo `*.vercel.app` adreso. SQLite demo DB yra
    git push -u github main
    ```
 3. Eikite į [vercel.com/new](https://vercel.com/new) (tas pats account, kur `avocadotech.eu`).
-4. **Import** tą GitHub repo → Framework: Next.js → **Deploy** (be env vars).
+4. **Import** tą GitHub repo → Framework: Next.js → pridėkite env `SESSION_SECRET` → **Deploy**.
 5. Po 1–2 min gausite `https://lyfora-clinic-….vercel.app` — tuo dalinkitės.
-6. Demo loginai: `pacientas@lyfora.lt` / `lyfora2026`.
 
 Pastaba: serverless cold start’e sesijos /tmp DB gali „atsinaujinti“ — demo’ui to užtenka.
 

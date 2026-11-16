@@ -221,7 +221,13 @@ async function main() {
   const rareFemale = readJson<RareFile>("vcf_rare_mutations_female.json");
   const rareMale = readJson<RareFile>("vcf_rare_mutations_male.json");
 
-  const hash = bcrypt.hashSync("lyfora2026", 10);
+  const demoPassword = process.env.DEMO_PASSWORD?.trim();
+  if (!demoPassword) {
+    throw new Error(
+      "Set DEMO_PASSWORD before seeding (e.g. DEMO_PASSWORD='…' npm run db:seed)"
+    );
+  }
+  const hash = bcrypt.hashSync(demoPassword, 10);
   const now = new Date().toISOString();
 
   const patientUserId = "user_patient_male";
@@ -896,7 +902,9 @@ async function main() {
   console.log("  male microarray genotypes:", maleGeno.genotypes.length);
   console.log("  female microarray genotypes:", femaleGeno.genotypes.length);
   console.log("  male rare:", rareMale.variants.length, "female rare:", rareFemale.variants.length);
-  console.log("  logins: pacientas@lyfora.lt / paciente@lyfora.lt / gydytojas@lyfora.lt  pass: lyfora2026");
+  console.log(
+    "  logins: pacientas@lyfora.lt / paciente@lyfora.lt / gydytojas@lyfora.lt (password from DEMO_PASSWORD)"
+  );
 }
 
 main().catch((err) => {

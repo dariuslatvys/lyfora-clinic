@@ -44,12 +44,21 @@ export async function GET(
     return NextResponse.json({ error: "missing_file" }, { status: 404 });
   }
   const buf = fs.readFileSync(full);
+  const rawType = (row.mimeType || "").toLowerCase();
+  const safeInline =
+    rawType.startsWith("image/") ||
+    rawType === "application/pdf" ||
+    rawType.startsWith("text/plain");
+  const contentType = safeInline
+    ? rawType
+    : "application/octet-stream";
   return new NextResponse(buf, {
     headers: {
-      "Content-Type": row.mimeType || "application/octet-stream",
-      "Content-Disposition": `inline; filename="${encodeURIComponent(
-        row.originalName
-      )}"`,
+      "Content-Type": contentType,
+      "X-Content-Type-Options": "nosniff",
+      "Content-Disposition": `${
+        safeInline ? "inline" : "attachment"
+      }; filename="${encodeURIComponent(row.originalName)}"`,
       "Content-Length": String(buf.length),
       "Cache-Control": "private, max-age=60",
     },

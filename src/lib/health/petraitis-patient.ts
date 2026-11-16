@@ -1,4 +1,5 @@
 import bcrypt from "bcryptjs";
+import { randomUUID } from "crypto";
 import { eq } from "drizzle-orm";
 import { ensureSchema, getDb, getSqlite } from "@/lib/db";
 import { patients, users } from "@/lib/db/schema";
@@ -60,7 +61,11 @@ export function ensurePetraitisPatient() {
     .where(eq(patients.id, PETRAITIS_ID))
     .get();
   if (!existing) {
-    const hash = bcrypt.hashSync("lyfora2026", 10);
+    const seedPassword =
+      process.env.DEMO_PASSWORD?.trim() ||
+      // Unusable until local seed sets DEMO_PASSWORD — never a fixed shipped secret.
+      `locked-${randomUUID()}`;
+    const hash = bcrypt.hashSync(seedPassword, 10);
     const now = new Date().toISOString();
     const userExists = db
       .select()

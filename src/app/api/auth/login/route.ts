@@ -5,8 +5,22 @@ import {
   buildSessionToken,
   sessionCookieOptions,
 } from "@/lib/auth/session";
+import { checkLoginRateLimit } from "@/lib/auth/login-rate-limit";
 
 export async function POST(req: Request) {
+  const limited = checkLoginRateLimit(req);
+  if (!limited.ok) {
+    return NextResponse.json(
+      { error: "rate_limited" },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(limited.retryAfterSec || 60),
+        },
+      }
+    );
+  }
+
   const body = await req.json();
   const email = String(body.email || "");
   const password = String(body.password || "");

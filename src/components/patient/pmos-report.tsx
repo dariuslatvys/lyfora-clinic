@@ -1,7 +1,23 @@
 import Link from "next/link";
-import type { PmosReport } from "@/lib/health/reproductive-phenotypes";
+import type {
+  AssessmentItem,
+  PmosReport,
+} from "@/lib/health/reproductive-phenotypes";
 
-const OUTCOME_RANK = { triggered: 0, deferred: 1, cleared: 2 } as const;
+function AssessmentCard({
+  item,
+  locale,
+}: {
+  item: AssessmentItem;
+  locale: "lt" | "en";
+}) {
+  return (
+    <article className={`pmos-assess-card is-${item.kind}`}>
+      <h4>{locale === "en" ? item.titleEn : item.titleLt}</h4>
+      <p>{locale === "en" ? item.detailEn : item.detailLt}</p>
+    </article>
+  );
+}
 
 export function PmosReportView({
   locale,
@@ -13,12 +29,10 @@ export function PmosReportView({
   const story =
     locale === "en" ? report.patientStoryEn : report.patientStoryLt;
   const paragraphs = story.split(/\n\n+/).filter(Boolean);
-
-  const checks = [...report.ruledOut].sort(
-    (a, b) => OUTCOME_RANK[a.outcome] - OUTCOME_RANK[b.outcome]
+  const present = report.assessment.filter(
+    (a) => a.kind === "present" || a.kind === "watch"
   );
-  const fired = report.rules.filter((r) => r.state === "fired");
-  const quiet = report.rules.filter((r) => r.state === "not_fired");
+  const ruledOut = report.assessment.filter((a) => a.kind === "ruled_out");
 
   return (
     <div className="pmos-report stack" style={{ gap: 16 }}>
@@ -30,13 +44,23 @@ export function PmosReportView({
           {locale === "en" ? report.headlineEn : report.headlineLt}
         </h2>
         <p className="pmos-aka">
-          {locale === "en"
-            ? "Formerly PKS / PCOS — polycystic ovary syndrome."
-            : "Anksčiau vadintas PKS — policistinių kiaušidžių sindromu."}
+          {locale === "en" ? (
+            <>
+              <span>PMOS</span> — {report.pmosExpandEn}.{" "}
+              <span>PKS</span> — {report.pksExpandLt}.
+            </>
+          ) : (
+            <>
+              <span>PMOS</span> — {report.pmosExpandEn}.{" "}
+              <span>PKS</span> — {report.pksExpandLt}.
+            </>
+          )}
         </p>
         <div className="pmos-story">
           {paragraphs.map((p, i) => (
-            <p key={i}>{p}</p>
+            <p key={i} className={i === 0 ? "pmos-story-lead" : undefined}>
+              {p}
+            </p>
           ))}
         </div>
         <p className="pmos-next">
@@ -49,120 +73,72 @@ export function PmosReportView({
 
       <section className="panel pmos-section">
         <h3>
-          {locale === "en"
-            ? "What the system calculated"
-            : "Ką apskaičiavo sistema"}
+          {locale === "en" ? "Calculation algorithm" : "Apskaičiavimo algoritmas"}
         </h3>
         <p className="pmos-section-lead">
           {locale === "en"
-            ? "Concrete numbers from your period dates, questionnaire and basic blood panel."
-            : "Konkretūs skaičiai iš Jūsų mėnesinių datų, klausimyno ir bazinio kraujo tyrimo."}
+            ? "What the system derived from your period dates, questionnaire and basic blood panel."
+            : "Ką sistema išvedė iš Jūsų mėnesinių datų, klausimyno ir bazinio kraujo tyrimo."}
         </p>
-        <div className="pmos-calc-list">
-          {report.calculated.map((row) => (
-            <article key={row.labelLt} className="pmos-calc-card">
-              <h4>{locale === "en" ? row.labelEn : row.labelLt}</h4>
-              <p className="pmos-from">
-                <span>{locale === "en" ? "From" : "Iš ko"}:</span>{" "}
-                {locale === "en" ? row.fromEn : row.fromLt}
-              </p>
-              <p className="pmos-result">
-                {locale === "en" ? row.resultEn : row.resultLt}
-              </p>
-            </article>
-          ))}
+        <div className="pmos-calc-table-wrap">
+          <table className="pmos-calc-table">
+            <thead>
+              <tr>
+                <th>{locale === "en" ? "What" : "Kas"}</th>
+                <th>{locale === "en" ? "From" : "Iš ko"}</th>
+                <th>{locale === "en" ? "Result" : "Rezultatas"}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {report.calculated.map((row) => (
+                <tr key={row.labelLt}>
+                  <td>{locale === "en" ? row.labelEn : row.labelLt}</td>
+                  <td>{locale === "en" ? row.fromEn : row.fromLt}</td>
+                  <td>{locale === "en" ? row.resultEn : row.resultLt}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </section>
 
       <section className="panel pmos-section">
         <h3>
-          {locale === "en"
-            ? "What was checked for PMOS"
-            : "Kas tikrinta dėl PMOS"}
+          {locale === "en" ? "Signs and ruled-out conditions" : "Požymiai ir atmestos būklės"}
         </h3>
         <p className="pmos-section-lead">
           {locale === "en"
-            ? "Risk findings first, then items still being tested, then conditions that were ruled out."
-            : "Pirma rizikingi radiniai, tada dar tikrinamos būklės, galiausiai — kas atmesta."}
+            ? "Left: signs that fit this picture. Right: conditions that do not fit your answers and tests."
+            : "Kairėje — požymiai, kurie dera su šiuo paveikslu. Dešinėje — būklės, kurios pagal atsakymus ir tyrimus neatitinka."}
         </p>
-        <ol className="pmos-ruled-list">
-          {checks.map((step, i) => (
-            <li
-              key={step.step}
-              className={`pmos-ruled-item pmos-outcome-${step.outcome}`}
-            >
-              <div className="pmos-ruled-num" aria-hidden="true">
-                {i + 1}
-              </div>
-              <div className="pmos-ruled-body">
-                <div className="pmos-ruled-top">
-                  <h4>{locale === "en" ? step.titleEn : step.titleLt}</h4>
-                  <span className="pmos-outcome-pill">
-                    {step.outcome === "triggered"
-                      ? locale === "en"
-                        ? "Risk signal"
-                        : "Rizikos signalas"
-                      : step.outcome === "deferred"
-                        ? locale === "en"
-                          ? "Still testing"
-                          : "Tikrinama toliau"
-                        : locale === "en"
-                          ? "Ruled out"
-                          : "Atmesta"}
-                  </span>
-                </div>
-                <p className="pmos-from">
-                  <span>{locale === "en" ? "Check" : "Patikra"}:</span>{" "}
-                  {locale === "en" ? step.checkEn : step.checkLt}
-                </p>
-                <p className="pmos-result">
-                  {locale === "en" ? step.verdictEn : step.verdictLt}
-                </p>
-              </div>
-            </li>
-          ))}
-        </ol>
-      </section>
-
-      <section className="panel pmos-section">
-        <h3>
-          {locale === "en" ? "Rules" : "Taisyklės"}
-        </h3>
-        <div className="pmos-rules-split">
-          <div className="pmos-rules-col">
-            <h4 className="pmos-rules-col-title is-fired">
-              {locale === "en" ? "Fired" : "Suveikusios"}
-              <span>{fired.length}</span>
+        <div className="pmos-assess-split">
+          <div className="pmos-assess-col">
+            <h4 className="pmos-assess-col-title is-present">
+              {locale === "en" ? "Present signs" : "Esami požymiai"}
+              <span>{present.length}</span>
             </h4>
-            <div className="pmos-rules-list">
-              {fired.map((rule) => (
-                <article key={rule.titleLt} className="pmos-rule-card is-fired">
-                  <h4>{locale === "en" ? rule.titleEn : rule.titleLt}</h4>
-                  {rule.strengthLt ? (
-                    <p className="pmos-strength">
-                      {locale === "en" ? rule.strengthEn : rule.strengthLt}
-                    </p>
-                  ) : null}
-                  <p className="pmos-result">
-                    {locale === "en" ? rule.resultEn : rule.resultLt}
-                  </p>
-                </article>
+            <div className="pmos-assess-list">
+              {present.map((item) => (
+                <AssessmentCard
+                  key={item.titleLt}
+                  item={item}
+                  locale={locale}
+                />
               ))}
             </div>
           </div>
-          <div className="pmos-rules-col">
-            <h4 className="pmos-rules-col-title is-quiet">
-              {locale === "en" ? "Did not fire" : "Nesuveikusios"}
-              <span>{quiet.length}</span>
+          <div className="pmos-assess-col">
+            <h4 className="pmos-assess-col-title is-ruled">
+              {locale === "en" ? "Ruled out" : "Atmesta"}
+              <span>{ruledOut.length}</span>
             </h4>
-            <div className="pmos-rules-list">
-              {quiet.map((rule) => (
-                <article key={rule.titleLt} className="pmos-rule-card is-quiet">
-                  <h4>{locale === "en" ? rule.titleEn : rule.titleLt}</h4>
-                  <p className="pmos-result">
-                    {locale === "en" ? rule.resultEn : rule.resultLt}
-                  </p>
-                </article>
+            <div className="pmos-assess-list">
+              {ruledOut.map((item) => (
+                <AssessmentCard
+                  key={item.titleLt}
+                  item={item}
+                  locale={locale}
+                />
               ))}
             </div>
           </div>

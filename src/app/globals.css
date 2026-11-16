@@ -3434,8 +3434,13 @@ a.integ-metric.clickable:hover {
 .pmos-aka {
   margin: 0 0 12px;
   font-size: 0.84rem;
-  line-height: 1.4;
+  line-height: 1.45;
   color: var(--muted);
+}
+
+.pmos-aka span {
+  font-weight: 650;
+  color: var(--ink-soft);
 }
 
 .pmos-story {
@@ -3452,6 +3457,11 @@ a.integ-metric.clickable:hover {
   font-size: 0.95rem;
   line-height: 1.55;
   color: var(--ink-soft);
+}
+
+.pmos-story-lead {
+  font-weight: 650;
+  color: var(--ink) !important;
 }
 
 .pmos-next {
@@ -3480,20 +3490,66 @@ a.integ-metric.clickable:hover {
 }
 
 .pmos-calc-list,
-.pmos-rules-list,
+.pmos-assess-list,
 .pmos-tests-list {
   display: grid;
   gap: 10px;
 }
 
-.pmos-rules-split {
+.pmos-calc-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface-2) 70%, transparent);
+}
+
+.pmos-calc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.pmos-calc-table th,
+.pmos-calc-table td {
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+}
+
+.pmos-calc-table th {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: color-mix(in srgb, var(--surface-raised) 80%, transparent);
+}
+
+.pmos-calc-table tr:last-child td {
+  border-bottom: none;
+}
+
+.pmos-calc-table td:first-child {
+  font-weight: 650;
+  color: var(--ink);
+  min-width: 9rem;
+}
+
+.pmos-calc-table td:nth-child(2) {
+  color: var(--muted);
+  min-width: 8rem;
+}
+
+.pmos-assess-split {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px;
   align-items: start;
 }
 
-.pmos-rules-col-title {
+.pmos-assess-col-title {
   margin: 0 0 10px;
   display: flex;
   align-items: center;
@@ -3504,7 +3560,7 @@ a.integ-metric.clickable:hover {
   font-weight: 700;
 }
 
-.pmos-rules-col-title span {
+.pmos-assess-col-title span {
   display: inline-flex;
   min-width: 1.5rem;
   justify-content: center;
@@ -3515,13 +3571,17 @@ a.integ-metric.clickable:hover {
   color: var(--ink-soft);
 }
 
-.pmos-rules-col-title.is-fired {
+.pmos-assess-col-title.is-present {
   color: var(--r-orange);
 }
 
-.pmos-rules-col-title.is-fired span {
+.pmos-assess-col-title.is-present span {
   background: color-mix(in srgb, var(--r-orange) 22%, var(--surface));
   color: var(--r-orange);
+}
+
+.pmos-assess-col-title.is-ruled {
+  color: var(--ink-soft);
 }
 
 .pmos-test-actions,
@@ -3539,7 +3599,7 @@ a.integ-metric.clickable:hover {
 }
 
 .pmos-calc-card,
-.pmos-rule-card,
+.pmos-assess-card,
 .pmos-test-card {
   padding: 12px 14px;
   border-radius: 12px;
@@ -3548,109 +3608,32 @@ a.integ-metric.clickable:hover {
 }
 
 .pmos-calc-card h4,
-.pmos-rule-card h4,
-.pmos-test-card h4,
-.pmos-ruled-body h4 {
+.pmos-assess-card h4,
+.pmos-test-card h4 {
   margin: 0 0 6px;
   font-family: var(--font-display), Manrope, sans-serif;
   font-size: 0.95rem;
   font-weight: 700;
 }
 
-.pmos-from {
-  margin: 0 0 6px;
-  font-size: 0.78rem;
-  color: var(--muted);
-  line-height: 1.4;
-}
-
-.pmos-from span {
-  font-weight: 650;
-}
-
-.pmos-result {
+.pmos-assess-card p {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   line-height: 1.45;
-  color: var(--ink);
-}
-
-.pmos-ruled-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 10px;
-}
-
-.pmos-ruled-item {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 12px;
-  padding: 12px 14px;
-  border-radius: 12px;
-  border: 1px solid var(--line);
-  background: color-mix(in srgb, var(--surface-2) 70%, transparent);
-}
-
-.pmos-ruled-num {
-  width: 28px;
-  height: 28px;
-  border-radius: 999px;
-  display: grid;
-  place-items: center;
-  font-size: 0.78rem;
-  font-weight: 700;
-  background: var(--surface-raised);
-  color: var(--ink);
-}
-
-.pmos-outcome-triggered {
-  border-color: color-mix(in srgb, var(--r-orange) 50%, var(--line));
-  background: color-mix(in srgb, var(--r-orange-bg) 55%, var(--surface));
-}
-
-.pmos-outcome-triggered .pmos-ruled-num {
-  background: color-mix(in srgb, var(--r-orange) 28%, var(--surface));
-  color: var(--r-orange);
-}
-
-.pmos-ruled-top {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 4px;
-}
-
-.pmos-outcome-pill {
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 8px;
-  border-radius: 999px;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  background: var(--surface-raised);
   color: var(--ink-soft);
 }
 
-.pmos-outcome-triggered .pmos-outcome-pill,
-.pmos-rule-card.is-fired .pmos-outcome-pill {
-  background: color-mix(in srgb, var(--r-orange) 22%, var(--surface));
-  color: var(--r-orange);
+.pmos-assess-card.is-present {
+  border-color: color-mix(in srgb, var(--r-orange) 42%, var(--line));
+  background: color-mix(in srgb, var(--r-orange-bg) 45%, var(--surface));
 }
 
-.pmos-rule-card.is-quiet {
-  opacity: 0.88;
+.pmos-assess-card.is-watch {
+  border-color: color-mix(in srgb, var(--r-amber, #c4a35a) 40%, var(--line));
 }
 
-.pmos-strength {
-  margin: 0 0 6px;
-  font-size: 0.78rem;
-  font-weight: 650;
-  color: var(--r-orange);
+.pmos-assess-card.is-ruled_out {
+  opacity: 0.92;
 }
 
 .pmos-test-card p {
@@ -3672,7 +3655,7 @@ a.integ-metric.clickable:hover {
 
 @media (max-width: 820px) {
   .repro-pheno-grid,
-  .pmos-rules-split {
+  .pmos-assess-split {
     grid-template-columns: 1fr;
   }
 }

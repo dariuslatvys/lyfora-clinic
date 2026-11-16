@@ -164,25 +164,12 @@ export type CalcRow = {
   resultEn: string;
 };
 
-export type RuledOutStep = {
-  step: number;
+export type AssessmentItem = {
   titleLt: string;
   titleEn: string;
-  checkLt: string;
-  checkEn: string;
-  verdictLt: string;
-  verdictEn: string;
-  outcome: "cleared" | "deferred" | "triggered";
-};
-
-export type RuleRow = {
-  titleLt: string;
-  titleEn: string;
-  state: "fired" | "not_fired";
-  strengthLt?: string;
-  strengthEn?: string;
-  resultLt: string;
-  resultEn: string;
+  detailLt: string;
+  detailEn: string;
+  kind: "present" | "ruled_out" | "watch";
 };
 
 export type TargetTest = {
@@ -199,6 +186,10 @@ export type TargetTest = {
 export type PmosReport = {
   headlineLt: string;
   headlineEn: string;
+  /** English expansion of PMOS */
+  pmosExpandEn: string;
+  /** Lithuanian expansion of PKS */
+  pksExpandLt: string;
   patientStoryLt: string;
   patientStoryEn: string;
   disclaimerLt: string;
@@ -206,8 +197,8 @@ export type PmosReport = {
   nextStepsLt: string;
   nextStepsEn: string;
   calculated: CalcRow[];
-  ruledOut: RuledOutStep[];
-  rules: RuleRow[];
+  /** Combined assessment: present signs (left) vs ruled out / absent (right). */
+  assessment: AssessmentItem[];
   tests: TargetTest[];
   noteLt: string;
   noteEn: string;
@@ -215,192 +206,168 @@ export type PmosReport = {
 
 /** Patient-facing PMOS report from the PKS sample case (Rasa), sections 3–7 style. */
 export const DEMO_PMOS_REPORT: PmosReport = {
-  headlineLt:
-    "Verta pasitikrinti dėl PMOS (policistinių kiaušidžių metabolinio–ovuliacijos sindromo)",
-  headlineEn:
-    "Worth checking for PMOS (polycystic ovary metabolic–ovulatory syndrome)",
+  headlineLt: "Verta pasitikrinti dėl PMOS",
+  headlineEn: "Worth checking for PMOS",
+  pmosExpandEn: "polycystic ovary metabolic–ovulatory syndrome",
+  pksExpandLt: "policistinių kiaušidžių sindromas",
   patientStoryLt:
-    "Jūsų mėnesinės kartojasi vidutiniškai kas 57 dienas (apie 6 kartus per metus), ir tai rodo, kad ovuliacija vyksta ne kiekvieną mėnesį. Kartu yra kelių požymių, būdingų androgenų (vyriškųjų hormonų) pertekliui: plaukai ant smakro ir pilvo, aknė, retėjantys plaukai viršugalvyje. Toks derinys atitinka PMOS požymius. PMOS turi maždaug 1 iš 8 moterų, ir jis gerai valdomas.\n\nTaip pat verta atkreipti dėmesį į medžiagų apykaitą. Gliukozė, trigliceridai ir kepenų fermentas ALT šiek tiek padidėję, o gerojo cholesterolio mažiau. Kartu su tamsiomis odos dėmėmis tai rodo insulino rezistenciją, kuri dažnai lydi PMOS ir yra pagrindinis veiksnys, kurį galima keisti.",
+    "Verta pasitikrinti dėl policistinių kiaušidžių sindromo (PKS)\n\nJūsų mėnesinės kartojasi vidutiniškai kas 57 dienas (apie 6 kartus per metus), ir tai rodo, kad ovuliacija vyksta ne kiekvieną mėnesį. Kartu yra kelių požymių, būdingų androgenų (vyriškųjų hormonų) pertekliui: plaukai ant smakro ir pilvo, aknė, retėjantys plaukai viršugalvyje. Toks derinys atitinka PKS požymius. PKS turi maždaug 1 iš 8 moterų, ir jis gerai valdomas.\n\nTaip pat verta atkreipti dėmesį į medžiagų apykaitą. Gliukozė, trigliceridai ir kepenų fermentas ALT šiek tiek padidėję, o gerojo cholesterolio mažiau. Kartu su tamsiomis odos dėmėmis tai rodo insulino rezistenciją, kuri dažnai lydi PKS ir yra pagrindinis veiksnys, kurį galima keisti.",
   patientStoryEn:
-    "Your periods repeat about every 57 days (around 6 times a year), which suggests ovulation does not happen every month. Together with several signs of androgen (male hormone) excess — hair on the chin and abdomen, acne, thinning at the crown — this pattern matches PMOS. About 1 in 8 women have PMOS, and it is usually manageable.\n\nMetabolism also deserves attention. Glucose, triglycerides and the liver enzyme ALT are a little high, and HDL (“good”) cholesterol is lower. Together with dark skin patches, that points to insulin resistance, which often accompanies PMOS and is a key factor you can change.",
+    "Worth checking for polycystic ovary syndrome (PCOS)\n\nYour periods repeat about every 57 days (around 6 times a year), which suggests ovulation does not happen every month. Together with several signs of androgen (male hormone) excess — hair on the chin and abdomen, acne, thinning at the crown — this pattern matches PCOS. About 1 in 8 women have PCOS, and it is usually manageable.\n\nMetabolism also deserves attention. Glucose, triglycerides and the liver enzyme ALT are a little high, and HDL (“good”) cholesterol is lower. Together with dark skin patches, that points to insulin resistance, which often accompanies PCOS and is a key factor you can change.",
   disclaimerLt:
-    "Tai ne diagnozė. Rezultatas parodo, kokie Jūsų simptomai gali būti susiję ir ką verta aptarti su gydytoju. PMOS (policistinių kiaušidžių metabolinis–ovuliacijos sindromas; anksčiau PKS — policistinių kiaušidžių sindromas) patvirtina gydytojas, atmetęs panašias būkles.",
+    "Tai ne diagnozė. Rezultatas parodo, kokie Jūsų simptomai gali būti susiję ir ką verta aptarti su gydytoju.",
   disclaimerEn:
-    "This is not a diagnosis. The result shows how your symptoms may relate and what to discuss with a clinician. A doctor confirms PMOS (polycystic ovary metabolic–ovulatory syndrome; formerly PCOS) after ruling out similar conditions.",
+    "This is not a diagnosis. The result shows how your symptoms may relate and what to discuss with a clinician.",
   nextStepsLt:
     "Ką daryti toliau: prie to paties kraujo ėmimo siūlome atlikti testosteroną ir SHBG, 17-OH progesteroną, prolaktiną, hCG ir gliukozės toleravimo mėginį. Su rezultatais kreipkitės į šeimos gydytoją, ginekologą ar endokrinologą. Gydytojas, atmetęs kitas priežastis, gali patvirtinti diagnozę ir aptarti gydymą: mitybą, fizinį aktyvumą, ciklo reguliavimą, aknės ir plaukuotumo gydymą.",
   nextStepsEn:
-    "Next: with the same blood draw we suggest testosterone and SHBG, 17-OH progesterone, prolactin, hCG and a glucose tolerance test. Take the results to your GP, gynaecologist or endocrinologist. After ruling out other causes, they can confirm the diagnosis and discuss care: diet, activity, cycle regulation, and treatment for acne or excess hair.",
+    "Next steps: with the same blood draw we suggest testosterone and SHBG, 17-OH progesterone, prolactin, hCG and a glucose tolerance test. Take the results to your GP, gynaecologist or endocrinologist. After ruling out other causes, they can confirm the diagnosis and discuss care: diet, activity, cycle regulation, and treatment for acne or excess hair.",
   calculated: [
     {
-      labelLt: "Ciklo trukmės",
-      labelEn: "Cycle lengths",
-      fromLt: "7 mėnesinių datos iš Flo",
-      fromEn: "7 period dates from Flo",
+      labelLt: "Ciklo trukmės (6 intervalai)",
+      labelEn: "Cycle lengths (6 intervals)",
+      fromLt: "Nr. 14 datos (Flo)",
+      fromEn: "Q14 dates (Flo)",
       resultLt:
-        "Intervalai 49, 65, 47, 79, 42, 70 d. · vidurkis 59 d. · mediana 57 d. · ~6 ciklai per metus · dabartinė pertrauka 50 d.",
+        "49, 65, 47, 79, 42, 70 d.; vidurkis 59 d., mediana 57 d.; ~6 ciklai per metus; dabartinė pertrauka 50 d.",
       resultEn:
-        "Intervals 49, 65, 47, 79, 42, 70 days · mean 59 · median 57 · ~6 cycles/year · current gap 50 days",
+        "49, 65, 47, 79, 42, 70 days; mean 59, median 57; ~6 cycles/year; current gap 50 days",
     },
     {
       labelLt: "Ovuliacijos sutrikimas",
       labelEn: "Ovulation disruption",
-      fromLt: "Mediana > 35 d. arba < 8 ciklai per metus",
-      fromEn: "Median > 35 days or < 8 cycles per year",
-      resultLt: "Taip — abu kriterijai tenkinami",
-      resultEn: "Yes — both criteria are met",
+      fromLt: "Apibrėžimas: mediana > 35 d. arba < 8 ciklai per metus",
+      fromEn: "Definition: median > 35 days or < 8 cycles per year",
+      resultLt: "Taip (abu kriterijai)",
+      resultEn: "Yes (both criteria)",
     },
     {
       labelLt: "Androgenų pertekliaus požymiai",
       labelEn: "Androgen-excess signs",
-      fromLt: "Plaukuotumas, viršugalvio retėjimas, aknė",
-      fromEn: "Body hair, crown thinning, acne",
+      fromLt: "Nr. 32, 33, 35",
+      fromEn: "Q32, 33, 35",
       resultLt:
-        "3 požymiai — ryškūs: plaukai (smakras, lūpa, pilvas), viršugalvio retėjimas, suaugusiųjų aknė",
+        "3 požymiai – ryškus: plaukuotumas (smakras, lūpa, pilvas), viršugalvio retėjimas, suaugusiųjų aknė",
       resultEn:
-        "3 signs — marked: hair (chin, lip, abdomen), crown thinning, adult acne",
+        "3 signs – marked: hair growth (chin, lip, abdomen), crown thinning, adult acne",
     },
     {
       labelLt: "Insulino rezistencijos požymiai",
       labelEn: "Insulin-resistance signs",
-      fromLt: "KMI, odos dėmės ir kraujo tyrimai",
-      fromEn: "BMI, skin patches and blood tests",
+      fromLt: "Nr. 2, 35, kraujas",
+      fromEn: "Q2, 35, blood panel",
       resultLt:
-        "6 iš 6: KMI 28,3 · tamsios aksominės dėmės · gliukozė 5,7 · TG 1,9 · DTL 1,05 · ALT 41",
+        "6 iš 6: KMI 28,3, tamsios aksominės dėmės, gliukozė 5,7, TG 1,9, DTL 1,05, ALT 41",
       resultEn:
-        "6 of 6: BMI 28.3 · dark velvet patches · glucose 5.7 · TG 1.9 · HDL 1.05 · ALT 41",
+        "6 of 6: BMI 28.3, dark velvet patches, glucose 5.7, TG 1.9, HDL 1.05, ALT 41",
     },
     {
-      labelLt: "Simptomų pradžia",
-      labelEn: "Symptom onset",
-      fromLt: "Klausimyno atsakymas",
-      fromEn: "Questionnaire answer",
-      resultLt: "Nuo pirmųjų mėnesinių — būdinga PMOS",
-      resultEn: "Since first periods — typical for PMOS",
+      labelLt: "Pradžia",
+      labelEn: "Onset",
+      fromLt: "Nr. 53",
+      fromEn: "Q53",
+      resultLt: "Nuo pirmųjų mėnesinių – būdinga PKS",
+      resultEn: "Since first periods – typical for PCOS",
     },
   ],
-  ruledOut: [
+  assessment: [
     {
-      step: 1,
-      titleLt: "Raudonos vėliavos",
-      titleEn: "Red flags",
-      checkLt: "Staigus plaukuotumas, balso pokytis, spenelių išskyros, nuolatinis pūtimas",
-      checkEn: "Sudden hair growth, voice change, nipple discharge, persistent bloating",
-      verdictLt: "Nėra — plaukuotumas nuo paauglystės, ne staigus",
-      verdictEn: "None — hair growth since adolescence, not sudden",
-      outcome: "cleared",
+      kind: "present",
+      titleLt: "Ovuliacijos sutrikimas + androgenų požymiai",
+      titleEn: "Ovulation disruption + androgen signs",
+      detailLt:
+        "Stiprus derinys (≥ 2 androgenų požymiai, nuo pirmųjų mėnesinių). Atitinka PKS / PMOS signalą — verta tikslinių tyrimų.",
+      detailEn:
+        "Strong pattern (≥ 2 androgen signs since first periods). Matches a PCOS / PMOS signal — targeted tests are warranted.",
     },
     {
-      step: 2,
+      kind: "present",
+      titleLt: "Insulino rezistencijos požymiai",
+      titleEn: "Insulin-resistance signs",
+      detailLt:
+        "6 iš 6 požymių (KMI, odos dėmės, gliukozė, TG, DTL, ALT). Siūloma OGTT arba HbA1c; ALT — kepenų įvertinimas.",
+      detailEn:
+        "6 of 6 signs (BMI, skin patches, glucose, TG, HDL, ALT). Suggest OGTT or HbA1c; ALT — liver assessment.",
+    },
+    {
+      kind: "present",
+      titleLt: "Viršugalvio retėjimas su plaukuotumu ir akne",
+      titleEn: "Crown thinning with hair growth and acne",
+      detailLt: "Plaukų retėjimas siejamas su androgenais (simptomų žemėlapis).",
+      detailEn: "Hair thinning linked with androgens (symptom map).",
+    },
+    {
+      kind: "watch",
       titleLt: "Nėštumas",
       titleEn: "Pregnancy",
-      checkLt: "Dabartinė pertrauka 50 d. (< 60 d.)",
-      checkEn: "Current gap 50 days (< 60)",
-      verdictLt: "Privalomo hCG nėra; vis tiek įtraukiamas į tikslinius tyrimus",
-      verdictEn: "hCG not mandatory yet; still included in targeted tests",
-      outcome: "deferred",
+      detailLt:
+        "Dabartinė pertrauka 50 d. (< 60 d.) — privalomo hCG nėra, bet jis įtrauktas į tikslinius tyrimus.",
+      detailEn:
+        "Current gap 50 days (< 60) — hCG is not mandatory yet, but it is included in targeted tests.",
     },
     {
-      step: 3,
-      titleLt: "Prolaktinas",
-      titleEn: "Prolactin",
-      checkLt: "Pieno išsiskyrimas iš spenelių",
-      checkEn: "Nipple milk leakage",
-      verdictLt: "Signalo nėra; prolaktinas lieka tiksliniuose tyrimuose atmetimui",
-      verdictEn: "No signal; prolactin stays in targeted tests to rule it out",
-      outcome: "cleared",
+      kind: "ruled_out",
+      titleLt: "Raudonos vėliavos",
+      titleEn: "Red flags",
+      detailLt:
+        "Staigaus plaukuotumo, balso pokyčio, spenelių išskyrų ar nuolatinio pūtimo nėra — plaukuotumas nuo paauglystės.",
+      detailEn:
+        "No sudden hair growth, voice change, nipple discharge or persistent bloating — hair growth since adolescence.",
     },
     {
-      step: 4,
+      kind: "ruled_out",
+      titleLt: "Prolaktino signalas",
+      titleEn: "Prolactin signal",
+      detailLt:
+        "Pieno išsiskyrimo nėra; prolaktinas lieka tiksliniuose tyrimuose atmetimui.",
+      detailEn:
+        "No milk leakage; prolactin stays in targeted tests to exclude excess.",
+    },
+    {
+      kind: "ruled_out",
       titleLt: "Skydliaukė",
       titleEn: "Thyroid",
-      checkLt: "TSH 1,9 mIU/l (norma 0,4–4,0)",
-      checkEn: "TSH 1.9 mIU/l (range 0.4–4.0)",
-      verdictLt: "Skydliaukės priežastis mažai tikėtina (TSH normoje)",
-      verdictEn: "Thyroid cause unlikely (TSH in range)",
-      outcome: "cleared",
+      detailLt: "TSH 1,9 mIU/l — normoje, skydliaukės priežastis mažai tikėtina.",
+      detailEn: "TSH 1.9 mIU/l — in range, thyroid cause unlikely.",
     },
     {
-      step: 5,
+      kind: "ruled_out",
       titleLt: "Energijos trūkumas",
       titleEn: "Energy deficit",
-      checkLt: "KMI 28,3; intensyvaus sporto / mažo valgymo požymių nėra",
-      checkEn: "BMI 28.3; no heavy sport / under-eating signs",
-      verdictLt:
-        "Energijos trūkumo amenorėja mažai tikėtina — KMI ne žemas, sporto / mitybos raudonų vėliavų nėra",
-      verdictEn:
-        "Energy-deficit amenorrhoea unlikely — BMI is not low and there are no sport / intake red flags",
-      outcome: "cleared",
+      detailLt:
+        "KMI 28,3; intensyvaus sporto / mažo valgymo požymių nėra.",
+      detailEn:
+        "BMI 28.3; no heavy sport / under-eating signs.",
     },
     {
-      step: 6,
+      kind: "ruled_out",
       titleLt: "Priešlaikinė menopauzė / perimenopauzė",
       titleEn: "Premature menopause / perimenopause",
-      checkLt: "26 m., pertrauka < 4 mėn., karščio bangų nėra",
-      checkEn: "Age 26, gap < 4 months, no hot flushes",
-      verdictLt:
-        "Amžius ir simptomai neatitinka ankstyvos perimenopauzės ar priešlaikinės menopauzės",
-      verdictEn:
-        "Age and symptoms do not match early perimenopause or premature menopause",
-      outcome: "cleared",
+      detailLt: "26 m., pertrauka < 4 mėn., karščio bangų nėra.",
+      detailEn: "Age 26, gap < 4 months, no hot flushes.",
     },
     {
-      step: 7,
-      titleLt: "PMOS",
-      titleEn: "PMOS",
-      checkLt: "Ovuliacijos sutrikimas + ryškūs androgenų požymiai",
-      checkEn: "Ovulation disruption + marked androgen signs",
-      verdictLt: "Stiprus signalas — verta pasitikrinti tiksliniais tyrimais",
-      verdictEn: "Strong signal — worth confirming with targeted tests",
-      outcome: "triggered",
-    },
-  ],
-  rules: [
-    {
-      titleLt: "Ovuliacijos sutrikimas + androgenų požymiai, < 40 m.",
-      titleEn: "Ovulation disruption + androgen signs, under 40",
-      state: "fired",
-      strengthLt: "STIPRUS (≥ 2 androgenų požymiai, nuo pirmųjų mėnesinių)",
-      strengthEn: "STRONG (≥ 2 androgen signs, since first periods)",
-      resultLt: "PMOS signalas; siūlomi tiksliniai tyrimai",
-      resultEn: "PMOS signal; targeted tests suggested",
-    },
-    {
-      titleLt: "PMOS signalas + insulino rezistencijos požymiai",
-      titleEn: "PMOS signal + insulin-resistance signs",
-      state: "fired",
-      resultLt: "OGTT arba HbA1c; ALT → kepenų įvertinimas",
-      resultEn: "OGTT or HbA1c; ALT → liver assessment",
-    },
-    {
-      titleLt: "Viršugalvio retėjimas + plaukuotumas, aknė, nereguliarus ciklas",
-      titleEn: "Crown thinning + hair, acne, irregular cycle",
-      state: "fired",
-      strengthLt: "Simptomų žemėlapis",
-      strengthEn: "Symptom map",
-      resultLt: "Plaukų retėjimas siejamas su androgenais",
-      resultEn: "Hair thinning linked with androgens",
-    },
-    {
-      titleLt: "PMOS + pertraukos > 90 d. (gimdos gleivinės apsauga)",
-      titleEn: "PMOS + gaps > 90 days (endometrial protection)",
-      state: "not_fired",
-      resultLt: "Ilgiausia pertrauka 79 d. — stebėti; jei ilgės, aptarti su gydytoju",
-      resultEn: "Longest gap 79 days — watch; if gaps lengthen, discuss with a clinician",
-    },
-    {
+      kind: "ruled_out",
       titleLt: "Endometriozė (NICE)",
       titleEn: "Endometriosis (NICE)",
-      state: "not_fired",
-      resultLt: "0 požymių — endometriozės signalo nėra",
-      resultEn: "0 signs — no endometriosis signal",
+      detailLt: "0 požymių — endometriozės signalo nėra.",
+      detailEn: "0 signs — no endometriosis signal.",
     },
     {
+      kind: "ruled_out",
       titleLt: "Gausios mėnesinės, anemija, PMDD, depresija",
       titleEn: "Heavy periods, anaemia, PMDD, depression",
-      state: "not_fired",
-      resultLt: "Šiuo metu nesuveikė",
-      resultEn: "Did not fire this time",
+      detailLt: "Šių derinių požymių dabar nėra.",
+      detailEn: "No signs of these combinations right now.",
+    },
+    {
+      kind: "watch",
+      titleLt: "Gimdos gleivinės apsauga (> 90 d. pertraukos)",
+      titleEn: "Endometrial protection (> 90-day gaps)",
+      detailLt:
+        "Ilgiausia pertrauka 79 d. — kol kas stebėti; jei ilgės, aptarti su gydytoju.",
+      detailEn:
+        "Longest gap 79 days — watch for now; if gaps lengthen, discuss with a clinician.",
     },
   ],
   tests: [

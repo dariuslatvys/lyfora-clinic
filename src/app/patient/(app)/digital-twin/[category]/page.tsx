@@ -164,8 +164,8 @@ export default async function CategoryDetailPage({
               : "SNP rezultatai, kurie gali keisti vaistų poveikį. Paspauskite geną — pamatysite paaiškinimą paprasta kalba."
             : cat.id === "reproductive"
               ? locale === "en"
-                ? "This area covers your cycle, hormones, fertility and four key phenotypes (PMOS, endometriosis, early perimenopause, menopause). Signals come from the women’s questionnaire, lab results and genetics (SNPs below). Open a phenotype for a plain-language explanation and your personal result."
-                : "Ši sritis apima ciklą, hormonus, vaisingumą ir keturis pagrindinius fenotipus (PMOS, endometriozę, ankstyvą perimenopauzę, menopauzę). Duomenys imami iš moters klausimyno, laboratorinių tyrimų ir genetikos (SNP — žemiau). Atidarykite fenotipą: paprasta kalba ir Jūsų asmeninis signalas."
+                ? "This area covers your cycle, hormones, fertility and four key phenotypes (PMOS, endometriosis, early perimenopause, menopause). Signals come from the women’s questionnaire, lab results and genetics (SNPs below)."
+                : "Ši sritis apima ciklą, hormonus, vaisingumą ir keturis pagrindinius fenotipus (PMOS, endometriozę, ankstyvą perimenopauzę, menopauzę). Duomenys imami iš moters klausimyno, laboratorinių tyrimų ir genetikos (SNP — žemiau)."
               : cat.summary}
         </p>
       </section>

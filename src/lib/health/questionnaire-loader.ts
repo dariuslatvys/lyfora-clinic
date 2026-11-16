@@ -1,18 +1,35 @@
 "use server";
 import fs from "fs";
 import path from "path";
-import type { QDefinition } from "./questionnaire";
+import type { QDefinition, QuestionnaireKind } from "./questionnaire";
 
-let _def: QDefinition | null = null;
+export type WomenQDefinition = QDefinition & {
+  titleLt?: string;
+  titleEn?: string;
+  introLt?: string;
+  introEn?: string;
+};
 
-export async function loadQuestionnaireDefinition(): Promise<QDefinition> {
-  if (_def) return _def;
-  const p = path.join(
+const cache: Partial<Record<QuestionnaireKind, WomenQDefinition>> = {};
+
+function definitionPath(kind: QuestionnaireKind) {
+  return path.join(
     process.cwd(),
     "data",
     "parsed",
-    "health_questionnaire.json"
+    kind === "women"
+      ? "women_hormone_questionnaire.json"
+      : "health_questionnaire.json"
   );
-  _def = JSON.parse(fs.readFileSync(p, "utf8")) as QDefinition;
-  return _def;
+}
+
+export async function loadQuestionnaireDefinition(
+  kind: QuestionnaireKind = "general"
+): Promise<WomenQDefinition> {
+  const hit = cache[kind];
+  if (hit) return hit;
+  const raw = fs.readFileSync(definitionPath(kind), "utf8");
+  const def = JSON.parse(raw) as WomenQDefinition;
+  cache[kind] = def;
+  return def;
 }

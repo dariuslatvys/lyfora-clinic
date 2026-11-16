@@ -10,9 +10,12 @@ import {
   conditionsForSex,
   fieldLabel,
   optionLabel,
+  questionnaireLocalStoragePrefix,
+  syncWomenDerivedScores,
   type QDefinition,
   type QField,
   type QuestionnaireAnswers,
+  type QuestionnaireKind,
   type FamilyMember,
   visibleFieldsForStep,
   completionStats,
@@ -28,12 +31,15 @@ function uid() {
   return `fm_${Math.random().toString(36).slice(2, 9)}`;
 }
 
-const Q_STORAGE_PREFIX = "lyfora_questionnaire_v1:";
-
-function readLocalAnswers(patientId: string): QuestionnaireAnswers | null {
+function readLocalAnswers(
+  patientId: string,
+  kind: QuestionnaireKind
+): QuestionnaireAnswers | null {
   if (typeof window === "undefined") return null;
   try {
-    const raw = window.localStorage.getItem(Q_STORAGE_PREFIX + patientId);
+    const raw = window.localStorage.getItem(
+      questionnaireLocalStoragePrefix(kind) + patientId
+    );
     if (!raw) return null;
     const parsed = JSON.parse(raw) as QuestionnaireAnswers;
     if (!parsed || typeof parsed !== "object") return null;
@@ -43,11 +49,15 @@ function readLocalAnswers(patientId: string): QuestionnaireAnswers | null {
   }
 }
 
-function writeLocalAnswers(patientId: string, answers: QuestionnaireAnswers) {
+function writeLocalAnswers(
+  patientId: string,
+  answers: QuestionnaireAnswers,
+  kind: QuestionnaireKind
+) {
   if (typeof window === "undefined") return;
   try {
     window.localStorage.setItem(
-      Q_STORAGE_PREFIX + patientId,
+      questionnaireLocalStoragePrefix(kind) + patientId,
       JSON.stringify(answers)
     );
   } catch {
@@ -71,12 +81,22 @@ export function QuestionnaireForm({
   initialDefinition,
   initialAnswers,
   initialStep = 0,
+  kind = "general",
+  titleLt,
+  titleEn,
+  introLt,
+  introEn,
 }: {
   locale: "lt" | "en";
   patientId: string;
   initialDefinition: QDefinition;
   initialAnswers: QuestionnaireAnswers;
   initialStep?: number;
+  kind?: QuestionnaireKind;
+  titleLt?: string;
+  titleEn?: string;
+  introLt?: string;
+  introEn?: string;
 }) {
   const router = useRouter();
   const def = initialDefinition;
@@ -95,9 +115,14 @@ export function QuestionnaireForm({
   const [saveFlash, setSaveFlash] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const hasSexField = useMemo(
+    () => def.fields.some((f) => f.label === "Biological Sex"),
+    [def.fields]
+  );
+
   // Prefer newer browser copy when serverless /tmp DB was reset.
   useEffect(() => {
-    const local = readLocalAnswers(patientId);
+    const local = readLocalAnswers(patientId, kind);
     const best = newerAnswers(initialAnswers, local);
     if (best !== initialAnswers) {
       setAnswers(best);
@@ -107,7 +132,7 @@ export function QuestionnaireForm({
       void fetch("/api/patient/questionnaire", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ answers: best }),
+        body: JSON.stringify({ answers: best, kind }),
         cache: "no-store",
       })
         .then(async (res) => {
@@ -116,19 +141,25 @@ export function QuestionnaireForm({
           setAnswers(data.answers);
           answersRef.current = data.answers;
           setSavedAt(data.answers.updatedAt);
-          writeLocalAnswers(patientId, data.answers);
+          writeLocalAnswers(patientId, data.answers, kind);
         })
         .catch(() => undefined);
     }
-  }, [patientId, initialAnswers]);
+  }, [patientId, initialAnswers, kind]);
 
   const sex = biologicalSex(answers, def);
   const steps = useMemo(() => {
     return def.steps.filter((s) => {
-      if (s.title.startsWith("6.")) return sex === "Female";
+      if (hasSexField && s.title.startsWith("6.")) {
+        if (sex !== "Female") return false;
+      }
+      // Hide branches with no currently visible questions (women questionnaire).
+      if (kind === "women") {
+        return visibleFieldsForStep(def, s.title, answers).length > 0;
+      }
       return true;
     });
-  }, [def.steps, sex]);
+  }, [def.steps, sex, hasSexField, kind, def, answers]);
 
   useEffect(() => {
     if (stepIdx >= steps.length) setStepIdx(Math.max(0, steps.length - 1));
@@ -147,16 +178,44 @@ export function QuestionnaireForm({
     }));
   }, []);
 
-  // Keep BMI and age (from DOB) in sync
+  // Keep BMI, age and women-derived scores in sync
   useEffect(() => {
-    const bmiField = def.fields.find((f) => f.label === "BMI");
+    if (kind === "women") {
+      const synced = syncWomenDerivedScores(answers, def);
+      const keys = [
+        "w_age",
+        "w_bmi",
+        "w_samanta_score",
+        "w_mrs_score",
+        "w_phq2_score",
+      ] as const;
+      let changed = false;
+      for (const k of keys) {
+        if (synced.values[k] !== answers.values[k]) {
+          changed = true;
+          break;
+        }
+      }
+      if (changed) {
+        setAnswers(synced);
+        answersRef.current = synced;
+      }
+      return;
+    }
+    const bmiField = def.fields.find(
+      (f) => f.label === "BMI" || f.label === "KMI" || f.id === "w_bmi"
+    );
     if (bmiField) {
       const bmi = computeBmi(answers, def);
       if (bmi != null && answers.values[bmiField.id] !== bmi) {
         setValue(bmiField.id, bmi);
       }
     }
-    const ageField = def.fields.find((f) => f.label === "Age" && f.auto);
+    const ageField = def.fields.find(
+      (f) =>
+        (f.label === "Age" || f.label === "Amžius" || f.id === "w_age") &&
+        f.auto
+    );
     if (ageField) {
       const age = computeAge(answers, def);
       if (age != null && answers.values[ageField.id] !== age) {
@@ -165,7 +224,7 @@ export function QuestionnaireForm({
         setValue(ageField.id, null);
       }
     }
-  }, [answers, def, setValue]);
+  }, [answers, def, setValue, kind]);
 
   const save = useCallback(
     async (opts?: {
@@ -182,7 +241,7 @@ export function QuestionnaireForm({
         const res = await fetch("/api/patient/questionnaire", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ answers: payload }),
+          body: JSON.stringify({ answers: payload, kind }),
           cache: "no-store",
         });
         if (!res.ok) throw new Error("save failed");
@@ -190,7 +249,7 @@ export function QuestionnaireForm({
         setAnswers(data.answers);
         answersRef.current = data.answers;
         setSavedAt(data.answers.updatedAt);
-        writeLocalAnswers(patientId, data.answers);
+        writeLocalAnswers(patientId, data.answers, kind);
         setMode(opts?.finish ? "view" : "edit");
         if (!opts?.silent) {
           setSaveFlash(
@@ -211,7 +270,7 @@ export function QuestionnaireForm({
           ...answersRef.current,
           updatedAt: new Date().toISOString(),
         };
-        writeLocalAnswers(patientId, draft);
+        writeLocalAnswers(patientId, draft, kind);
         setError(
           locale === "en"
             ? "Could not save to the server. A local copy was kept — try again."
@@ -222,7 +281,7 @@ export function QuestionnaireForm({
         setSaving(false);
       }
     },
-    [locale, patientId, router]
+    [locale, patientId, router, kind]
   );
 
   function stepTitle(title: string) {
@@ -243,8 +302,15 @@ export function QuestionnaireForm({
             ← {locale === "en" ? "Health record" : "Sveikatos kortelė"}
           </Link>
           <h1 className="font-[family-name:var(--font-display)] text-[1.55rem] font-bold mt-2 mb-1">
-            {locale === "en" ? "Health questionnaire" : "Sveikatos klausimynas"}
+            {locale === "en"
+              ? titleEn || "Health questionnaire"
+              : titleLt || "Sveikatos klausimynas"}
           </h1>
+          {(introLt || introEn) && (
+            <p className="small muted m-0" style={{ maxWidth: 52 * 16 }}>
+              {locale === "en" ? introEn || introLt : introLt || introEn}
+            </p>
+          )}
           <p className="small muted m-0">
             {locale === "en"
               ? `Completion ${stats.percent}% · ${stats.filled}/${stats.required} required fields`
@@ -330,7 +396,7 @@ export function QuestionnaireForm({
               />
             ))}
 
-            {step.title.startsWith("2.") ? (
+            {kind === "general" && step.title.startsWith("2.") ? (
               <ConditionDetailsBlock
                 def={def}
                 answers={answers}
@@ -340,7 +406,7 @@ export function QuestionnaireForm({
               />
             ) : null}
 
-            {step.title.startsWith("10.") ? (
+            {kind === "general" && step.title.startsWith("10.") ? (
               <FamilyHistoryBlock
                 def={def}
                 answers={answers}

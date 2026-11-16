@@ -7,19 +7,28 @@ import {
   normalizeQuestionnaireAnswers,
   parseStoredAnswers,
   questionnaireStorageKey,
+  syncWomenDerivedScores,
   type QuestionnaireAnswers,
+  type QuestionnaireKind,
 } from "@/lib/health/questionnaire";
 import { loadQuestionnaireDefinition } from "@/lib/health/questionnaire-loader";
 import { syncQuestionnaireMetrics } from "@/lib/health/sync-questionnaire-metrics";
 
-export async function GET() {
+function parseKind(raw: unknown): QuestionnaireKind {
+  return raw === "women" ? "women" : "general";
+}
+
+export async function GET(req: Request) {
   const current = await getCurrentUser();
   if (!current?.patient) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
+  const url = new URL(req.url);
+  const kind = parseKind(url.searchParams.get("kind"));
+
   ensureSchema();
   const db = getDb();
-  const key = questionnaireStorageKey();
+  const key = questionnaireStorageKey(kind);
   const row = db
     .select()
     .from(questionnaire)
@@ -31,18 +40,22 @@ export async function GET() {
     )
     .get();
 
-  const def = await loadQuestionnaireDefinition();
-  const answers = parseStoredAnswers(row?.value);
-  // Prefill sex from patient profile if empty
-  const sexField = def.fields.find(
-    (f: { label: string; id: string }) => f.label === "Biological Sex"
-  );
-  if (sexField && !answers.values[sexField.id]) {
-    answers.values[sexField.id] =
-      current.patient.sex === "female" ? "Female" : "Male";
+  const def = await loadQuestionnaireDefinition(kind);
+  let answers = parseStoredAnswers(row?.value);
+  if (kind === "general") {
+    const sexField = def.fields.find(
+      (f: { label: string; id: string }) => f.label === "Biological Sex"
+    );
+    if (sexField && !answers.values[sexField.id]) {
+      answers.values[sexField.id] =
+        current.patient.sex === "female" ? "Female" : "Male";
+    }
+  } else {
+    answers = syncWomenDerivedScores(answers, def);
   }
 
   return NextResponse.json({
+    kind,
     definition: def,
     answers,
     patientSex: current.patient.sex,
@@ -54,9 +67,12 @@ export async function PUT(req: Request) {
   if (!current?.patient) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
-  let body: { answers?: QuestionnaireAnswers };
+  let body: { answers?: QuestionnaireAnswers; kind?: QuestionnaireKind };
   try {
-    body = (await req.json()) as { answers?: QuestionnaireAnswers };
+    body = (await req.json()) as {
+      answers?: QuestionnaireAnswers;
+      kind?: QuestionnaireKind;
+    };
   } catch {
     return NextResponse.json({ error: "invalid json" }, { status: 400 });
   }
@@ -64,14 +80,19 @@ export async function PUT(req: Request) {
     return NextResponse.json({ error: "answers required" }, { status: 400 });
   }
 
-  const answers: QuestionnaireAnswers = normalizeQuestionnaireAnswers({
+  const kind = parseKind(body.kind);
+  const def = await loadQuestionnaireDefinition(kind);
+  let answers: QuestionnaireAnswers = normalizeQuestionnaireAnswers({
     ...body.answers,
     updatedAt: new Date().toISOString(),
   });
+  if (kind === "women") {
+    answers = syncWomenDerivedScores(answers, def);
+  }
 
   ensureSchema();
   const db = getDb();
-  const key = questionnaireStorageKey();
+  const key = questionnaireStorageKey(kind);
   const existing = db
     .select()
     .from(questionnaire)
@@ -99,9 +120,9 @@ export async function PUT(req: Request) {
       .run();
   }
 
-  // Push vitals (BP, HRV, VO₂max, …) into the twin marker store
-  const def = await loadQuestionnaireDefinition();
-  syncQuestionnaireMetrics(current.patient.id, answers, def);
+  if (kind === "general") {
+    syncQuestionnaireMetrics(current.patient.id, answers, def);
+  }
 
-  return NextResponse.json({ ok: true, answers });
+  return NextResponse.json({ ok: true, answers, kind });
 }

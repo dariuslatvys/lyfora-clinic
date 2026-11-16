@@ -37,9 +37,29 @@ export default async function HealthCardPage() {
       )
     )
     .get();
-  const def = await loadQuestionnaireDefinition();
+  const def = await loadQuestionnaireDefinition("general");
   const answers = parseStoredAnswers(row?.value);
   const stats = completionStats(def, answers);
+
+  const isFemale = current.patient.sex === "female";
+  let womenAnswers = parseStoredAnswers(null);
+  let womenStats = { percent: 0, filled: 0, required: 0 };
+  if (isFemale) {
+    const womenDef = await loadQuestionnaireDefinition("women");
+    const womenKey = questionnaireStorageKey("women");
+    const womenRow = db
+      .select()
+      .from(questionnaire)
+      .where(
+        and(
+          eq(questionnaire.patientId, current.patient.id),
+          eq(questionnaire.key, womenKey)
+        )
+      )
+      .get();
+    womenAnswers = parseStoredAnswers(womenRow?.value);
+    womenStats = completionStats(womenDef, womenAnswers);
+  }
 
   const card = buildHealthCard({
     patientName: current.patient.fullName,
@@ -118,6 +138,69 @@ export default async function HealthCardPage() {
           </div>
         </div>
       </section>
+
+      {isFemale ? (
+        <section className="card">
+          <div className="card-head">
+            <div>
+              <h2>
+                {locale === "en"
+                  ? "Additional women's questionnaire"
+                  : "Papildomas moters klausimynas"}
+              </h2>
+              <p className="small muted m-0">
+                {locale === "en"
+                  ? "Hormone and cycle health — supplements the general intake."
+                  : "Hormoninė ir ciklo sveikata — papildo bendrąjį klausimyną."}
+              </p>
+            </div>
+            <Link
+              href="/patient/health-card/questionnaire/women"
+              className="btn"
+            >
+              {womenAnswers.updatedAt
+                ? locale === "en"
+                  ? "Open"
+                  : "Atidaryti"
+                : locale === "en"
+                  ? "Fill in"
+                  : "Pildyti"}
+            </Link>
+          </div>
+          <div className="row between" style={{ marginTop: 8 }}>
+            <div className="stack" style={{ gap: 4 }}>
+              <span className="small muted">
+                {locale === "en" ? "Completion" : "Užpildymas"}
+              </span>
+              <b className="num" style={{ fontSize: "1.35rem" }}>
+                {womenStats.percent}%
+              </b>
+              <span className="xs muted">
+                {womenStats.filled}/{womenStats.required}{" "}
+                {locale === "en" ? "required fields" : "privalomų laukų"}
+              </span>
+            </div>
+            <div
+              className="q-progress"
+              style={{ width: 180, alignSelf: "center" }}
+            >
+              <i style={{ width: `${womenStats.percent}%` }} />
+            </div>
+            <div className="stack" style={{ gap: 4, textAlign: "right" }}>
+              <span className="small muted">
+                {locale === "en" ? "Last saved" : "Paskutinį kartą"}
+              </span>
+              <b>
+                {womenAnswers.updatedAt
+                  ? formatDateTime(womenAnswers.updatedAt, locale)
+                  : locale === "en"
+                    ? "Not started"
+                    : "Dar nepradėta"}
+              </b>
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       <HealthCardTabs
         locale={locale}

@@ -76,7 +76,10 @@ export type QuestionnaireAnswers = {
 };
 
 const ANSWER_KEY = "health_questionnaire_v1";
+const WOMEN_ANSWER_KEY = "women_hormone_questionnaire_v1";
 const CURRENT_YEAR = () => new Date().getFullYear();
+
+export type QuestionnaireKind = "general" | "women";
 
 export function emptyAnswers(): QuestionnaireAnswers {
   return {
@@ -252,8 +255,16 @@ export function normalizeQuestionnaireAnswers(
   };
 }
 
-export function questionnaireStorageKey() {
-  return ANSWER_KEY;
+export function questionnaireStorageKey(kind: QuestionnaireKind = "general") {
+  return kind === "women" ? WOMEN_ANSWER_KEY : ANSWER_KEY;
+}
+
+export function questionnaireLocalStoragePrefix(
+  kind: QuestionnaireKind = "general"
+) {
+  return kind === "women"
+    ? "lyfora_women_questionnaire_v1:"
+    : "lyfora_questionnaire_v1:";
 }
 
 export function fieldById(def: QDefinition, id: string) {
@@ -292,10 +303,26 @@ export function biologicalSex(answers: QuestionnaireAnswers, def: QDefinition) {
 
 export function computeBmi(answers: QuestionnaireAnswers, def: QDefinition) {
   const h = Number(
-    findFieldValue(answers, def, (f) => f.label === "Height")
+    findFieldValue(
+      answers,
+      def,
+      (f) =>
+        f.label === "Height" ||
+        f.label === "Ūgis" ||
+        f.id === "w_height" ||
+        f.id.endsWith("__height")
+    )
   );
   const w = Number(
-    findFieldValue(answers, def, (f) => f.label === "Weight")
+    findFieldValue(
+      answers,
+      def,
+      (f) =>
+        f.label === "Weight" ||
+        f.label === "Svoris" ||
+        f.id === "w_weight" ||
+        f.id.endsWith("__weight")
+    )
   );
   if (!h || !w || h < 50 || h > 260 || w < 20 || w > 400) return null;
   const m = h / 100;
@@ -319,9 +346,237 @@ export function computeAge(answers: QuestionnaireAnswers, def: QDefinition) {
   const dob = findFieldValue(
     answers,
     def,
-    (f) => f.label === "Date of Birth"
+    (f) =>
+      f.label === "Date of Birth" ||
+      f.label === "Gimimo data" ||
+      f.id === "w_birth_date" ||
+      f.id.endsWith("__date_of_birth")
   );
   return typeof dob === "string" ? ageFromDob(dob) : null;
+}
+
+function asStringList(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value.filter((v): v is string => typeof v === "string");
+  }
+  if (typeof value === "string" && value) return [value];
+  return [];
+}
+
+function numericAnswer(value: unknown): number | null {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string") {
+    const m = value.trim().match(/^-?\d+/);
+    if (m) return Number(m[0]);
+  }
+  return null;
+}
+
+function splitTopLevel(expr: string, sep: string): string[] {
+  const parts: string[] = [];
+  let depth = 0;
+  let start = 0;
+  for (let i = 0; i < expr.length; i++) {
+    const ch = expr[i];
+    if (ch === "(") depth += 1;
+    else if (ch === ")") depth = Math.max(0, depth - 1);
+    else if (depth === 0 && expr.startsWith(sep, i)) {
+      parts.push(expr.slice(start, i).trim());
+      i += sep.length - 1;
+      start = i + 1;
+    }
+  }
+  parts.push(expr.slice(start).trim());
+  return parts.filter(Boolean);
+}
+
+function stripOuterParens(expr: string): string {
+  let rule = expr.trim();
+  while (rule.startsWith("(") && rule.endsWith(")")) {
+    let depth = 0;
+    let wrapsAll = true;
+    for (let i = 0; i < rule.length; i++) {
+      if (rule[i] === "(") depth += 1;
+      else if (rule[i] === ")") {
+        depth -= 1;
+        if (depth === 0 && i !== rule.length - 1) {
+          wrapsAll = false;
+          break;
+        }
+      }
+    }
+    if (!wrapsAll) break;
+    rule = rule.slice(1, -1).trim();
+  }
+  return rule;
+}
+
+function evalShowAtom(
+  atom: string,
+  answers: QuestionnaireAnswers,
+  def: QDefinition
+): boolean {
+  const rule = stripOuterParens(atom);
+  if (!rule || rule === "Visada" || rule === "always" || rule === "@always") {
+    return true;
+  }
+
+  const orParts = splitTopLevel(rule, "||");
+  if (orParts.length > 1) {
+    return orParts.some((p) => evalShowAtom(p, answers, def));
+  }
+  const andParts = splitTopLevel(rule, "&&");
+  if (andParts.length > 1) {
+    return andParts.every((p) => evalShowAtom(p, answers, def));
+  }
+
+  if (!rule.startsWith("@")) return true;
+
+  const age = computeAge(answers, def);
+  if (rule.startsWith("@age_gte:")) {
+    const n = Number(rule.slice(9));
+    return age != null && age >= n;
+  }
+  if (rule.startsWith("@age_lt:")) {
+    const n = Number(rule.slice(8));
+    return age != null && age < n;
+  }
+  if (rule.startsWith("@bmi_lt:")) {
+    const n = Number(rule.slice(8));
+    const bmi = computeBmi(answers, def);
+    return bmi != null && bmi < n;
+  }
+  if (rule.startsWith("@bmi_gte:")) {
+    const n = Number(rule.slice(9));
+    const bmi = computeBmi(answers, def);
+    return bmi != null && bmi >= n;
+  }
+  if (rule.startsWith("@samanta_gte:")) {
+    const n = Number(rule.slice(13));
+    return samantaScore(answers) >= n;
+  }
+  if (rule.startsWith("@phq2_gte:")) {
+    const n = Number(rule.slice(10));
+    return phq2Score(answers) >= n;
+  }
+  if (rule.startsWith("@eq:")) {
+    const rest = rule.slice(4);
+    const colon = rest.indexOf(":");
+    if (colon < 0) return true;
+    const id = rest.slice(0, colon);
+    const opts = rest.slice(colon + 1).split("|");
+    const v = answers.values[id];
+    return typeof v === "string" && opts.includes(v);
+  }
+  if (rule.startsWith("@not_eq:")) {
+    const rest = rule.slice(8);
+    const colon = rest.indexOf(":");
+    if (colon < 0) return true;
+    const id = rest.slice(0, colon);
+    const opts = rest.slice(colon + 1).split("|");
+    const v = answers.values[id];
+    return !(typeof v === "string" && opts.includes(v));
+  }
+  if (rule.startsWith("@includes:")) {
+    const rest = rule.slice(10);
+    const colon = rest.indexOf(":");
+    if (colon < 0) return true;
+    const id = rest.slice(0, colon);
+    const opts = rest.slice(colon + 1).split("|");
+    const list = asStringList(answers.values[id]);
+    return opts.some((o) => list.includes(o));
+  }
+  if (rule.startsWith("@not_includes:")) {
+    const rest = rule.slice(14);
+    const colon = rest.indexOf(":");
+    if (colon < 0) return true;
+    const id = rest.slice(0, colon);
+    const opts = rest.slice(colon + 1).split("|");
+    const list = asStringList(answers.values[id]);
+    // If unanswered, treat as "does not include"
+    if (list.length === 0) return true;
+    return !opts.some((o) => list.includes(o));
+  }
+  if (rule.startsWith("@num_gte:")) {
+    const rest = rule.slice(9);
+    const colon = rest.indexOf(":");
+    if (colon < 0) return true;
+    const id = rest.slice(0, colon);
+    const n = Number(rest.slice(colon + 1));
+    const v = numericAnswer(answers.values[id]);
+    return v != null && v >= n;
+  }
+  return true;
+}
+
+const SAMANTA_IDS = [
+  "w_samanta_duration",
+  "w_samanta_heavy_days",
+  "w_samanta_change_day",
+  "w_samanta_change_night",
+  "w_samanta_clots",
+  "w_samanta_cancel",
+] as const;
+
+export function samantaScore(answers: QuestionnaireAnswers) {
+  let n = 0;
+  for (const id of SAMANTA_IDS) {
+    if (answers.values[id] === "Taip") n += 1;
+  }
+  return n;
+}
+
+const MRS_IDS = [
+  "w_mrs_hot",
+  "w_mrs_heart",
+  "w_mrs_sleep",
+  "w_mrs_depressed",
+  "w_mrs_irritable",
+  "w_mrs_anxiety",
+  "w_mrs_exhaustion",
+  "w_mrs_sexual",
+  "w_mrs_bladder",
+  "w_mrs_vaginal",
+  "w_mrs_joints",
+] as const;
+
+export function mrsScore(answers: QuestionnaireAnswers) {
+  let n = 0;
+  for (const id of MRS_IDS) {
+    const v = numericAnswer(answers.values[id]);
+    if (v != null) n += v;
+  }
+  return n;
+}
+
+export function phq2Score(answers: QuestionnaireAnswers) {
+  const a = numericAnswer(answers.values.w_phq2_interest) ?? 0;
+  const b = numericAnswer(answers.values.w_phq2_depressed) ?? 0;
+  return a + b;
+}
+
+/** Keep calculated women-questionnaire scores in sync. */
+export function syncWomenDerivedScores(
+  answers: QuestionnaireAnswers,
+  def: QDefinition
+): QuestionnaireAnswers {
+  const next = { ...answers, values: { ...answers.values } };
+  const ageField = def.fields.find((f) => f.id === "w_age");
+  const bmiField = def.fields.find((f) => f.id === "w_bmi");
+  const age = computeAge(next, def);
+  const bmi = computeBmi(next, def);
+  if (ageField) next.values[ageField.id] = age;
+  if (bmiField) next.values[bmiField.id] = bmi;
+  if (def.fields.some((f) => f.id === "w_samanta_score")) {
+    next.values.w_samanta_score = samantaScore(next);
+  }
+  if (def.fields.some((f) => f.id === "w_mrs_score")) {
+    next.values.w_mrs_score = mrsScore(next);
+  }
+  if (def.fields.some((f) => f.id === "w_phq2_score")) {
+    next.values.w_phq2_score = phq2Score(next);
+  }
+  return next;
 }
 
 /** LT display labels for common English questionnaire fields. */
@@ -468,11 +723,19 @@ export function isFieldVisible(
 
   const rule = (field.showWhen || "Visada").trim();
   if (!rule || rule === "Visada") {
-    // Female-only step
-    if (field.step.startsWith("6.")) {
+    // Female-only step in the general questionnaire only
+    if (
+      field.step.startsWith("6.") &&
+      def.fields.some((f) => f.label === "Biological Sex")
+    ) {
       return biologicalSex(answers, def) === "Female";
     }
     return true;
+  }
+
+  // Women hormone questionnaire DSL: @eq / @includes / && / || / (...)
+  if (rule.startsWith("@") || rule.includes("&&") || rule.includes("||")) {
+    return evalShowAtom(rule, answers, def);
   }
 
   const sex = biologicalSex(answers, def);
@@ -535,7 +798,12 @@ export function isFieldVisible(
     return findFieldValue(answers, def, gate) === "Yes";
   }
 
-  if (field.step.startsWith("6.")) return sex === "Female";
+  if (
+    field.step.startsWith("6.") &&
+    def.fields.some((f) => f.label === "Biological Sex")
+  ) {
+    return sex === "Female";
+  }
   return true;
 }
 
@@ -582,6 +850,19 @@ export const STEP_TITLE_LT: Record<string, string> = {
   "8. Environment & Social Support": "8. Aplinka ir socialinė parama",
   "9. Psychological & Emotional Health": "9. Psichologinė ir emocinė sveikata",
   "10. Family History": "10. Šeimos anamnezė",
+  // Women hormone questionnaire (already LT titles — identity map)
+  "1. Apie Jus": "1. Apie Jus",
+  "2. Sveikatos istorija": "2. Sveikatos istorija",
+  "3. Mėnesinių ciklas": "3. Mėnesinių ciklas",
+  "4. Kraujavimo gausa": "4. Kraujavimo gausa",
+  "5. Skausmas": "5. Skausmas",
+  "6. Plaukai ir oda": "6. Plaukai ir oda",
+  "7. Savijauta prieš mėnesines": "7. Savijauta prieš mėnesines",
+  "8. Bendra savijauta": "8. Bendra savijauta",
+  "9. Lytinė sveikata": "9. Lytinė sveikata",
+  "10. Menopauzės simptomai": "10. Menopauzės simptomai",
+  "11. Nuotaika": "11. Nuotaika",
+  "12. Simptomų trukmė": "12. Simptomų trukmė",
 };
 
 export const SECTION_TITLE_LT: Record<string, string> = {

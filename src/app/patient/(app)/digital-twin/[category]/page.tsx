@@ -25,6 +25,7 @@ import {
   type HealthCategoryId,
 } from "@/lib/health/categories";
 import { explainRareVariant } from "@/lib/health/explain-rare";
+import { ReproductivePhenotypesPanel } from "@/components/patient/reproductive-phenotypes";
 
 function Pill({
   colour,
@@ -161,9 +162,17 @@ export default async function CategoryDetailPage({
             ? locale === "en"
               ? "SNP results that can affect how your body responds to medicines. Open a gene for the plain-language explanation."
               : "SNP rezultatai, kurie gali keisti vaistų poveikį. Paspauskite geną — pamatysite paaiškinimą paprasta kalba."
-            : cat.summary}
+            : cat.id === "reproductive"
+              ? locale === "en"
+                ? "Based on your women’s questionnaire and labs, we highlight four phenotypes that most often shape reproductive health. Open each one for a plain-language explanation — and your personal signal."
+                : "Pagal Jūsų moters klausimyną ir tyrimus išskiriame keturis fenotipus, kurie dažniausiai formuoja reprodukcinę sveikatą. Atidarykite kiekvieną — paprastai kalba ir Jūsų asmeninis signalas."
+              : cat.summary}
         </p>
       </section>
+
+      {cat.id === "reproductive" ? (
+        <ReproductivePhenotypesPanel locale={locale} />
+      ) : null}
 
       {!genesOnly && (hasMarkers || hasPhysical || hasSnps || hasRare) && (
         <nav className="cat-source-tabs" aria-label={labels.categoriesTitle}>

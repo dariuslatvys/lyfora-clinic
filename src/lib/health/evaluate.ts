@@ -2,6 +2,7 @@ import type { RiskColour } from "./colours";
 import { combineCategoryColour, maxColour, normalizeColour } from "./colours";
 import {
   categoriesForSex,
+  categorySignalAliases,
   matchPrimaryCategory,
   type HealthCategoryId,
 } from "./categories";
@@ -264,7 +265,11 @@ export function evaluateDigitalTwin(input: {
     );
     const { biomarkers: markers, physical } = splitMarkersByKind(allForCat);
 
-    const catRare = rare.filter((v) => rareGeneCategory(v.gene) === cat.id);
+    const rareAliases = new Set(categorySignalAliases(cat.id));
+    const catRare = rare.filter((v) => {
+      const mapped = rareGeneCategory(v.gene);
+      return mapped != null && rareAliases.has(mapped);
+    });
 
     const biomarkerColour = evaluateMarkerColour(markers);
     const physicalColour = evaluatePhysicalColour(physical);

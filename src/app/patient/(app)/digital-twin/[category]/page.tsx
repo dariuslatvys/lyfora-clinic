@@ -20,7 +20,10 @@ import { MarkerChart } from "@/components/patient/marker-chart";
 import { Sparkline } from "@/components/patient/sparkline";
 import { SnpDetailPanel } from "@/components/patient/snp-detail";
 import { PharmaGenesTabs } from "@/components/patient/pharma-genes-tabs";
-import type { HealthCategoryId } from "@/lib/health/categories";
+import {
+  resolveCategoryId,
+  type HealthCategoryId,
+} from "@/lib/health/categories";
 import { explainRareVariant } from "@/lib/health/explain-rare";
 
 function Pill({
@@ -53,7 +56,8 @@ export default async function CategoryDetailPage({
     (twin.patient.sex as "male" | "female") ||
     "male";
 
-  const cat = twin.categories.find((c) => c.id === category);
+  const resolved = resolveCategoryId(category, patientSex);
+  const cat = twin.categories.find((c) => c.id === resolved);
   if (!cat) notFound();
 
   const selectedMarkerKey = sp.marker;

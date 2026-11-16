@@ -26,11 +26,16 @@ const RANK: Record<RiskColour, number> = {
 const AREA_TO_PKG: Record<string, string> = {
   cardiovascular: "lab-pkg-cardiovascular-core",
   metabolic: "lab-pkg-metabolic-core",
+  cardio_metabolic: "lab-pkg-cardiovascular-core",
   physical: "lab-pkg-physical-core",
   mental: "lab-pkg-mental-core",
   hormonal: "lab-pkg-hormonal-m-core",
+  hormones_men: "lab-pkg-hormonal-m-core",
+  hormones_women: "lab-pkg-hormonal-m-core",
+  reproductive: "lab-pkg-hormonal-m-core",
   immune: "lab-pkg-immune-core",
   nutrient: "lab-pkg-nutrient-core",
+  oncology: "lab-pkg-cardiovascular-core",
 };
 
 type TwinLike = {
@@ -122,7 +127,11 @@ export function buildRecommendations(
     suggestedIds.add("gen-hrt-lipid");
     suggestedIds.add("con-genetics-60");
   }
-  if (attention.some((c) => c.id === "cardiovascular")) {
+  if (
+    attention.some(
+      (c) => c.id === "cardiovascular" || c.id === "cardio_metabolic"
+    )
+  ) {
     suggestedIds.add("gen-hrt02");
     suggestedIds.add("con-cardio-45");
   }

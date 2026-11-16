@@ -156,6 +156,7 @@ export default async function DigitalTwinPage() {
 
       <OverviewPanels
         locale={locale}
+        sex={(current.patient.sex as "male" | "female") || "male"}
         labels={{
           healthMapTitle: labels.healthMapTitle,
           cardSummary: labels.cardSummary,

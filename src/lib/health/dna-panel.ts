@@ -116,9 +116,14 @@ export function dnaPrimaryToCategoryId(
   sex: "male" | "female" = "male"
 ) {
   if (primaryEn === "Hormonal Health") {
-    return sex === "female" ? "hormones_women" : "hormones_men";
+    return sex === "female" ? "reproductive" : "hormones_men";
   }
-  return PRIMARY_TO_CAT[primaryEn] || "cardiovascular";
+  const base = PRIMARY_TO_CAT[primaryEn] || "cardiovascular";
+  if (sex === "female") {
+    if (base === "cardiovascular" || base === "metabolic") return "cardio_metabolic";
+    if (base === "immune") return "cardio_metabolic";
+  }
+  return base;
 }
 
 export function dnaSnpDetailHref(

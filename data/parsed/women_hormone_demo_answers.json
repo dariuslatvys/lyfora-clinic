@@ -1,6 +1,6 @@
 {
   "updatedAt": "2026-11-16T09:30:00.000Z",
-  "seedVersion": "pks-gabija-v2.8",
+  "seedVersion": "pks-rasa-v2.8",
   "values": {
     "w_birth_date": "2000-03-08",
     "w_height": 168,
@@ -75,7 +75,7 @@
     "w_phq2_interest": "1 – Keletą dienų",
     "w_phq2_depressed": "0 – Visai ne",
     "w_symptom_onset": "Nuo pirmųjų mėnesinių",
-    "_seedVersion": "pks-gabija-v2.8"
+    "_seedVersion": "pks-rasa-v2.8"
   },
   "conditionDetails": {},
   "familyMembers": [],

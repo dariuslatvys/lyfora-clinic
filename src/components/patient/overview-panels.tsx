@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { BodyMap, type BodyMapCategory } from "@/components/patient/body-map";
+import { WomenHealthMap } from "@/components/patient/women-health-map";
 import { CategoryCard } from "@/components/patient/category-card";
 import { PILL_CLASS, type RiskColour } from "@/lib/health/colours";
 import type { FlaggedLab } from "@/lib/health/marker-colour";
@@ -64,6 +65,7 @@ export function OverviewPanels({
   planPerks,
   mode = "full",
   interactive = true,
+  sex = "male",
 }: {
   locale: "lt" | "en";
   labels: Labels;
@@ -78,6 +80,7 @@ export function OverviewPanels({
   mode?: "full" | "summary";
   /** When false, tiles and rows render without patient-portal links. */
   interactive?: boolean;
+  sex?: "male" | "female";
 }) {
   const [tab, setTab] = useState<"map" | "summary">(
     mode === "summary" ? "summary" : "map"
@@ -114,11 +117,18 @@ export function OverviewPanels({
       ) : null}
 
       {!showSummary ? (
-        <BodyMap
-          categories={categories}
-          geneHint={labels.geneMarkerHint}
-          centerLabel="Lyfora"
-        />
+        sex === "female" ? (
+          <WomenHealthMap
+            categories={categories}
+            geneHint={labels.geneMarkerHint}
+          />
+        ) : (
+          <BodyMap
+            categories={categories}
+            geneHint={labels.geneMarkerHint}
+            centerLabel="Lyfora"
+          />
+        )
       ) : (
         <OverviewSummaryContent
           locale={locale}

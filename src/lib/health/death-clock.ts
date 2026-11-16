@@ -856,13 +856,15 @@ export function loadDeathClock(
     });
   }
 
+  const cardioCat = twin.categories.find(
+    (c) => c.id === "cardiovascular" || c.id === "cardio_metabolic"
+  );
+  const metaCat = twin.categories.find(
+    (c) => c.id === "metabolic" || c.id === "cardio_metabolic"
+  );
   const cardioHot =
-    twin.categories.find((c) => c.id === "cardiovascular")?.colour === "red" ||
-    twin.categories.find((c) => c.id === "cardiovascular")?.colour ===
-      "orange";
-  const metaHot =
-    twin.categories.find((c) => c.id === "metabolic")?.colour === "red" ||
-    twin.categories.find((c) => c.id === "metabolic")?.colour === "orange";
+    cardioCat?.colour === "red" || cardioCat?.colour === "orange";
+  const metaHot = metaCat?.colour === "red" || metaCat?.colour === "orange";
 
   pushRec({
     id: "cardio-labs",
@@ -891,9 +893,13 @@ export function loadDeathClock(
   recommendations.sort((a, b) => b.gainWeeks - a.gainWeeks);
 
   const causes: DeathClockCause[] = [];
-  const cardio = twin.categories.find((c) => c.id === "cardiovascular");
+  const cardio = twin.categories.find(
+    (c) => c.id === "cardiovascular" || c.id === "cardio_metabolic"
+  );
   const onco = twin.categories.find((c) => c.id === "oncology");
-  const meta = twin.categories.find((c) => c.id === "metabolic");
+  const meta = twin.categories.find(
+    (c) => c.id === "metabolic" || c.id === "cardio_metabolic"
+  );
   if (cardio && (cardio.colour === "red" || cardio.colour === "orange")) {
     causes.push({
       id: "cvd",

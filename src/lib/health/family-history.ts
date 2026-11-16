@@ -1,5 +1,6 @@
 import type { FamilyMember } from "@/lib/health/questionnaire";
 import type { RiskColour } from "@/lib/health/colours";
+import { categorySignalAliases } from "@/lib/health/categories";
 
 const CURRENT_YEAR = () => new Date().getFullYear();
 
@@ -57,6 +58,17 @@ export function familyConditionCategoryIds(condition: string): string[] {
   if (/thyroid|graves|hormonal|endocrine|polycystic|pcos/.test(c)) {
     ids.add("hormones_men");
     ids.add("hormones_women");
+    ids.add("reproductive");
+  }
+  if (
+    /heart|coronary|myocardial|infarct|stroke|tia|blood pressure|hypertension|arrhythmia|cardiac|cholesterol|athero|peripheral artery|diabetes|prediabetes|insulin|obesity|metabolic|gout|lipid|dyslipidemia|hypercholesterol/.test(
+      c
+    )
+  ) {
+    ids.add("cardio_metabolic");
+  }
+  if (/bone|joint|osteo|arthritis|fracture|muscle|sarcopen/.test(c)) {
+    ids.add("physical");
   }
   if (
     /alzheimer|parkinson|migraine|epilepsy|neuro|ms\b|multiple sclerosis|depression|anxiety|bipolar|psychiatr|mental|cognitive/.test(
@@ -112,7 +124,21 @@ export function applyFamilyHistoryColour(
   colour: RiskColour,
   signals: Map<string, { firstDegree: boolean; labels: string[] }>
 ): RiskColour {
-  const hit = signals.get(categoryId);
+  let hit = signals.get(categoryId);
+  if (!hit) {
+    for (const alias of categorySignalAliases(categoryId)) {
+      const alt = signals.get(alias);
+      if (!alt) continue;
+      if (!hit) {
+        hit = { firstDegree: alt.firstDegree, labels: [...alt.labels] };
+      } else {
+        hit.firstDegree = hit.firstDegree || alt.firstDegree;
+        for (const label of alt.labels) {
+          if (!hit.labels.includes(label)) hit.labels.push(label);
+        }
+      }
+    }
+  }
   if (!hit) return colour;
   // First-degree disease history: +1 step (cap orange). Second-degree: only if still green/grey.
   if (hit.firstDegree) return bumpColour(colour, 1);

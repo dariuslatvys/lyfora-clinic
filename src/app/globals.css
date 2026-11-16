@@ -2048,6 +2048,154 @@ a.who.on {
   z-index: 4;
 }
 
+/* Female overview: mosaic of 6 domains (no body silhouette). */
+.women-map {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 18px 16px 16px;
+  overflow: hidden;
+  background:
+    radial-gradient(
+      120% 80% at 8% 0%,
+      color-mix(in srgb, var(--accent) 16%, transparent),
+      transparent 55%
+    ),
+    radial-gradient(
+      90% 70% at 100% 100%,
+      color-mix(in srgb, #3a6b8c 18%, transparent),
+      transparent 50%
+    ),
+    var(--surface-2);
+}
+
+.women-map-hint {
+  margin: 0 0 14px;
+  max-width: 36rem;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+.women-map-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.women-tile {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: center;
+  min-height: 88px;
+  padding: 14px 14px 14px 16px;
+  text-decoration: none;
+  color: inherit;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--cc, var(--line)) 28%, var(--line));
+  background: color-mix(in srgb, var(--surface) 78%, transparent);
+  overflow: hidden;
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    background 0.18s ease;
+  animation: women-tile-in 0.45s ease both;
+}
+
+.women-tile-0 {
+  animation-delay: 0.04s;
+}
+.women-tile-1 {
+  animation-delay: 0.1s;
+}
+.women-tile-2 {
+  animation-delay: 0.16s;
+}
+.women-tile-3 {
+  animation-delay: 0.22s;
+}
+.women-tile-4 {
+  animation-delay: 0.28s;
+}
+.women-tile-5 {
+  animation-delay: 0.34s;
+}
+
+@keyframes women-tile-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.women-tile:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--cc, var(--accent)) 55%, var(--line));
+  background: color-mix(in srgb, var(--cc, var(--accent)) 10%, var(--surface));
+}
+
+.women-tile-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  color: var(--cc, var(--accent));
+  background: color-mix(in srgb, var(--cc, var(--accent)) 18%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--cc, var(--accent)) 40%, transparent);
+  flex-shrink: 0;
+}
+
+.women-tile-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.women-tile-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.women-tile-copy b {
+  font-family: var(--font-display), Manrope, sans-serif;
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--ink);
+}
+
+.women-tile-copy em {
+  font-style: normal;
+  font-size: 0.74rem;
+  font-weight: 650;
+  color: var(--cc, var(--muted));
+  line-height: 1.25;
+}
+
+.women-tile-bar {
+  position: absolute;
+  left: 0;
+  top: 12px;
+  bottom: 12px;
+  width: 3px;
+  border-radius: 999px;
+  background: var(--cc, var(--accent));
+}
+
+@media (max-width: 720px) {
+  .women-map-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .death-clock-compare {
   display: grid;
   grid-template-columns: 1fr 1fr;

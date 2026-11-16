@@ -5374,11 +5374,32 @@ a.hc-kpi.clickable:hover {
   padding: 14px 16px 16px;
 }
 
+.pharma-purpose-block.has-reaction {
+  border-color: color-mix(in srgb, var(--r-orange, #d97706) 45%, var(--line));
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--r-orange, #d97706) 10%, var(--surface)),
+    var(--surface) 55%
+  );
+}
+
+.pharma-purpose-block.no-reaction {
+  opacity: 0.92;
+}
+
 .pharma-purpose-head {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: 12px;
+}
+
+.pharma-purpose-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-end;
+  flex-shrink: 0;
 }
 
 .pharma-purpose-title {
@@ -5387,6 +5408,26 @@ a.hc-kpi.clickable:hover {
   font-size: 1.12rem;
   font-weight: 700;
   letter-spacing: -0.01em;
+}
+
+.pharma-actives {
+  font-size: 0.92rem;
+  line-height: 1.35;
+  color: var(--ink);
+}
+
+.pharma-actives-label {
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
+.pharma-actives-focus {
+  font-size: 0.85rem;
+}
+
+.pharma-actives strong {
+  font-weight: 700;
+  color: var(--ink);
 }
 
 .market-detail-page {

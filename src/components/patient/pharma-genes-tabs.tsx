@@ -10,6 +10,10 @@ import {
   type RiskColour,
 } from "@/lib/health/colours";
 import { pharmaSubcategoryLabel } from "@/lib/health/pharma-plain";
+import {
+  pharmaActiveSubstances,
+  pharmaActivesForRows,
+} from "@/lib/health/pharma-actives";
 import { MedToleranceCheck } from "@/components/patient/med-tolerance-check";
 
 export type PharmaSnpRow = {
@@ -23,7 +27,7 @@ export type PharmaSnpRow = {
   subcategory: string | null;
 };
 
-/** Higher-level “what are these medicines for?” buckets. */
+/** Higher-level medicine-effect buckets (what the related drugs are for). */
 const PURPOSE_ORDER: {
   id: string;
   match: RegExp;
@@ -123,6 +127,14 @@ function purposeFor(subcategory: string | null | undefined) {
   return PURPOSE_ORDER[PURPOSE_ORDER.length - 1];
 }
 
+function hasReaction(rows: PharmaSnpRow[]) {
+  return rows.some((r) => colourRank(r.colour) >= 3);
+}
+
+function maxReactionRank(rows: PharmaSnpRow[]) {
+  return rows.reduce((m, r) => Math.max(m, colourRank(r.colour)), 0);
+}
+
 function Pill({
   colour,
   label,
@@ -140,6 +152,7 @@ function SnpRow({
   colourLabels,
   awaitingDna,
   selected,
+  showActives,
 }: {
   s: PharmaSnpRow;
   category: string;
@@ -147,8 +160,12 @@ function SnpRow({
   colourLabels: Record<RiskColour, string>;
   awaitingDna: string;
   selected: boolean;
+  showActives?: boolean;
 }) {
   const c: RiskColour = s.colour || "grey";
+  const actives = showActives
+    ? pharmaActiveSubstances(s.subcategory, locale)
+    : [];
   return (
     <Link
       href={`/patient/snp/${encodeURIComponent(s.snpId)}?cat=${category}`}
@@ -170,6 +187,16 @@ function SnpRow({
               {s.snpId.split("__")[0]}
             </span>
           </span>
+          {actives.length ? (
+            <p className="text-xs text-[var(--ink)] m-0 mt-1 font-medium">
+              {locale === "en"
+                ? "Active substance with sensitivity: "
+                : "Veiklioji medžiaga su jautrumu: "}
+              <span className="text-[var(--accent-ink,var(--ink))]">
+                {actives.join(", ")}
+              </span>
+            </p>
+          ) : null}
           <p className="text-xs text-[var(--ink-soft)] m-0 mt-1">
             {s.genotypeAvailable
               ? `${s.allele1}/${s.allele2} · ${s.matchCount} ${
@@ -186,9 +213,7 @@ function SnpRow({
         </div>
         <Pill
           colour={c}
-          label={
-            s.colour ? colourLabels[s.colour] : colourLabels.grey
-          }
+          label={s.colour ? colourLabels[s.colour] : colourLabels.grey}
         />
       </div>
     </Link>
@@ -210,36 +235,42 @@ export function PharmaGenesTabs({
   colourLabels: Record<RiskColour, string>;
   awaitingDna: string;
 }) {
-  const [tab, setTab] = useState<"risk" | "purpose" | "tolerance">("risk");
+  const [tab, setTab] = useState<"effect" | "risk" | "tolerance">("effect");
 
   const copy = useMemo(
     () =>
       locale === "en"
         ? {
+            effect: "By medicine effect",
             risk: "By risk",
-            purpose: "By medicine use",
             tolerance: "Medicine tolerance check",
+            effectBlurb:
+              "Medicine groups first — those with a reaction signal on top, then groups without a signal. Each group names the active substance you may be sensitive to.",
             riskBlurb:
               "Genes sorted by your personal risk colour — highest first.",
-            purposeBlurb:
-              "Same genes grouped by what the related medicines are typically taken for.",
             toleranceBlurb:
               "Instant check: enter one or more medicines and press Check.",
             focus: "Focus",
             empty: "No genes in this group.",
+            withReaction: "Reaction signal",
+            noReaction: "No reaction signal",
+            activesLabel: "Active substance with sensitivity",
           }
         : {
+            effect: "Pagal vaistų poveikį",
             risk: "Pagal riziką",
-            purpose: "Pagal vaistų paskirtį",
             tolerance: "Vaistų toleravimo tikrinimas",
+            effectBlurb:
+              "Pirma vaistų grupės su reakcijos signalu, žemiau — be signalo. Kiekvienoje grupėje aiškiai matote veikliąją medžiagą, kuriai yra jautrumas.",
             riskBlurb:
               "Genai surikiuoti pagal jūsų rizikos spalvą — didžiausia rizika pirmiausia.",
-            purposeBlurb:
-              "Tie patys genai sugrupuoti pagal tai, nuo ko paprastai geriami susiję vaistai.",
             toleranceBlurb:
               "Momentinis tikrinimas: įveskite vieną ar kelis vaistus ir paspauskite „Tikrinti“.",
             focus: "Sritis",
             empty: "Šioje grupėje genų nėra.",
+            withReaction: "Yra reakcijos signalas",
+            noReaction: "Reakcijos signalo nėra",
+            activesLabel: "Veiklioji medžiaga su jautrumu",
           },
     [locale]
   );
@@ -255,15 +286,12 @@ export function PharmaGenesTabs({
     [snps]
   );
 
-  const byPurpose = useMemo(() => {
+  const byEffect = useMemo(() => {
     const map = new Map<
       string,
       {
         purpose: (typeof PURPOSE_ORDER)[number];
-        groups: Map<
-          string,
-          { label: string; rows: PharmaSnpRow[] }
-        >;
+        groups: Map<string, { label: string; rows: PharmaSnpRow[] }>;
       }
     >();
 
@@ -283,7 +311,6 @@ export function PharmaGenesTabs({
       bucket.groups.get(subKey)!.rows.push(s);
     }
 
-    // sort rows inside each subcategory by risk
     for (const bucket of map.values()) {
       for (const g of bucket.groups.values()) {
         g.rows.sort(
@@ -294,12 +321,22 @@ export function PharmaGenesTabs({
       }
     }
 
-    return PURPOSE_ORDER.map((p) => map.get(p.id)).filter(
+    const buckets = PURPOSE_ORDER.map((p) => map.get(p.id)).filter(
       Boolean
     ) as {
       purpose: (typeof PURPOSE_ORDER)[number];
       groups: Map<string, { label: string; rows: PharmaSnpRow[] }>;
     }[];
+
+    // Groups with a reaction signal first, then quieter groups.
+    return [...buckets].sort((a, b) => {
+      const aRows = [...a.groups.values()].flatMap((g) => g.rows);
+      const bRows = [...b.groups.values()].flatMap((g) => g.rows);
+      const aHit = hasReaction(aRows) ? 1 : 0;
+      const bHit = hasReaction(bRows) ? 1 : 0;
+      if (bHit !== aHit) return bHit - aHit;
+      return maxReactionRank(bRows) - maxReactionRank(aRows);
+    });
   }, [snps, locale]);
 
   return (
@@ -307,8 +344,20 @@ export function PharmaGenesTabs({
       <div
         className="tabs visits-tabs"
         role="tablist"
-        aria-label={locale === "en" ? "Pharmacogenetics views" : "Farmakogenetikos vaizdai"}
+        aria-label={
+          locale === "en" ? "Pharmacogenetics views" : "Farmakogenetikos vaizdai"
+        }
       >
+        <button
+          type="button"
+          role="tab"
+          className={tab === "effect" ? "on" : undefined}
+          aria-selected={tab === "effect"}
+          onClick={() => setTab("effect")}
+        >
+          {copy.effect}
+          <span className="visits-tab-count">{byEffect.length}</span>
+        </button>
         <button
           type="button"
           role="tab"
@@ -318,16 +367,6 @@ export function PharmaGenesTabs({
         >
           {copy.risk}
           <span className="visits-tab-count">{snps.length}</span>
-        </button>
-        <button
-          type="button"
-          role="tab"
-          className={tab === "purpose" ? "on" : undefined}
-          aria-selected={tab === "purpose"}
-          onClick={() => setTab("purpose")}
-        >
-          {copy.purpose}
-          <span className="visits-tab-count">{byPurpose.length}</span>
         </button>
         <button
           type="button"
@@ -342,7 +381,7 @@ export function PharmaGenesTabs({
 
       {tab !== "tolerance" ? (
         <p className="small muted mt-2 mb-3">
-          {tab === "risk" ? copy.riskBlurb : copy.purposeBlurb}
+          {tab === "effect" ? copy.effectBlurb : copy.riskBlurb}
         </p>
       ) : (
         <div className="mt-2" />
@@ -359,18 +398,37 @@ export function PharmaGenesTabs({
               colourLabels={colourLabels}
               awaitingDna={awaitingDna}
               selected={selectedSnpId === s.snpId}
+              showActives={colourRank(s.colour) >= 2}
             />
           ))}
         </div>
-      ) : tab === "purpose" ? (
+      ) : tab === "effect" ? (
         <div className="stack" style={{ gap: 16 }}>
-          {byPurpose.map(({ purpose, groups }) => {
-            const total = [...groups.values()].reduce(
-              (n, g) => n + g.rows.length,
-              0
+          {byEffect.map(({ purpose, groups }) => {
+            const allRows = [...groups.values()].flatMap((g) => g.rows);
+            const total = allRows.length;
+            const reacted = hasReaction(allRows);
+            // Only name actives tied to a yellow/orange/red sensitivity signal.
+            const sensitiveRows = allRows.filter(
+              (r) => colourRank(r.colour) >= 2
             );
+            const actives = pharmaActivesForRows(
+              sensitiveRows.length ? sensitiveRows : [],
+              locale
+            );
+            const sortedGroups = [...groups.entries()].sort(([, a], [, b]) => {
+              const aHit = hasReaction(a.rows) ? 1 : 0;
+              const bHit = hasReaction(b.rows) ? 1 : 0;
+              if (bHit !== aHit) return bHit - aHit;
+              return maxReactionRank(b.rows) - maxReactionRank(a.rows);
+            });
             return (
-              <section key={purpose.id} className="pharma-purpose-block">
+              <section
+                key={purpose.id}
+                className={`pharma-purpose-block ${
+                  reacted ? "has-reaction" : "no-reaction"
+                }`}
+              >
                 <div className="pharma-purpose-head">
                   <div>
                     <h4 className="pharma-purpose-title">
@@ -379,35 +437,67 @@ export function PharmaGenesTabs({
                     <p className="small muted m-0 mt-1">
                       {locale === "en" ? purpose.blurbEn : purpose.blurbLt}
                     </p>
+                    {actives.length ? (
+                      <p className="pharma-actives m-0 mt-2">
+                        <span className="pharma-actives-label">
+                          {copy.activesLabel}:
+                        </span>{" "}
+                        <strong>{actives.join(", ")}</strong>
+                      </p>
+                    ) : null}
                   </div>
-                  <span className="pill plain c-acc">{total}</span>
+                  <div className="pharma-purpose-badges">
+                    <span
+                      className={`pill plain ${
+                        reacted ? "c-orange" : "c-none"
+                      }`}
+                    >
+                      {reacted ? copy.withReaction : copy.noReaction}
+                    </span>
+                    <span className="pill plain c-acc">{total}</span>
+                  </div>
                 </div>
                 <div className="stack mt-3" style={{ gap: 12 }}>
-                  {[...groups.entries()].map(([subKey, g]) => (
-                    <div key={subKey}>
-                      <p className="eyebrow mb-2">
-                        {copy.focus}: {g.label}
-                      </p>
-                      <div className="space-y-2">
-                        {g.rows.map((s) => (
-                          <SnpRow
-                            key={`${s.gene}-${s.snpId}`}
-                            s={s}
-                            category={category}
-                            locale={locale}
-                            colourLabels={colourLabels}
-                            awaitingDna={awaitingDna}
-                            selected={selectedSnpId === s.snpId}
-                          />
-                        ))}
+                  {sortedGroups.map(([subKey, g]) => {
+                    const focusActives = pharmaActivesForRows(
+                      g.rows.filter((r) => colourRank(r.colour) >= 2),
+                      locale
+                    );
+                    return (
+                      <div key={subKey}>
+                        <p className="eyebrow mb-1">
+                          {copy.focus}: {g.label}
+                        </p>
+                        {focusActives.length ? (
+                          <p className="pharma-actives pharma-actives-focus m-0 mb-2">
+                            <span className="pharma-actives-label">
+                              {copy.activesLabel}:
+                            </span>{" "}
+                            <strong>{focusActives.join(", ")}</strong>
+                          </p>
+                        ) : null}
+                        <div className="space-y-2">
+                          {g.rows.map((s) => (
+                            <SnpRow
+                              key={`${s.gene}-${s.snpId}`}
+                              s={s}
+                              category={category}
+                              locale={locale}
+                              colourLabels={colourLabels}
+                              awaitingDna={awaitingDna}
+                              selected={selectedSnpId === s.snpId}
+                              showActives={colourRank(s.colour) >= 2}
+                            />
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </section>
             );
           })}
-          {!byPurpose.length ? (
+          {!byEffect.length ? (
             <div className="empty">{copy.empty}</div>
           ) : null}
         </div>

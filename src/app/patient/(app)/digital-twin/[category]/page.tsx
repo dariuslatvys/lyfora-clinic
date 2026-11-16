@@ -118,9 +118,39 @@ export default async function CategoryDetailPage({
   const snpTitle =
     cat.id === "pharmacogenetics"
       ? locale === "lt"
-        ? "Farmakogenetika (SNP)"
-        : "Pharmacogenetics (SNP)"
+        ? "Genetinis atsakas į vaistus"
+        : "Genetic response to medicines"
       : labels.snpTestTitle;
+
+  const genesSectionTitle =
+    cat.id === "pharmacogenetics"
+      ? locale === "lt"
+        ? "Genetinis atsakas į vaistus"
+        : "Genetic response to medicines"
+      : labels.genes;
+
+  const pharmaColourLabels =
+    cat.id === "pharmacogenetics"
+      ? locale === "lt"
+        ? {
+            ...labels.geneColourLabels,
+            green: "Toleruojama",
+            yellow: "Stebėti",
+            orange: "Galimas netoleravimas",
+            red: "Netoleruojama / didelė rizika",
+            grey: "Nėra duomenų",
+            badge: "Stebėti",
+          }
+        : {
+            ...labels.geneColourLabels,
+            green: "Usually tolerated",
+            yellow: "Monitor",
+            orange: "Possible intolerance",
+            red: "Not well tolerated / high risk",
+            grey: "No data",
+            badge: "Monitor",
+          }
+      : labels.geneColourLabels;
 
   const geneticColour: RiskColour = cat.geneticColour ?? "grey";
   const biomarkerColour = cat.biomarkerColour;
@@ -158,10 +188,10 @@ export default async function CategoryDetailPage({
           ) : null}
         </div>
         <p className="cat-hero-summary">
-          {genesOnly
+          {genesOnly || cat.id === "pharmacogenetics"
             ? locale === "en"
-              ? "SNP results that can affect how your body responds to medicines. Open a gene for the plain-language explanation."
-              : "SNP rezultatai, kurie gali keisti vaistų poveikį. Paspauskite geną — pamatysite paaiškinimą paprasta kalba."
+              ? "This section shows your genetic response to medicines — which active substances are usually tolerated and which may be poorly tolerated. It is a signal for clinicians, not a prescription change by itself."
+              : "Ši skiltis rodo genetinį atsaką į vaistus — kurios veikliosios medžiagos paprastai toleruojamos, o kurioms gali būti netoleravimas. Tai signalas gydytojui, o ne savaiminis recepto keitimas."
             : cat.id === "reproductive"
               ? locale === "en"
                 ? "This area covers your cycle, hormones, fertility and four key phenotypes (PMOS, endometriosis, early perimenopause, menopause). Signals come from the women’s questionnaire, lab results and genetics (SNPs below)."
@@ -445,7 +475,7 @@ export default async function CategoryDetailPage({
             <div id="section-genes" className="panel scroll-mt-24">
               <div className="card-head" style={{ marginBottom: 0 }}>
                 <h3 className="font-[family-name:var(--font-display)] text-2xl">
-                  {labels.genes}
+                  {genesSectionTitle}
                 </h3>
                 {!genesOnly && (
                   <Pill
@@ -488,7 +518,7 @@ export default async function CategoryDetailPage({
                       subcategory: s.subcategory,
                     }))}
                     selectedSnpId={selectedSnpId}
-                    colourLabels={labels.geneColourLabels}
+                    colourLabels={pharmaColourLabels}
                     awaitingDna={labels.awaitingDna}
                   />
                 ) : (

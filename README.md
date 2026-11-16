@@ -35,9 +35,13 @@ UI niekur nerodo tikrų asmenų. Demo pacientai:
 
 ```bash
 npm install
-npm run db:seed
+DEMO_PASSWORD='your-local-password' npm run db:seed
+export SESSION_SECRET="$(openssl rand -base64 48)"
 npm run dev -- -p 43123 -H 127.0.0.1
 ```
+
+Lokaliai be `SESSION_SECRET` raktas generuojamas į `data/db/.session-secret` (gitignored).
+Publikuotoje aplinkoje privalomas `SESSION_SECRET`.
 
 Atidarykite [http://127.0.0.1:43123](http://127.0.0.1:43123).
 
@@ -45,6 +49,17 @@ Atidarykite [http://127.0.0.1:43123](http://127.0.0.1:43123).
 
 Prototipui pakanka nemokamo `*.vercel.app` adreso. SQLite demo DB yra
 `data/demo/lyfora.sqlite` (Vercel’e kopijuojama į `/tmp`).
+
+Vercel Environment Variables (būtina prisijungimui):
+
+- `SESSION_SECRET` — ilga atsitiktinė eilutė (`openssl rand -base64 48`)
+- `DEMO_PASSWORD` — slaptažodis demo paskyroms (`pacientas@…` / `paciente@…` / `gydytojas@…`)
+- `GROQ_API_KEY` (rekomenduojama demo, nemokama) — Ask AI per Groq; raktas: https://console.groq.com/keys
+- `GEMINI_API_KEY` (alternatyva, nemokama) — Google AI Studio
+- `OPENAI_API_KEY` (nebūtina, mokama) — jei nėra kitų raktų
+- Be jokio LLM rakto Ask AI vis tiek veikia taisyklėmis (įskaitant PMOS)
+
+Po env išsaugojimo padarykite Redeploy.
 
 ### Jūsų žingsniai
 
@@ -55,9 +70,8 @@ Prototipui pakanka nemokamo `*.vercel.app` adreso. SQLite demo DB yra
    git push -u github main
    ```
 3. Eikite į [vercel.com/new](https://vercel.com/new) (tas pats account, kur `avocadotech.eu`).
-4. **Import** tą GitHub repo → Framework: Next.js → **Deploy** (be env vars).
+4. **Import** tą GitHub repo → Framework: Next.js → Environment Variables: `SESSION_SECRET` ir `DEMO_PASSWORD` → **Deploy**.
 5. Po 1–2 min gausite `https://lyfora-clinic-….vercel.app` — tuo dalinkitės.
-6. Demo loginai: `pacientas@lyfora.lt` / `lyfora2026`.
 
 Pastaba: serverless cold start’e sesijos /tmp DB gali „atsinaujinti“ — demo’ui to užtenka.
 

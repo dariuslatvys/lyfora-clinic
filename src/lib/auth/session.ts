@@ -4,17 +4,13 @@ import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
 import { ensureSchema, getDb } from "@/lib/db";
 import { users, patients } from "@/lib/db/schema";
+import { sessionSigningSecret } from "@/lib/auth/secrets";
 
 export const sessionCookieName = "lyfora_session";
 const TTL_MS = 1000 * 60 * 60 * 24 * 14;
 
-/** Demo-safe secret; override with SESSION_SECRET in production if desired. */
 function secret() {
-  return (
-    process.env.SESSION_SECRET ||
-    process.env.LYFORA_SESSION_SECRET ||
-    "lyfora-demo-session-v1"
-  );
+  return sessionSigningSecret();
 }
 
 function sign(payload: string) {
@@ -74,21 +70,26 @@ export async function destroySession() {
 }
 
 export async function getCurrentUser() {
-  ensureSchema();
-  const jar = await cookies();
-  const token = jar.get(sessionCookieName)?.value;
-  if (!token) return null;
-  const parsed = decodeSession(token);
-  if (!parsed) return null;
+  try {
+    ensureSchema();
+    const jar = await cookies();
+    const token = jar.get(sessionCookieName)?.value;
+    if (!token) return null;
+    const parsed = decodeSession(token);
+    if (!parsed) return null;
 
-  const db = getDb();
-  const user = db.select().from(users).where(eq(users.id, parsed.userId)).get();
-  if (!user) return null;
-  const patient =
-    user.role === "patient"
-      ? db.select().from(patients).where(eq(patients.userId, user.id)).get()
-      : null;
-  return { user, patient };
+    const db = getDb();
+    const user = db.select().from(users).where(eq(users.id, parsed.userId)).get();
+    if (!user) return null;
+    const patient =
+      user.role === "patient"
+        ? db.select().from(patients).where(eq(patients.userId, user.id)).get()
+        : null;
+    return { user, patient };
+  } catch {
+    // Missing SESSION_SECRET (or DB) on a hosted instance — treat as logged out.
+    return null;
+  }
 }
 
 export async function loginWithPassword(

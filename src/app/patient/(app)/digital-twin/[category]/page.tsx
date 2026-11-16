@@ -235,7 +235,7 @@ export default async function CategoryDetailPage({
                 }}
                 aria-hidden="true"
               />
-              {labels.genes}
+              {genesSectionTitle}
             </a>
           ) : null}
           {hasRare ? (
@@ -482,8 +482,8 @@ export default async function CategoryDetailPage({
                     colour={geneticColour}
                     label={
                       cat.geneticColour
-                        ? labels.geneColourLabels[geneticColour]
-                        : labels.geneColourLabels.grey
+                        ? pharmaColourLabels[geneticColour]
+                        : pharmaColourLabels.grey
                     }
                   />
                 )}

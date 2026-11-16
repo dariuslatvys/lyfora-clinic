@@ -31,8 +31,8 @@ export function ReproductivePhenotypesPanel({
         </h3>
         <p className="repro-panel-lead">
           {locale === "en"
-            ? "Open a phenotype to see how it can affect fertility and daily life — and what your questionnaire signals for you."
-            : "Atidarykite fenotipą: kaip jis veikia vaisingumą ir kasdienybę, ir ką Jūsų klausimynas rodo būtent Jums."}
+            ? "Each phenotype explains impact on reproductive health, fertility and daily life. Your signal combines the questionnaire, labs and genetics."
+            : "Kiekvienas fenotipas paaiškina poveikį reprodukcinei sveikatai, vaisingumui ir kasdienybei. Jūsų signalas jungia klausimyną, tyrimus ir genetiką."}
         </p>
       </div>
 

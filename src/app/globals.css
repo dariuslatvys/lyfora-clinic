@@ -3352,12 +3352,19 @@ a.integ-metric.clickable:hover {
 }
 
 .pmos-headline {
-  margin: 0 0 12px;
+  margin: 0 0 8px;
   font-family: var(--font-display), Manrope, sans-serif;
   font-size: clamp(1.35rem, 2.4vw, 1.75rem);
   font-weight: 750;
   line-height: 1.25;
   color: var(--ink);
+}
+
+.pmos-aka {
+  margin: 0 0 12px;
+  font-size: 0.84rem;
+  line-height: 1.4;
+  color: var(--muted);
 }
 
 .pmos-story {
@@ -3406,6 +3413,58 @@ a.integ-metric.clickable:hover {
 .pmos-tests-list {
   display: grid;
   gap: 10px;
+}
+
+.pmos-rules-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  align-items: start;
+}
+
+.pmos-rules-col-title {
+  margin: 0 0 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-family: var(--font-display), Manrope, sans-serif;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.pmos-rules-col-title span {
+  display: inline-flex;
+  min-width: 1.5rem;
+  justify-content: center;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  background: var(--surface-raised);
+  color: var(--ink-soft);
+}
+
+.pmos-rules-col-title.is-fired {
+  color: var(--r-orange);
+}
+
+.pmos-rules-col-title.is-fired span {
+  background: color-mix(in srgb, var(--r-orange) 22%, var(--surface));
+  color: var(--r-orange);
+}
+
+.pmos-test-actions,
+.pmos-consult-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.pmos-consult-row {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
 }
 
 .pmos-calc-card,
@@ -3541,7 +3600,8 @@ a.integ-metric.clickable:hover {
 }
 
 @media (max-width: 820px) {
-  .repro-pheno-grid {
+  .repro-pheno-grid,
+  .pmos-rules-split {
     grid-template-columns: 1fr;
   }
 }

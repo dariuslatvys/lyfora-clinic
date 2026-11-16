@@ -34,9 +34,9 @@ export const REPRODUCTIVE_PHENOTYPES: ReproductivePhenotype[] = [
     nameLt: "PMOS",
     nameEn: "PMOS",
     shortLt:
-      "Anksčiau vadintas policistinių kiaušidžių sindromu (PKS). Signalas, ne diagnozė.",
+      "PMOS — policistinių kiaušidžių metabolinis–ovuliacijos sindromas. Anksčiau vadintas PKS (policistinių kiaušidžių sindromu). Signalas, ne diagnozė.",
     shortEn:
-      "Formerly called polycystic ovary syndrome (PCOS). A signal, not a diagnosis.",
+      "PMOS — polycystic ovary metabolic–ovulatory syndrome. Formerly PKS / PCOS (polycystic ovary syndrome). A signal, not a diagnosis.",
     impactLt:
       "Dažnai siejamas su nereguliariu ciklu, androgenų pertekliumi (plaukuotumas, aknė, viršugalvio retėjimas) ir medžiagų apykaitos pokyčiais.",
     impactEn:
@@ -190,6 +190,10 @@ export type TargetTest = {
   nameEn: string;
   whyLt: string;
   whyEn: string;
+  /** Marketplace item id for order link. */
+  marketItemId?: string;
+  /** Extra consult / package links. */
+  links?: { labelLt: string; labelEn: string; href: string }[];
 };
 
 export type PmosReport = {
@@ -211,16 +215,18 @@ export type PmosReport = {
 
 /** Patient-facing PMOS report from the PKS sample case (Rasa), sections 3–7 style. */
 export const DEMO_PMOS_REPORT: PmosReport = {
-  headlineLt: "Verta pasitikrinti dėl PMOS",
-  headlineEn: "Worth checking for PMOS",
+  headlineLt:
+    "Verta pasitikrinti dėl PMOS (policistinių kiaušidžių metabolinio–ovuliacijos sindromo)",
+  headlineEn:
+    "Worth checking for PMOS (polycystic ovary metabolic–ovulatory syndrome)",
   patientStoryLt:
     "Jūsų mėnesinės kartojasi vidutiniškai kas 57 dienas (apie 6 kartus per metus), ir tai rodo, kad ovuliacija vyksta ne kiekvieną mėnesį. Kartu yra kelių požymių, būdingų androgenų (vyriškųjų hormonų) pertekliui: plaukai ant smakro ir pilvo, aknė, retėjantys plaukai viršugalvyje. Toks derinys atitinka PMOS požymius. PMOS turi maždaug 1 iš 8 moterų, ir jis gerai valdomas.\n\nTaip pat verta atkreipti dėmesį į medžiagų apykaitą. Gliukozė, trigliceridai ir kepenų fermentas ALT šiek tiek padidėję, o gerojo cholesterolio mažiau. Kartu su tamsiomis odos dėmėmis tai rodo insulino rezistenciją, kuri dažnai lydi PMOS ir yra pagrindinis veiksnys, kurį galima keisti.",
   patientStoryEn:
     "Your periods repeat about every 57 days (around 6 times a year), which suggests ovulation does not happen every month. Together with several signs of androgen (male hormone) excess — hair on the chin and abdomen, acne, thinning at the crown — this pattern matches PMOS. About 1 in 8 women have PMOS, and it is usually manageable.\n\nMetabolism also deserves attention. Glucose, triglycerides and the liver enzyme ALT are a little high, and HDL (“good”) cholesterol is lower. Together with dark skin patches, that points to insulin resistance, which often accompanies PMOS and is a key factor you can change.",
   disclaimerLt:
-    "Tai ne diagnozė. Rezultatas parodo, kokie Jūsų simptomai gali būti susiję ir ką verta aptarti su gydytoju. PMOS (anksčiau vadintas PKS) patvirtina gydytojas, atmetęs panašias būkles.",
+    "Tai ne diagnozė. Rezultatas parodo, kokie Jūsų simptomai gali būti susiję ir ką verta aptarti su gydytoju. PMOS (policistinių kiaušidžių metabolinis–ovuliacijos sindromas; anksčiau PKS — policistinių kiaušidžių sindromas) patvirtina gydytojas, atmetęs panašias būkles.",
   disclaimerEn:
-    "This is not a diagnosis. The result shows how your symptoms may relate and what to discuss with a clinician. A doctor confirms PMOS (formerly PCOS) after ruling out similar conditions.",
+    "This is not a diagnosis. The result shows how your symptoms may relate and what to discuss with a clinician. A doctor confirms PMOS (polycystic ovary metabolic–ovulatory syndrome; formerly PCOS) after ruling out similar conditions.",
   nextStepsLt:
     "Ką daryti toliau: prie to paties kraujo ėmimo siūlome atlikti testosteroną ir SHBG, 17-OH progesteroną, prolaktiną, hCG ir gliukozės toleravimo mėginį. Su rezultatais kreipkitės į šeimos gydytoją, ginekologą ar endokrinologą. Gydytojas, atmetęs kitas priežastis, gali patvirtinti diagnozę ir aptarti gydymą: mitybą, fizinį aktyvumą, ciklo reguliavimą, aknės ir plaukuotumo gydymą.",
   nextStepsEn:
@@ -310,8 +316,8 @@ export const DEMO_PMOS_REPORT: PmosReport = {
       titleEn: "Thyroid",
       checkLt: "TSH 1,9 mIU/l (norma 0,4–4,0)",
       checkEn: "TSH 1.9 mIU/l (range 0.4–4.0)",
-      verdictLt: "Atmesta — skydliaukės priežastis mažai tikėtina",
-      verdictEn: "Ruled out — thyroid cause unlikely",
+      verdictLt: "Skydliaukės priežastis mažai tikėtina (TSH normoje)",
+      verdictEn: "Thyroid cause unlikely (TSH in range)",
       outcome: "cleared",
     },
     {
@@ -320,8 +326,10 @@ export const DEMO_PMOS_REPORT: PmosReport = {
       titleEn: "Energy deficit",
       checkLt: "KMI 28,3; intensyvaus sporto / mažo valgymo požymių nėra",
       checkEn: "BMI 28.3; no heavy sport / under-eating signs",
-      verdictLt: "Atmesta",
-      verdictEn: "Ruled out",
+      verdictLt:
+        "Energijos trūkumo amenorėja mažai tikėtina — KMI ne žemas, sporto / mitybos raudonų vėliavų nėra",
+      verdictEn:
+        "Energy-deficit amenorrhoea unlikely — BMI is not low and there are no sport / intake red flags",
       outcome: "cleared",
     },
     {
@@ -330,8 +338,10 @@ export const DEMO_PMOS_REPORT: PmosReport = {
       titleEn: "Premature menopause / perimenopause",
       checkLt: "26 m., pertrauka < 4 mėn., karščio bangų nėra",
       checkEn: "Age 26, gap < 4 months, no hot flushes",
-      verdictLt: "Atmesta",
-      verdictEn: "Ruled out",
+      verdictLt:
+        "Amžius ir simptomai neatitinka ankstyvos perimenopauzės ar priešlaikinės menopauzės",
+      verdictEn:
+        "Age and symptoms do not match early perimenopause or premature menopause",
       outcome: "cleared",
     },
     {
@@ -340,8 +350,8 @@ export const DEMO_PMOS_REPORT: PmosReport = {
       titleEn: "PMOS",
       checkLt: "Ovuliacijos sutrikimas + ryškūs androgenų požymiai",
       checkEn: "Ovulation disruption + marked androgen signs",
-      verdictLt: "Taisyklė suveikia — stiprus signalas",
-      verdictEn: "Rule fires — strong signal",
+      verdictLt: "Stiprus signalas — verta pasitikrinti tiksliniais tyrimais",
+      verdictEn: "Strong signal — worth confirming with targeted tests",
       outcome: "triggered",
     },
   ],
@@ -399,6 +409,19 @@ export const DEMO_PMOS_REPORT: PmosReport = {
       nameEn: "Testosterone + SHBG (free androgen index)",
       whyLt: "Patvirtinti biocheminį androgenų perteklių kraujyje.",
       whyEn: "Confirm biochemical androgen excess in blood.",
+      marketItemId: "lab-lai-laisvu-androgenu-indeksas-isskaiciuojamas-is-testost",
+      links: [
+        {
+          labelLt: "Testosteronas",
+          labelEn: "Testosterone",
+          href: "/patient/marketplace?item=lab-testosteronas",
+        },
+        {
+          labelLt: "SHBG",
+          labelEn: "SHBG",
+          href: "/patient/marketplace?item=lab-lytinius-hormonus-surisantis-globulinas-shbg",
+        },
+      ],
     },
     {
       nameLt: "17-OH progesteronas (ryte, ankstyvoje folikulinėje fazėje)",
@@ -407,18 +430,28 @@ export const DEMO_PMOS_REPORT: PmosReport = {
         "Atmesti neklasikinę įgimtą antinksčių hiperplaziją, kuri gali atrodyti kaip PMOS.",
       whyEn:
         "Rule out non-classic congenital adrenal hyperplasia, which can look like PMOS.",
+      marketItemId: "lab-pkg-hormonal-w-core",
+      links: [
+        {
+          labelLt: "Endokrinologo konsultacija",
+          labelEn: "Endocrinology consult",
+          href: "/patient/marketplace?item=con-endo-40",
+        },
+      ],
     },
     {
       nameLt: "Prolaktinas",
       nameEn: "Prolactin",
       whyLt: "Atmesti prolaktino perteklių kaip ciklo sutrikimo priežastį.",
       whyEn: "Rule out high prolactin as a cause of cycle disruption.",
+      marketItemId: "lab-prolaktinas-prl-makroprolaktinas",
     },
     {
       nameLt: "hCG",
       nameEn: "hCG",
       whyLt: "Atmesti nėštumą prieš tolesnius sprendimus.",
       whyEn: "Rule out pregnancy before further decisions.",
+      marketItemId: "lab-chorioninis-gonadotropinas-hcg",
     },
     {
       nameLt: "OGTT 75 g (arba HbA1c)",
@@ -427,12 +460,38 @@ export const DEMO_PMOS_REPORT: PmosReport = {
         "PMOS gairė rekomenduoja visoms; Jums gliukozė nevalgius jau padidėjusi.",
       whyEn:
         "PMOS guidelines recommend it for all; your fasting glucose is already raised.",
+      marketItemId: "lab-gliukozes-toleravimo-meginys-2-tasku",
+      links: [
+        {
+          labelLt: "HbA1c",
+          labelEn: "HbA1c",
+          href: "/patient/marketplace?item=lab-glikozilintas-hemoglobinas-hba1c",
+        },
+        {
+          labelLt: "Metabolinis paketas",
+          labelEn: "Metabolic package",
+          href: "/patient/marketplace?item=lab-pkg-metabolic-core",
+        },
+      ],
     },
     {
       nameLt: "Kepenų įvertinimas (gydytojo nuožiūra: UG, FIB-4)",
       nameEn: "Liver assessment (clinician choice: ultrasound, FIB-4)",
       whyLt: "ALT 41 su insulino rezistencija — galima riebi kepenų liga.",
       whyEn: "ALT 41 with insulin resistance — fatty liver is possible.",
+      marketItemId: "lab-alaninaminotransferaze-gpt-alt",
+      links: [
+        {
+          labelLt: "Endokrinologo konsultacija",
+          labelEn: "Endocrinology consult",
+          href: "/patient/marketplace?item=con-endo-40",
+        },
+        {
+          labelLt: "Šeimos gydytojo konsultacija",
+          labelEn: "GP consultation",
+          href: "/patient/marketplace?item=con-gp-30",
+        },
+      ],
     },
   ],
   noteLt:

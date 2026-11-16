@@ -38,7 +38,9 @@ export default async function ReproductivePhenotypePage({
     <div className="stack" style={{ gap: 12 }}>
       <Link href="/patient/digital-twin/reproductive" className="text-sm text-[var(--muted)]">
         ← {labels.back} ·{" "}
-        {locale === "en" ? "Reproductive health" : "Reprodukcinė sveikata"}
+        {locale === "en"
+          ? "Women’s health and life stages"
+          : "Moters sveikata ir gyvybiniai etapai"}
       </Link>
 
       {phenotype.id === "pmos" ? (

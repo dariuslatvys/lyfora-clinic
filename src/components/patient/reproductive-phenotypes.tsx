@@ -26,13 +26,13 @@ export function ReproductivePhenotypesPanel({
       <div className="repro-panel-head">
         <h3 className="repro-panel-title">
           {locale === "en"
-            ? "Four reproductive phenotypes"
-            : "Keturi reprodukcinės sveikatos fenotipai"}
+            ? "Four women’s health phenotypes"
+            : "Keturi moters sveikatos fenotipai"}
         </h3>
         <p className="repro-panel-lead">
           {locale === "en"
-            ? "Each phenotype explains impact on reproductive health, fertility and daily life. Your signal combines the questionnaire, labs and genetics."
-            : "Kiekvienas fenotipas paaiškina poveikį reprodukcinei sveikatai, vaisingumui ir kasdienybei. Jūsų signalas jungia klausimyną, tyrimus ir genetiką."}
+            ? "Each phenotype explains impact on cycle and hormones, fertility and daily life. Your signal combines the questionnaire, labs and genetics."
+            : "Kiekvienas fenotipas paaiškina poveikį ciklui ir hormonams, vaisingumui ir kasdienybei. Jūsų signalas jungia klausimyną, tyrimus ir genetiką."}
         </p>
       </div>
 

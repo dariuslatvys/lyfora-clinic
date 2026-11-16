@@ -233,8 +233,8 @@ export function PmosReportView({
         <Link href="/patient/digital-twin/reproductive">
           ←{" "}
           {locale === "en"
-            ? "Back to reproductive health"
-            : "Atgal į reprodukcinę sveikatą"}
+            ? "Back to women’s health and life stages"
+            : "Atgal į moters sveikatą ir gyvybinius etapus"}
         </Link>
       </p>
     </div>

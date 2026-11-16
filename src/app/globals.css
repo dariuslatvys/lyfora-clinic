@@ -2818,14 +2818,17 @@ a.who.on {
 }
 
 .marker-chart .recharts-cartesian-axis-tick-value {
-  fill: #1a2e28;
+  fill: var(--ink-soft);
   font-weight: 650;
 }
 
 .marker-chart-label {
-  fill: #06473c;
+  fill: #cfece0;
   font-weight: 700;
   font-size: 12px;
+  paint-order: stroke fill;
+  stroke: rgba(11, 20, 18, 0.7);
+  stroke-width: 3px;
 }
 
 .trend-delta {

@@ -68,7 +68,7 @@ export function MarkerChart({
           margin={{ top: 28, right: 16, left: 4, bottom: 4 }}
         >
           <CartesianGrid
-            stroke="rgba(15, 55, 45, 0.14)"
+            stroke="rgba(227, 236, 232, 0.12)"
             strokeDasharray="3 6"
             vertical={false}
           />
@@ -76,25 +76,25 @@ export function MarkerChart({
             <ReferenceArea
               y1={refLow}
               y2={refHigh}
-              fill="rgba(15, 107, 92, 0.16)"
-              stroke="rgba(15, 107, 92, 0.35)"
+              fill="rgba(92, 201, 167, 0.12)"
+              stroke="rgba(92, 201, 167, 0.35)"
               strokeOpacity={1}
               ifOverflow="extendDomain"
             />
           )}
           <XAxis
             dataKey="label"
-            tick={{ fontSize: 12, fill: "#1a2e28", fontWeight: 600 }}
-            tickLine={{ stroke: "#6b857c" }}
-            axisLine={{ stroke: "#6b857c" }}
+            tick={{ fontSize: 12, fill: "#bccbc5", fontWeight: 600 }}
+            tickLine={{ stroke: "#8aa099" }}
+            axisLine={{ stroke: "#8aa099" }}
             dy={4}
           />
           <YAxis
             domain={[minV - pad, maxV + pad]}
-            tick={{ fontSize: 12, fill: "#1a2e28", fontWeight: 600 }}
+            tick={{ fontSize: 12, fill: "#bccbc5", fontWeight: 600 }}
             tickFormatter={formatTick}
-            tickLine={{ stroke: "#6b857c" }}
-            axisLine={{ stroke: "#6b857c" }}
+            tickLine={{ stroke: "#8aa099" }}
+            axisLine={{ stroke: "#8aa099" }}
             width={48}
           />
           <Tooltip
@@ -110,31 +110,31 @@ export function MarkerChart({
             }}
             contentStyle={{
               borderRadius: 10,
-              border: "1px solid #0F6B5C",
-              background: "#f4faf7",
-              color: "#0b1f1a",
+              border: "1px solid #5cc9a7",
+              background: "#152420",
+              color: "#e3ece8",
               fontSize: 13,
               fontWeight: 600,
-              boxShadow: "0 8px 24px rgba(11, 40, 32, 0.12)",
+              boxShadow: "0 8px 24px rgba(0, 0, 0, 0.35)",
             }}
-            itemStyle={{ color: "#0F6B5C", fontWeight: 700 }}
-            labelStyle={{ color: "#1a2e28", fontWeight: 700, marginBottom: 4 }}
+            itemStyle={{ color: "#5cc9a7", fontWeight: 700 }}
+            labelStyle={{ color: "#e3ece8", fontWeight: 700, marginBottom: 4 }}
           />
           <Line
             type="monotone"
             dataKey="value"
-            stroke="#0A5C4F"
-            strokeWidth={3.5}
+            stroke="#7EE0C0"
+            strokeWidth={4}
             dot={{
-              r: 5.5,
-              fill: "#0A5C4F",
-              stroke: "#ffffff",
+              r: 6,
+              fill: "#7EE0C0",
+              stroke: "#0b1412",
               strokeWidth: 2,
             }}
             activeDot={{
-              r: 7,
-              fill: "#06473C",
-              stroke: "#ffffff",
+              r: 8,
+              fill: "#a8f0d6",
+              stroke: "#0b1412",
               strokeWidth: 2,
             }}
             isAnimationActive={false}
@@ -144,7 +144,7 @@ export function MarkerChart({
               position="top"
               offset={10}
               className="marker-chart-label"
-              fill="#06473C"
+              fill="#cfece0"
               fontSize={12}
               fontWeight={700}
             />

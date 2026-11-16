@@ -226,8 +226,8 @@ export const DEMO_PMOS_REPORT: PmosReport = {
     {
       labelLt: "Ciklo trukmės (6 intervalai)",
       labelEn: "Cycle lengths (6 intervals)",
-      fromLt: "Nr. 14 datos (Flo)",
-      fromEn: "Q14 dates (Flo)",
+      fromLt: "Mėnesinių datos (Flo)",
+      fromEn: "Period dates (Flo)",
       resultLt:
         "49, 65, 47, 79, 42, 70 d.; vidurkis 59 d., mediana 57 d.; ~6 ciklai per metus; dabartinė pertrauka 50 d.",
       resultEn:
@@ -244,8 +244,8 @@ export const DEMO_PMOS_REPORT: PmosReport = {
     {
       labelLt: "Androgenų pertekliaus požymiai",
       labelEn: "Androgen-excess signs",
-      fromLt: "Nr. 32, 33, 35",
-      fromEn: "Q32, 33, 35",
+      fromLt: "Klausimynas (plaukuotumas, retėjimas, aknė)",
+      fromEn: "Questionnaire (hair growth, thinning, acne)",
       resultLt:
         "3 požymiai – ryškus: plaukuotumas (smakras, lūpa, pilvas), viršugalvio retėjimas, suaugusiųjų aknė",
       resultEn:
@@ -254,8 +254,8 @@ export const DEMO_PMOS_REPORT: PmosReport = {
     {
       labelLt: "Insulino rezistencijos požymiai",
       labelEn: "Insulin-resistance signs",
-      fromLt: "Nr. 2, 35, kraujas",
-      fromEn: "Q2, 35, blood panel",
+      fromLt: "KMI, odos požymiai ir kraujo tyrimai",
+      fromEn: "BMI, skin signs and blood panel",
       resultLt:
         "6 iš 6: KMI 28,3, tamsios aksominės dėmės, gliukozė 5,7, TG 1,9, DTL 1,05, ALT 41",
       resultEn:
@@ -264,8 +264,8 @@ export const DEMO_PMOS_REPORT: PmosReport = {
     {
       labelLt: "Pradžia",
       labelEn: "Onset",
-      fromLt: "Nr. 53",
-      fromEn: "Q53",
+      fromLt: "Klausimynas (simptomų pradžia)",
+      fromEn: "Questionnaire (symptom onset)",
       resultLt: "Nuo pirmųjų mėnesinių – būdinga PKS",
       resultEn: "Since first periods – typical for PCOS",
     },

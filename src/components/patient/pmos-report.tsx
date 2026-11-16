@@ -106,11 +106,6 @@ export function PmosReportView({
         <h3>
           {locale === "en" ? "Signs and ruled-out conditions" : "Požymiai ir atmestos būklės"}
         </h3>
-        <p className="pmos-section-lead">
-          {locale === "en"
-            ? "Left: signs that fit this picture. Right: conditions that do not fit your answers and tests."
-            : "Kairėje — požymiai, kurie dera su šiuo paveikslu. Dešinėje — būklės, kurios pagal atsakymus ir tyrimus neatitinka."}
-        </p>
         <div className="pmos-assess-split">
           <div className="pmos-assess-col">
             <h4 className="pmos-assess-col-title is-present">

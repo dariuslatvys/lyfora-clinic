@@ -770,133 +770,94 @@ async function main() {
   insertQ.run(femaleId, "family_breast_cancer", "močiutė");
   insertQ.run(femaleId, "menstrual_regular", "taip");
 
-  // Prefill Papildomas moters klausimynas for demo female patient (PDF v2.8 options).
-  {
-    const womenDemoPath = path.join(
-      ROOT,
-      "data",
-      "parsed",
-      "women_hormone_demo_answers.json"
+  // Always seed structured questionnaires from parsed demo JSON
+  // (preserved patient edits for health_questionnaire_v1 win when richer).
+  function loadDemoAnswers(fileName: string) {
+    const p = path.join(PARSED, fileName);
+    if (!fs.existsSync(p)) return null;
+    return normalizeQuestionnaireAnswers(
+      JSON.parse(fs.readFileSync(p, "utf8"))
     );
-    if (fs.existsSync(womenDemoPath)) {
-      const womenDef = await loadQuestionnaireDefinition("women");
-      const raw = JSON.parse(fs.readFileSync(womenDemoPath, "utf8")) as {
-        updatedAt?: string;
-        values?: Record<string, unknown>;
-        conditionDetails?: Record<string, unknown>;
-        familyMembers?: unknown[];
-        cancer?: { types: string[]; treatment: string[] };
-      };
-      const seeded = syncWomenDerivedScores(
-        normalizeQuestionnaireAnswers({
-          updatedAt: raw.updatedAt || now,
-          values: raw.values || {},
-          conditionDetails: {},
-          familyMembers: [],
-          cancer: raw.cancer || { types: [], treatment: [] },
-        }),
-        womenDef
-      );
-      insertQ.run(
-        femaleId,
-        "women_hormone_questionnaire_v1",
-        JSON.stringify(seeded)
-      );
-      console.log("  seeded women hormone questionnaire for", femaleId);
-    }
   }
 
-  function withFamilyHistoryDemo(
-    pid: string,
-    raw: string | null | undefined
-  ): string {
-    const a = parseStoredAnswers(raw);
-    const isFemale = pid === femaleId || pid === "patient_female";
-    const year = new Date().getFullYear();
-    // Unified cards: relation + birth/death years + diseases
-    a.familyMembers = isFemale
-      ? [
-          {
-            id: "fm_seed_f1",
-            relative: "Maternal Grandmother",
-            conditions: ["Breast Cancer"],
-            birthYear: year - 84,
-            vitalStatus: "Deceased",
-            deathYear: year - 1,
-          },
-          {
-            id: "fm_seed_f2",
-            relative: "Mother",
-            conditions: ["High Blood Pressure"],
-            birthYear: year - 86,
-            vitalStatus: "Living",
-            deathYear: null,
-          },
-          {
-            id: "fm_seed_f3",
-            relative: "Father",
-            conditions: [],
-            birthYear: year - 84,
-            vitalStatus: "Living",
-            deathYear: null,
-          },
-        ]
-      : [
-          {
-            id: "fm_seed_m1",
-            relative: "Father",
-            conditions: [
-              "Heart Attack / Myocardial Infarction",
-              "High Blood Pressure",
-            ],
-            birthYear: 1950,
-            vitalStatus: "Deceased",
-            deathYear: 2022,
-          },
-          {
-            id: "fm_seed_m3",
-            relative: "Mother",
-            conditions: ["High Blood Pressure"],
-            birthYear: year - 88,
-            vitalStatus: "Living",
-            deathYear: null,
-          },
-          {
-            id: "fm_seed_m2",
-            relative: "Maternal Grandmother",
-            conditions: [],
-            birthYear: 1928,
-            vitalStatus: "Deceased",
-            deathYear: 2020,
-          },
-        ];
-    a.updatedAt = a.updatedAt || new Date().toISOString();
-    return JSON.stringify(a);
+  function preservedGeneral(pid: string) {
+    const hit = preservedQ.find(
+      (r) =>
+        (r.patient_id === pid ||
+          (pid === femaleId && r.patient_id === "patient_female") ||
+          (pid === patientId && r.patient_id === "patient_male")) &&
+        r.key === "health_questionnaire_v1"
+    );
+    return hit ? parseStoredAnswers(hit.value) : null;
   }
 
-  // Restore patient-entered questionnaire and push vitals into markers
-  for (const row of preservedQ) {
-    const pid =
-      row.patient_id === "patient_female" ? femaleId : patientId;
-    const value =
-      row.key === "health_questionnaire_v1"
-        ? withFamilyHistoryDemo(pid, row.value)
-        : row.value;
-    insertQ.run(pid, row.key, value);
+  function valueCount(a: ReturnType<typeof parseStoredAnswers> | null) {
+    if (!a) return 0;
+    return Object.values(a.values || {}).filter((v) => {
+      if (v == null || v === "") return false;
+      if (Array.isArray(v) && v.length === 0) return false;
+      return true;
+    }).length;
   }
-  if (preservedQ.length) {
-    const def = await loadQuestionnaireDefinition();
-    for (const row of preservedQ) {
-      const pid =
-        row.patient_id === "patient_female" ? femaleId : patientId;
-      const value =
-        row.key === "health_questionnaire_v1"
-          ? withFamilyHistoryDemo(pid, row.value)
-          : row.value;
-      syncQuestionnaireMetrics(pid, parseStoredAnswers(value), def);
+
+  const maleDemo = loadDemoAnswers("general_questionnaire_demo_male.json");
+  const femaleDemo = loadDemoAnswers("general_questionnaire_demo_female.json");
+  const womenDemoRaw = loadDemoAnswers("women_hormone_demo_answers.json");
+
+  const malePreserved = preservedGeneral(patientId);
+  const femalePreserved = preservedGeneral(femaleId);
+  const maleAnswers =
+    valueCount(malePreserved) > valueCount(maleDemo)
+      ? malePreserved!
+      : maleDemo;
+  const femaleAnswers =
+    valueCount(femalePreserved) > valueCount(femaleDemo)
+      ? femalePreserved!
+      : femaleDemo;
+
+  if (maleAnswers) {
+    insertQ.run(
+      patientId,
+      "health_questionnaire_v1",
+      JSON.stringify(maleAnswers)
+    );
+  }
+  if (femaleAnswers) {
+    insertQ.run(
+      femaleId,
+      "health_questionnaire_v1",
+      JSON.stringify(femaleAnswers)
+    );
+  }
+
+  if (womenDemoRaw) {
+    const womenDef = await loadQuestionnaireDefinition("women");
+    // Keep DOB / height / weight identical to general female questionnaire.
+    if (femaleAnswers) {
+      const dob =
+        femaleAnswers.values["1_basic_profile_health_metrics__date_of_birth"];
+      const height =
+        femaleAnswers.values["1_basic_profile_health_metrics__height"];
+      const weight =
+        femaleAnswers.values["1_basic_profile_health_metrics__weight"];
+      if (dob) womenDemoRaw.values.w_birth_date = dob;
+      if (height != null) womenDemoRaw.values.w_height = height;
+      if (weight != null) womenDemoRaw.values.w_weight = weight;
     }
-    // Keep wearable-imported series (Apple Health / Oura) as the latest
-    // for those keys — questionnaire restore must not overwrite them.
+    const womenSeeded = syncWomenDerivedScores(womenDemoRaw, womenDef);
+    insertQ.run(
+      femaleId,
+      "women_hormone_questionnaire_v1",
+      JSON.stringify(womenSeeded)
+    );
+    console.log("  seeded women hormone questionnaire for", femaleId);
+  }
+
+  // Push vitals from general questionnaires into twin markers
+  {
+    const def = await loadQuestionnaireDefinition("general");
+    if (maleAnswers) syncQuestionnaireMetrics(patientId, maleAnswers, def);
+    if (femaleAnswers) syncQuestionnaireMetrics(femaleId, femaleAnswers, def);
     sqlite
       .prepare(
         `DELETE FROM marker_results
@@ -904,7 +865,12 @@ async function main() {
            AND marker_key IN ('VO2MAX','HRV','ACTIVITY_DATA','SLEEP_DATA')`
       )
       .run();
-    console.log("  restored questionnaire rows:", preservedQ.length);
+    console.log(
+      "  seeded general questionnaires:",
+      [maleAnswers && "male", femaleAnswers && "female"]
+        .filter(Boolean)
+        .join(", ")
+    );
   }
 
   const femaleMarkerCount = (

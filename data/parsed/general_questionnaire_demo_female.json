@@ -1,0 +1,120 @@
+{
+  "updatedAt": "2026-11-16T08:00:00.000Z",
+  "values": {
+    "1_basic_profile_health_metrics__biological_sex": "Female",
+    "1_basic_profile_health_metrics__date_of_birth": "1988-03-12",
+    "1_basic_profile_health_metrics__age": 38,
+    "1_basic_profile_health_metrics__height": 168,
+    "1_basic_profile_health_metrics__weight": 64,
+    "1_basic_profile_health_metrics__bmi": 22.7,
+    "1_basic_profile_health_metrics__waist_circumference": 67,
+    "1_basic_profile_health_metrics__known_blood_pressure": {
+      "sys": 125,
+      "dia": 70
+    },
+    "1_basic_profile_health_metrics__resting_heart_rate": 60,
+    "1_basic_profile_health_metrics__hrv_30_day_average": 45,
+    "1_basic_profile_health_metrics__vo_max": 38,
+    "1_basic_profile_health_metrics__how_would_you_rate_your_overall_health": "Very Good",
+    "2_current_past_medical_conditions__have_you_ever_been_diagnosed_with_any_medical_condition": "Yes",
+    "2_current_past_medical_conditions__conditions__medical_conditions": [
+      "Migraine",
+      "Acid Reflux (GERD)",
+      "Chronic Back Pain",
+      "Female Infertility"
+    ],
+    "3_allergies__do_you_have_any_known_allergies": "Yes",
+    "3_allergies__food_allergies": [
+      "Eggs",
+      "Milk"
+    ],
+    "3_allergies__contact_allergies": [
+      "Cleaning Products"
+    ],
+    "4_current_medications_supplements__are_you_currently_taking_any_prescription_medications": "No",
+    "4_current_medications_supplements__are_you_currently_taking_any_supplements": "Yes",
+    "4_current_medications_supplements__supplements": [
+      "Feritinas"
+    ],
+    "5_significant_medical_events_symptoms__5_1_prior_surgeries_procedures__have_you_ever_undergone_any_surgery_or_significant_medical_procedure": "No",
+    "5_significant_medical_events_symptoms__5_2_major_injuries_health_events__have_you_experienced_any_major_injuries_or_serious_health_events": "No",
+    "5_significant_medical_events_symptoms__hospitalizations__have_you_ever_been_hospitalized_excluding_planned_surgeries": "No",
+    "5_significant_medical_events_symptoms__abnormal_or_borderline_test_results__have_you_ever_been_informed_that_any_of_the_following_health_markers_were_abnormal_or_borderline": "No",
+    "5_significant_medical_events_symptoms__chronic_symptoms_functional_limitations__do_you_currently_experience_any_persistent_symptoms_that_affect_your_daily_life": "No",
+    "6_female_health__which_best_describes_your_current_situation": "Regular periods",
+    "6_female_health__how_would_you_describe_your_typical_menstrual_flow": "Moderate",
+    "6_female_health__how_much_does_menstrual_pain_affect_your_daily_activities": "Mild",
+    "6_female_health__do_you_experience_pelvic_pain_between_periods_and_or_pain_during_intercourse": "Yes",
+    "6_female_health__have_your_periods_become_noticeably_more_irregular_in_the_last_12_months": "No",
+    "6_female_health__are_you_currently_using_hormonal_contraception": "No",
+    "6_female_health__are_you_currently_using_hormone_replacement_therapy_hrt": "No",
+    "7_lifestyle__do_you_exercise_or_participate_in_sports": "Yes",
+    "7_lifestyle__type_of_exercise_sport": [
+      "Cycling",
+      "Running",
+      "Yoga / Pilates"
+    ],
+    "7_lifestyle__exercise_frequency": "Regularly (several times per week)",
+    "7_lifestyle__average_sleep_duration": "7–8 hours",
+    "7_lifestyle__sleep_quality": "Average",
+    "7_lifestyle__diet_type": "Mediterranean",
+    "7_lifestyle__do_you_smoke_or_use_nicotine_products": "Current User",
+    "7_lifestyle__nicotine_product_type": [
+      "E-cigarettes / Vaping"
+    ],
+    "7_lifestyle__alcohol_consumption": "Occasionally",
+    "7_lifestyle__recreational_drug_use": "Never",
+    "8_environment_social_support__living_area": "Urban",
+    "8_environment_social_support__work_conditions": "Office",
+    "8_environment_social_support__social_support": "Medium",
+    "9_psychological_emotional_health__stress_level": "0–10",
+    "9_psychological_emotional_health__mood_emotional_state": "Stable",
+    "9_psychological_emotional_health__anxiety_symptoms": [
+      "Sleep disruption"
+    ],
+    "9_psychological_emotional_health__depression_symptoms": [
+      "Appetite changes"
+    ],
+    "9_psychological_emotional_health__burnout_exhaustion": "0–10",
+    "9_psychological_emotional_health__cognitive_performance": "1–5",
+    "9_psychological_emotional_health__current_mental_health_care": [
+      "None"
+    ],
+    "9_psychological_emotional_health__overall_health_score": 7
+  },
+  "conditionDetails": {},
+  "familyMembers": [
+    {
+      "id": "fm_seed_f1",
+      "relative": "Maternal Grandmother",
+      "conditions": [
+        "Breast Cancer"
+      ],
+      "birthYear": 1942,
+      "vitalStatus": "Deceased",
+      "deathYear": 2025
+    },
+    {
+      "id": "fm_seed_f2",
+      "relative": "Mother",
+      "conditions": [
+        "High Blood Pressure"
+      ],
+      "birthYear": 1964,
+      "vitalStatus": "Living",
+      "deathYear": null
+    },
+    {
+      "id": "fm_seed_f3",
+      "relative": "Father",
+      "conditions": [],
+      "birthYear": 1962,
+      "vitalStatus": "Living",
+      "deathYear": null
+    }
+  ],
+  "cancer": {
+    "types": [],
+    "treatment": []
+  }
+}

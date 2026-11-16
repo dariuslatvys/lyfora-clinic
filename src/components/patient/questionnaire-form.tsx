@@ -133,31 +133,38 @@ export function QuestionnaireForm({
     [def.fields]
   );
 
-  // Prefer newer browser copy when serverless /tmp DB was reset.
+  // Prefer richer browser copy when serverless /tmp DB was reset —
+  // never push a sparse local draft over a filled server questionnaire.
   useEffect(() => {
     const local = readLocalAnswers(patientId, kind);
     const best = newerAnswers(initialAnswers, local);
-    if (best !== initialAnswers) {
-      setAnswers(best);
-      answersRef.current = best;
-      setSavedAt(best.updatedAt);
-      // Push browser copy back to server so Death Clock / twin see it too.
-      void fetch("/api/patient/questionnaire", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ answers: best, kind }),
-        cache: "no-store",
-      })
-        .then(async (res) => {
-          if (!res.ok) return;
-          const data = (await res.json()) as { answers: QuestionnaireAnswers };
-          setAnswers(data.answers);
-          answersRef.current = data.answers;
-          setSavedAt(data.answers.updatedAt);
-          writeLocalAnswers(patientId, data.answers, kind);
-        })
-        .catch(() => undefined);
+    if (best === initialAnswers) {
+      writeLocalAnswers(patientId, initialAnswers, kind);
+      return;
     }
+    const serverRicher = filledCount(initialAnswers) > filledCount(best);
+    if (serverRicher) {
+      writeLocalAnswers(patientId, initialAnswers, kind);
+      return;
+    }
+    setAnswers(best);
+    answersRef.current = best;
+    setSavedAt(best.updatedAt);
+    void fetch("/api/patient/questionnaire", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ answers: best, kind }),
+      cache: "no-store",
+    })
+      .then(async (res) => {
+        if (!res.ok) return;
+        const data = (await res.json()) as { answers: QuestionnaireAnswers };
+        setAnswers(data.answers);
+        answersRef.current = data.answers;
+        setSavedAt(data.answers.updatedAt);
+        writeLocalAnswers(patientId, data.answers, kind);
+      })
+      .catch(() => undefined);
   }, [patientId, initialAnswers, kind]);
 
   const sex = biologicalSex(answers, def);

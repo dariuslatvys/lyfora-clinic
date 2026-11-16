@@ -1,0 +1,107 @@
+{
+  "updatedAt": "2026-11-16T08:00:00.000Z",
+  "values": {
+    "1_basic_profile_health_metrics__biological_sex": "Male",
+    "2_current_past_medical_conditions__have_you_ever_been_diagnosed_with_any_medical_condition": "Yes",
+    "2_current_past_medical_conditions__conditions__medical_conditions": [
+      "High Blood Pressure (Hypertension)",
+      "Acid Reflux (GERD)"
+    ],
+    "1_basic_profile_health_metrics__known_blood_pressure": {
+      "sys": 132,
+      "dia": 79
+    },
+    "1_basic_profile_health_metrics__resting_heart_rate": 68,
+    "1_basic_profile_health_metrics__hrv_30_day_average": 52,
+    "1_basic_profile_health_metrics__date_of_birth": "1972-04-17",
+    "1_basic_profile_health_metrics__age": 54,
+    "1_basic_profile_health_metrics__height": 179,
+    "1_basic_profile_health_metrics__weight": 83,
+    "1_basic_profile_health_metrics__bmi": 25.9,
+    "1_basic_profile_health_metrics__waist_circumference": 95,
+    "1_basic_profile_health_metrics__vo_max": 35,
+    "1_basic_profile_health_metrics__how_would_you_rate_your_overall_health": "Good",
+    "3_allergies__do_you_have_any_known_allergies": "Yes",
+    "3_allergies__food_allergies": [
+      "Sesame"
+    ],
+    "3_allergies__environmental_allergies": [
+      "Animal Dander"
+    ],
+    "3_allergies__insect_allergies": [
+      "Bee Stings"
+    ],
+    "3_allergies__severity": "Moderate",
+    "4_current_medications_supplements__are_you_currently_taking_any_prescription_medications": "Yes",
+    "4_current_medications_supplements__current_medications": [
+      "Tezeo (Telmisartan)",
+      "Roswera (Rosuvastatin)"
+    ],
+    "4_current_medications_supplements__are_you_currently_taking_any_supplements": "Yes",
+    "5_significant_medical_events_symptoms__5_1_prior_surgeries_procedures__have_you_ever_undergone_any_surgery_or_significant_medical_procedure": "No",
+    "5_significant_medical_events_symptoms__5_2_major_injuries_health_events__have_you_experienced_any_major_injuries_or_serious_health_events": "No",
+    "5_significant_medical_events_symptoms__hospitalizations__have_you_ever_been_hospitalized_excluding_planned_surgeries": "No",
+    "5_significant_medical_events_symptoms__abnormal_or_borderline_test_results__have_you_ever_been_informed_that_any_of_the_following_health_markers_were_abnormal_or_borderline": "No",
+    "5_significant_medical_events_symptoms__chronic_symptoms_functional_limitations__do_you_currently_experience_any_persistent_symptoms_that_affect_your_daily_life": "No",
+    "7_lifestyle__do_you_exercise_or_participate_in_sports": "Yes",
+    "7_lifestyle__type_of_exercise_sport": [
+      "Walking",
+      "Cycling",
+      "Gym / Strength Training"
+    ],
+    "7_lifestyle__exercise_frequency": "Regularly (several times per week)",
+    "7_lifestyle__average_sleep_duration": "6–7 hours",
+    "7_lifestyle__sleep_quality": "Average",
+    "7_lifestyle__diet_type": "Balanced",
+    "7_lifestyle__do_you_smoke_or_use_nicotine_products": "Former User",
+    "7_lifestyle__alcohol_consumption": "Occasionally",
+    "7_lifestyle__recreational_drug_use": "Never",
+    "8_environment_social_support__living_area": "Nature",
+    "8_environment_social_support__work_conditions": "Office",
+    "8_environment_social_support__social_support": "Medium",
+    "9_psychological_emotional_health__stress_level": "0–10",
+    "9_psychological_emotional_health__mood_emotional_state": "Fluctuating",
+    "9_psychological_emotional_health__anxiety_symptoms": [
+      "Sleep disruption"
+    ],
+    "9_psychological_emotional_health__burnout_exhaustion": "0–10",
+    "9_psychological_emotional_health__cognitive_performance": "1–5",
+    "9_psychological_emotional_health__overall_health_score": 7
+  },
+  "conditionDetails": {},
+  "familyMembers": [
+    {
+      "id": "fm_seed_m1",
+      "relative": "Father",
+      "conditions": [
+        "Heart Attack / Myocardial Infarction",
+        "High Blood Pressure"
+      ],
+      "birthYear": 1950,
+      "vitalStatus": "Deceased",
+      "deathYear": 2022
+    },
+    {
+      "id": "fm_seed_m3",
+      "relative": "Mother",
+      "conditions": [
+        "High Blood Pressure"
+      ],
+      "birthYear": 1938,
+      "vitalStatus": "Living",
+      "deathYear": null
+    },
+    {
+      "id": "fm_seed_m2",
+      "relative": "Maternal Grandmother",
+      "conditions": [],
+      "birthYear": 1928,
+      "vitalStatus": "Deceased",
+      "deathYear": 2020
+    }
+  ],
+  "cancer": {
+    "types": [],
+    "treatment": []
+  }
+}

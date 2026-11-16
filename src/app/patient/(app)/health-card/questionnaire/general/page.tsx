@@ -9,6 +9,10 @@ import {
   questionnaireStorageKey,
 } from "@/lib/health/questionnaire";
 import { loadQuestionnaireDefinition } from "@/lib/health/questionnaire-loader";
+import {
+  ensureDemoQuestionnaire,
+  syncSharedMetrics,
+} from "@/lib/health/ensure-demo-questionnaires";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -24,6 +28,11 @@ export default async function GeneralQuestionnairePage({
   const sp = await searchParams;
 
   ensureSchema();
+  await ensureDemoQuestionnaire(current.patient.id, "general");
+  if (current.patient.sex === "female") {
+    await ensureDemoQuestionnaire(current.patient.id, "women");
+    await syncSharedMetrics(current.patient.id);
+  }
   const db = getDb();
   const key = questionnaireStorageKey("general");
   const row = db

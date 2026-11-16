@@ -11,7 +11,10 @@ import {
 } from "@/lib/health/questionnaire";
 import { loadQuestionnaireDefinition } from "@/lib/health/questionnaire-loader";
 import { formatDateTime } from "@/lib/utils";
-import { ensureWomenDemoAnswers } from "@/lib/health/ensure-women-demo";
+import {
+  ensureDemoQuestionnaire,
+  syncSharedMetrics,
+} from "@/lib/health/ensure-demo-questionnaires";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -23,8 +26,10 @@ export default async function QuestionnaireHubPage() {
   const isFemale = current.patient.sex === "female";
 
   ensureSchema();
+  await ensureDemoQuestionnaire(current.patient.id, "general");
   if (isFemale) {
-    await ensureWomenDemoAnswers(current.patient.id);
+    await ensureDemoQuestionnaire(current.patient.id, "women");
+    await syncSharedMetrics(current.patient.id);
   }
   const db = getDb();
 

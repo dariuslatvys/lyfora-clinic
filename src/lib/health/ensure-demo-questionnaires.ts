@@ -90,16 +90,34 @@ export async function ensureDemoQuestionnaire(
     )
     .get();
   const current = parseStoredAnswers(existing?.value);
-  if (filledCount(current) >= 8) return;
-
   const demo = readDemoFile(file);
   if (!demo) return;
+
+  const demoVersion = String(
+    (demo.values as Record<string, unknown>)?._seedVersion || ""
+  );
+  const currentVersion = String(
+    (current.values as Record<string, unknown>)?._seedVersion || ""
+  );
+  const currentN = filledCount(current);
+  const demoN = filledCount(demo);
+  // Demo patients: re-seed when empty, sparse, or seed version drifted.
+  const needsRestore =
+    currentN < 8 ||
+    currentN + 5 < demoN ||
+    (demoVersion && demoVersion !== currentVersion);
+  if (!needsRestore) return;
 
   let answers = demo;
   if (kind === "women") {
     const def = await loadQuestionnaireDefinition("women");
     answers = syncWomenDerivedScores(demo, def);
   }
+  // Fresh timestamp so client prefers server over any leftover draft.
+  answers = {
+    ...answers,
+    updatedAt: new Date().toISOString(),
+  };
   upsertAnswers(patientId, kind, answers);
 }
 

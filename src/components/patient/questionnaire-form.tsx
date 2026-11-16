@@ -74,18 +74,18 @@ function filledCount(answers: QuestionnaireAnswers) {
 }
 
 function newerAnswers(
-  a: QuestionnaireAnswers,
-  b: QuestionnaireAnswers | null
+  server: QuestionnaireAnswers,
+  local: QuestionnaireAnswers | null
 ): QuestionnaireAnswers {
-  if (!b) return a;
-  const aCount = filledCount(a);
-  const bCount = filledCount(b);
-  // Prefer the richer answer set (avoids empty local drafts wiping seeded demo).
-  if (aCount >= 5 && bCount < aCount / 2) return a;
-  if (bCount >= 5 && aCount < bCount / 2) return b;
-  const at = Date.parse(a.updatedAt || "") || 0;
-  const bt = Date.parse(b.updatedAt || "") || 0;
-  return bt > at ? b : a;
+  if (!local) return server;
+  const serverN = filledCount(server);
+  const localN = filledCount(local);
+  // Never let a sparse browser draft replace a filled server questionnaire.
+  if (serverN >= 8 && localN < serverN) return server;
+  if (localN >= 8 && serverN < localN / 2) return local;
+  const st = Date.parse(server.updatedAt || "") || 0;
+  const lt = Date.parse(local.updatedAt || "") || 0;
+  return lt > st ? local : server;
 }
 
 export function QuestionnaireForm({

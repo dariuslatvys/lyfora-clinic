@@ -163,8 +163,8 @@ export function PatientRail({
           "who",
           pathname.startsWith("/patient/health-card/questionnaire") && "on"
         )}
-        aria-label={`Sveikatos klausimynas — ${patientName}`}
-        title="Sveikatos klausimynas"
+        aria-label={`Klausimynai — ${patientName}`}
+        title="Klausimynai"
       >
         <div className="av">{initials(patientName)}</div>
         <div style={{ minWidth: 0 }}>

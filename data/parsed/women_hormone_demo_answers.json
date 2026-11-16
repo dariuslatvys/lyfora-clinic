@@ -1,9 +1,10 @@
 {
-  "updatedAt": "2026-11-16T08:00:00.000Z",
+  "updatedAt": "2026-11-16T09:30:00.000Z",
+  "seedVersion": "pks-gabija-v2.8",
   "values": {
-    "w_birth_date": "1988-03-12",
+    "w_birth_date": "2000-03-08",
     "w_height": 168,
-    "w_weight": 64,
+    "w_weight": 80,
     "w_hormones": [
       "Nevartoju"
     ],
@@ -14,76 +15,67 @@
       "Nieko iš išvardytų"
     ],
     "w_trying_conceive": "Nebandau",
-    "w_miscarriages": "Ne",
+    "w_miscarriages": "Nebuvau nėščia",
     "w_concerns": [
       "Nereguliarios ar dingusios mėnesinės",
-      "Skausmas",
-      "Nuovargis",
-      "Plaukai, oda"
+      "Plaukai, oda",
+      "Nuovargis"
     ],
     "w_diagnoses": [
       "Nieko iš išvardytų"
     ],
     "w_smoking": "Ne",
     "w_family_female": [
-      "Nieko iš išvardytų"
+      "Nežinau"
     ],
     "w_family_clotting": [
       "Nieko iš išvardytų"
     ],
     "w_period_status": "Taip, nereguliariai",
-    "w_period_dates": "2026-10-02, 2026-08-28, 2026-07-15, 2026-06-20, 2026-05-10",
-    "w_cycle_length": "Labai skiriasi",
-    "w_longest_gap": "60–90 d.",
-    "w_cycle_variability": "Taip",
-    "w_spotting": "Buvo 1–2 kartus",
+    "w_period_dates": "2025-10-02, 2025-11-20, 2026-01-24, 2026-03-12, 2026-05-30, 2026-07-11, 2026-09-19",
+    "w_spotting": "Niekada",
     "w_postcoital_bleed": "Ne",
     "w_heavy_periods": "Ne",
-    "w_period_pain": "6",
-    "w_pain_miss_work": "Kartais",
-    "w_painkillers_help": "Iš dalies",
-    "w_pain_worsened": "Taip",
+    "w_period_pain": "4",
+    "w_pain_miss_work": "Niekada",
+    "w_painkillers_help": "Taip",
+    "w_pain_worsened": "Ne",
     "w_other_pain": [
-      "Dubens skausmas ne mėnesinių metu 6 mėn. ar ilgiau",
-      "Gilus skausmas lytinių santykių metu ar po jų"
+      "Nieko iš išvardytų"
     ],
     "w_hair_body": [
-      "Smakras, viršutinė lūpa"
+      "Smakras, viršutinė lūpa",
+      "Pilvas"
     ],
     "w_hair_loss": [
-      "Daugiau plaukų iškrenta visoje galvoje"
+      "Retėja viršugalvis ar platėja sklastymo linija"
     ],
-    "w_hair_trigger": "Ne",
     "w_acne_acanthosis": [
-      "Nieko iš išvardytų"
+      "Vidutinę ar sunkią aknę, kuri tęsiasi ar atsirado suaugus",
+      "Tamsias aksomines dėmes kaklo ar pažastų srityje"
     ],
     "w_androgen_redflag": "Ne",
     "w_pms_symptoms": [
-      "Nuotaikos svyravimai, dirglumas, liūdesys ar nerimas",
-      "Pilvo pūtimas",
-      "Krūtų jautrumas ar tinimas"
+      "Krūtų jautrumas ar tinimas",
+      "Pilvo pūtimas"
     ],
-    "w_pms_impact": "6",
-    "w_mood_other_days": "Ne",
+    "w_pms_impact": "2",
     "w_symptoms_3m": [
       "Nuovargis",
-      "Miego sutrikimai",
       "Nepaaiškinamas svorio didėjimas"
     ],
     "w_bloating_redflag": "Ne",
     "w_nipple_discharge": "Ne",
-    "w_migraine_aura": "Ne",
     "w_energy_deficit": [
       "Nieko iš išvardytų"
     ],
     "w_sexual": [
-      "Sumažėjusį lytinį potraukį",
-      "Gilų skausmą lytinių santykių metu"
+      "Nieko iš išvardytų"
     ],
-    "w_sexual_distress": "Taip",
     "w_phq2_interest": "1 – Keletą dienų",
-    "w_phq2_depressed": "1 – Keletą dienų",
-    "w_symptom_onset": "Prieš 3–12 mėn."
+    "w_phq2_depressed": "0 – Visai ne",
+    "w_symptom_onset": "Nuo pirmųjų mėnesinių",
+    "_seedVersion": "pks-gabija-v2.8"
   },
   "conditionDetails": {},
   "familyMembers": [],

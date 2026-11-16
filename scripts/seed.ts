@@ -261,7 +261,7 @@ async function main() {
     femaleUserId,
     "Rasa Rasaitė",
     "female",
-    "1988-03-12",
+    "2000-03-08",
     null,
     1,
     1,

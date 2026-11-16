@@ -262,9 +262,10 @@ export function questionnaireStorageKey(kind: QuestionnaireKind = "general") {
 export function questionnaireLocalStoragePrefix(
   kind: QuestionnaireKind = "general"
 ) {
+  // Bump suffix when demo seeds change so stale empty browser drafts are ignored.
   return kind === "women"
-    ? "lyfora_women_questionnaire_v1:"
-    : "lyfora_questionnaire_v1:";
+    ? "lyfora_women_questionnaire_v4:"
+    : "lyfora_questionnaire_v4:";
 }
 
 export function fieldById(def: QDefinition, id: string) {

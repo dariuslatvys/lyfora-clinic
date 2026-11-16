@@ -1,12 +1,12 @@
 {
-  "updatedAt": "2026-11-16T08:00:00.000Z",
+  "updatedAt": "2026-11-16T09:30:00.000Z",
   "values": {
     "1_basic_profile_health_metrics__biological_sex": "Female",
-    "1_basic_profile_health_metrics__date_of_birth": "1988-03-12",
-    "1_basic_profile_health_metrics__age": 38,
+    "1_basic_profile_health_metrics__date_of_birth": "2000-03-08",
+    "1_basic_profile_health_metrics__age": 26,
     "1_basic_profile_health_metrics__height": 168,
-    "1_basic_profile_health_metrics__weight": 64,
-    "1_basic_profile_health_metrics__bmi": 22.7,
+    "1_basic_profile_health_metrics__weight": 80,
+    "1_basic_profile_health_metrics__bmi": 28.3,
     "1_basic_profile_health_metrics__waist_circumference": 67,
     "1_basic_profile_health_metrics__known_blood_pressure": {
       "sys": 125,
@@ -80,7 +80,8 @@
     "9_psychological_emotional_health__current_mental_health_care": [
       "None"
     ],
-    "9_psychological_emotional_health__overall_health_score": 7
+    "9_psychological_emotional_health__overall_health_score": 7,
+    "_seedVersion": "pks-gabija-v2.8"
   },
   "conditionDetails": {},
   "familyMembers": [

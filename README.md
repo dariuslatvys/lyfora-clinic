@@ -51,7 +51,14 @@ Atidarykite [http://127.0.0.1:43123](http://127.0.0.1:43123).
 ## Viešas demo (Vercel free)
 
 Prototipui pakanka nemokamo `*.vercel.app` adreso. SQLite demo DB yra
-`data/demo/lyfora.sqlite` (Vercel’e kopijuojama į `/tmp`). Nustatykite `SESSION_SECRET` (ir, jei reikia prisijungti, `DEMO_PASSWORD` prieš seed).
+`data/demo/lyfora.sqlite` (Vercel’e kopijuojama į `/tmp`).
+
+Vercel Environment Variables (būtina prisijungimui):
+
+- `SESSION_SECRET` — ilga atsitiktinė eilutė (`openssl rand -base64 48`)
+- `DEMO_PASSWORD` — slaptažodis demo paskyroms (`pacientas@…` / `paciente@…` / `gydytojas@…`)
+
+Po env išsaugojimo padarykite Redeploy.
 
 ### Jūsų žingsniai
 
@@ -62,7 +69,7 @@ Prototipui pakanka nemokamo `*.vercel.app` adreso. SQLite demo DB yra
    git push -u github main
    ```
 3. Eikite į [vercel.com/new](https://vercel.com/new) (tas pats account, kur `avocadotech.eu`).
-4. **Import** tą GitHub repo → Framework: Next.js → pridėkite env `SESSION_SECRET` → **Deploy**.
+4. **Import** tą GitHub repo → Framework: Next.js → Environment Variables: `SESSION_SECRET` ir `DEMO_PASSWORD` → **Deploy**.
 5. Po 1–2 min gausite `https://lyfora-clinic-….vercel.app` — tuo dalinkitės.
 
 Pastaba: serverless cold start’e sesijos /tmp DB gali „atsinaujinti“ — demo’ui to užtenka.

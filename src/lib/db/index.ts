@@ -3,6 +3,7 @@ import { drizzle } from "drizzle-orm/better-sqlite3";
 import fs from "fs";
 import path from "path";
 import * as schema from "./schema";
+import { ensureDemoPasswords } from "@/lib/auth/ensure-demo-passwords";
 
 const BUNDLED_DEMO = path.join(process.cwd(), "data", "demo", "lyfora.sqlite");
 const LOCAL_DB = path.join(process.cwd(), "data", "db", "lyfora.sqlite");
@@ -177,4 +178,5 @@ export function ensureSchema() {
     CREATE INDEX IF NOT EXISTS idx_uploads_patient ON patient_uploads(patient_id);
     CREATE INDEX IF NOT EXISTS idx_clinic_visits_patient ON clinic_visits(patient_id);
   `);
+  ensureDemoPasswords(sqlite);
 }

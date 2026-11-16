@@ -65,11 +65,24 @@ function writeLocalAnswers(
   }
 }
 
+function filledCount(answers: QuestionnaireAnswers) {
+  return Object.values(answers.values || {}).filter((v) => {
+    if (v == null || v === "") return false;
+    if (Array.isArray(v) && v.length === 0) return false;
+    return true;
+  }).length;
+}
+
 function newerAnswers(
   a: QuestionnaireAnswers,
   b: QuestionnaireAnswers | null
 ): QuestionnaireAnswers {
   if (!b) return a;
+  const aCount = filledCount(a);
+  const bCount = filledCount(b);
+  // Prefer the richer answer set (avoids empty local drafts wiping seeded demo).
+  if (aCount >= 5 && bCount < aCount / 2) return a;
+  if (bCount >= 5 && aCount < bCount / 2) return b;
   const at = Date.parse(a.updatedAt || "") || 0;
   const bt = Date.parse(b.updatedAt || "") || 0;
   return bt > at ? b : a;

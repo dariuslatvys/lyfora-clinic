@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { eq, and } from "drizzle-orm";
 import { getCurrentUser } from "@/lib/auth/session";
@@ -6,15 +5,12 @@ import { t } from "@/lib/i18n/dictionary";
 import { ensureSchema, getDb } from "@/lib/db";
 import { questionnaire } from "@/lib/db/schema";
 import {
-  completionStats,
   parseStoredAnswers,
   questionnaireStorageKey,
 } from "@/lib/health/questionnaire";
-import { loadQuestionnaireDefinition } from "@/lib/health/questionnaire-loader";
 import { buildHealthCard } from "@/lib/health/health-card-data";
 import { HealthCardTabs } from "@/components/patient/health-card-tabs";
 import { loadDigitalTwin } from "@/lib/health/load-twin";
-import { formatDateTime } from "@/lib/utils";
 import { ensurePetraitisPatient } from "@/lib/health/petraitis-patient";
 
 export default async function HealthCardPage() {
@@ -37,9 +33,7 @@ export default async function HealthCardPage() {
       )
     )
     .get();
-  const def = await loadQuestionnaireDefinition("general");
   const answers = parseStoredAnswers(row?.value);
-  const stats = completionStats(def, answers);
 
   const card = buildHealthCard({
     patientName: current.patient.fullName,
@@ -66,59 +60,6 @@ export default async function HealthCardPage() {
 
   return (
     <div className="stack" style={{ gap: 16 }}>
-      <section className="card">
-        <div className="card-head">
-          <div>
-            <h2>
-              {locale === "en" ? "Health questionnaire" : "Sveikatos klausimynas"}
-            </h2>
-            <p className="small muted m-0">
-              {locale === "en"
-                ? "Structured intake — answers feed the card tabs below."
-                : "Struktūruotas klausimynas — atsakymai papildo kortelės tabus žemiau."}
-            </p>
-          </div>
-          <Link href="/patient/health-card/questionnaire" className="btn">
-            {answers.updatedAt
-              ? locale === "en"
-                ? "Open questionnaire"
-                : "Atidaryti klausimyną"
-              : locale === "en"
-                ? "Fill questionnaire"
-                : "Pildyti klausimyną"}
-          </Link>
-        </div>
-        <div className="row between" style={{ marginTop: 8 }}>
-          <div className="stack" style={{ gap: 4 }}>
-            <span className="small muted">
-              {locale === "en" ? "Completion" : "Užpildymas"}
-            </span>
-            <b className="num" style={{ fontSize: "1.35rem" }}>
-              {stats.percent}%
-            </b>
-            <span className="xs muted">
-              {stats.filled}/{stats.required}{" "}
-              {locale === "en" ? "required fields" : "privalomų laukų"}
-            </span>
-          </div>
-          <div className="q-progress" style={{ width: 180, alignSelf: "center" }}>
-            <i style={{ width: `${stats.percent}%` }} />
-          </div>
-          <div className="stack" style={{ gap: 4, textAlign: "right" }}>
-            <span className="small muted">
-              {locale === "en" ? "Last saved" : "Paskutinį kartą"}
-            </span>
-            <b>
-              {answers.updatedAt
-                ? formatDateTime(answers.updatedAt, locale)
-                : locale === "en"
-                  ? "Not started"
-                  : "Dar nepradėta"}
-            </b>
-          </div>
-        </div>
-      </section>
-
       <HealthCardTabs
         locale={locale}
         labels={labels}

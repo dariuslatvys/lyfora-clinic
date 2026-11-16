@@ -10,6 +10,7 @@ import {
   syncWomenDerivedScores,
 } from "@/lib/health/questionnaire";
 import { loadQuestionnaireDefinition } from "@/lib/health/questionnaire-loader";
+import { ensureWomenDemoAnswers } from "@/lib/health/ensure-women-demo";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -28,6 +29,7 @@ export default async function WomenQuestionnairePage({
   const sp = await searchParams;
 
   ensureSchema();
+  await ensureWomenDemoAnswers(current.patient.id);
   const db = getDb();
   const key = questionnaireStorageKey("women");
   const row = db

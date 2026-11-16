@@ -93,11 +93,6 @@ export function HealthCardTabs({
           </h1>
           <p className="small muted mt-1 mb-0">{headMeta}</p>
         </div>
-        {!readOnly ? (
-          <Link href="/patient/health-card/questionnaire" className="btn ghost sm">
-            {locale === "en" ? "Questionnaire" : "Klausimynas"}
-          </Link>
-        ) : null}
       </div>
 
       <div

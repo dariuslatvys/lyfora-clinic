@@ -11,6 +11,7 @@ import {
 } from "@/lib/health/questionnaire";
 import { loadQuestionnaireDefinition } from "@/lib/health/questionnaire-loader";
 import { formatDateTime } from "@/lib/utils";
+import { ensureWomenDemoAnswers } from "@/lib/health/ensure-women-demo";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -22,6 +23,9 @@ export default async function QuestionnaireHubPage() {
   const isFemale = current.patient.sex === "female";
 
   ensureSchema();
+  if (isFemale) {
+    await ensureWomenDemoAnswers(current.patient.id);
+  }
   const db = getDb();
 
   const generalDef = await loadQuestionnaireDefinition("general");

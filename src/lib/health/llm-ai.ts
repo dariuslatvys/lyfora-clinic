@@ -38,7 +38,7 @@ function twinContext(patientId: string, locale: Locale): string {
     .join(", ");
 
   return [
-    `Patient: ${twin.patient.displayName} (${twin.patient.sex})`,
+    `Patient: ${twin.patient.fullName} (${twin.patient.sex})`,
     attention
       ? locale === "en"
         ? `Attention areas: ${attention}`

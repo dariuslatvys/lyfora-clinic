@@ -44,39 +44,9 @@ export default async function WomenQuestionnairePage({
   const def = await loadQuestionnaireDefinition("women");
   let answers = parseStoredAnswers(row?.value);
 
-  // Prefill DOB / height / weight from patient profile or general questionnaire.
-  if (!answers.values.w_birth_date && current.patient.dob) {
+  // Prefill DOB from patient profile only when the women questionnaire is empty.
+  if (!answers.updatedAt && !answers.values.w_birth_date && current.patient.dob) {
     answers.values.w_birth_date = current.patient.dob;
-  }
-  const generalKey = questionnaireStorageKey("general");
-  const generalRow = db
-    .select()
-    .from(questionnaire)
-    .where(
-      and(
-        eq(questionnaire.patientId, current.patient.id),
-        eq(questionnaire.key, generalKey)
-      )
-    )
-    .get();
-  if (generalRow?.value) {
-    const general = parseStoredAnswers(generalRow.value);
-    const map: Array<[string, (id: string) => boolean]> = [
-      ["w_birth_date", (id) => id.includes("date_of_birth")],
-      ["w_height", (id) => id.endsWith("__height") || id.includes("height")],
-      ["w_weight", (id) => id.endsWith("__weight") || id.includes("weight")],
-    ];
-    for (const [target, match] of map) {
-      if (answers.values[target] != null && answers.values[target] !== "") {
-        continue;
-      }
-      for (const [id, value] of Object.entries(general.values)) {
-        if (match(id) && value != null && value !== "") {
-          answers.values[target] = value;
-          break;
-        }
-      }
-    }
   }
 
   answers = syncWomenDerivedScores(answers, def);

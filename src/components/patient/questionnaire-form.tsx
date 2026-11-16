@@ -298,8 +298,11 @@ export function QuestionnaireForm({
     <div className="stack q-wrap" style={{ gap: 14 }}>
       <div className="row between" style={{ alignItems: "flex-start" }}>
         <div>
-          <Link href="/patient/health-card" className="text-sm text-[var(--muted)]">
-            ← {locale === "en" ? "Health record" : "Sveikatos kortelė"}
+          <Link
+            href="/patient/health-card/questionnaire"
+            className="text-sm text-[var(--muted)]"
+          >
+            ← {locale === "en" ? "Questionnaires" : "Klausimynai"}
           </Link>
           <h1 className="font-[family-name:var(--font-display)] text-[1.55rem] font-bold mt-2 mb-1">
             {locale === "en"

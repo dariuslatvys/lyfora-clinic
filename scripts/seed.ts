@@ -4,7 +4,11 @@ import bcrypt from "bcryptjs";
 import Database from "better-sqlite3";
 import { ensureSchema, getSqlite } from "../src/lib/db";
 import { loadQuestionnaireDefinition } from "../src/lib/health/questionnaire-loader";
-import { parseStoredAnswers } from "../src/lib/health/questionnaire";
+import {
+  normalizeQuestionnaireAnswers,
+  parseStoredAnswers,
+  syncWomenDerivedScores,
+} from "../src/lib/health/questionnaire";
 import { syncQuestionnaireMetrics } from "../src/lib/health/sync-questionnaire-metrics";
 
 type JsonSnp = {
@@ -765,6 +769,42 @@ async function main() {
   insertQ.run(femaleId, "sleep_hours", "7-8");
   insertQ.run(femaleId, "family_breast_cancer", "močiutė");
   insertQ.run(femaleId, "menstrual_regular", "taip");
+
+  // Prefill Papildomas moters klausimynas for demo female patient (PDF v2.8 options).
+  {
+    const womenDemoPath = path.join(
+      ROOT,
+      "data",
+      "parsed",
+      "women_hormone_demo_answers.json"
+    );
+    if (fs.existsSync(womenDemoPath)) {
+      const womenDef = await loadQuestionnaireDefinition("women");
+      const raw = JSON.parse(fs.readFileSync(womenDemoPath, "utf8")) as {
+        updatedAt?: string;
+        values?: Record<string, unknown>;
+        conditionDetails?: Record<string, unknown>;
+        familyMembers?: unknown[];
+        cancer?: { types: string[]; treatment: string[] };
+      };
+      const seeded = syncWomenDerivedScores(
+        normalizeQuestionnaireAnswers({
+          updatedAt: raw.updatedAt || now,
+          values: raw.values || {},
+          conditionDetails: {},
+          familyMembers: [],
+          cancer: raw.cancer || { types: [], treatment: [] },
+        }),
+        womenDef
+      );
+      insertQ.run(
+        femaleId,
+        "women_hormone_questionnaire_v1",
+        JSON.stringify(seeded)
+      );
+      console.log("  seeded women hormone questionnaire for", femaleId);
+    }
+  }
 
   function withFamilyHistoryDemo(
     pid: string,

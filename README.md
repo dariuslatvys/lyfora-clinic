@@ -57,6 +57,7 @@ Vercel Environment Variables (būtina prisijungimui):
 
 - `SESSION_SECRET` — ilga atsitiktinė eilutė (`openssl rand -base64 48`)
 - `DEMO_PASSWORD` — slaptažodis demo paskyroms (`pacientas@…` / `paciente@…` / `gydytojas@…`)
+- `OPENAI_API_KEY` (nebūtina) — jei nustatytas, Ask AI naudoja LLM; be jo veikia taisyklėmis (įskaitant PMOS paaiškinimą)
 
 Po env išsaugojimo padarykite Redeploy.
 

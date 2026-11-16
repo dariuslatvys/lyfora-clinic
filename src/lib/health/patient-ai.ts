@@ -4,6 +4,7 @@ import { loadDigitalTwin } from "./load-twin";
 import { explainSnp } from "./explain-snp";
 import { explainRareVariant } from "./explain-rare";
 import { colourRank } from "./colours";
+import { DEMO_PMOS_REPORT } from "./reproductive-phenotypes";
 
 const DISCLAIMER_LT =
   "Asistentas neteikia diagnozių ir nekeičia gydymo. Informacija paremta jūsų įkeltais duomenimis. Kilus abejonėms kreipkitės į gydytoją ar nuotolinę konsultaciją; 112 — tik gyvybei pavojingais atvejais.";
@@ -36,6 +37,59 @@ export function buildPatientAiReply(input: {
   const attention = twin.categories
     .filter((c) => colourRank(c.colour) >= 3)
     .sort((a, b) => colourRank(b.colour) - colourRank(a.colour));
+
+  // PMOS / PKS / PCOS — explain in plain language (with patient demo context)
+  if (
+    /\bpmos\b|\bpks\b|\bpcos\b|policist|kiaušid|kiausid|ovuliac|androgen/.test(
+      ql
+    )
+  ) {
+    const report = DEMO_PMOS_REPORT;
+    if (locale === "en") {
+      return {
+        reply: [
+          `**PMOS** means **${report.pmosExpandEn}**.`,
+          `In Lithuanian it is often still called **PKS** — **${report.pksExpandLt}** (English: PCOS).`,
+          "",
+          "In simple terms: cycles can be irregular because ovulation does not happen every month, and there may be signs of higher male hormones (acne, excess hair, crown thinning). Metabolism / insulin resistance often travels with it.",
+          "",
+          twin.patient.sex === "female"
+            ? [
+                "In your Lyfora demo card there is a **worth checking** PMOS signal:",
+                report.patientStoryEn.split(/\n\n+/)[1] ||
+                  report.patientStoryEn,
+                "",
+                report.disclaimerEn,
+              ].join("\n")
+            : "This explanation is general; your card is not the female demo PMOS case.",
+          "",
+          "This is not a diagnosis — discuss next tests with a GP, gynaecologist or endocrinologist.",
+        ].join("\n"),
+        disclaimer,
+      };
+    }
+    return {
+      reply: [
+        `**PMOS** — **${report.pmosExpandEn}**.`,
+        `Lietuviškai dažnai vadinamas **PKS** — **${report.pksExpandLt}**.`,
+        "",
+        "Paprasčiau: mėnesinės gali būti nereguliarios, nes ovuliacija vyksta ne kiekvieną mėnesį, ir gali būti androgenų (vyriškųjų hormonų) pertekliaus požymių — aknė, plaukuotumas, viršugalvio retėjimas. Dažnai lydi ir medžiagų apykaitos / insulino rezistencijos pokyčiai.",
+        "",
+        twin.patient.sex === "female"
+          ? [
+              "Jūsų Lyfora demo kortelėje yra signalas **verta pasitikrinti dėl PMOS**:",
+              report.patientStoryLt.split(/\n\n+/).slice(1).join("\n\n") ||
+                report.patientStoryLt,
+              "",
+              report.disclaimerLt,
+            ].join("\n")
+          : "Šis paaiškinimas bendras; jūsų kortelė nėra moters PMOS demo atvejis.",
+        "",
+        "Tai nėra diagnozė — tolesnius tyrimus aptarkite su šeimos gydytoju, ginekologu ar endokrinologu.",
+      ].join("\n"),
+      disclaimer,
+    };
+  }
 
   // Focus: specific gene / SNP / rare mutation
   const geneHit = twin.categories

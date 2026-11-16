@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/session";
 import { buildPatientAiReply } from "@/lib/health/patient-ai";
+import { tryLlmPatientReply } from "@/lib/health/llm-ai";
 import type { Locale } from "@/lib/i18n/dictionary";
 
 export async function POST(req: Request) {
@@ -27,11 +28,14 @@ export async function POST(req: Request) {
       : "patient_male";
 
   const locale = (current.user.locale as Locale) || "lt";
-  const result = buildPatientAiReply({
-    patientId,
-    locale,
-    message,
-  });
+  const llm = await tryLlmPatientReply({ patientId, locale, message });
+  const result =
+    llm ||
+    buildPatientAiReply({
+      patientId,
+      locale,
+      message,
+    });
 
   return NextResponse.json(result);
 }

@@ -34,14 +34,22 @@ export function LoginForm({
         credentials: "same-origin",
         body: JSON.stringify({ email, password, role }),
       });
+      const data = (await res.json().catch(() => ({}))) as {
+        redirect?: string;
+        error?: string;
+        message?: string;
+      };
       if (!res.ok) {
-        setError("Nepavyko prisijungti / Sign-in failed");
+        setError(
+          data.error === "missing_session_secret"
+            ? "Trūksta SESSION_SECRET serveryje — nustatyk Vercel ir Redeploy"
+            : data.message || "Nepavyko prisijungti / Sign-in failed"
+        );
         setLoading(false);
         return;
       }
-      const data = (await res.json()) as { redirect?: string };
       // Full navigation so the session cookie is reliably picked up
-      window.location.href = data.redirect || "/patient/digital-twin";
+      window.location.assign(data.redirect || "/patient/digital-twin");
     } catch {
       setError("Nepavyko prisijungti / Sign-in failed");
       setLoading(false);

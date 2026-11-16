@@ -22,8 +22,8 @@ export async function POST(req: Request) {
   }
 
   const body = await req.json();
-  const email = String(body.email || "");
-  const password = String(body.password || "");
+  const email = String(body.email || "").trim();
+  const password = String(body.password || "").trim();
   const role = body.role as "patient" | "doctor" | undefined;
   const result = await loginWithPassword(email, password, role);
   if (!result.ok) {

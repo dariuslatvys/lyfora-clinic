@@ -124,32 +124,64 @@ export default async function IntegrationSummaryPage({
                   <tr>
                     <th>{locale === "en" ? "Date" : "Data"}</th>
                     <th>{locale === "en" ? "Value" : "Reikšmė"}</th>
+                    <th>{locale === "en" ? "Note" : "Pastaba"}</th>
                     <th>{locale === "en" ? "Source" : "Šaltinis"}</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {[...s.points].reverse().map((p) => (
-                    <tr key={`${p.date}-${p.value}`}>
-                      <td>{p.date}</td>
-                      <td className="labs-val">
-                        {Number.isInteger(p.value)
-                          ? p.value.toLocaleString(locale === "en" ? "en-GB" : "lt-LT")
-                          : String(p.value).replace(".", ",")}{" "}
-                        {s.unit}
-                      </td>
-                      <td className="small muted">
-                        {locale === "en"
-                          ? `imported from ${title}`
-                          : `importuota iš ${title}`}
-                      </td>
-                    </tr>
-                  ))}
+                  {[...s.points].reverse().map((p) => {
+                    const note =
+                      locale === "en" ? p.noteEn || "" : p.noteLt || "";
+                    const valueLabel =
+                      p.value === 0
+                        ? "—"
+                        : `${
+                            Number.isInteger(p.value)
+                              ? p.value.toLocaleString(
+                                  locale === "en" ? "en-GB" : "lt-LT"
+                                )
+                              : String(p.value).replace(".", ",")
+                          } ${s.unit}`;
+                    return (
+                      <tr key={`${p.date}-${p.value}`}>
+                        <td>{p.date}</td>
+                        <td className="labs-val">{valueLabel}</td>
+                        <td className="small muted">{note || "—"}</td>
+                        <td className="small muted">
+                          {locale === "en"
+                            ? `imported from ${title}`
+                            : `importuota iš ${title}`}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
           </section>
         );
       })}
+
+      {demo.slug === "flo" ? (
+        <section className="panel">
+          <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold m-0">
+            {locale === "en"
+              ? "Used in Women’s health"
+              : "Naudojama Moters sveikatoje"}
+          </h2>
+          <p className="mt-2 mb-3 text-sm text-[var(--ink-soft)] leading-relaxed">
+            {locale === "en"
+              ? "These Flo dates feed the PMOS cycle calculation (median 57 days, ~6 cycles/year)."
+              : "Šios Flo datos maitina PMOS ciklo skaičiavimą (mediana 57 d., ~6 ciklai per metus)."}
+          </p>
+          <Link
+            href="/patient/digital-twin/reproductive/pmos"
+            className="btn sm"
+          >
+            {locale === "en" ? "Open PMOS report" : "Atidaryti PMOS ataskaitą"}
+          </Link>
+        </section>
+      ) : null}
 
       <div className="row" style={{ gap: 8 }}>
         <Link href="/patient/integrations" className="btn ghost">

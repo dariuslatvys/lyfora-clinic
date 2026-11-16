@@ -235,8 +235,8 @@ export const DEMO_PMOS_REPORT: PmosReport = {
     {
       labelLt: "Ciklo trukmės",
       labelEn: "Cycle lengths",
-      fromLt: "7 mėnesinių datos iš programėlės",
-      fromEn: "7 period dates from your tracker",
+      fromLt: "7 mėnesinių datos iš Flo",
+      fromEn: "7 period dates from Flo",
       resultLt:
         "Intervalai 49, 65, 47, 79, 42, 70 d. · vidurkis 59 d. · mediana 57 d. · ~6 ciklai per metus · dabartinė pertrauka 50 d.",
       resultEn:

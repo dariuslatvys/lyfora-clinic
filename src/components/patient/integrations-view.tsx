@@ -12,19 +12,28 @@ import {
 
 type IntegrationGroup = {
   id: string;
-  title: string;
+  titleLt: string;
+  titleEn: string;
   items: string[];
 };
 
 const GROUPS: IntegrationGroup[] = [
   {
+    id: "womens-health",
+    titleLt: "Moters sveikatos programėlės",
+    titleEn: "Women’s health apps",
+    items: ["Flo", "Clue", "Natural Cycles"],
+  },
+  {
     id: "health-apps",
-    title: "Your health apps",
+    titleLt: "Sveikatos programėlės",
+    titleEn: "Your health apps",
     items: ["Apple Health", "Google Fit", "Samsung Health", "Huawei Health"],
   },
   {
     id: "watches",
-    title: "Your watches, bands and rings",
+    titleLt: "Laikrodžiai, apyrankės ir žiedai",
+    titleEn: "Your watches, bands and rings",
     items: [
       "Garmin",
       "Fitbit",
@@ -39,7 +48,8 @@ const GROUPS: IntegrationGroup[] = [
   },
   {
     id: "sports",
-    title: "Your sports apps",
+    titleLt: "Sporto programėlės",
+    titleEn: "Your sports apps",
     items: [
       "Strava",
       "Peloton",
@@ -55,17 +65,20 @@ const GROUPS: IntegrationGroup[] = [
   },
   {
     id: "devices",
-    title: "Your health devices",
+    titleLt: "Sveikatos įrenginiai",
+    titleEn: "Your health devices",
     items: ["OMRON", "beurer", "iHealth"],
   },
   {
     id: "sleep",
-    title: "Your Sleep",
+    titleLt: "Miegas",
+    titleEn: "Your Sleep",
     items: ["Eight Sleep", "TEMPUR"],
   },
   {
     id: "nutrition",
-    title: "Your nutrition",
+    titleLt: "Mityba",
+    titleEn: "Your nutrition",
     items: ["myfitnesspal", "cronometer", "FatSecret"],
   },
 ];
@@ -108,7 +121,9 @@ export function IntegrationsView({
 
       {GROUPS.map((group) => (
         <section key={group.id} className="integ-section">
-          <h2 className="integ-title">{group.title}</h2>
+          <h2 className="integ-title">
+            {locale === "en" ? group.titleEn : group.titleLt}
+          </h2>
           <div className="integ-grid">
             {group.items.map((name) => {
               const key = `${group.id}:${name}`;

@@ -121,6 +121,7 @@ export function OverviewPanels({
           <WomenHealthMap
             categories={categories}
             geneHint={labels.geneMarkerHint}
+            locale={locale}
           />
         ) : (
           <BodyMap

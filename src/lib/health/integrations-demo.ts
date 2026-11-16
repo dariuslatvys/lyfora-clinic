@@ -1,4 +1,4 @@
-export type IntegrationSlug = "apple-health" | "oura";
+export type IntegrationSlug = "apple-health" | "oura" | "flo";
 
 export type IntegrationMetric = {
   id: string;
@@ -37,7 +37,19 @@ export const CONNECTED_INTEGRATION_NAMES = new Set([
   "Apple Health",
   "OURA",
   "Oura",
+  "Flo",
 ]);
+
+/** Period start dates imported from Flo for the demo female patient (PKS/PMOS case). */
+export const FLO_PERIOD_STARTS = [
+  "2025-10-02",
+  "2025-11-20",
+  "2026-01-24",
+  "2026-03-12",
+  "2026-05-30",
+  "2026-07-11",
+  "2026-09-19",
+] as const;
 
 export const INTEGRATION_DEMOS: Record<IntegrationSlug, IntegrationDemo> = {
   "apple-health": {
@@ -238,17 +250,130 @@ export const INTEGRATION_DEMOS: Record<IntegrationSlug, IntegrationDemo> = {
       },
     ],
   },
+  flo: {
+    slug: "flo",
+    listName: "Flo",
+    titleLt: "Flo",
+    titleEn: "Flo",
+    blurbLt:
+      "Mėnesinių ciklo duomenys iš Flo — 7 paskutinės pradžios datos, intervalai ir dabartinė pertrauka, naudojami Moters sveikatos (PMOS) vertinime.",
+    blurbEn:
+      "Cycle data from Flo — 7 latest period start dates, intervals and the current gap, used in Women’s health (PMOS) evaluation.",
+    syncedAt: "2026-11-08T09:15:00.000Z",
+    metrics: [
+      {
+        id: "last-period",
+        labelLt: "Paskutinė pradžia",
+        labelEn: "Last period start",
+        value: "2026-09-19",
+        hintLt: "Importuota iš Flo",
+        hintEn: "Imported from Flo",
+      },
+      {
+        id: "cycle-median",
+        labelLt: "Ciklo mediana",
+        labelEn: "Cycle median",
+        value: "57 d.",
+        hintLt: "6 intervalai iš 7 datų",
+        hintEn: "6 intervals from 7 dates",
+      },
+      {
+        id: "cycle-mean",
+        labelLt: "Ciklo vidurkis",
+        labelEn: "Cycle average",
+        value: "59 d.",
+        hintLt: "Ilgesnis nei 35 d. — ovuliacijos signalas",
+        hintEn: "Longer than 35 d. — ovulation signal",
+      },
+      {
+        id: "cycles-year",
+        labelLt: "Ciklai per metus",
+        labelEn: "Cycles per year",
+        value: "~6",
+        hintLt: "Mažiau nei 8 — ovuliacijos sutrikimo kriterijus",
+        hintEn: "Under 8 — ovulation-disruption criterion",
+      },
+      {
+        id: "current-gap",
+        labelLt: "Dabartinė pertrauka",
+        labelEn: "Current gap",
+        value: "50 d.",
+        hintLt: "Nuo 2026-09-19",
+        hintEn: "Since 2026-09-19",
+      },
+      {
+        id: "dates-count",
+        labelLt: "Importuotos datos",
+        labelEn: "Imported dates",
+        value: "7",
+        hintLt: "Programėlės istorija",
+        hintEn: "App history",
+      },
+    ],
+    series: [
+      {
+        titleLt: "Mėnesinių pradžios datos",
+        titleEn: "Period start dates",
+        unit: "d. tarp ciklų",
+        points: [
+          {
+            date: "2025-10-02",
+            value: 0,
+            noteLt: "Pirmoji importuota data",
+            noteEn: "First imported date",
+          },
+          {
+            date: "2025-11-20",
+            value: 49,
+            noteLt: "Intervalas nuo ankstesnės",
+            noteEn: "Interval from previous",
+          },
+          {
+            date: "2026-01-24",
+            value: 65,
+            noteLt: "Intervalas nuo ankstesnės",
+            noteEn: "Interval from previous",
+          },
+          {
+            date: "2026-03-12",
+            value: 47,
+            noteLt: "Intervalas nuo ankstesnės",
+            noteEn: "Interval from previous",
+          },
+          {
+            date: "2026-05-30",
+            value: 79,
+            noteLt: "Ilgiausias tarpas",
+            noteEn: "Longest gap",
+          },
+          {
+            date: "2026-07-11",
+            value: 42,
+            noteLt: "Intervalas nuo ankstesnės",
+            noteEn: "Interval from previous",
+          },
+          {
+            date: "2026-09-19",
+            value: 70,
+            noteLt: "Paskutinė pradžia",
+            noteEn: "Latest start",
+          },
+        ],
+      },
+    ],
+  },
 };
 
 export function integrationSlugForName(name: string): IntegrationSlug | null {
   const n = name.trim().toLowerCase();
   if (n === "apple health") return "apple-health";
   if (n === "oura" || n === "oura ring") return "oura";
+  if (n === "flo") return "flo";
   return null;
 }
 
 export function getIntegrationDemo(slug: string): IntegrationDemo | null {
-  if (slug === "apple-health" || slug === "oura") {
+  if (slug === "apple-health" || slug === "oura" || slug === "flo") {
     return INTEGRATION_DEMOS[slug];
   }
   return null;
@@ -286,6 +411,11 @@ export function importSourceLabel(
     return locale === "en"
       ? "(imported from Oura)"
       : "(importuota iš Oura)";
+  }
+  if (s === "flo" || s === "flo-health" || s === "flo app") {
+    return locale === "en"
+      ? "(imported from Flo)"
+      : "(importuota iš Flo)";
   }
   return null;
 }

@@ -2048,151 +2048,219 @@ a.who.on {
   z-index: 4;
 }
 
-/* Female overview: mosaic of 6 domains (no body silhouette). */
+/* Female overview: illustrated mosaic of 6 domains (no body silhouette). */
 .women-map {
   position: relative;
   border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 18px 16px 16px;
+  border-radius: 18px;
+  padding: 16px;
   overflow: hidden;
   background:
     radial-gradient(
-      120% 80% at 8% 0%,
-      color-mix(in srgb, var(--accent) 16%, transparent),
+      100% 70% at 0% 0%,
+      color-mix(in srgb, var(--accent) 14%, transparent),
       transparent 55%
     ),
     radial-gradient(
-      90% 70% at 100% 100%,
-      color-mix(in srgb, #3a6b8c 18%, transparent),
+      80% 60% at 100% 100%,
+      color-mix(in srgb, #3a6b8c 14%, transparent),
       transparent 50%
     ),
     var(--surface-2);
 }
 
 .women-map-hint {
-  margin: 0 0 14px;
+  margin: 0 0 12px;
   max-width: 36rem;
   font-size: 0.72rem;
   line-height: 1.4;
   color: var(--muted);
 }
 
-.women-map-grid {
+.women-map-mosaic {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-auto-rows: minmax(148px, auto);
   gap: 10px;
 }
 
-.women-tile {
+.women-mosaic-card {
   position: relative;
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 12px;
-  align-items: center;
-  min-height: 88px;
-  padding: 14px 14px 14px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 148px;
+  border-radius: 16px;
+  overflow: hidden;
   text-decoration: none;
   color: inherit;
-  border-radius: 14px;
-  border: 1px solid color-mix(in srgb, var(--cc, var(--line)) 28%, var(--line));
-  background: color-mix(in srgb, var(--surface) 78%, transparent);
-  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--cc, var(--line)) 35%, var(--line));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
   transition:
-    transform 0.18s ease,
-    border-color 0.18s ease,
-    background 0.18s ease;
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
   animation: women-tile-in 0.45s ease both;
 }
 
-.women-tile-0 {
+.women-mosaic-0 {
+  grid-column: span 3;
+  grid-row: span 2;
+  min-height: 306px;
   animation-delay: 0.04s;
 }
-.women-tile-1 {
+.women-mosaic-1 {
+  grid-column: span 3;
   animation-delay: 0.1s;
 }
-.women-tile-2 {
+.women-mosaic-2 {
+  grid-column: span 3;
   animation-delay: 0.16s;
 }
-.women-tile-3 {
+.women-mosaic-3 {
+  grid-column: span 2;
   animation-delay: 0.22s;
 }
-.women-tile-4 {
+.women-mosaic-4 {
+  grid-column: span 2;
   animation-delay: 0.28s;
 }
-.women-tile-5 {
+.women-mosaic-5 {
+  grid-column: span 2;
   animation-delay: 0.34s;
 }
 
 @keyframes women-tile-in {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(10px) scale(0.985);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
-.women-tile:hover {
-  transform: translateY(-2px);
-  border-color: color-mix(in srgb, var(--cc, var(--accent)) 55%, var(--line));
-  background: color-mix(in srgb, var(--cc, var(--accent)) 10%, var(--surface));
+.women-mosaic-card:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--cc, var(--accent)) 65%, var(--line));
+  box-shadow:
+    0 14px 28px rgba(0, 0, 0, 0.28),
+    inset 0 0 0 1px color-mix(in srgb, var(--cc, var(--accent)) 30%, transparent);
 }
 
-.women-tile-icon {
-  width: 46px;
-  height: 46px;
-  border-radius: 12px;
-  display: grid;
-  place-items: center;
-  color: var(--cc, var(--accent));
-  background: color-mix(in srgb, var(--cc, var(--accent)) 18%, var(--surface));
-  border: 1px solid color-mix(in srgb, var(--cc, var(--accent)) 40%, transparent);
-  flex-shrink: 0;
+.women-mosaic-media {
+  position: absolute;
+  inset: 0;
 }
 
-.women-tile-icon svg {
-  width: 22px;
-  height: 22px;
+.women-mosaic-img {
+  object-fit: cover;
+  object-position: center;
+  transform: scale(1.02);
+  transition: transform 0.35s ease;
 }
 
-.women-tile-copy {
+.women-mosaic-card:hover .women-mosaic-img {
+  transform: scale(1.06);
+}
+
+.women-mosaic-fallback {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background:
+    radial-gradient(
+      circle at 30% 20%,
+      color-mix(in srgb, var(--cc, var(--accent)) 35%, transparent),
+      transparent 55%
+    ),
+    var(--surface);
+}
+
+.women-mosaic-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    transparent 28%,
+    rgba(8, 16, 14, 0.55) 62%,
+    rgba(8, 16, 14, 0.88) 100%
+  );
+  pointer-events: none;
+}
+
+.women-mosaic-copy {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  min-width: 0;
+  gap: 5px;
+  padding: 14px 14px 15px;
 }
 
-.women-tile-copy b {
-  font-family: var(--font-display), Manrope, sans-serif;
-  font-size: 0.92rem;
-  font-weight: 700;
-  line-height: 1.25;
-  color: var(--ink);
-}
-
-.women-tile-copy em {
-  font-style: normal;
-  font-size: 0.74rem;
-  font-weight: 650;
-  color: var(--cc, var(--muted));
-  line-height: 1.25;
-}
-
-.women-tile-bar {
-  position: absolute;
-  left: 0;
-  top: 12px;
-  bottom: 12px;
-  width: 3px;
+.women-mosaic-status {
+  align-self: flex-start;
+  padding: 3px 8px;
   border-radius: 999px;
-  background: var(--cc, var(--accent));
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--cc, var(--accent));
+  background: color-mix(in srgb, var(--cc, var(--accent)) 18%, rgba(8, 16, 14, 0.75));
+  border: 1px solid color-mix(in srgb, var(--cc, var(--accent)) 40%, transparent);
 }
 
-@media (max-width: 720px) {
-  .women-map-grid {
+.women-mosaic-copy b {
+  font-family: var(--font-display), Manrope, sans-serif;
+  font-size: 1rem;
+  font-weight: 750;
+  line-height: 1.25;
+  color: #f2f7f5;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.45);
+}
+
+.women-mosaic-0 .women-mosaic-copy b {
+  font-size: 1.28rem;
+  max-width: 16ch;
+}
+
+@media (max-width: 900px) {
+  .women-map-mosaic {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: minmax(140px, auto);
+  }
+  .women-mosaic-0,
+  .women-mosaic-1,
+  .women-mosaic-2,
+  .women-mosaic-3,
+  .women-mosaic-4,
+  .women-mosaic-5 {
+    grid-column: span 1;
+    grid-row: span 1;
+    min-height: 160px;
+  }
+  .women-mosaic-0 {
+    grid-column: span 2;
+    min-height: 200px;
+  }
+  .women-mosaic-0 .women-mosaic-copy b {
+    font-size: 1.1rem;
+    max-width: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .women-map-mosaic {
     grid-template-columns: 1fr;
+  }
+  .women-mosaic-0,
+  .women-mosaic-1,
+  .women-mosaic-2,
+  .women-mosaic-3,
+  .women-mosaic-4,
+  .women-mosaic-5 {
+    grid-column: span 1;
   }
 }
 

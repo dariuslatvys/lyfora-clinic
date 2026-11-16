@@ -57,7 +57,10 @@ Vercel Environment Variables (būtina prisijungimui):
 
 - `SESSION_SECRET` — ilga atsitiktinė eilutė (`openssl rand -base64 48`)
 - `DEMO_PASSWORD` — slaptažodis demo paskyroms (`pacientas@…` / `paciente@…` / `gydytojas@…`)
-- `OPENAI_API_KEY` (nebūtina) — jei nustatytas, Ask AI naudoja LLM; be jo veikia taisyklėmis (įskaitant PMOS paaiškinimą)
+- `GROQ_API_KEY` (rekomenduojama demo, nemokama) — Ask AI per Groq; raktas: https://console.groq.com/keys
+- `GEMINI_API_KEY` (alternatyva, nemokama) — Google AI Studio
+- `OPENAI_API_KEY` (nebūtina, mokama) — jei nėra kitų raktų
+- Be jokio LLM rakto Ask AI vis tiek veikia taisyklėmis (įskaitant PMOS)
 
 Po env išsaugojimo padarykite Redeploy.
 

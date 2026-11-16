@@ -51,68 +51,145 @@ function twinContext(patientId: string, locale: Locale): string {
     .join("\n");
 }
 
-/** OpenAI-compatible chat when OPENAI_API_KEY is set; otherwise null. */
+function systemPrompt(locale: Locale, context: string) {
+  return locale === "en"
+    ? [
+        "You are Lyfora AI, a patient health explainer inside the Lyfora clinic app.",
+        "Answer in clear plain English. Do not diagnose or prescribe.",
+        "Use only the patient context below plus general medical literacy.",
+        "If asked what PMOS/PKS/PCOS is, explain simply and relate to the patient's demo signal when relevant.",
+        "Keep answers under 220 words. Use short paragraphs. Bold key terms with ** like **PMOS**.",
+        "",
+        "Patient context:",
+        context,
+      ].join("\n")
+    : [
+        "Tu esi Lyfora AI — paciento sveikatos paaiškintojas Lyfora klinikos programoje.",
+        "Atsakyk aiškia lietuvių kalba. Nediagnozuok ir neskirk gydymo.",
+        "Naudok tik žemiau esantį paciento kontekstą ir bendrą sveikatos raštingumą.",
+        "Jei klausia kas yra PMOS/PKS/PCOS — paaiškink paprastai ir, jei tinka, susiek su paciento demo signalu.",
+        "Iki ~220 žodžių. Trumpomis pastraipomis. Svarbius terminus žymėk ** taip: **PMOS**.",
+        "",
+        "Paciento kontekstas:",
+        context,
+      ].join("\n");
+}
+
+async function chatCompletions(opts: {
+  baseUrl: string;
+  apiKey: string;
+  model: string;
+  system: string;
+  message: string;
+}): Promise<string | null> {
+  const res = await fetch(
+    `${opts.baseUrl.replace(/\/$/, "")}/chat/completions`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${opts.apiKey}`,
+      },
+      body: JSON.stringify({
+        model: opts.model,
+        temperature: 0.3,
+        messages: [
+          { role: "system", content: opts.system },
+          { role: "user", content: opts.message },
+        ],
+      }),
+    }
+  );
+  if (!res.ok) return null;
+  const data = (await res.json()) as {
+    choices?: { message?: { content?: string } }[];
+  };
+  return data.choices?.[0]?.message?.content?.trim() || null;
+}
+
+async function geminiGenerate(opts: {
+  apiKey: string;
+  model: string;
+  system: string;
+  message: string;
+}): Promise<string | null> {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(
+    opts.model
+  )}:generateContent?key=${encodeURIComponent(opts.apiKey)}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      systemInstruction: { parts: [{ text: opts.system }] },
+      contents: [{ role: "user", parts: [{ text: opts.message }] }],
+      generationConfig: { temperature: 0.3 },
+    }),
+  });
+  if (!res.ok) return null;
+  const data = (await res.json()) as {
+    candidates?: { content?: { parts?: { text?: string }[] } }[];
+  };
+  return (
+    data.candidates?.[0]?.content?.parts
+      ?.map((p) => p.text || "")
+      .join("")
+      .trim() || null
+  );
+}
+
+/**
+ * Prefer free Groq, then free Gemini, then optional paid OpenAI.
+ * Returns null when no key is configured or the provider call fails.
+ */
 export async function tryLlmPatientReply(input: {
   patientId: string;
   locale: Locale;
   message: string;
 }): Promise<LlmResult> {
-  const apiKey = process.env.OPENAI_API_KEY?.trim();
-  if (!apiKey) return null;
-
-  const base =
-    process.env.OPENAI_BASE_URL?.trim() || "https://api.openai.com/v1";
-  const model = process.env.OPENAI_MODEL?.trim() || "gpt-4o-mini";
   const disclaimer = input.locale === "en" ? DISCLAIMER_EN : DISCLAIMER_LT;
   const context = twinContext(input.patientId, input.locale);
+  const system = systemPrompt(input.locale, context);
 
-  const system =
-    input.locale === "en"
-      ? [
-          "You are Lyfora AI, a patient health explainer inside the Lyfora clinic app.",
-          "Answer in clear plain English. Do not diagnose or prescribe.",
-          "Use only the patient context below plus general medical literacy.",
-          "If asked what PMOS/PKS/PCOS is, explain simply and relate to the patient's demo signal when relevant.",
-          "Keep answers under 220 words. Use short paragraphs. Bold key terms with ** like **PMOS**.",
-          "",
-          "Patient context:",
-          context,
-        ].join("\n")
-      : [
-          "Tu esi Lyfora AI — paciento sveikatos paaiškintojas Lyfora klinikos programoje.",
-          "Atsakyk aiškia lietuvių kalba. Nediagnozuok ir neskirk gydymo.",
-          "Naudok tik žemiau esantį paciento kontekstą ir bendrą sveikatos raštingumą.",
-          "Jei klausia kas yra PMOS/PKS/PCOS — paaiškink paprastai ir, jei tinka, susiek su paciento demo signalu.",
-          "Iki ~220 žodžių. Trumpomis pastraipomis. Svarbius terminus žymėk ** taip: **PMOS**.",
-          "",
-          "Paciento kontekstas:",
-          context,
-        ].join("\n");
+  const groqKey = process.env.GROQ_API_KEY?.trim();
+  const geminiKey = process.env.GEMINI_API_KEY?.trim();
+  const openaiKey = process.env.OPENAI_API_KEY?.trim();
 
   try {
-    const res = await fetch(`${base.replace(/\/$/, "")}/chat/completions`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model,
-        temperature: 0.3,
-        messages: [
-          { role: "system", content: system },
-          { role: "user", content: input.message },
-        ],
-      }),
-    });
-    if (!res.ok) return null;
-    const data = (await res.json()) as {
-      choices?: { message?: { content?: string } }[];
-    };
-    const reply = data.choices?.[0]?.message?.content?.trim();
-    if (!reply) return null;
-    return { reply, disclaimer };
+    if (groqKey) {
+      const reply = await chatCompletions({
+        baseUrl: "https://api.groq.com/openai/v1",
+        apiKey: groqKey,
+        model: process.env.GROQ_MODEL?.trim() || "llama-3.1-8b-instant",
+        system,
+        message: input.message,
+      });
+      if (reply) return { reply, disclaimer };
+    }
+
+    if (geminiKey) {
+      const reply = await geminiGenerate({
+        apiKey: geminiKey,
+        model: process.env.GEMINI_MODEL?.trim() || "gemini-2.0-flash",
+        system,
+        message: input.message,
+      });
+      if (reply) return { reply, disclaimer };
+    }
+
+    if (openaiKey) {
+      const reply = await chatCompletions({
+        baseUrl:
+          process.env.OPENAI_BASE_URL?.trim() || "https://api.openai.com/v1",
+        apiKey: openaiKey,
+        model: process.env.OPENAI_MODEL?.trim() || "gpt-4o-mini",
+        system,
+        message: input.message,
+      });
+      if (reply) return { reply, disclaimer };
+    }
   } catch {
     return null;
   }
+
+  return null;
 }

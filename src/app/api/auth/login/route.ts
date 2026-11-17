@@ -8,7 +8,12 @@ import {
 import { checkLoginRateLimit } from "@/lib/auth/login-rate-limit";
 
 export async function POST(req: Request) {
-  const limited = checkLoginRateLimit(req);
+  const body = await req.json();
+  const email = String(body.email || "").trim();
+  const password = String(body.password || "").trim();
+  const role = body.role as "patient" | "doctor" | undefined;
+
+  const limited = checkLoginRateLimit(req, email);
   if (!limited.ok) {
     return NextResponse.json(
       { error: "rate_limited" },
@@ -20,11 +25,6 @@ export async function POST(req: Request) {
       }
     );
   }
-
-  const body = await req.json();
-  const email = String(body.email || "").trim();
-  const password = String(body.password || "").trim();
-  const role = body.role as "patient" | "doctor" | undefined;
   const result = await loginWithPassword(email, password, role);
   if (!result.ok) {
     return NextResponse.json({ error: result.error }, { status: 401 });

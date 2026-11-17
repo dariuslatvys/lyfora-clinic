@@ -9,8 +9,12 @@ import {
   savePatientUpload,
   type UploadCategory,
 } from "@/lib/health/uploads";
+import { isLikelySvgUpload } from "@/lib/security/safe-download-type";
 
 export const runtime = "nodejs";
+
+const MAX_UPLOADS = 40;
+const MAX_TOTAL_BYTES = 100 * 1024 * 1024;
 
 export async function GET() {
   const current = await getCurrentUser();
@@ -63,11 +67,30 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "too_large" }, { status: 413 });
   }
 
+  const originalName = file.name || "upload.bin";
+  if (
+    isLikelySvgUpload({
+      mimeType: file.type || null,
+      originalName,
+    })
+  ) {
+    return NextResponse.json({ error: "unsupported_type" }, { status: 415 });
+  }
+
+  const existing = listPatientUploads(current.patient.id);
+  if (existing.length >= MAX_UPLOADS) {
+    return NextResponse.json({ error: "quota_count" }, { status: 429 });
+  }
+  const usedBytes = existing.reduce((sum, row) => sum + (row.sizeBytes || 0), 0);
+  if (usedBytes + file.size > MAX_TOTAL_BYTES) {
+    return NextResponse.json({ error: "quota_bytes" }, { status: 429 });
+  }
+
   const bytes = Buffer.from(await file.arrayBuffer());
   const saved = savePatientUpload({
     patientId: current.patient.id,
     category,
-    originalName: file.name || "upload.bin",
+    originalName,
     mimeType: file.type || null,
     bytes,
     note,

@@ -39,6 +39,7 @@ import {
   getClinicVisit,
   listClinicVisitAttachments,
 } from "@/lib/health/clinic-visits";
+import { sanitizeHttpsUrl } from "@/lib/security/safe-http-url";
 
 function guessCategory(categoriesJson: string): HealthCategoryId | null {
   let cats: string[] = [];
@@ -186,11 +187,11 @@ export default async function VisitDetailPage({
           )}
         </section>
 
-        {clinic.mode === "video" && clinic.videoUrl ? (
+        {clinic.mode === "video" && sanitizeHttpsUrl(clinic.videoUrl) ? (
           <a
-            href={clinic.videoUrl}
+            href={sanitizeHttpsUrl(clinic.videoUrl)!}
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
             className="btn"
             style={{ alignSelf: "flex-start" }}
           >

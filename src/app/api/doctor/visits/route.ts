@@ -11,6 +11,7 @@ import {
   type ClinicVisitMode,
 } from "@/lib/health/clinic-visits";
 import { UPLOAD_CATEGORIES, type UploadCategory } from "@/lib/health/uploads";
+import { sanitizeHttpsUrl } from "@/lib/security/safe-http-url";
 
 export const runtime = "nodejs";
 
@@ -59,7 +60,13 @@ export async function POST(req: Request) {
   const videoPlatform = form.get("videoPlatform")
     ? String(form.get("videoPlatform"))
     : null;
-  const videoUrl = form.get("videoUrl") ? String(form.get("videoUrl")) : null;
+  const videoUrlRaw = form.get("videoUrl")
+    ? String(form.get("videoUrl"))
+    : null;
+  const videoUrl = sanitizeHttpsUrl(videoUrlRaw);
+  if (videoUrlRaw && videoUrlRaw.trim() && !videoUrl) {
+    return NextResponse.json({ error: "bad_video_url" }, { status: 400 });
+  }
 
   if (!patientId || !date || !time) {
     return NextResponse.json({ error: "missing_fields" }, { status: 400 });

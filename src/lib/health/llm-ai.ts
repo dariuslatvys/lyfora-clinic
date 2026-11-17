@@ -2,8 +2,6 @@ import type { Locale } from "@/lib/i18n/dictionary";
 import { t } from "@/lib/i18n/dictionary";
 import { loadDigitalTwin } from "./load-twin";
 import { colourRank } from "./colours";
-import { DEMO_PMOS_REPORT } from "./reproductive-phenotypes";
-
 type LlmResult = { reply: string; disclaimer: string } | null;
 
 const DISCLAIMER_LT =
@@ -11,6 +9,10 @@ const DISCLAIMER_LT =
 const DISCLAIMER_EN =
   "This assistant does not give diagnoses or change treatment. Answers are based on your uploaded data. If you have concerns, contact your clinician or book a consult; call emergency services only in life-threatening situations.";
 
+/**
+ * De-identified twin summary for third-party LLMs:
+ * no name, markers, SNP/NGS gene symbols, or other direct identifiers.
+ */
 function twinContext(patientId: string, locale: Locale): string {
   const twin = loadDigitalTwin(patientId, locale);
   const labels = t(locale);
@@ -20,16 +22,15 @@ function twinContext(patientId: string, locale: Locale): string {
     .map((c) => {
       const name = labels.categoryNames[c.id] || c.id;
       const colour = labels.colourLabels[c.colour];
-      const genes = c.rare.map((r) => r.gene).join(", ");
-      return `${name}: ${colour}${genes ? `; NGS ${genes}` : ""}`;
+      return `${name}: ${colour}`;
     })
     .join("\n");
 
   const pmos =
     twin.patient.sex === "female"
       ? locale === "en"
-        ? `PMOS demo signal: ${DEMO_PMOS_REPORT.headlineEn}. ${DEMO_PMOS_REPORT.pmosExpandEn}. Also known as PKS — ${DEMO_PMOS_REPORT.pksExpandLt}.`
-        : `PMOS demo signalas: ${DEMO_PMOS_REPORT.headlineLt}. PMOS — ${DEMO_PMOS_REPORT.pmosExpandEn}. PKS — ${DEMO_PMOS_REPORT.pksExpandLt}.`
+        ? "PMOS educational note available for this female profile (demo phenotype signal may apply)."
+        : "Yra PMOS edukacinė pastaba šiam moters profiliui (gali būti demo fenotipo signalas)."
       : "";
 
   const attention = twin.categories
@@ -38,11 +39,13 @@ function twinContext(patientId: string, locale: Locale): string {
     .join(", ");
 
   return [
-    `Patient: ${twin.patient.fullName} (${twin.patient.sex})`,
+    locale === "en"
+      ? `De-identified patient sex: ${twin.patient.sex}`
+      : `Deidentifikuota lytis: ${twin.patient.sex}`,
     attention
       ? locale === "en"
-        ? `Attention areas: ${attention}`
-        : `Dėmesio sritys: ${attention}`
+        ? `Attention areas (labels only): ${attention}`
+        : `Dėmesio sritys (tik pavadinimai): ${attention}`
       : "",
     cats,
     pmos,
@@ -56,21 +59,23 @@ function systemPrompt(locale: Locale, context: string) {
     ? [
         "You are Lyfora AI, a patient health explainer inside the Lyfora clinic app.",
         "Answer in clear plain English. Do not diagnose or prescribe.",
-        "Use only the patient context below plus general medical literacy.",
-        "If asked what PMOS/PKS/PCOS is, explain simply and relate to the patient's demo signal when relevant.",
+        "Use only the de-identified context below plus general medical literacy.",
+        "Never invent personal identifiers, gene names, lab values, or diagnoses.",
+        "If asked what PMOS/PKS/PCOS is, explain simply in educational terms.",
         "Keep answers under 220 words. Use short paragraphs. Bold key terms with ** like **PMOS**.",
         "",
-        "Patient context:",
+        "De-identified health context:",
         context,
       ].join("\n")
     : [
         "Tu esi Lyfora AI — paciento sveikatos paaiškintojas Lyfora klinikos programoje.",
         "Atsakyk aiškia lietuvių kalba. Nediagnozuok ir neskirk gydymo.",
-        "Naudok tik žemiau esantį paciento kontekstą ir bendrą sveikatos raštingumą.",
-        "Jei klausia kas yra PMOS/PKS/PCOS — paaiškink paprastai ir, jei tinka, susiek su paciento demo signalu.",
+        "Naudok tik žemiau esantį deidentifikuotą kontekstą ir bendrą sveikatos raštingumą.",
+        "Niekada neišgalvok asmens duomenų, genų pavadinimų, tyrimų reikšmių ar diagnozių.",
+        "Jei klausia kas yra PMOS/PKS/PCOS — paaiškink paprastai edukaciniu stiliumi.",
         "Iki ~220 žodžių. Trumpomis pastraipomis. Svarbius terminus žymėk ** taip: **PMOS**.",
         "",
-        "Paciento kontekstas:",
+        "Deidentifikuotas sveikatos kontekstas:",
         context,
       ].join("\n");
 }

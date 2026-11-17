@@ -13,6 +13,7 @@ import {
   type DoctorPatientOption,
 } from "@/lib/doctor/doctor-calendar";
 import type { DoctorVisitCopy } from "@/components/doctor/doctor-visit-copy";
+import { sanitizeHttpsUrl } from "@/lib/security/safe-http-url";
 
 export function DoctorAppointmentDetail({
   locale,
@@ -34,6 +35,7 @@ export function DoctorAppointmentDetail({
   const phone = a.patientPhone || linked?.phone || "";
   const email = a.patientEmail || linked?.email || "";
   const docs = listAppointmentDocuments(a);
+  const safeVideoUrl = sanitizeHttpsUrl(a.videoUrl);
   const sourceLabel =
     !source || source.kind === "doctor_created"
       ? copy.doctorCreated
@@ -119,24 +121,24 @@ export function DoctorAppointmentDetail({
         <div className="doctor-appt-source-card stack" style={{ gap: 8 }}>
           <span className="eyebrow">{copy.visitType}</span>
           <b>{modeLabel(a.mode, locale)}</b>
-          {a.videoUrl ? (
+          {safeVideoUrl ? (
             <>
               <p className="small muted m-0">
                 {videoPlatformLabel(a.videoPlatform)}
                 {" · "}
                 <a
-                  href={a.videoUrl}
+                  href={safeVideoUrl}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   className="mono"
                 >
-                  {a.videoUrl}
+                  {safeVideoUrl}
                 </a>
               </p>
               <a
-                href={a.videoUrl}
+                href={safeVideoUrl}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="btn sm"
                 style={{ alignSelf: "flex-start" }}
               >

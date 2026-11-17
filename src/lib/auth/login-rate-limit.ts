@@ -1,34 +1,42 @@
-type Bucket = { count: number; resetAt: number };
-
-const buckets = new Map<string, Bucket>();
+import { checkRequestRateLimit } from "@/lib/auth/request-rate-limit";
 
 const WINDOW_MS = 15 * 60 * 1000;
 const MAX_ATTEMPTS = 20;
 
-function clientKey(req: Request) {
+/**
+ * Prefer the rightmost X-Forwarded-For hop (usually set by the edge/proxy).
+ * The leftmost value is client-supplied and must not be trusted alone.
+ */
+export function platformClientIp(req: Request): string {
+  const realIp = req.headers.get("x-real-ip")?.trim();
+  if (realIp && !realIp.includes(",")) return realIp;
+
   const fwd = req.headers.get("x-forwarded-for");
-  if (fwd) return fwd.split(",")[0]?.trim() || "unknown";
-  return req.headers.get("x-real-ip") || "unknown";
+  if (fwd) {
+    const parts = fwd
+      .split(",")
+      .map((p) => p.trim())
+      .filter(Boolean);
+    if (parts.length) return parts[parts.length - 1]!;
+  }
+
+  return "unknown";
 }
 
-/** Simple in-memory login throttle (per instance). */
-export function checkLoginRateLimit(req: Request): {
+/** Login throttle keyed by platform IP and optional email. */
+export function checkLoginRateLimit(
+  req: Request,
+  email?: string
+): {
   ok: boolean;
   retryAfterSec?: number;
 } {
-  const key = clientKey(req);
-  const now = Date.now();
-  const bucket = buckets.get(key);
-  if (!bucket || bucket.resetAt <= now) {
-    buckets.set(key, { count: 1, resetAt: now + WINDOW_MS });
-    return { ok: true };
-  }
-  if (bucket.count >= MAX_ATTEMPTS) {
-    return {
-      ok: false,
-      retryAfterSec: Math.max(1, Math.ceil((bucket.resetAt - now) / 1000)),
-    };
-  }
-  bucket.count += 1;
-  return { ok: true };
+  const ip = platformClientIp(req);
+  const normalizedEmail = (email || "").trim().toLowerCase();
+  const key = `login:${ip}:${normalizedEmail || "_"}`;
+  return checkRequestRateLimit({
+    key,
+    windowMs: WINDOW_MS,
+    max: MAX_ATTEMPTS,
+  });
 }

@@ -8,6 +8,7 @@ import {
   deletePatientUpload,
   resolveUploadFile,
 } from "@/lib/health/uploads";
+import { downloadContentHeaders } from "@/lib/security/safe-download-type";
 
 export const runtime = "nodejs";
 
@@ -44,21 +45,17 @@ export async function GET(
     return NextResponse.json({ error: "missing_file" }, { status: 404 });
   }
   const buf = fs.readFileSync(full);
-  const rawType = (row.mimeType || "").toLowerCase();
-  const safeInline =
-    rawType.startsWith("image/") ||
-    rawType === "application/pdf" ||
-    rawType.startsWith("text/plain");
-  const contentType = safeInline
-    ? rawType
-    : "application/octet-stream";
+  const { contentType, disposition } = downloadContentHeaders({
+    mimeType: row.mimeType,
+    originalName: row.originalName,
+  });
   return new NextResponse(buf, {
     headers: {
       "Content-Type": contentType,
       "X-Content-Type-Options": "nosniff",
-      "Content-Disposition": `${
-        safeInline ? "inline" : "attachment"
-      }; filename="${encodeURIComponent(row.originalName)}"`,
+      "Content-Disposition": `${disposition}; filename="${encodeURIComponent(
+        row.originalName
+      )}"`,
       "Content-Length": String(buf.length),
       "Cache-Control": "private, max-age=60",
     },

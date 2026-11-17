@@ -48,35 +48,31 @@ Lokalioje aplinkoje be `SESSION_SECRET` raktas generuojamas į `data/db/.session
 
 Atidarykite [http://127.0.0.1:43123](http://127.0.0.1:43123).
 
-## Viešas demo (Vercel free)
+## Viešas demo (Vercel)
 
-Prototipui pakanka nemokamo `*.vercel.app` adreso. SQLite demo DB yra
-`data/demo/lyfora.sqlite` (Vercel’e kopijuojama į `/tmp`).
+Viešas hostas — **Vercel** (repo: [dariuslatvys/lyfora-clinic](https://github.com/dariuslatvys/lyfora-clinic)).
+SQLite demo DB yra `data/demo/lyfora.sqlite` (Vercel’e kopijuojama į `/tmp`).
 
-Vercel Environment Variables (būtina prisijungimui):
+### Environment Variables (Project → Settings → Environment Variables)
+
+Būtina prisijungimui:
 
 - `SESSION_SECRET` — ilga atsitiktinė eilutė (`openssl rand -base64 48`)
 - `DEMO_PASSWORD` — slaptažodis demo paskyroms (`pacientas@…` / `paciente@…` / `gydytojas@…`)
-- `GROQ_API_KEY` (rekomenduojama demo, nemokama) — Ask AI per Groq; raktas: https://console.groq.com/keys
-- `GEMINI_API_KEY` (alternatyva, nemokama) — Google AI Studio
-- `OPENAI_API_KEY` (nebūtina, mokama) — jei nėra kitų raktų
-- Be jokio LLM rakto Ask AI vis tiek veikia taisyklėmis (įskaitant PMOS)
 
-Po env išsaugojimo padarykite Redeploy.
+Nebūtina (Ask AI):
 
-### Jūsų žingsniai
+- `GROQ_API_KEY` / `GEMINI_API_KEY` / `OPENAI_API_KEY` — jei nėra jokio LLM rakto, Ask AI veikia taisyklėmis (įskaitant PMOS)
 
-1. Cursor’e paspauskite **Create repo** (kad projektas taptų tikru GitHub / Origin repo).
-2. Jei repo Origin’e, o Vercel nori GitHub — sukurkite tuščią GitHub repo ir push’inkite:
-   ```bash
-   git remote add github https://github.com/<jūsų-user>/lyfora-clinic.git
-   git push -u github main
-   ```
-3. Eikite į [vercel.com/new](https://vercel.com/new) (tas pats account, kur `avocadotech.eu`).
-4. **Import** tą GitHub repo → Framework: Next.js → Environment Variables: `SESSION_SECRET` ir `DEMO_PASSWORD` → **Deploy**.
-5. Po 1–2 min gausite `https://lyfora-clinic-….vercel.app` — tuo dalinkitės.
+Po env išsaugojimo padarykite **Redeploy**.
 
-Pastaba: serverless cold start’e sesijos /tmp DB gali „atsinaujinti“ — demo’ui to užtenka.
+### Deploy
+
+1. Jei projekto Vercel’e dar nėra: [vercel.com/new](https://vercel.com/new) → **Import** `dariuslatvys/lyfora-clinic` → Framework: Next.js → įrašykite `SESSION_SECRET` ir `DEMO_PASSWORD` → **Deploy**.
+2. Jei projektas jau prijungtas prie šio GitHub repo — po `main` push Vercel pats redeploy’ina; tik patikrinkite, kad abu env yra nustatyti Production aplinkai.
+3. Adresas: `https://lyfora-clinic-….vercel.app` (arba jūsų custom domain).
+
+Pastaba: serverless cold start’e `/tmp` DB gali „atsinaujinti“ — demo’ui to užtenka.
 
 ## Duomenys
 

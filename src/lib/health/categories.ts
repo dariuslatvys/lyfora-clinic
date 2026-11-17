@@ -117,6 +117,17 @@ export const FEMALE_OVERVIEW_ORDER: HealthCategoryId[] = [
   "pharmacogenetics",
 ];
 
+/** Display order for male overview mosaic (existing male categories only). */
+export const MALE_OVERVIEW_ORDER: HealthCategoryId[] = [
+  "cardiovascular",
+  "metabolic",
+  "hormones_men",
+  "immune",
+  "mental",
+  "oncology",
+  "pharmacogenetics",
+];
+
 export function categoriesForSex(sex: "male" | "female") {
   return HEALTH_CATEGORIES.filter((c) => !c.sex || c.sex === sex);
 }

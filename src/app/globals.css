@@ -2048,7 +2048,8 @@ a.who.on {
   z-index: 4;
 }
 
-/* Female overview: illustrated mosaic of 6 domains (no body silhouette). */
+/* Health-map mosaic (female 6 tiles / male 7 tiles). Legacy .women-* aliases kept. */
+.health-map,
 .women-map {
   position: relative;
   border: 1px solid var(--line);
@@ -2069,6 +2070,22 @@ a.who.on {
     var(--surface-2);
 }
 
+.health-map.is-male {
+  background:
+    radial-gradient(
+      100% 70% at 0% 0%,
+      color-mix(in srgb, var(--accent) 12%, transparent),
+      transparent 55%
+    ),
+    radial-gradient(
+      80% 60% at 100% 100%,
+      color-mix(in srgb, #2f5a4a 16%, transparent),
+      transparent 50%
+    ),
+    var(--surface-2);
+}
+
+.health-map-hint,
 .women-map-hint {
   margin: 0 0 12px;
   max-width: 36rem;
@@ -2077,6 +2094,7 @@ a.who.on {
   color: var(--muted);
 }
 
+.health-map-mosaic,
 .women-map-mosaic {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -2084,6 +2102,7 @@ a.who.on {
   gap: 10px;
 }
 
+.health-mosaic-card,
 .women-mosaic-card {
   position: relative;
   display: flex;
@@ -2100,34 +2119,58 @@ a.who.on {
     transform 0.2s ease,
     border-color 0.2s ease,
     box-shadow 0.2s ease;
-  animation: women-tile-in 0.45s ease both;
+  animation: health-tile-in 0.45s ease both;
 }
 
+.health-mosaic-0,
 .women-mosaic-0 {
   grid-column: span 3;
   grid-row: span 2;
   min-height: 306px;
   animation-delay: 0.04s;
 }
+.health-mosaic-1,
 .women-mosaic-1 {
   grid-column: span 3;
   animation-delay: 0.1s;
 }
+.health-mosaic-2,
 .women-mosaic-2 {
   grid-column: span 3;
   animation-delay: 0.16s;
 }
+.health-mosaic-3,
 .women-mosaic-3 {
   grid-column: span 2;
   animation-delay: 0.22s;
 }
+.health-mosaic-4,
 .women-mosaic-4 {
   grid-column: span 2;
   animation-delay: 0.28s;
 }
+.health-mosaic-5,
 .women-mosaic-5 {
   grid-column: span 2;
   animation-delay: 0.34s;
+}
+
+/* Male 7th tile: full-width footer band under the 2+2+2 row. */
+.health-map-mosaic.is-male .health-mosaic-6 {
+  grid-column: span 6;
+  min-height: 132px;
+  animation-delay: 0.4s;
+}
+
+@keyframes health-tile-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 @keyframes women-tile-in {
@@ -2141,6 +2184,7 @@ a.who.on {
   }
 }
 
+.health-mosaic-card:hover,
 .women-mosaic-card:hover {
   transform: translateY(-3px);
   border-color: color-mix(in srgb, var(--cc, var(--accent)) 65%, var(--line));
@@ -2149,11 +2193,13 @@ a.who.on {
     inset 0 0 0 1px color-mix(in srgb, var(--cc, var(--accent)) 30%, transparent);
 }
 
+.health-mosaic-media,
 .women-mosaic-media {
   position: absolute;
   inset: 0;
 }
 
+.health-mosaic-img,
 .women-mosaic-img {
   object-fit: cover;
   object-position: center;
@@ -2161,10 +2207,12 @@ a.who.on {
   transition: transform 0.35s ease;
 }
 
+.health-mosaic-card:hover .health-mosaic-img,
 .women-mosaic-card:hover .women-mosaic-img {
   transform: scale(1.06);
 }
 
+.health-mosaic-fallback,
 .women-mosaic-fallback {
   display: block;
   width: 100%;
@@ -2178,6 +2226,7 @@ a.who.on {
     var(--surface);
 }
 
+.health-mosaic-scrim,
 .women-mosaic-scrim {
   position: absolute;
   inset: 0;
@@ -2190,6 +2239,7 @@ a.who.on {
   pointer-events: none;
 }
 
+.health-mosaic-copy,
 .women-mosaic-copy {
   position: relative;
   z-index: 1;
@@ -2199,6 +2249,7 @@ a.who.on {
   padding: 14px 14px 15px;
 }
 
+.health-mosaic-status,
 .women-mosaic-status {
   align-self: flex-start;
   padding: 3px 8px;
@@ -2211,6 +2262,7 @@ a.who.on {
   border: 1px solid color-mix(in srgb, var(--cc, var(--accent)) 40%, transparent);
 }
 
+.health-mosaic-copy b,
 .women-mosaic-copy b {
   font-family: var(--font-display), Manrope, sans-serif;
   font-size: 1rem;
@@ -2220,16 +2272,25 @@ a.who.on {
   text-shadow: 0 1px 10px rgba(0, 0, 0, 0.45);
 }
 
+.health-mosaic-0 .health-mosaic-copy b,
 .women-mosaic-0 .women-mosaic-copy b {
   font-size: 1.28rem;
   max-width: 16ch;
 }
 
 @media (max-width: 900px) {
+  .health-map-mosaic,
   .women-map-mosaic {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-auto-rows: minmax(140px, auto);
   }
+  .health-mosaic-0,
+  .health-mosaic-1,
+  .health-mosaic-2,
+  .health-mosaic-3,
+  .health-mosaic-4,
+  .health-mosaic-5,
+  .health-mosaic-6,
   .women-mosaic-0,
   .women-mosaic-1,
   .women-mosaic-2,
@@ -2240,10 +2301,15 @@ a.who.on {
     grid-row: span 1;
     min-height: 160px;
   }
+  .health-mosaic-0,
   .women-mosaic-0 {
     grid-column: span 2;
     min-height: 200px;
   }
+  .health-map-mosaic.is-male .health-mosaic-6 {
+    grid-column: span 2;
+  }
+  .health-mosaic-0 .health-mosaic-copy b,
   .women-mosaic-0 .women-mosaic-copy b {
     font-size: 1.1rem;
     max-width: none;
@@ -2251,15 +2317,26 @@ a.who.on {
 }
 
 @media (max-width: 560px) {
+  .health-map-mosaic,
   .women-map-mosaic {
     grid-template-columns: 1fr;
   }
+  .health-mosaic-0,
+  .health-mosaic-1,
+  .health-mosaic-2,
+  .health-mosaic-3,
+  .health-mosaic-4,
+  .health-mosaic-5,
+  .health-mosaic-6,
   .women-mosaic-0,
   .women-mosaic-1,
   .women-mosaic-2,
   .women-mosaic-3,
   .women-mosaic-4,
   .women-mosaic-5 {
+    grid-column: span 1;
+  }
+  .health-map-mosaic.is-male .health-mosaic-6 {
     grid-column: span 1;
   }
 }

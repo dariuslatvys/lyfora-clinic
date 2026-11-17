@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { BodyMap, type BodyMapCategory } from "@/components/patient/body-map";
+import type { BodyMapCategory } from "@/components/patient/body-map";
 import { WomenHealthMap } from "@/components/patient/women-health-map";
+import { MenHealthMap } from "@/components/patient/men-health-map";
 import { CategoryCard } from "@/components/patient/category-card";
 import { PILL_CLASS, type RiskColour } from "@/lib/health/colours";
 import type { FlaggedLab } from "@/lib/health/marker-colour";
@@ -124,10 +125,10 @@ export function OverviewPanels({
             locale={locale}
           />
         ) : (
-          <BodyMap
+          <MenHealthMap
             categories={categories}
             geneHint={labels.geneMarkerHint}
-            centerLabel="Lyfora"
+            locale={locale}
           />
         )
       ) : (

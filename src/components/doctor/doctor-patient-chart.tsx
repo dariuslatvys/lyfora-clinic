@@ -3,6 +3,9 @@
 import { useMemo, useState } from "react";
 import { OverviewPanels } from "@/components/patient/overview-panels";
 import { HealthCardTabs } from "@/components/patient/health-card-tabs";
+import { ReproductivePhenotypesPanel } from "@/components/patient/reproductive-phenotypes";
+import { WomenHealthMap } from "@/components/patient/women-health-map";
+import { MenHealthMap } from "@/components/patient/men-health-map";
 import type { Dictionary } from "@/lib/i18n/dictionary";
 import type {
   HealthCardModel,
@@ -59,6 +62,8 @@ export function DoctorPatientChart({
   planPerks,
   card,
   pharmaSnps,
+  sex = "male",
+  patientId,
 }: {
   locale: "lt" | "en";
   labels: Dictionary;
@@ -72,14 +77,23 @@ export function DoctorPatientChart({
   planPerks: string;
   card: HealthCardModel;
   pharmaSnps: PharmaSnpRow[];
+  sex?: "male" | "female";
+  patientId: string;
 }) {
+  const isFemale = sex === "female";
   const startOnDiagnoses = useMemo(() => hasDiagnosisFiles(card), [card]);
-  const [tab, setTab] = useState<"summary" | "health">(
-    startOnDiagnoses ? "health" : "summary"
+  const [tab, setTab] = useState<"map" | "women" | "summary" | "health">(
+    startOnDiagnoses ? "health" : isFemale ? "map" : "summary"
   );
   const [healthTab, setHealthTab] = useState<HealthCardTabId>(
     startOnDiagnoses ? "dx" : "sum"
   );
+
+  const womenHealthHref = `/doctor/patients/${patientId}/reproductive`;
+  const hrefForCategory = (categoryId: string) => {
+    if (categoryId === "reproductive") return womenHealthHref;
+    return null;
+  };
 
   return (
     <div className="stack" style={{ gap: 14 }}>
@@ -88,6 +102,26 @@ export function DoctorPatientChart({
         role="tablist"
         aria-label={locale === "en" ? "Patient chart" : "Paciento kortelė"}
       >
+        <button
+          type="button"
+          role="tab"
+          className={tab === "map" ? "on" : undefined}
+          aria-selected={tab === "map"}
+          onClick={() => setTab("map")}
+        >
+          {overviewLabels.healthMapTitle}
+        </button>
+        {isFemale ? (
+          <button
+            type="button"
+            role="tab"
+            className={tab === "women" ? "on" : undefined}
+            aria-selected={tab === "women"}
+            onClick={() => setTab("women")}
+          >
+            {locale === "en" ? "Women’s health" : "Moters sveikata"}
+          </button>
+        ) : null}
         <button
           type="button"
           role="tab"
@@ -125,7 +159,44 @@ export function DoctorPatientChart({
         ) : null}
       </div>
 
-      {tab === "summary" ? (
+      {tab === "map" ? (
+        isFemale ? (
+          <WomenHealthMap
+            categories={categories}
+            geneHint={overviewLabels.geneMarkerHint}
+            locale={locale}
+            interactive={false}
+            hrefForCategory={hrefForCategory}
+          />
+        ) : (
+          <MenHealthMap
+            categories={categories}
+            geneHint={overviewLabels.geneMarkerHint}
+            locale={locale}
+            interactive={false}
+          />
+        )
+      ) : tab === "women" && isFemale ? (
+        <div className="stack" style={{ gap: 14 }} id="women-health">
+          <div className="panel" style={{ padding: "14px 16px" }}>
+            <h3 className="m-0 font-[family-name:var(--font-display)] text-xl">
+              {locale === "en"
+                ? "Women’s health and life stages"
+                : "Moters sveikata ir gyvybiniai etapai"}
+            </h3>
+            <p className="small muted m-0 mt-2">
+              {locale === "en"
+                ? "Cycle, hormones, fertility and the four key phenotypes — the same women’s health area the patient sees in her twin."
+                : "Ciklas, hormonai, vaisingumas ir keturi pagrindiniai fenotipai — ta pati moters sveikatos sritis, kurią pacientė mato savo dvynyje."}
+            </p>
+          </div>
+          <ReproductivePhenotypesPanel
+            locale={locale}
+            basePath={`/doctor/patients/${patientId}/reproductive`}
+            interactive
+          />
+        </div>
+      ) : tab === "summary" ? (
         <OverviewPanels
           locale={locale}
           labels={overviewLabels}
@@ -138,6 +209,7 @@ export function DoctorPatientChart({
           planPerks={planPerks}
           mode="summary"
           interactive={false}
+          sex={sex}
         />
       ) : (
         <HealthCardTabs

@@ -19,11 +19,16 @@ export function HealthMapMosaic({
   categories,
   geneHint,
   locale = "lt",
+  interactive = true,
+  hrefForCategory,
 }: {
   sex: "male" | "female";
   categories: BodyMapCategory[];
   geneHint: string;
   locale?: "lt" | "en";
+  /** When false, tiles are not links (unless hrefForCategory returns a URL). */
+  interactive?: boolean;
+  hrefForCategory?: (categoryId: string) => string | null | undefined;
 }) {
   const order = sex === "female" ? FEMALE_OVERVIEW_ORDER : MALE_OVERVIEW_ORDER;
   const artPack: Record<string, HealthMapArt> =
@@ -51,13 +56,19 @@ export function HealthMapMosaic({
       >
         {tiles.map((c, i) => {
           const art = artPack[c.id];
-          return (
-            <Link
-              key={c.id}
-              href={`/patient/digital-twin/${c.id}`}
-              className={`health-mosaic-card health-mosaic-${i}`}
-              style={{ ["--cc" as string]: COLOUR_HEX[c.colour as RiskColour] }}
-            >
+          const customHref = hrefForCategory?.(c.id);
+          const href =
+            customHref !== undefined
+              ? customHref
+              : interactive
+                ? `/patient/digital-twin/${c.id}`
+                : null;
+          const className = `health-mosaic-card health-mosaic-${i}`;
+          const style = {
+            ["--cc" as string]: COLOUR_HEX[c.colour as RiskColour],
+          };
+          const body = (
+            <>
               <span className="health-mosaic-media" aria-hidden={!art}>
                 {art ? (
                   <Image
@@ -80,7 +91,19 @@ export function HealthMapMosaic({
                 </span>
                 <b>{c.title}</b>
               </span>
-            </Link>
+            </>
+          );
+          if (href) {
+            return (
+              <Link key={c.id} href={href} className={className} style={style}>
+                {body}
+              </Link>
+            );
+          }
+          return (
+            <div key={c.id} className={`${className} is-static`} style={style}>
+              {body}
+            </div>
           );
         })}
       </div>

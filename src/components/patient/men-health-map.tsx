@@ -6,10 +6,14 @@ export function MenHealthMap({
   categories,
   geneHint,
   locale = "lt",
+  interactive = true,
+  hrefForCategory,
 }: {
   categories: BodyMapCategory[];
   geneHint: string;
   locale?: "lt" | "en";
+  interactive?: boolean;
+  hrefForCategory?: (categoryId: string) => string | null | undefined;
 }) {
   return (
     <HealthMapMosaic
@@ -17,6 +21,8 @@ export function MenHealthMap({
       categories={categories}
       geneHint={geneHint}
       locale={locale}
+      interactive={interactive}
+      hrefForCategory={hrefForCategory}
     />
   );
 }

@@ -67,6 +67,7 @@ export function OverviewPanels({
   mode = "full",
   interactive = true,
   sex = "male",
+  hrefForCategory,
 }: {
   locale: "lt" | "en";
   labels: Labels;
@@ -82,6 +83,7 @@ export function OverviewPanels({
   /** When false, tiles and rows render without patient-portal links. */
   interactive?: boolean;
   sex?: "male" | "female";
+  hrefForCategory?: (categoryId: string) => string | null | undefined;
 }) {
   const [tab, setTab] = useState<"map" | "summary">(
     mode === "summary" ? "summary" : "map"
@@ -123,12 +125,16 @@ export function OverviewPanels({
             categories={categories}
             geneHint={labels.geneMarkerHint}
             locale={locale}
+            interactive={interactive}
+            hrefForCategory={hrefForCategory}
           />
         ) : (
           <MenHealthMap
             categories={categories}
             geneHint={labels.geneMarkerHint}
             locale={locale}
+            interactive={interactive}
+            hrefForCategory={hrefForCategory}
           />
         )
       ) : (

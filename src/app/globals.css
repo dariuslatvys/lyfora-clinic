@@ -2193,6 +2193,20 @@ a.who.on {
     inset 0 0 0 1px color-mix(in srgb, var(--cc, var(--accent)) 30%, transparent);
 }
 
+.health-mosaic-card.is-static {
+  cursor: default;
+}
+.health-mosaic-card.is-static:hover {
+  transform: none;
+}
+
+.repro-pheno-card.is-static {
+  cursor: default;
+}
+.repro-pheno-card.is-static:hover {
+  transform: none;
+}
+
 .health-mosaic-media,
 .women-mosaic-media {
   position: absolute;

@@ -190,6 +190,8 @@ export default async function DoctorPatientChartPage({
       <DoctorPatientChart
         locale={locale}
         labels={labels}
+        sex={(twin.patient.sex as "male" | "female") || "male"}
+        patientId={id}
         overviewLabels={{
           healthMapTitle: labels.healthMapTitle,
           cardSummary: labels.cardSummary,

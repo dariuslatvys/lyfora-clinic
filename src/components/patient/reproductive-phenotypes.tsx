@@ -16,8 +16,13 @@ const SIGNAL_PILL: Record<PhenotypeSignal, string> = {
 
 export function ReproductivePhenotypesPanel({
   locale,
+  basePath = "/patient/digital-twin/reproductive",
+  interactive = true,
 }: {
   locale: "lt" | "en";
+  /** Base path for phenotype detail links (patient or doctor). */
+  basePath?: string;
+  interactive?: boolean;
 }) {
   const statusById = new Map(DEMO_PHENOTYPE_STATUS.map((s) => [s.id, s]));
 
@@ -39,14 +44,13 @@ export function ReproductivePhenotypesPanel({
       <div className="repro-pheno-grid">
         {REPRODUCTIVE_PHENOTYPES.map((p) => {
           const st = statusById.get(p.id)!;
-          const href = `/patient/digital-twin/reproductive/${p.id}`;
-          return (
-            <Link
-              key={p.id}
-              href={href}
-              className="repro-pheno-card"
-              style={{ ["--cc" as string]: COLOUR_HEX[st.colour as RiskColour] }}
-            >
+          const href = `${basePath}/${p.id}`;
+          const className = "repro-pheno-card";
+          const style = {
+            ["--cc" as string]: COLOUR_HEX[st.colour as RiskColour],
+          };
+          const body = (
+            <>
               <div className="repro-pheno-top">
                 <h4>{locale === "en" ? p.nameEn : p.nameLt}</h4>
                 <span
@@ -60,7 +64,11 @@ export function ReproductivePhenotypesPanel({
               </p>
               <dl className="repro-pheno-impact">
                 <div>
-                  <dt>{locale === "en" ? "Reproductive health" : "Reprodukcinė sveikata"}</dt>
+                  <dt>
+                    {locale === "en"
+                      ? "Reproductive health"
+                      : "Reprodukcinė sveikata"}
+                  </dt>
                   <dd>{locale === "en" ? p.impactEn : p.impactLt}</dd>
                 </div>
                 <div>
@@ -68,14 +76,32 @@ export function ReproductivePhenotypesPanel({
                   <dd>{locale === "en" ? p.fertilityEn : p.fertilityLt}</dd>
                 </div>
                 <div>
-                  <dt>{locale === "en" ? "Daily life" : "Kasdienė gyvenimo kokybė"}</dt>
+                  <dt>
+                    {locale === "en"
+                      ? "Daily life"
+                      : "Kasdienė gyvenimo kokybė"}
+                  </dt>
                   <dd>{locale === "en" ? p.dailyEn : p.dailyLt}</dd>
                 </div>
               </dl>
-              <span className="repro-pheno-cta">
-                {locale === "en" ? "Open details →" : "Atidaryti detales →"}
-              </span>
-            </Link>
+              {interactive ? (
+                <span className="repro-pheno-cta">
+                  {locale === "en" ? "Open details →" : "Atidaryti detales →"}
+                </span>
+              ) : null}
+            </>
+          );
+          if (interactive) {
+            return (
+              <Link key={p.id} href={href} className={className} style={style}>
+                {body}
+              </Link>
+            );
+          }
+          return (
+            <div key={p.id} className={`${className} is-static`} style={style}>
+              {body}
+            </div>
           );
         })}
       </div>

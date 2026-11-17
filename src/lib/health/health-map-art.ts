@@ -41,37 +41,38 @@ export const FEMALE_HEALTH_MAP_ART: Record<string, HealthMapArt> = {
 
 export const MALE_HEALTH_MAP_ART: Record<string, HealthMapArt> = {
   cardiovascular: {
-    src: "/brand/categories/cardiovascular-botanical.jpg",
+    src: "/brand/categories/cardiovascular-final.jpg",
     altLt: "Širdies ir kraujagyslių sveikata",
     altEn: "Heart and vessel health",
   },
   metabolic: {
-    src: "/brand/categories/metabolic-botanical.jpg",
+    src: "/brand/categories/metabolic-final.jpg",
     altLt: "Metabolinė sveikata",
     altEn: "Metabolic health",
   },
   hormones_men: {
-    src: "/brand/categories/hormones_men-botanical.jpg",
+    src: "/brand/categories/hormones_men-final.jpg",
     altLt: "Vyrų hormonų sveikata",
     altEn: "Men’s hormone health",
   },
   immune: {
-    src: "/brand/categories/immune-botanical.jpg",
+    src: "/brand/categories/immune-final.jpg",
     altLt: "Imuninė sveikata",
     altEn: "Immune health",
   },
   mental: {
-    src: "/brand/categories/mental_men-botanical.jpg",
+    src: "/brand/categories/mental_men-final.jpg",
     altLt: "Psichikos ir emocinė sveikata",
     altEn: "Mental and emotional health",
   },
   oncology: {
-    src: "/brand/categories/oncology_men-botanical.jpg",
+    src: "/brand/categories/oncology_men-final.jpg",
     altLt: "Vėžio prevencija",
     altEn: "Cancer prevention",
   },
   pharmacogenetics: {
-    src: "/brand/categories/pharmacogenetics_men-botanical.jpg",
+    // Same art as the women’s pharmacogenetics tile.
+    src: "/brand/categories/pharmacogenetics.jpg",
     altLt: "Farmakogenetika",
     altEn: "Pharmacogenetics",
   },

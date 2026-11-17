@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { OverviewPanels } from "@/components/patient/overview-panels";
 import { HealthCardTabs } from "@/components/patient/health-card-tabs";
 import { ReproductivePhenotypesPanel } from "@/components/patient/reproductive-phenotypes";
@@ -45,8 +45,15 @@ type OverviewLabels = {
   colourLabels: Record<string, string>;
 };
 
-function hasDiagnosisFiles(card: HealthCardModel) {
-  return card.conditions.some((c) => (c.links || []).length > 0);
+type ChartTab = "map" | "women" | "summary" | "health";
+
+function parseInitialTab(
+  raw: string | undefined,
+  sex: "male" | "female"
+): ChartTab {
+  if (raw === "map" || raw === "summary" || raw === "health") return raw;
+  if (raw === "women" && sex === "female") return "women";
+  return sex === "female" ? "map" : "summary";
 }
 
 export function DoctorPatientChart({
@@ -64,6 +71,8 @@ export function DoctorPatientChart({
   pharmaSnps,
   sex = "male",
   patientId,
+  initialTab,
+  focusCategory,
 }: {
   locale: "lt" | "en";
   labels: Dictionary;
@@ -79,20 +88,37 @@ export function DoctorPatientChart({
   pharmaSnps: PharmaSnpRow[];
   sex?: "male" | "female";
   patientId: string;
+  initialTab?: string;
+  focusCategory?: string;
 }) {
   const isFemale = sex === "female";
-  const startOnDiagnoses = useMemo(() => hasDiagnosisFiles(card), [card]);
-  const [tab, setTab] = useState<"map" | "women" | "summary" | "health">(
-    startOnDiagnoses ? "health" : isFemale ? "map" : "summary"
+  const [tab, setTab] = useState<ChartTab>(() =>
+    parseInitialTab(initialTab, sex)
   );
-  const [healthTab, setHealthTab] = useState<HealthCardTabId>(
-    startOnDiagnoses ? "dx" : "sum"
-  );
+  const [healthTab] = useState<HealthCardTabId>("sum");
+  const [focusId, setFocusId] = useState(focusCategory || "");
+
+  useEffect(() => {
+    setTab(parseInitialTab(initialTab, sex));
+  }, [initialTab, sex]);
+
+  useEffect(() => {
+    setFocusId(focusCategory || "");
+  }, [focusCategory]);
+
+  useEffect(() => {
+    if (!focusId || tab !== "map") return;
+    const el = document.getElementById(`doctor-cat-${focusId}`);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [focusId, tab]);
 
   const womenHealthHref = `/doctor/patients/${patientId}/reproductive`;
   const hrefForCategory = (categoryId: string) => {
     if (categoryId === "reproductive") return womenHealthHref;
-    return null;
+    // Keep focus on the map tile for problem-area deep links.
+    return `/doctor/patients/${patientId}?tab=map&focus=${encodeURIComponent(categoryId)}`;
   };
 
   return (
@@ -136,46 +162,41 @@ export function DoctorPatientChart({
           role="tab"
           className={tab === "health" ? "on" : undefined}
           aria-selected={tab === "health"}
-          onClick={() => {
-            setTab("health");
-            if (startOnDiagnoses) setHealthTab("dx");
-          }}
+          onClick={() => setTab("health")}
         >
           {labels.healthCard}
         </button>
-        {startOnDiagnoses ? (
-          <button
-            type="button"
-            role="tab"
-            className={tab === "health" && healthTab === "dx" ? "on" : undefined}
-            aria-selected={tab === "health" && healthTab === "dx"}
-            onClick={() => {
-              setHealthTab("dx");
-              setTab("health");
-            }}
-          >
-            {labels.cardDiagnoses}
-          </button>
-        ) : null}
       </div>
 
       {tab === "map" ? (
-        isFemale ? (
-          <WomenHealthMap
-            categories={categories}
-            geneHint={overviewLabels.geneMarkerHint}
-            locale={locale}
-            interactive={false}
-            hrefForCategory={hrefForCategory}
-          />
-        ) : (
-          <MenHealthMap
-            categories={categories}
-            geneHint={overviewLabels.geneMarkerHint}
-            locale={locale}
-            interactive={false}
-          />
-        )
+        <div
+          className={
+            focusId ? `doctor-map-focus focus-${focusId}` : "doctor-map-focus"
+          }
+          data-focus={focusId || undefined}
+        >
+          {isFemale ? (
+            <WomenHealthMap
+              categories={categories}
+              geneHint={overviewLabels.geneMarkerHint}
+              locale={locale}
+              interactive
+              hrefForCategory={hrefForCategory}
+              tileIdPrefix="doctor-cat-"
+              focusCategoryId={focusId || undefined}
+            />
+          ) : (
+            <MenHealthMap
+              categories={categories}
+              geneHint={overviewLabels.geneMarkerHint}
+              locale={locale}
+              interactive
+              hrefForCategory={hrefForCategory}
+              tileIdPrefix="doctor-cat-"
+              focusCategoryId={focusId || undefined}
+            />
+          )}
+        </div>
       ) : tab === "women" && isFemale ? (
         <div className="stack" style={{ gap: 14 }} id="women-health">
           <div className="panel" style={{ padding: "14px 16px" }}>

@@ -6737,6 +6737,24 @@ a.hc-kpi.clickable:hover {
   font-size: 0.82rem;
   font-weight: 650;
   border: 1px solid transparent;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    filter 0.15s ease;
+}
+
+.doctor-cat-pill:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+}
+
+.health-mosaic-card.is-focused {
+  outline: 2px solid color-mix(in srgb, var(--cc, var(--accent)) 80%, white);
+  outline-offset: 3px;
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--cc, var(--accent)) 25%, transparent),
+    0 14px 28px rgba(0, 0, 0, 0.28);
 }
 
 .doctor-cat-pill i {

@@ -41,14 +41,17 @@ const RANK: Record<RiskColour, number> = {
 
 export default async function DoctorPatientChartPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams?: Promise<{ tab?: string; focus?: string }>;
 }) {
   const current = await getCurrentUser();
   if (!current || current.user.role !== "doctor") redirect("/login/doctor");
   const locale = ((current.user.locale as Locale) || "lt") as Locale;
   const labels = t(locale);
   const { id } = await params;
+  const query = (await searchParams) || {};
   ensureSchema();
   ensurePetraitisPatient();
   const twin = loadDigitalTwin(id, locale);
@@ -192,6 +195,8 @@ export default async function DoctorPatientChartPage({
         labels={labels}
         sex={(twin.patient.sex as "male" | "female") || "male"}
         patientId={id}
+        initialTab={query.tab}
+        focusCategory={query.focus}
         overviewLabels={{
           healthMapTitle: labels.healthMapTitle,
           cardSummary: labels.cardSummary,

@@ -119,7 +119,10 @@ export function DoctorPatientsList({
                     {p.dob ? ` (${p.dob})` : ""} · {p.sexLabel}
                   </p>
                 </div>
-                <Link href={`/doctor/patients/${p.id}`} className="btn sm">
+                <Link
+                  href={`/doctor/patients/${p.id}?tab=health`}
+                  className="btn sm"
+                >
                   {copy.open}
                 </Link>
               </div>
@@ -147,16 +150,23 @@ export function DoctorPatientsList({
                 <div className="mt-3">
                   <span className="eyebrow">{copy.cats}</span>
                   <div className="doctor-patient-cats mt-2">
-                    {p.categories.map((c) => (
-                      <span
-                        key={c.id}
-                        className={`doctor-cat-pill colour-${c.colour}`}
-                        title={c.colourLabel}
-                      >
-                        <i aria-hidden />
-                        {c.title}
-                      </span>
-                    ))}
+                    {p.categories.map((c) => {
+                      const href =
+                        c.id === "reproductive"
+                          ? `/doctor/patients/${p.id}?tab=women`
+                          : `/doctor/patients/${p.id}?tab=map&focus=${encodeURIComponent(c.id)}`;
+                      return (
+                        <Link
+                          key={c.id}
+                          href={href}
+                          className={`doctor-cat-pill colour-${c.colour}`}
+                          title={c.colourLabel}
+                        >
+                          <i aria-hidden />
+                          {c.title}
+                        </Link>
+                      );
+                    })}
                   </div>
                 </div>
               ) : null}

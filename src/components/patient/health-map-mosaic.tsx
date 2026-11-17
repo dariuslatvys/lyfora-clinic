@@ -21,6 +21,8 @@ export function HealthMapMosaic({
   locale = "lt",
   interactive = true,
   hrefForCategory,
+  tileIdPrefix,
+  focusCategoryId,
 }: {
   sex: "male" | "female";
   categories: BodyMapCategory[];
@@ -29,6 +31,8 @@ export function HealthMapMosaic({
   /** When false, tiles are not links (unless hrefForCategory returns a URL). */
   interactive?: boolean;
   hrefForCategory?: (categoryId: string) => string | null | undefined;
+  tileIdPrefix?: string;
+  focusCategoryId?: string;
 }) {
   const order = sex === "female" ? FEMALE_OVERVIEW_ORDER : MALE_OVERVIEW_ORDER;
   const artPack: Record<string, HealthMapArt> =
@@ -63,10 +67,16 @@ export function HealthMapMosaic({
               : interactive
                 ? `/patient/digital-twin/${c.id}`
                 : null;
-          const className = `health-mosaic-card health-mosaic-${i}`;
+          const focused = focusCategoryId === c.id;
+          const className = `health-mosaic-card health-mosaic-${i}${
+            focused ? " is-focused" : ""
+          }`;
           const style = {
             ["--cc" as string]: COLOUR_HEX[c.colour as RiskColour],
           };
+          const tileId = tileIdPrefix
+            ? `${tileIdPrefix}${c.id}`
+            : undefined;
           const body = (
             <>
               <span className="health-mosaic-media" aria-hidden={!art}>
@@ -95,13 +105,24 @@ export function HealthMapMosaic({
           );
           if (href) {
             return (
-              <Link key={c.id} href={href} className={className} style={style}>
+              <Link
+                key={c.id}
+                id={tileId}
+                href={href}
+                className={className}
+                style={style}
+              >
                 {body}
               </Link>
             );
           }
           return (
-            <div key={c.id} className={`${className} is-static`} style={style}>
+            <div
+              key={c.id}
+              id={tileId}
+              className={`${className} is-static`}
+              style={style}
+            >
               {body}
             </div>
           );

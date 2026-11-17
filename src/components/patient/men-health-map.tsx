@@ -8,12 +8,16 @@ export function MenHealthMap({
   locale = "lt",
   interactive = true,
   hrefForCategory,
+  tileIdPrefix,
+  focusCategoryId,
 }: {
   categories: BodyMapCategory[];
   geneHint: string;
   locale?: "lt" | "en";
   interactive?: boolean;
   hrefForCategory?: (categoryId: string) => string | null | undefined;
+  tileIdPrefix?: string;
+  focusCategoryId?: string;
 }) {
   return (
     <HealthMapMosaic
@@ -23,6 +27,8 @@ export function MenHealthMap({
       locale={locale}
       interactive={interactive}
       hrefForCategory={hrefForCategory}
+      tileIdPrefix={tileIdPrefix}
+      focusCategoryId={focusCategoryId}
     />
   );
 }

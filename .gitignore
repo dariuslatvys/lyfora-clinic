@@ -55,3 +55,12 @@ next-env.d.ts
 /data/lyfora-source/dna/**
 !/data/lyfora-source/dna/.gitkeep
 /step*.webp
+
+# local runtime sqlite (demo uses data/demo/)
+/data/lyfora.db
+
+# health-map art work-in-progress
+/public/brand/categories/_pending-male/
+/public/brand/categories/male-approved/
+/public/brand/categories/*-approved.jpg
+/public/brand/categories/pharmacogenetics_men-final.jpg

@@ -73,6 +73,7 @@ export default async function DoctorPatientsPage() {
       name: patientDisplayName(p.sex, locale, p.id),
       dob: p.dob,
       birthYear: birthYearFromDob(p.dob),
+      sex: (p.sex === "female" ? "female" : "male") as "male" | "female",
       sexLabel:
         p.sex === "male"
           ? locale === "en"

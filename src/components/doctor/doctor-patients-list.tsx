@@ -10,6 +10,7 @@ export type DoctorPatientListItem = {
   name: string;
   dob: string | null;
   birthYear: string;
+  sex: "male" | "female";
   sexLabel: string;
   notes: string | null;
   visitCount: number;
@@ -120,7 +121,11 @@ export function DoctorPatientsList({
                   </p>
                 </div>
                 <Link
-                  href={`/doctor/patients/${p.id}?tab=health`}
+                  href={
+                    p.sex === "female"
+                      ? `/doctor/patients/${p.id}?tab=women`
+                      : `/doctor/patients/${p.id}?tab=health`
+                  }
                   className="btn sm"
                 >
                   {copy.open}

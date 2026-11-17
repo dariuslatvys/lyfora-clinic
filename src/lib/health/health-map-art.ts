@@ -41,37 +41,37 @@ export const FEMALE_HEALTH_MAP_ART: Record<string, HealthMapArt> = {
 
 export const MALE_HEALTH_MAP_ART: Record<string, HealthMapArt> = {
   cardiovascular: {
-    src: "/brand/categories/cardiovascular-simple.jpg",
+    src: "/brand/categories/cardiovascular-botanical.jpg",
     altLt: "Širdies ir kraujagyslių sveikata",
     altEn: "Heart and vessel health",
   },
   metabolic: {
-    src: "/brand/categories/metabolic-simple.jpg",
+    src: "/brand/categories/metabolic-botanical.jpg",
     altLt: "Metabolinė sveikata",
     altEn: "Metabolic health",
   },
   hormones_men: {
-    src: "/brand/categories/hormones_men-simple.jpg",
+    src: "/brand/categories/hormones_men-botanical.jpg",
     altLt: "Vyrų hormonų sveikata",
     altEn: "Men’s hormone health",
   },
   immune: {
-    src: "/brand/categories/immune-simple.jpg",
+    src: "/brand/categories/immune-botanical.jpg",
     altLt: "Imuninė sveikata",
     altEn: "Immune health",
   },
   mental: {
-    src: "/brand/categories/mental_men-simple.jpg",
+    src: "/brand/categories/mental_men-botanical.jpg",
     altLt: "Psichikos ir emocinė sveikata",
     altEn: "Mental and emotional health",
   },
   oncology: {
-    src: "/brand/categories/oncology_men-simple.jpg",
+    src: "/brand/categories/oncology_men-botanical.jpg",
     altLt: "Vėžio prevencija",
     altEn: "Cancer prevention",
   },
   pharmacogenetics: {
-    src: "/brand/categories/pharmacogenetics_men-simple.jpg",
+    src: "/brand/categories/pharmacogenetics_men-botanical.jpg",
     altLt: "Farmakogenetika",
     altEn: "Pharmacogenetics",
   },

@@ -39,18 +39,36 @@ const FOCUS_BY_ID: Record<string, BodyFocus> = {
   hormones_men: { x: 50, y: 44, mode: "pelvis" },
 };
 
-/** Figure + orbit tuned for one full-bleed dark stage */
-const FIG_W = 32;
+const FIG_W = 30;
 const FIG_H = FIG_W * (1280 / 720);
 const FIG_LEFT = 50 - FIG_W / 2;
-const FIG_TOP = 50 - FIG_H / 2;
-const ORBIT_R = 41;
+const FIG_TOP = 48 - FIG_H / 2;
+const ORBIT_R = 38;
 const CX = 50;
-const CY = 50;
+const CY = 49;
 
-const FEMALE_TWIN_SRC = "/brand/health-map/woman-hologram-v5.png";
-const FEMALE_TWIN_FALLBACK = "/brand/health-map/woman-hologram-v4.png";
+const FEMALE_TWIN_SRC = "/brand/health-map/woman-hologram-v7.png";
+const FEMALE_TWIN_FALLBACK = "/brand/health-map/woman-hologram-v5.png";
 const MALE_TWIN_SRC = "/brand/body-twin-hub.png";
+
+const PARTICLES = [
+  [14, 20],
+  [86, 16],
+  [10, 52],
+  [90, 48],
+  [18, 78],
+  [82, 74],
+  [38, 10],
+  [62, 88],
+  [6, 36],
+  [94, 64],
+  [28, 86],
+  [72, 12],
+  [22, 42],
+  [78, 56],
+  [44, 92],
+  [56, 8],
+] as const;
 
 function bodyToStage(local: { x: number; y: number }) {
   return {
@@ -83,6 +101,12 @@ function orderForSex(
 
 function focusFor(id: string): BodyFocus {
   return FOCUS_BY_ID[id] || { x: 50, y: 40, mode: "body" };
+}
+
+function shortTitle(title: string) {
+  // Keep orbit labels short like BioTwin floating nodes
+  const cut = title.split(/[,\u2013\-–]/)[0]?.trim() || title;
+  return cut.length > 28 ? `${cut.slice(0, 26)}…` : cut;
 }
 
 function CategoryGlyph({ id }: { id: string }) {
@@ -268,6 +292,12 @@ export function RadialHealthMapLab({
         data-hot={activeId ? "1" : "0"}
       >
         <div className="twin-void" aria-hidden>
+          <img
+            className="twin-stage-bg"
+            src="/brand/health-map/twin-stage-bg.jpg"
+            alt=""
+            decoding="async"
+          />
           <span className="twin-atmos twin-atmos-a" />
           <span className="twin-atmos twin-atmos-b" />
           <span className="twin-bloom" />
@@ -284,12 +314,12 @@ export function RadialHealthMapLab({
               x2="100%"
               y2="100%"
             >
-              <stop offset="0%" stopColor="rgba(120,240,180,0.05)" />
-              <stop offset="45%" stopColor="rgba(170,255,210,0.42)" />
-              <stop offset="100%" stopColor="rgba(90,200,160,0.06)" />
+              <stop offset="0%" stopColor="rgba(120,240,180,0.04)" />
+              <stop offset="50%" stopColor="rgba(180,255,220,0.38)" />
+              <stop offset="100%" stopColor="rgba(90,200,160,0.05)" />
             </linearGradient>
           </defs>
-          <circle cx={CX} cy={CY} r={ORBIT_R + 6} className="twin-orbit-soft" />
+          <circle cx={CX} cy={CY} r={ORBIT_R + 7} className="twin-orbit-soft" />
           <circle
             cx={CX}
             cy={CY}
@@ -297,6 +327,16 @@ export function RadialHealthMapLab({
             className="twin-orbit-ring"
             stroke={`url(#twinOrbitGrad-${uid})`}
           />
+          {PARTICLES.map(([px, py], i) => (
+            <circle
+              key={`${px}-${py}`}
+              cx={px}
+              cy={py}
+              r={i % 3 === 0 ? 0.32 : 0.18}
+              className="twin-particle"
+              style={{ animationDelay: `${(i % 8) * 0.4}s` }}
+            />
+          ))}
         </svg>
 
         <div
@@ -355,9 +395,9 @@ export function RadialHealthMapLab({
             ? (() => {
                 const leftSide = activeOrbit.x < CX;
                 const qx = leftSide
-                  ? Math.min(activeOrbit.x, stageFocus.x) - 10
-                  : Math.max(activeOrbit.x, stageFocus.x) + 10;
-                const qy = activeOrbit.y * 0.42 + stageFocus.y * 0.58;
+                  ? Math.min(activeOrbit.x, stageFocus.x) - 9
+                  : Math.max(activeOrbit.x, stageFocus.x) + 9;
+                const qy = activeOrbit.y * 0.4 + stageFocus.y * 0.6;
                 const d = `M ${activeOrbit.x} ${activeOrbit.y} Q ${qx} ${qy} ${stageFocus.x} ${stageFocus.y}`;
                 return (
                   <g filter={`url(#twinBeamGlow-${uid})`}>
@@ -412,7 +452,7 @@ export function RadialHealthMapLab({
                 <CategoryGlyph id={c.id} />
               </span>
               <span className="twin-chip-copy">
-                <b>{c.title}</b>
+                <b>{shortTitle(c.title)}</b>
                 <em>
                   <i />
                   {c.colourLabel}
@@ -424,9 +464,9 @@ export function RadialHealthMapLab({
         })}
 
         <div className="twin-hud" aria-hidden>
-          <span className="twin-hud-tag">Lyfora twin</span>
+          <span className="twin-hud-tag">The human virtual twin</span>
           <span className="twin-hud-meta">
-            {activeTile ? activeTile.title : "Sveikatos žemėlapis"}
+            {activeTile ? activeTile.title : "Lyfora sveikatos žemėlapis"}
           </span>
         </div>
       </div>

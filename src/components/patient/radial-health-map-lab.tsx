@@ -2,7 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState, type CSSProperties, type ReactNode } from "react";
+import {
+  useId,
+  useMemo,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 import type { BodyMapCategory } from "@/components/patient/body-map";
 import { COLOUR_HEX, type RiskColour } from "@/lib/health/colours";
 import {
@@ -10,8 +16,6 @@ import {
   MALE_OVERVIEW_ORDER,
   type HealthCategoryId,
 } from "@/lib/health/categories";
-
-type Slot = { deg: number };
 
 /** Focus in body-image local % (0–100 of hologram frame). */
 type BodyFocus = {
@@ -24,11 +28,9 @@ const FOCUS_BY_ID: Record<string, BodyFocus> = {
   cardio_metabolic: { x: 51, y: 29, mode: "heart" },
   cardiovascular: { x: 51, y: 29, mode: "heart" },
   mental: { x: 50, y: 11, mode: "brain" },
-  // Ovaries (lateral) — not belly midline, not crotch
   reproductive: { x: 57, y: 44, mode: "pelvis" },
   hormones_women: { x: 57, y: 44, mode: "pelvis" },
   pharmacogenetics: { x: 50, y: 37, mode: "gut" },
-  // Full-body wash; line anchors at sternum
   physical: { x: 50, y: 27, mode: "body" },
   oncology: { x: 50, y: 29, mode: "outline" },
   metabolic: { x: 50, y: 37, mode: "gut" },
@@ -36,45 +38,16 @@ const FOCUS_BY_ID: Record<string, BodyFocus> = {
   hormones_men: { x: 50, y: 44, mode: "pelvis" },
 };
 
-/** Figure box as % of square stage (kept in sync with CSS). */
-const FIG_W = 34;
+const FIG_W = 58;
 const FIG_H = FIG_W * (1280 / 720);
 const FIG_LEFT = 50 - FIG_W / 2;
 const FIG_TOP = 50 - FIG_H / 2;
-const ORBIT_R = 39;
-const CX = 50;
-const CY = 50;
-
-const PARTICLES = [
-  [18, 22],
-  [78, 18],
-  [12, 48],
-  [86, 44],
-  [22, 72],
-  [74, 76],
-  [42, 14],
-  [58, 86],
-  [8, 34],
-  [91, 62],
-  [34, 82],
-  [66, 12],
-  [28, 38],
-  [70, 58],
-  [16, 64],
-  [84, 28],
-] as const;
 
 function bodyToStage(local: { x: number; y: number }) {
   return {
     x: FIG_LEFT + (local.x / 100) * FIG_W,
     y: FIG_TOP + (local.y / 100) * FIG_H,
   };
-}
-
-function slotsForCount(n: number): Slot[] {
-  const step = 360 / n;
-  const start = -90 + step / 2;
-  return Array.from({ length: n }, (_, i) => ({ deg: start + step * i }));
 }
 
 function orderForSex(
@@ -102,7 +75,7 @@ function CategoryGlyph({ id }: { id: string }) {
     viewBox: "0 0 24 24",
     fill: "none",
     stroke: "currentColor",
-    strokeWidth: 1.5,
+    strokeWidth: 1.55,
     strokeLinecap: "round" as const,
     strokeLinejoin: "round" as const,
     "aria-hidden": true,
@@ -191,13 +164,18 @@ function BodyFocusMarks({
   accent: string;
 }) {
   if (mode === "body") {
-    return <span className="twin-mark is-body" style={{ background: accent }} />;
+    return (
+      <span
+        className="twin-mark is-body"
+        style={{ background: accent, ["--cc" as string]: accent }}
+      />
+    );
   }
   if (mode === "outline") {
     return (
       <span
         className="twin-mark is-outline"
-        style={{ borderColor: accent, boxShadow: `0 0 28px ${accent}55` }}
+        style={{ borderColor: accent, boxShadow: `0 0 24px ${accent}44` }}
       />
     );
   }
@@ -234,209 +212,185 @@ export function RadialHealthMapLab({
   categories: BodyMapCategory[];
   geneHint?: string;
 }) {
+  const uid = useId().replace(/:/g, "");
   const tiles = useMemo(
     () => orderForSex(categories, sex),
     [categories, sex]
   );
-  const slots = useMemo(() => slotsForCount(tiles.length), [tiles.length]);
-  const [hovered, setHovered] = useState<string | null>(null);
+  const [activeId, setActiveId] = useState<string | null>(null);
 
   const figureSrc =
     sex === "female"
       ? "/brand/health-map/woman-hologram-v6.webp"
       : "/brand/body-twin-hub.png";
 
-  const active = hovered ? focusFor(hovered) : null;
-  const activeTile = tiles.find((t) => t.id === hovered) || null;
-  const activeIndex = hovered
-    ? tiles.findIndex((t) => t.id === hovered)
-    : -1;
-  const activeSlot = activeIndex >= 0 ? slots[activeIndex] : null;
+  const active = activeId ? focusFor(activeId) : null;
+  const activeTile = tiles.find((t) => t.id === activeId) || null;
   const accent = activeTile
     ? COLOUR_HEX[activeTile.colour as RiskColour]
     : "#5ee4a8";
   const stageFocus = active ? bodyToStage(active) : null;
-  const activeOrbit = activeSlot
-    ? {
-        x: CX + ORBIT_R * Math.cos((activeSlot.deg * Math.PI) / 180),
-        y: CY + ORBIT_R * Math.sin((activeSlot.deg * Math.PI) / 180),
-      }
-    : null;
+  const activeIndex = activeId
+    ? tiles.findIndex((t) => t.id === activeId)
+    : -1;
+
+  // Anchor connector to the vertical rail row center on the right edge of the stage
+  const railAnchor =
+    activeIndex >= 0
+      ? {
+          x: 98,
+          y: 14 + (activeIndex + 0.5) * (72 / Math.max(tiles.length, 1)),
+        }
+      : null;
 
   return (
     <div className="twin-lab rise-in">
-      <div
-        className="twin-stage"
-        data-sex={sex}
-        data-focus={active?.mode || ""}
-        data-hot={hovered ? "1" : "0"}
-      >
-        <div className="twin-void" aria-hidden>
-          <span className="twin-atmos twin-atmos-a" />
-          <span className="twin-atmos twin-atmos-b" />
-          <span className="twin-bloom" />
-          <span className="twin-scan" />
-          <span className="twin-floor" />
-          <span className="twin-vignette" />
-        </div>
-
-        <svg className="twin-orbit" viewBox="0 0 100 100" aria-hidden>
-          <defs>
-            <linearGradient id="twinOrbitGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="rgba(120,240,180,0.04)" />
-              <stop offset="40%" stopColor="rgba(160,255,210,0.55)" />
-              <stop offset="100%" stopColor="rgba(80,200,160,0.06)" />
-            </linearGradient>
-          </defs>
-
-          <circle cx={CX} cy={CY} r={ORBIT_R + 7} className="twin-orbit-soft" />
-          <circle
-            cx={CX}
-            cy={CY}
-            r={ORBIT_R}
-            className="twin-orbit-ring"
-            stroke="url(#twinOrbitGrad)"
-          />
-          <circle cx={CX} cy={CY} r={ORBIT_R - 6.5} className="twin-orbit-inner" />
-
-          {PARTICLES.map(([px, py], i) => (
-            <circle
-              key={`${px}-${py}`}
-              cx={px}
-              cy={py}
-              r={i % 3 === 0 ? 0.28 : 0.18}
-              className="twin-particle"
-              style={{ animationDelay: `${(i % 8) * 0.45}s` }}
-            />
-          ))}
-        </svg>
-
+      <div className="twin-shell">
         <div
-          className={`twin-figure${active ? ` focus-${active.mode}` : ""}`}
-          aria-hidden
-          style={
-            {
-              width: `${FIG_W}%`,
-              ...(active ? { ["--focus-c" as string]: accent } : {}),
-            } as CSSProperties
-          }
+          className="twin-stage"
+          data-sex={sex}
+          data-focus={active?.mode || ""}
+          data-hot={activeId ? "1" : "0"}
         >
-          <div className="twin-figure-glow" />
-          <div className="twin-figure-rim" />
-          <Image
-            src={figureSrc}
-            alt=""
-            width={720}
-            height={1280}
-            className="twin-photo"
-            priority
-            unoptimized
-          />
-          <span className="twin-scanline" />
-          <span className="twin-mesh" />
-          {active ? (
-            <BodyFocusMarks
-              mode={active.mode}
-              x={active.x}
-              y={active.y}
-              accent={accent}
+          <div className="twin-void" aria-hidden>
+            <span className="twin-atmos twin-atmos-a" />
+            <span className="twin-atmos twin-atmos-b" />
+            <span className="twin-bloom" />
+            <span className="twin-floor" />
+            <span className="twin-vignette" />
+          </div>
+
+          <svg className="twin-orbit" viewBox="0 0 100 100" aria-hidden>
+            <circle cx="50" cy="50" r="44" className="twin-orbit-soft" />
+            <circle cx="50" cy="50" r="36" className="twin-orbit-ring" />
+          </svg>
+
+          <div
+            className={`twin-figure${active ? ` focus-${active.mode}` : ""}`}
+            aria-hidden
+            style={
+              {
+                width: `${FIG_W}%`,
+                ...(active ? { ["--focus-c" as string]: accent } : {}),
+              } as CSSProperties
+            }
+          >
+            <div className="twin-figure-glow" />
+            <Image
+              src={figureSrc}
+              alt=""
+              width={720}
+              height={1280}
+              className="twin-photo"
+              priority
+              unoptimized
             />
-          ) : null}
+            <span className="twin-scanline" />
+            {active ? (
+              <BodyFocusMarks
+                mode={active.mode}
+                x={active.x}
+                y={active.y}
+                accent={accent}
+              />
+            ) : null}
+          </div>
+
+          <svg className="twin-focus-layer" viewBox="0 0 100 100" aria-hidden>
+            <defs>
+              <filter
+                id={`twinBeamGlow-${uid}`}
+                x="-40%"
+                y="-40%"
+                width="180%"
+                height="180%"
+              >
+                <feGaussianBlur stdDeviation="0.4" result="blur" />
+                <feMerge>
+                  <feMergeNode in="blur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+            {active && railAnchor && stageFocus ? (
+              <g filter={`url(#twinBeamGlow-${uid})`}>
+                <path
+                  d={`M ${railAnchor.x} ${railAnchor.y} Q 78 ${railAnchor.y} ${stageFocus.x} ${stageFocus.y}`}
+                  className="twin-focus-line twin-focus-line-soft"
+                  style={{ stroke: accent }}
+                  fill="none"
+                />
+                <path
+                  d={`M ${railAnchor.x} ${railAnchor.y} Q 78 ${railAnchor.y} ${stageFocus.x} ${stageFocus.y}`}
+                  className="twin-focus-line"
+                  style={{ stroke: accent }}
+                  fill="none"
+                />
+                <circle
+                  cx={stageFocus.x}
+                  cy={stageFocus.y}
+                  r={1.15}
+                  fill={accent}
+                  className="twin-focus-dot"
+                />
+              </g>
+            ) : null}
+          </svg>
+
+          <div className="twin-hud" aria-hidden>
+            <span className="twin-hud-tag">Lyfora twin</span>
+            <span className="twin-hud-meta">
+              {activeTile ? activeTile.title : "Sveikatos žemėlapis"}
+            </span>
+          </div>
         </div>
 
-        <svg className="twin-focus-layer" viewBox="0 0 100 100" aria-hidden>
-          <defs>
-            <filter id="twinBeamGlow" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="0.5" result="blur" />
-              <feMerge>
-                <feMergeNode in="blur" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
-          </defs>
-          {active && activeOrbit && stageFocus
-            ? (() => {
-                // Route outside the silhouette — never through the crotch
-                const leftSide = activeOrbit.x < CX;
-                const qx = leftSide
-                  ? Math.min(activeOrbit.x, stageFocus.x) - 10
-                  : Math.max(activeOrbit.x, stageFocus.x) + 10;
-                const qy = activeOrbit.y * 0.42 + stageFocus.y * 0.58;
-                const d = `M ${activeOrbit.x} ${activeOrbit.y} Q ${qx} ${qy} ${stageFocus.x} ${stageFocus.y}`;
-                return (
-                  <g filter="url(#twinBeamGlow)">
-                    <path
-                      d={d}
-                      className="twin-focus-line twin-focus-line-soft"
-                      style={{ stroke: accent }}
-                      fill="none"
-                    />
-                    <path
-                      d={d}
-                      className="twin-focus-line"
-                      style={{ stroke: accent }}
-                      fill="none"
-                    />
-                    <circle
-                      cx={stageFocus.x}
-                      cy={stageFocus.y}
-                      r={1.1}
-                      fill={accent}
-                      className="twin-focus-dot"
-                    />
-                  </g>
-                );
-              })()
-            : null}
-        </svg>
+        <aside className="twin-rail" aria-label="Sveikatos kategorijos">
+          <div className="twin-rail-head">
+            <p className="twin-rail-kicker">Kategorijos</p>
+            <h3>{tiles.length} sveikatos sritys</h3>
+            <p className="twin-rail-note">
+              Užveskite pelę — twin parodo organą. Visos sritys lieka matomos.
+            </p>
+          </div>
 
-        {tiles.map((c, i) => {
-          const s = slots[i]!;
-          const isHot = hovered === c.id;
-          const isDim = !!hovered && !isHot;
-          const rad = (s.deg * Math.PI) / 180;
-          const x = CX + ORBIT_R * Math.cos(rad);
-          const y = CY + ORBIT_R * Math.sin(rad);
-          // Keep chips readable: labels flip to outer side of orbit
-          const outward = s.deg > -90 && s.deg < 90 ? "right" : "left";
-          return (
-            <Link
-              key={c.id}
-              href={`/patient/digital-twin/${c.id}`}
-              className={`twin-chip side-${outward}${isHot ? " is-hot" : ""}${
-                isDim ? " is-dim" : ""
-              }`}
-              style={{
-                left: `${x}%`,
-                top: `${y}%`,
-                ["--cc" as string]: COLOUR_HEX[c.colour as RiskColour],
-              }}
-              onMouseEnter={() => setHovered(c.id)}
-              onMouseLeave={() => setHovered(null)}
-              onFocus={() => setHovered(c.id)}
-              onBlur={() => setHovered(null)}
-            >
-              <span className="twin-chip-orb" aria-hidden>
-                <CategoryGlyph id={c.id} />
-              </span>
-              <span className="twin-chip-copy">
-                <b>{c.title}</b>
-                <em>
-                  <i />
-                  {c.colourLabel}
-                  {c.geneticBadge ? ` · ${c.geneticMark || "DNR"}` : ""}
-                </em>
-              </span>
-            </Link>
-          );
-        })}
-
-        <div className="twin-hud" aria-hidden>
-          <span className="twin-hud-tag">Lyfora twin</span>
-          <span className="twin-hud-meta">
-            {hovered && activeTile ? activeTile.title : "Sveikatos žemėlapis"}
-          </span>
-        </div>
+          <div className="twin-rail-list" role="list">
+            {tiles.map((c, i) => {
+              const isHot = activeId === c.id;
+              return (
+                <Link
+                  key={c.id}
+                  href={`/patient/digital-twin/${c.id}`}
+                  role="listitem"
+                  className={`twin-row${isHot ? " is-hot" : ""}`}
+                  style={{
+                    ["--cc" as string]: COLOUR_HEX[c.colour as RiskColour],
+                    ["--i" as string]: i,
+                  }}
+                  onMouseEnter={() => setActiveId(c.id)}
+                  onMouseLeave={() => setActiveId(null)}
+                  onFocus={() => setActiveId(c.id)}
+                  onBlur={() => setActiveId(null)}
+                >
+                  <span className="twin-row-orb" aria-hidden>
+                    <CategoryGlyph id={c.id} />
+                  </span>
+                  <span className="twin-row-copy">
+                    <b>{c.title}</b>
+                    <em>
+                      <i />
+                      {c.colourLabel}
+                      {c.geneticBadge ? ` · ${c.geneticMark || "DNR"}` : ""}
+                    </em>
+                  </span>
+                  <span className="twin-row-go" aria-hidden>
+                    +
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
+        </aside>
       </div>
     </div>
   );

@@ -7315,32 +7315,34 @@ a.mon-event-card:hover {
   flex-wrap: wrap;
 }
 
-/* Experimental radial health map — BioTwin-level cinematic stage */
+/* Experimental twin map — hologram stage + always-readable category rail */
 .twin-lab {
   position: relative;
-  border-radius: 30px;
-  padding: 2px;
+  border-radius: 28px;
+  padding: 1px;
   overflow: hidden;
-  background:
-    linear-gradient(135deg, rgba(140, 230, 190, 0.22), rgba(40, 80, 70, 0.08) 42%, rgba(90, 180, 150, 0.18));
-  box-shadow:
-    0 30px 80px rgba(0, 0, 0, 0.28),
-    inset 0 1px 0 rgba(210, 255, 230, 0.12);
+  background: linear-gradient(135deg, rgba(140, 230, 190, 0.2), rgba(30, 60, 50, 0.1) 50%, rgba(90, 180, 150, 0.16));
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.22);
+}
+
+.twin-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+  gap: 0;
+  border-radius: 27px;
+  overflow: hidden;
+  background: #07110e;
+  min-height: min(72vh, 720px);
 }
 
 .twin-stage {
   position: relative;
-  width: min(100%, 880px);
-  aspect-ratio: 1 / 1;
-  margin: 0 auto;
+  min-height: 560px;
   isolation: isolate;
-  border-radius: 28px;
   overflow: hidden;
   background:
-    radial-gradient(ellipse 38% 34% at 50% 44%, rgba(70, 210, 160, 0.22), transparent 70%),
-    radial-gradient(ellipse 70% 55% at 18% 18%, rgba(40, 120, 110, 0.18), transparent 62%),
-    radial-gradient(ellipse 55% 45% at 86% 78%, rgba(30, 90, 80, 0.16), transparent 68%),
-    radial-gradient(ellipse 100% 90% at 50% 110%, #071510 0%, #040a08 48%, #020605 100%);
+    radial-gradient(ellipse 48% 42% at 50% 46%, rgba(56, 180, 130, 0.18), transparent 70%),
+    radial-gradient(ellipse 80% 70% at 50% 100%, #0a1813 0%, #050c0a 60%, #030806 100%);
 }
 
 .twin-void {
@@ -7353,66 +7355,47 @@ a.mon-event-card:hover {
 .twin-atmos {
   position: absolute;
   border-radius: 50%;
-  filter: blur(48px);
-  opacity: 0.55;
+  filter: blur(42px);
+  opacity: 0.45;
   mix-blend-mode: screen;
 }
 
 .twin-atmos-a {
-  width: 42%;
-  height: 34%;
-  left: 8%;
-  top: 12%;
-  background: radial-gradient(circle, rgba(60, 170, 140, 0.35), transparent 70%);
-  animation: twin-drift 14s ease-in-out infinite;
+  width: 46%;
+  height: 36%;
+  left: 10%;
+  top: 14%;
+  background: radial-gradient(circle, rgba(60, 170, 140, 0.3), transparent 70%);
+  animation: twin-drift 16s ease-in-out infinite;
 }
 
 .twin-atmos-b {
-  width: 48%;
-  height: 38%;
-  right: 4%;
-  bottom: 10%;
-  background: radial-gradient(circle, rgba(40, 140, 160, 0.28), transparent 72%);
-  animation: twin-drift 18s ease-in-out infinite reverse;
+  width: 42%;
+  height: 34%;
+  right: 8%;
+  bottom: 12%;
+  background: radial-gradient(circle, rgba(40, 140, 160, 0.22), transparent 72%);
+  animation: twin-drift 20s ease-in-out infinite reverse;
 }
 
 .twin-bloom {
   position: absolute;
-  inset: 26% 30%;
+  inset: 28% 26%;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(120, 245, 190, 0.34), transparent 72%);
-  filter: blur(36px);
-  animation: twin-breathe 7.5s ease-in-out infinite;
-}
-
-.twin-scan {
-  position: absolute;
-  inset: 11%;
-  border-radius: 50%;
-  opacity: 0.42;
-  background: conic-gradient(
-    from 200deg,
-    transparent 0deg,
-    rgba(150, 250, 210, 0.14) 18deg,
-    transparent 52deg,
-    rgba(90, 200, 180, 0.08) 180deg,
-    transparent 220deg
-  );
-  mask-image: radial-gradient(circle, transparent 54%, #000 60%, #000 72%, transparent 78%);
-  -webkit-mask-image: radial-gradient(circle, transparent 54%, #000 60%, #000 72%, transparent 78%);
-  animation: twin-spin 32s linear infinite;
+  background: radial-gradient(circle, rgba(100, 230, 160, 0.22), transparent 72%);
+  filter: blur(28px);
+  animation: twin-breathe 8s ease-in-out infinite;
 }
 
 .twin-floor {
   position: absolute;
-  left: 22%;
-  right: 22%;
-  bottom: 8%;
-  height: 18%;
+  left: 18%;
+  right: 18%;
+  bottom: 6%;
+  height: 16%;
   border-radius: 50%;
-  background: radial-gradient(ellipse at center, rgba(90, 220, 170, 0.16), transparent 70%);
-  filter: blur(18px);
-  opacity: 0.7;
+  background: radial-gradient(ellipse at center, rgba(90, 220, 170, 0.14), transparent 70%);
+  filter: blur(16px);
 }
 
 .twin-vignette {
@@ -7420,28 +7403,22 @@ a.mon-event-card:hover {
   inset: 0;
   z-index: 7;
   pointer-events: none;
-  background:
-    radial-gradient(
-      ellipse 62% 58% at 50% 46%,
-      transparent 42%,
-      rgba(2, 6, 5, 0.5) 76%,
-      rgba(1, 4, 3, 0.92) 100%
-    ),
-    linear-gradient(180deg, rgba(2, 8, 6, 0.35), transparent 18%, transparent 78%, rgba(1, 4, 3, 0.55));
+  background: radial-gradient(
+    ellipse 70% 68% at 50% 48%,
+    transparent 48%,
+    rgba(3, 8, 6, 0.45) 82%,
+    rgba(2, 5, 4, 0.75) 100%
+  );
 }
 
 @keyframes twin-breathe {
-  0%, 100% { transform: scale(1); opacity: 0.48; }
-  50% { transform: scale(1.08); opacity: 0.86; }
-}
-
-@keyframes twin-spin {
-  to { transform: rotate(360deg); }
+  0%, 100% { transform: scale(1); opacity: 0.4; }
+  50% { transform: scale(1.06); opacity: 0.72; }
 }
 
 @keyframes twin-drift {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(4%, -3%) scale(1.08); }
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(3%, -2%); }
 }
 
 .twin-orbit,
@@ -7456,54 +7433,34 @@ a.mon-event-card:hover {
 .twin-orbit { z-index: 1; }
 .twin-focus-layer { z-index: 4; }
 
+.twin-orbit-soft,
 .twin-orbit-ring {
   fill: none;
-  stroke-width: 0.18;
-  opacity: 0.7;
+  stroke: rgba(150, 230, 190, 0.16);
+  stroke-width: 0.12;
 }
 
-.twin-orbit-soft,
-.twin-orbit-inner {
-  fill: none;
-  stroke: rgba(150, 230, 190, 0.12);
-  stroke-width: 0.1;
-}
-
-.twin-orbit-inner {
-  stroke-dasharray: 0.5 1.4;
-  opacity: 0.55;
-  animation: twin-spin 60s linear infinite;
-  transform-origin: 50% 50%;
-}
-
-.twin-particle {
-  fill: rgba(190, 255, 220, 0.55);
-  animation: twin-twinkle 3.6s ease-in-out infinite;
-}
-
-@keyframes twin-twinkle {
-  0%, 100% { opacity: 0.2; }
-  50% { opacity: 0.85; }
+.twin-orbit-ring {
+  stroke: rgba(160, 240, 200, 0.28);
+  stroke-width: 0.16;
 }
 
 .twin-focus-line {
   stroke-width: 0.28;
-  stroke-dasharray: 0.55 0.75;
+  stroke-dasharray: 0.55 0.7;
   opacity: 0.95;
   animation: twin-dash 1s linear infinite;
 }
 
 .twin-focus-line-soft {
-  stroke-width: 1.05;
+  stroke-width: 0.95;
   stroke-dasharray: none;
-  opacity: 0.22;
-  filter: blur(0.6px);
+  opacity: 0.2;
   animation: none;
 }
 
 .twin-focus-dot {
   opacity: 0.95;
-  filter: drop-shadow(0 0 1.4px currentColor);
 }
 
 @keyframes twin-dash {
@@ -7518,46 +7475,33 @@ a.mon-event-card:hover {
   z-index: 2;
   pointer-events: none;
   background: transparent !important;
-  animation: twin-figure-breathe 6.5s ease-in-out infinite;
+  animation: twin-figure-breathe 7s ease-in-out infinite;
   -webkit-mask-image: radial-gradient(
-    ellipse 58% 72% at 50% 44%,
-    #000 38%,
-    rgba(0, 0, 0, 0.92) 60%,
-    transparent 88%
+    ellipse 62% 74% at 50% 44%,
+    #000 42%,
+    rgba(0, 0, 0, 0.94) 64%,
+    transparent 90%
   );
   mask-image: radial-gradient(
-    ellipse 58% 72% at 50% 44%,
-    #000 38%,
-    rgba(0, 0, 0, 0.92) 60%,
-    transparent 88%
+    ellipse 62% 74% at 50% 44%,
+    #000 42%,
+    rgba(0, 0, 0, 0.94) 64%,
+    transparent 90%
   );
 }
 
 @keyframes twin-figure-breathe {
   0%, 100% { transform: translate(-50%, -50%) scale(1); }
-  50% { transform: translate(-50%, -50.4%) scale(1.012); }
+  50% { transform: translate(-50%, -50.3%) scale(1.01); }
 }
 
 .twin-figure-glow {
   position: absolute;
-  inset: 8% 12%;
+  inset: 10% 16%;
   border-radius: 50%;
-  background:
-    radial-gradient(circle at 50% 36%, rgba(120, 245, 190, 0.28), transparent 55%),
-    radial-gradient(circle at 50% 58%, rgba(50, 180, 150, 0.16), transparent 70%);
-  filter: blur(22px);
+  background: radial-gradient(circle, rgba(90, 220, 150, 0.16), transparent 70%);
+  filter: blur(18px);
   z-index: 0;
-}
-
-.twin-figure-rim {
-  position: absolute;
-  inset: 4% 16% 8%;
-  border-radius: 46% / 42%;
-  box-shadow:
-    inset 0 0 30px rgba(120, 240, 190, 0.12),
-    0 0 40px rgba(70, 200, 150, 0.12);
-  z-index: 0;
-  opacity: 0.7;
 }
 
 .twin-photo {
@@ -7570,12 +7514,12 @@ a.mon-event-card:hover {
   background: transparent !important;
   object-fit: contain;
   filter:
-    contrast(1.08)
-    saturate(1.18)
-    brightness(1.12)
-    drop-shadow(0 0 18px rgba(80, 220, 160, 0.28))
-    drop-shadow(0 0 42px rgba(40, 160, 120, 0.22));
+    contrast(1.06)
+    saturate(1.14)
+    brightness(1.1)
+    drop-shadow(0 0 22px rgba(70, 200, 140, 0.28));
   user-select: none;
+  transition: filter 0.25s ease;
 }
 
 .twin-scanline {
@@ -7586,34 +7530,17 @@ a.mon-event-card:hover {
   background: linear-gradient(
     180deg,
     transparent 0%,
-    rgba(170, 255, 210, 0.08) 48%,
+    rgba(160, 255, 200, 0.06) 50%,
     transparent 56%
   );
   background-size: 100% 220%;
-  animation: twin-sweep 5.8s ease-in-out infinite;
+  animation: twin-sweep 6s ease-in-out infinite;
   mix-blend-mode: soft-light;
-  opacity: 0.65;
-}
-
-.twin-mesh {
-  position: absolute;
-  inset: 8% 18% 12%;
-  z-index: 2;
-  pointer-events: none;
-  opacity: 0.18;
-  mix-blend-mode: screen;
-  background-image:
-    radial-gradient(circle at 20% 30%, rgba(180, 255, 220, 0.45) 0 0.8px, transparent 1.2px),
-    radial-gradient(circle at 70% 22%, rgba(180, 255, 220, 0.35) 0 0.7px, transparent 1.1px),
-    radial-gradient(circle at 45% 55%, rgba(180, 255, 220, 0.4) 0 0.8px, transparent 1.2px),
-    radial-gradient(circle at 62% 70%, rgba(180, 255, 220, 0.3) 0 0.7px, transparent 1.1px),
-    radial-gradient(circle at 35% 78%, rgba(180, 255, 220, 0.28) 0 0.6px, transparent 1px);
-  background-size: 100% 100%;
-  animation: twin-twinkle 4.8s ease-in-out infinite;
+  opacity: 0.5;
 }
 
 @keyframes twin-sweep {
-  0%, 100% { background-position: 0 -18%; }
+  0%, 100% { background-position: 0 -20%; }
   50% { background-position: 0 120%; }
 }
 
@@ -7621,33 +7548,18 @@ a.mon-event-card:hover {
   mix-blend-mode: lighten;
 }
 
+/* Focus never washes out the hologram — only soft accent bloom */
 .twin-figure.focus-heart .twin-photo,
 .twin-figure.focus-brain .twin-photo,
 .twin-figure.focus-pelvis .twin-photo,
-.twin-figure.focus-gut .twin-photo {
-  filter:
-    contrast(1.12)
-    saturate(1.28)
-    brightness(1.16)
-    drop-shadow(0 0 22px color-mix(in srgb, var(--focus-c, #5ee4a8) 55%, transparent))
-    drop-shadow(0 0 48px color-mix(in srgb, var(--focus-c, #5ee4a8) 28%, transparent));
-}
-
-.twin-figure.focus-body .twin-photo {
-  filter:
-    contrast(1.14)
-    saturate(1.3)
-    brightness(1.22)
-    drop-shadow(0 0 28px rgba(120, 240, 180, 0.55))
-    drop-shadow(0 0 56px rgba(80, 210, 150, 0.28));
-}
-
+.twin-figure.focus-gut .twin-photo,
+.twin-figure.focus-body .twin-photo,
 .twin-figure.focus-outline .twin-photo {
   filter:
-    contrast(1.16)
-    saturate(1.3)
-    brightness(1.1)
-    drop-shadow(0 0 24px color-mix(in srgb, var(--focus-c, #f0626b) 55%, transparent));
+    contrast(1.08)
+    saturate(1.16)
+    brightness(1.12)
+    drop-shadow(0 0 26px color-mix(in srgb, var(--focus-c, #5ee4a8) 40%, transparent));
 }
 
 .twin-mark {
@@ -7673,7 +7585,7 @@ a.mon-event-card:hover {
   opacity: 0.92;
   box-shadow:
     0 0 10px var(--cc, #5ee4a8),
-    0 0 24px color-mix(in srgb, var(--cc, #5ee4a8) 55%, transparent);
+    0 0 22px color-mix(in srgb, var(--cc, #5ee4a8) 50%, transparent);
   animation: twin-pulse 1.5s ease-in-out infinite;
 }
 
@@ -7693,7 +7605,6 @@ a.mon-event-card:hover {
   width: 28px;
   height: 28px;
   opacity: 0.55;
-  box-shadow: 0 0 16px color-mix(in srgb, var(--cc, #5ee4a8) 35%, transparent);
   animation: twin-ring 1.8s ease-out infinite;
 }
 
@@ -7706,7 +7617,7 @@ a.mon-event-card:hover {
 
 .twin-mark.is-heart .core { width: 12px; height: 10px; }
 .twin-mark.is-brain .core { width: 14px; height: 12px; }
-.twin-mark.is-gut .core { width: 14px; height: 14px; opacity: 0.7; }
+.twin-mark.is-gut .core { width: 14px; height: 14px; opacity: 0.75; }
 
 .twin-mark.is-pelvis i.ovary {
   position: absolute;
@@ -7715,8 +7626,8 @@ a.mon-event-card:hover {
   height: 8px;
   border-radius: 50%;
   transform: translate(-50%, -50%);
-  opacity: 0.88;
-  box-shadow: 0 0 14px currentColor;
+  opacity: 0.9;
+  box-shadow: 0 0 12px currentColor;
   animation: twin-pulse 1.5s ease-in-out infinite;
 }
 
@@ -7730,21 +7641,21 @@ a.mon-event-card:hover {
 }
 
 .twin-mark.is-body {
-  inset: 5% 18% 16%;
+  inset: 6% 20% 16%;
   width: auto;
   height: auto;
   left: auto;
   top: auto;
   transform: none;
   border-radius: 46% / 42%;
-  opacity: 0.16;
+  opacity: 0.14;
   background: var(--cc, #5ee4a8) !important;
   filter: blur(8px);
   animation: twin-pulse 2s ease-in-out infinite;
 }
 
 .twin-mark.is-outline {
-  inset: 4% 16% 14%;
+  inset: 5% 18% 14%;
   width: auto;
   height: auto;
   left: auto;
@@ -7752,7 +7663,7 @@ a.mon-event-card:hover {
   transform: none;
   border: 1.5px solid;
   border-radius: 46% / 42%;
-  opacity: 0.82;
+  opacity: 0.8;
   animation: twin-outline 1.35s ease-in-out infinite;
 }
 
@@ -7768,136 +7679,7 @@ a.mon-event-card:hover {
 
 @keyframes twin-outline {
   0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.92; }
-}
-
-.twin-chip {
-  position: absolute;
-  z-index: 5;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: max-content;
-  max-width: 210px;
-  margin: 0;
-  padding: 8px 14px 8px 8px;
-  text-decoration: none;
-  color: inherit;
-  border-radius: 999px;
-  background: linear-gradient(
-    135deg,
-    rgba(12, 28, 22, 0.72),
-    rgba(6, 16, 13, 0.55)
-  );
-  border: 1px solid color-mix(in srgb, var(--cc, #5ee4a8) 32%, rgba(255, 255, 255, 0.08));
-  backdrop-filter: blur(18px) saturate(1.25);
-  -webkit-backdrop-filter: blur(18px) saturate(1.25);
-  box-shadow:
-    0 10px 28px rgba(0, 0, 0, 0.34),
-    inset 0 1px 0 rgba(220, 255, 235, 0.08);
-  transform: translate(-50%, -50%);
-  transition:
-    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.22s ease,
-    border-color 0.22s ease,
-    background 0.22s ease,
-    box-shadow 0.22s ease,
-    filter 0.22s ease;
-}
-
-.twin-chip.side-left {
-  flex-direction: row-reverse;
-  padding: 8px 8px 8px 14px;
-  text-align: right;
-}
-
-.twin-chip.is-dim {
-  opacity: 0.24;
-  filter: saturate(0.45) brightness(0.85);
-}
-
-.twin-chip-orb {
-  flex: 0 0 auto;
-  width: 36px;
-  height: 36px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  color: #f5fff8;
-  background:
-    radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--cc) 42%, white), transparent 55%),
-    color-mix(in srgb, var(--cc) 24%, rgba(8, 20, 15, 0.95));
-  border: 1px solid color-mix(in srgb, var(--cc) 60%, rgba(255, 255, 255, 0.2));
-  box-shadow:
-    0 0 16px color-mix(in srgb, var(--cc) 30%, transparent),
-    inset 0 1px 0 rgba(255, 255, 255, 0.18);
-}
-
-.twin-chip-orb svg {
-  width: 16px;
-  height: 16px;
-}
-
-.twin-chip-copy {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.twin-chip-copy b {
-  font-family: var(--font-display), Manrope, sans-serif;
-  font-size: 0.76rem;
-  font-weight: 720;
-  line-height: 1.15;
-  color: #f6fcf8;
-  letter-spacing: -0.02em;
-}
-
-.twin-chip-copy em {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-style: normal;
-  font-size: 0.62rem;
-  font-weight: 650;
-  color: var(--cc, #5ee4a8);
-  letter-spacing: 0.01em;
-}
-
-.twin-chip-copy em i {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: var(--cc, #5ee4a8);
-  box-shadow: 0 0 7px var(--cc, #5ee4a8);
-}
-
-.twin-chip.side-left .twin-chip-copy em {
-  flex-direction: row-reverse;
-}
-
-.twin-chip.is-hot {
-  z-index: 8;
-  opacity: 1;
-  filter: none;
-  transform: translate(-50%, -50%) scale(1.05);
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--cc) 18%, rgba(10, 24, 18, 0.9)),
-    rgba(8, 18, 14, 0.82)
-  );
-  border-color: color-mix(in srgb, var(--cc) 70%, white);
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--cc) 22%, transparent),
-    0 16px 40px rgba(0, 0, 0, 0.4),
-    0 0 28px color-mix(in srgb, var(--cc) 22%, transparent);
-}
-
-.twin-chip.is-hot .twin-chip-orb {
-  box-shadow:
-    0 0 22px color-mix(in srgb, var(--cc) 50%, transparent),
-    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  50% { opacity: 0.9; }
 }
 
 .twin-hud {
@@ -7927,42 +7709,207 @@ a.mon-event-card:hover {
 
 .twin-hud-meta {
   font-family: var(--font-display), Manrope, sans-serif;
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   font-weight: 720;
   letter-spacing: -0.02em;
   color: rgba(245, 252, 248, 0.92);
-  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.45);
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.45);
+  max-width: 240px;
+}
+
+/* Always-readable TwinMe-style category rail */
+.twin-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px 18px 18px;
+  background:
+    linear-gradient(180deg, #f3f6f5 0%, #eef2f1 100%);
+  color: #0b2420;
+  border-left: 1px solid rgba(120, 160, 140, 0.18);
+}
+
+.twin-rail-head h3 {
+  margin: 4px 0 0;
+  font-family: var(--font-display), Manrope, sans-serif;
+  font-size: 1.35rem;
+  font-weight: 780;
+  letter-spacing: -0.03em;
+  color: #08262e;
+  line-height: 1.15;
+}
+
+.twin-rail-kicker {
+  margin: 0;
+  font-size: 0.68rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #3f6f68;
+}
+
+.twin-rail-note {
+  margin: 8px 0 0;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: #4a6560;
+}
+
+.twin-rail-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: auto;
+  padding-right: 2px;
+  max-height: none;
+  flex: 1;
+}
+
+.twin-row {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) 34px;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 10px 10px 10px;
+  text-decoration: none;
+  color: inherit;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid rgba(12, 40, 34, 0.08);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.2s ease;
+}
+
+.twin-row:hover,
+.twin-row.is-hot,
+.twin-row:focus-visible {
+  border-color: color-mix(in srgb, var(--cc, #45c08a) 55%, #08262e);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--cc, #45c08a) 25%, transparent),
+    0 10px 24px rgba(8, 38, 46, 0.08);
+  background: #fff;
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.twin-row-orb {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #f4fffa;
+  background: #08262e;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cc, #45c08a) 22%, transparent);
+}
+
+.twin-row-orb svg {
+  width: 17px;
+  height: 17px;
+}
+
+.twin-row-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.twin-row-copy b {
+  font-family: var(--font-display), Manrope, sans-serif;
+  font-size: 0.86rem;
+  font-weight: 720;
+  letter-spacing: -0.015em;
+  color: #08262e;
+  line-height: 1.2;
+}
+
+.twin-row-copy em {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-style: normal;
+  font-size: 0.72rem;
+  font-weight: 650;
+  color: color-mix(in srgb, var(--cc, #45c08a) 80%, #08262e);
+}
+
+.twin-row-copy em i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--cc, #45c08a);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cc, #45c08a) 18%, transparent);
+}
+
+.twin-row-go {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #08262e;
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.twin-row.is-hot .twin-row-go,
+.twin-row:hover .twin-row-go {
+  background: color-mix(in srgb, var(--cc, #45c08a) 70%, #08262e);
+}
+
+@media (max-width: 900px) {
+  .twin-shell {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+  .twin-stage {
+    min-height: 420px;
+    aspect-ratio: 1 / 1.05;
+  }
+  .twin-rail {
+    border-left: none;
+    border-top: 1px solid rgba(120, 160, 140, 0.18);
+  }
+  .twin-focus-layer {
+    display: none;
+  }
 }
 
 @media (max-width: 720px) {
   .twin-lab {
-    border-radius: 22px;
-  }
-  .twin-stage {
-    width: 100%;
     border-radius: 20px;
   }
-  .twin-chip {
-    max-width: 138px;
-    gap: 6px;
-    padding: 5px 8px 5px 5px;
+  .twin-shell {
+    border-radius: 19px;
   }
-  .twin-chip.side-left {
-    padding: 5px 5px 5px 8px;
+  .twin-stage {
+    min-height: 360px;
   }
-  .twin-chip-orb {
-    width: 28px;
-    height: 28px;
+  .twin-rail {
+    padding: 16px 12px 14px;
   }
-  .twin-chip-orb svg {
-    width: 13px;
-    height: 13px;
+  .twin-rail-head h3 {
+    font-size: 1.15rem;
   }
-  .twin-chip-copy b {
-    font-size: 0.62rem;
+  .twin-row {
+    grid-template-columns: 36px minmax(0, 1fr) 30px;
+    gap: 8px;
+    padding: 9px;
+    border-radius: 14px;
   }
-  .twin-chip-copy em {
-    font-size: 0.52rem;
+  .twin-row-orb {
+    width: 36px;
+    height: 36px;
+  }
+  .twin-row-copy b {
+    font-size: 0.8rem;
   }
   .twin-hud {
     left: 12px;
@@ -7972,7 +7919,6 @@ a.mon-event-card:hover {
     font-size: 0.78rem;
   }
 }
-
 
 
 

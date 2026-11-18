@@ -7380,11 +7380,12 @@ a.mon-event-card:hover {
 
 .twin-bloom {
   position: absolute;
-  inset: 28% 26%;
+  inset: 32% 30%;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(100, 230, 160, 0.22), transparent 72%);
+  background: radial-gradient(circle, rgba(100, 230, 160, 0.12), transparent 72%);
   filter: blur(28px);
   animation: twin-breathe 8s ease-in-out infinite;
+  z-index: 0;
 }
 
 .twin-floor {
@@ -7470,24 +7471,14 @@ a.mon-event-card:hover {
 .twin-figure {
   position: absolute;
   left: 50%;
-  top: 50%;
+  top: 48%;
   transform: translate(-50%, -50%);
-  z-index: 2;
+  z-index: 3;
+  width: 62%;
+  max-height: 92%;
   pointer-events: none;
   background: transparent !important;
   animation: twin-figure-breathe 7s ease-in-out infinite;
-  -webkit-mask-image: radial-gradient(
-    ellipse 62% 74% at 50% 44%,
-    #000 42%,
-    rgba(0, 0, 0, 0.94) 64%,
-    transparent 90%
-  );
-  mask-image: radial-gradient(
-    ellipse 62% 74% at 50% 44%,
-    #000 42%,
-    rgba(0, 0, 0, 0.94) 64%,
-    transparent 90%
-  );
 }
 
 @keyframes twin-figure-breathe {
@@ -7497,11 +7488,12 @@ a.mon-event-card:hover {
 
 .twin-figure-glow {
   position: absolute;
-  inset: 10% 16%;
+  inset: 12% 18%;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(90, 220, 150, 0.16), transparent 70%);
-  filter: blur(18px);
+  background: radial-gradient(circle, rgba(90, 220, 150, 0.12), transparent 70%);
+  filter: blur(16px);
   z-index: 0;
+  pointer-events: none;
 }
 
 .twin-photo {
@@ -7509,16 +7501,20 @@ a.mon-event-card:hover {
   z-index: 1;
   width: 100%;
   height: auto;
+  max-height: min(620px, 88vh);
   display: block;
   border-radius: 0 !important;
   background: transparent !important;
   object-fit: contain;
+  opacity: 1 !important;
+  visibility: visible !important;
   filter:
-    contrast(1.06)
-    saturate(1.14)
-    brightness(1.1)
-    drop-shadow(0 0 22px rgba(70, 200, 140, 0.28));
+    contrast(1.08)
+    saturate(1.2)
+    brightness(1.14)
+    drop-shadow(0 0 18px rgba(70, 200, 140, 0.35));
   user-select: none;
+  -webkit-user-drag: none;
   transition: filter 0.25s ease;
 }
 
@@ -7775,25 +7771,26 @@ a.mon-event-card:hover {
   color: inherit;
   border-radius: 16px;
   background: #ffffff;
-  border: 1px solid rgba(12, 40, 34, 0.08);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(12, 40, 34, 0.1);
+  box-shadow: none;
+  opacity: 1 !important;
+  filter: none !important;
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease,
-    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
-    background 0.2s ease;
+    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .twin-row:hover,
 .twin-row.is-hot,
 .twin-row:focus-visible {
-  border-color: color-mix(in srgb, var(--cc, #45c08a) 55%, #08262e);
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--cc, #45c08a) 25%, transparent),
-    0 10px 24px rgba(8, 38, 46, 0.08);
-  background: #fff;
-  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--cc, #45c08a) 65%, #08262e);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--cc, #45c08a) 28%, transparent);
+  background: #ffffff;
+  transform: none;
   outline: none;
+  opacity: 1 !important;
+  filter: none !important;
 }
 
 .twin-row-orb {

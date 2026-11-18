@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import {
+  useEffect,
   useId,
   useMemo,
   useState,
@@ -38,10 +38,14 @@ const FOCUS_BY_ID: Record<string, BodyFocus> = {
   hormones_men: { x: 50, y: 44, mode: "pelvis" },
 };
 
-const FIG_W = 58;
+const FIG_W = 62;
 const FIG_H = FIG_W * (1280 / 720);
 const FIG_LEFT = 50 - FIG_W / 2;
 const FIG_TOP = 50 - FIG_H / 2;
+
+const FEMALE_TWIN_SRC = "/brand/health-map/woman-hologram-v5.png";
+const FEMALE_TWIN_FALLBACK = "/brand/health-map/woman-hologram-v4.png";
+const MALE_TWIN_SRC = "/brand/body-twin-hub.png";
 
 function bodyToStage(local: { x: number; y: number }) {
   return {
@@ -219,10 +223,13 @@ export function RadialHealthMapLab({
   );
   const [activeId, setActiveId] = useState<string | null>(null);
 
-  const figureSrc =
-    sex === "female"
-      ? "/brand/health-map/woman-hologram-v6.webp"
-      : "/brand/body-twin-hub.png";
+  const [figureSrc, setFigureSrc] = useState(
+    sex === "female" ? FEMALE_TWIN_SRC : MALE_TWIN_SRC
+  );
+
+  useEffect(() => {
+    setFigureSrc(sex === "female" ? FEMALE_TWIN_SRC : MALE_TWIN_SRC);
+  }, [sex]);
 
   const active = activeId ? focusFor(activeId) : null;
   const activeTile = tiles.find((t) => t.id === activeId) || null;
@@ -276,14 +283,20 @@ export function RadialHealthMapLab({
             }
           >
             <div className="twin-figure-glow" />
-            <Image
+            {/* Plain <img> — Next/Image wrappers have clipped this hologram in some previews */}
+            <img
               src={figureSrc}
               alt=""
               width={720}
               height={1280}
               className="twin-photo"
-              priority
-              unoptimized
+              decoding="async"
+              fetchPriority="high"
+              onError={() => {
+                if (sex === "female" && figureSrc !== FEMALE_TWIN_FALLBACK) {
+                  setFigureSrc(FEMALE_TWIN_FALLBACK);
+                }
+              }}
             />
             <span className="twin-scanline" />
             {active ? (

@@ -7314,3 +7314,262 @@ a.mon-event-card:hover {
   gap: 12px;
   flex-wrap: wrap;
 }
+
+/* Experimental radial health map (map-lab) */
+.orbit-lab {
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 18px 18px 22px;
+  background:
+    radial-gradient(ellipse 55% 50% at 50% 48%, rgba(40, 120, 190, 0.18), transparent 70%),
+    linear-gradient(180deg, color-mix(in srgb, #061428 70%, var(--surface)), var(--surface-2));
+  overflow: visible;
+}
+
+.orbit-lab-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.orbit-lab-stage {
+  position: relative;
+  width: min(100%, 640px);
+  aspect-ratio: 1 / 1;
+  margin: 8px auto 0;
+}
+
+.orbit-lab-glow {
+  position: absolute;
+  inset: 18% 22%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(70, 190, 255, 0.22),
+    transparent 70%
+  );
+  filter: blur(8px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.orbit-lab-rings {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.orbit-ring {
+  fill: none;
+  stroke: color-mix(in srgb, #7ec8ff 35%, transparent);
+  stroke-width: 0.28;
+}
+
+.orbit-ring.soft {
+  stroke: color-mix(in srgb, #7ec8ff 16%, transparent);
+  stroke-width: 0.2;
+}
+
+.orbit-ring.mid {
+  stroke: color-mix(in srgb, #7ec8ff 22%, transparent);
+  stroke-dasharray: 0.6 1.4;
+}
+
+.orbit-spoke {
+  stroke-width: 0.22;
+  opacity: 0.28;
+  transition: opacity 0.2s ease, stroke-width 0.2s ease;
+}
+
+.orbit-spoke.on {
+  opacity: 0.85;
+  stroke-width: 0.38;
+}
+
+.orbit-lab-figure {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -52%);
+  width: min(42%, 250px);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.orbit-lab-photo {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 18px;
+  object-fit: cover;
+  mix-blend-mode: screen;
+  filter:
+    drop-shadow(0 0 28px rgba(80, 190, 255, 0.35))
+    saturate(1.15)
+    contrast(1.05);
+  user-select: none;
+}
+
+.orbit-lab[data-sex="male"] .orbit-lab-photo,
+.orbit-lab-stage[data-sex="male"] .orbit-lab-photo {
+  mix-blend-mode: normal;
+  border-radius: 0;
+  filter: drop-shadow(0 12px 28px rgba(70, 140, 190, 0.28));
+}
+
+.orbit-lab-figure-scrim {
+  position: absolute;
+  inset: auto 8% -6%;
+  height: 28%;
+  background: linear-gradient(transparent, color-mix(in srgb, #061428 85%, transparent));
+  pointer-events: none;
+}
+
+.orbit-node {
+  position: absolute;
+  z-index: 3;
+  width: 0;
+  height: 0;
+  text-decoration: none;
+  color: inherit;
+}
+
+.orbit-node-disc {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 58px;
+  height: 58px;
+  margin: -29px 0 0 -29px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--cc, #7ec8ff);
+  background:
+    radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--cc) 35%, #fff), transparent 55%),
+    color-mix(in srgb, var(--cc, var(--accent)) 18%, #071525);
+  border: 2px solid color-mix(in srgb, var(--cc, var(--accent)) 70%, #fff);
+  box-shadow:
+    0 0 0 5px color-mix(in srgb, var(--cc) 16%, transparent),
+    0 10px 22px rgba(0, 0, 0, 0.35);
+  transition:
+    transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.22s ease;
+}
+
+.orbit-node-disc svg {
+  width: 24px;
+  height: 24px;
+}
+
+.orbit-node-copy {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 150px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  pointer-events: none;
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
+}
+
+.orbit-node.side-right .orbit-node-copy {
+  transform: translate(38px, -50%);
+  text-align: left;
+}
+
+.orbit-node.side-left .orbit-node-copy {
+  transform: translate(calc(-100% - 38px), -50%);
+  text-align: right;
+}
+
+.orbit-node.side-top .orbit-node-copy {
+  transform: translate(-50%, calc(-100% - 40px));
+  text-align: center;
+  width: max-content;
+  max-width: 180px;
+}
+
+.orbit-node.side-bottom .orbit-node-copy {
+  transform: translate(-50%, 40px);
+  text-align: center;
+  width: 160px;
+}
+
+.orbit-node-copy b {
+  font-family: var(--font-display), Manrope, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--ink);
+  text-shadow: 0 0 12px rgba(0, 0, 0, 0.55);
+}
+
+.orbit-node-copy em {
+  font-style: normal;
+  font-size: 0.72rem;
+  font-weight: 650;
+  color: var(--cc, var(--muted));
+}
+
+.orbit-node.is-hot {
+  z-index: 5;
+}
+
+.orbit-node.is-hot .orbit-node-disc {
+  transform: scale(1.28);
+  box-shadow:
+    0 0 0 10px color-mix(in srgb, var(--cc) 22%, transparent),
+    0 16px 36px rgba(0, 0, 0, 0.45),
+    0 0 28px color-mix(in srgb, var(--cc) 45%, transparent);
+}
+
+.orbit-node.is-hot .orbit-node-copy {
+  transform: translate(42px, -50%) scale(1.08);
+}
+
+.orbit-node.side-left.is-hot .orbit-node-copy {
+  transform: translate(calc(-100% - 42px), -50%) scale(1.08);
+}
+
+.orbit-node.side-top.is-hot .orbit-node-copy {
+  transform: translate(-50%, calc(-100% - 46px)) scale(1.08);
+}
+
+.orbit-node.side-bottom.is-hot .orbit-node-copy {
+  transform: translate(-50%, 46px) scale(1.08);
+}
+
+.orbit-lab-hint {
+  margin: 12px 0 0;
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+@media (max-width: 720px) {
+  .orbit-lab-stage {
+    width: 100%;
+  }
+  .orbit-lab-figure {
+    width: min(48%, 200px);
+  }
+  .orbit-node-disc {
+    width: 48px;
+    height: 48px;
+    margin: -24px 0 0 -24px;
+  }
+  .orbit-node-copy {
+    width: 120px;
+  }
+  .orbit-node-copy b {
+    font-size: 0.78rem;
+  }
+}

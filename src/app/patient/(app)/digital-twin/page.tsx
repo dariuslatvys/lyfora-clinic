@@ -117,6 +117,13 @@ export default async function DigitalTwinPage() {
           <h1 className="overview-hello">
             {labels.goodMorning}, {firstName(name)}
           </h1>
+          <p className="small m-0 mb-1">
+            <Link href="/patient/digital-twin/map-lab" className="diag-link">
+              {locale === "en"
+                ? "Try experimental radial health map →"
+                : "Išbandyti eksperimentinį radialų žemėlapį →"}
+            </Link>
+          </p>
           <p className="diag-line">
             <span className="eyebrow" style={{ marginRight: 8 }}>
               {labels.diagnosisSummary}

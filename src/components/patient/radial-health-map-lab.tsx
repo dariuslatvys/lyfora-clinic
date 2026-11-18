@@ -19,20 +19,18 @@ type Slot = {
   side: "left" | "right" | "top" | "bottom";
 };
 
-/** Evenly spaced ring; start slightly above left so labels breathe. */
 function slotsForCount(n: number): Slot[] {
   const out: Slot[] = [];
-  const r = 40;
+  const r = 41.5;
   for (let i = 0; i < n; i++) {
-    // Start at -90° (top), go clockwise
     const deg = -90 + (360 / n) * i;
     const rad = (deg * Math.PI) / 180;
     const x = 50 + r * Math.cos(rad);
     const y = 50 + r * Math.sin(rad);
     let side: Slot["side"] = "right";
-    if (deg >= -120 && deg <= -60) side = "top";
-    else if (deg > -60 && deg < 60) side = "right";
-    else if (deg >= 60 && deg <= 120) side = "bottom";
+    if (deg >= -125 && deg <= -55) side = "top";
+    else if (deg > -55 && deg < 55) side = "right";
+    else if (deg >= 55 && deg <= 125) side = "bottom";
     else side = "left";
     out.push({ x, y, deg, side });
   }
@@ -75,7 +73,7 @@ export function RadialHealthMapLab({
 
   const figureSrc =
     sex === "female"
-      ? "/brand/health-map/woman-hologram.jpg"
+      ? "/brand/health-map/woman-hologram-v2.jpg"
       : "/brand/body-twin-hub.png";
 
   return (
@@ -92,8 +90,8 @@ export function RadialHealthMapLab({
           </h2>
           <p className="small muted m-0 mt-2 max-w-xl">
             {locale === "en"
-              ? "Hover a category to enlarge it. Click to open that area. Current mosaic overview stays unchanged."
-              : "Užveskite pelę ant kategorijos — ji padidėja. Spustelėję įeisite į sritį. Dabartinis mozaikos žemėlapis lieka nepakitęs."}
+              ? "Hover a category to enlarge it. Click to open that area."
+              : "Užveskite pelę ant kategorijos — ji padidėja. Spustelėję įeisite į sritį."}
           </p>
         </div>
         <Link href="/patient/digital-twin" className="btn ghost sm">
@@ -102,31 +100,67 @@ export function RadialHealthMapLab({
       </div>
 
       <div className="orbit-lab-stage" data-sex={sex}>
-        <div className="orbit-lab-glow" aria-hidden />
+        <div className="orbit-lab-atmosphere" aria-hidden>
+          <span className="orbit-haze haze-a" />
+          <span className="orbit-haze haze-b" />
+          <span className="orbit-haze haze-c" />
+          <span className="orbit-pulse" />
+        </div>
+
         <svg className="orbit-lab-rings" viewBox="0 0 100 100" aria-hidden>
-          <circle cx="50" cy="50" r="28" className="orbit-ring soft" />
-          <circle cx="50" cy="50" r="34" className="orbit-ring mid" />
+          <defs>
+            <radialGradient id="orbitCoreGlow" cx="50%" cy="48%" r="45%">
+              <stop offset="0%" stopColor="rgba(110,210,255,0.35)" />
+              <stop offset="55%" stopColor="rgba(40,120,200,0.08)" />
+              <stop offset="100%" stopColor="rgba(0,0,0,0)" />
+            </radialGradient>
+            <linearGradient id="spokeFade" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stopColor="white" stopOpacity="0" />
+              <stop offset="35%" stopColor="white" stopOpacity="0.7" />
+              <stop offset="100%" stopColor="white" stopOpacity="0.15" />
+            </linearGradient>
+          </defs>
+          <circle cx="50" cy="48" r="42" fill="url(#orbitCoreGlow)" />
+          <circle cx="50" cy="48" r="22" className="orbit-ring soft" />
           <circle
             cx="50"
-            cy="50"
-            r="40"
+            cy="48"
+            r="31"
+            className="orbit-ring mid"
+            strokeDasharray="0.55 1.35"
+          />
+          <circle
+            cx="50"
+            cy="48"
+            r="41.5"
             className="orbit-ring main"
-            strokeDasharray="1.2 1.1"
+            strokeDasharray="1.1 1.05"
           />
           {tiles.map((c, i) => {
             const s = slots[i]!;
+            const hot = hovered === c.id;
             return (
-              <line
-                key={`line-${c.id}`}
-                x1="50"
-                y1="48"
-                x2={s.x}
-                y2={s.y}
-                className={`orbit-spoke${hovered === c.id ? " on" : ""}`}
-                style={{
-                  stroke: COLOUR_HEX[c.colour as RiskColour],
-                }}
-              />
+              <g key={`spoke-${c.id}`}>
+                <line
+                  x1="50"
+                  y1="48"
+                  x2={s.x}
+                  y2={s.y}
+                  className={`orbit-spoke${hot ? " on" : ""}`}
+                  style={{
+                    stroke: COLOUR_HEX[c.colour as RiskColour],
+                  }}
+                />
+                <circle
+                  cx={s.x}
+                  cy={s.y}
+                  r={hot ? 3.2 : 1.6}
+                  className={`orbit-anchor${hot ? " on" : ""}`}
+                  style={{
+                    fill: COLOUR_HEX[c.colour as RiskColour],
+                  }}
+                />
+              </g>
             );
           })}
         </svg>
@@ -135,12 +169,11 @@ export function RadialHealthMapLab({
           <Image
             src={figureSrc}
             alt=""
-            width={420}
-            height={560}
+            width={520}
+            height={720}
             className="orbit-lab-photo"
             priority
           />
-          <span className="orbit-lab-figure-scrim" />
         </div>
 
         {tiles.map((c, i) => {

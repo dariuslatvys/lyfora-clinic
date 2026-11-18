@@ -7317,43 +7317,109 @@ a.mon-event-card:hover {
 
 /* Experimental radial health map (map-lab) */
 .orbit-lab {
-  border: 1px solid var(--line);
-  border-radius: 20px;
-  padding: 18px 18px 22px;
+  position: relative;
+  border: 1px solid color-mix(in srgb, #6ec8ff 18%, var(--line));
+  border-radius: 28px;
+  padding: 20px 18px 18px;
+  overflow: hidden;
   background:
-    radial-gradient(ellipse 55% 50% at 50% 48%, rgba(40, 120, 190, 0.18), transparent 70%),
-    linear-gradient(180deg, color-mix(in srgb, #061428 70%, var(--surface)), var(--surface-2));
-  overflow: visible;
+    radial-gradient(ellipse 70% 55% at 50% 45%, rgba(56, 160, 255, 0.16), transparent 62%),
+    radial-gradient(ellipse 40% 35% at 18% 20%, rgba(120, 60, 180, 0.12), transparent 55%),
+    radial-gradient(ellipse 35% 30% at 85% 75%, rgba(20, 180, 140, 0.1), transparent 50%),
+    linear-gradient(165deg, #040b16 0%, #071820 45%, #061018 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(140, 210, 255, 0.08),
+    0 24px 60px rgba(0, 0, 0, 0.35);
+}
+
+.orbit-lab::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(120, 200, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(120, 200, 255, 0.035) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: radial-gradient(ellipse 60% 55% at 50% 48%, black, transparent 75%);
+  opacity: 0.55;
 }
 
 .orbit-lab-head {
+  position: relative;
+  z-index: 2;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
   flex-wrap: wrap;
-  margin-bottom: 10px;
+  margin-bottom: 4px;
 }
 
 .orbit-lab-stage {
   position: relative;
-  width: min(100%, 640px);
+  width: min(100%, 720px);
   aspect-ratio: 1 / 1;
-  margin: 8px auto 0;
+  margin: 0 auto;
+  isolation: isolate;
 }
 
-.orbit-lab-glow {
+.orbit-lab-atmosphere {
   position: absolute;
-  inset: 18% 22%;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    rgba(70, 190, 255, 0.22),
-    transparent 70%
-  );
-  filter: blur(8px);
+  inset: 0;
   pointer-events: none;
   z-index: 0;
+}
+
+.orbit-haze {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(28px);
+  opacity: 0.55;
+}
+
+.orbit-haze.haze-a {
+  inset: 28% 30%;
+  background: radial-gradient(circle, rgba(90, 200, 255, 0.45), transparent 70%);
+  animation: orbit-breathe 7s ease-in-out infinite;
+}
+
+.orbit-haze.haze-b {
+  width: 34%;
+  height: 34%;
+  left: 8%;
+  top: 18%;
+  background: radial-gradient(circle, rgba(160, 90, 255, 0.22), transparent 70%);
+}
+
+.orbit-haze.haze-c {
+  width: 30%;
+  height: 30%;
+  right: 10%;
+  bottom: 16%;
+  background: radial-gradient(circle, rgba(40, 220, 170, 0.18), transparent 70%);
+}
+
+.orbit-pulse {
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  width: 58%;
+  height: 58%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1px solid rgba(120, 210, 255, 0.18);
+  animation: orbit-ring-pulse 5.5s ease-out infinite;
+}
+
+@keyframes orbit-breathe {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.08); opacity: 0.75; }
+}
+
+@keyframes orbit-ring-pulse {
+  0% { transform: translate(-50%, -50%) scale(0.72); opacity: 0.45; }
+  100% { transform: translate(-50%, -50%) scale(1.25); opacity: 0; }
 }
 
 .orbit-lab-rings {
@@ -7367,68 +7433,99 @@ a.mon-event-card:hover {
 
 .orbit-ring {
   fill: none;
-  stroke: color-mix(in srgb, #7ec8ff 35%, transparent);
-  stroke-width: 0.28;
+  stroke: rgba(140, 210, 255, 0.28);
+  stroke-width: 0.22;
 }
 
 .orbit-ring.soft {
-  stroke: color-mix(in srgb, #7ec8ff 16%, transparent);
-  stroke-width: 0.2;
+  stroke: rgba(140, 210, 255, 0.12);
+  stroke-width: 0.16;
 }
 
 .orbit-ring.mid {
-  stroke: color-mix(in srgb, #7ec8ff 22%, transparent);
-  stroke-dasharray: 0.6 1.4;
+  stroke: rgba(140, 210, 255, 0.2);
+}
+
+.orbit-ring.main {
+  stroke: rgba(160, 220, 255, 0.42);
+  stroke-width: 0.28;
+  filter: drop-shadow(0 0 2px rgba(100, 200, 255, 0.35));
 }
 
 .orbit-spoke {
-  stroke-width: 0.22;
-  opacity: 0.28;
-  transition: opacity 0.2s ease, stroke-width 0.2s ease;
+  stroke-width: 0.18;
+  opacity: 0.22;
+  stroke-linecap: round;
+  transition: opacity 0.25s ease, stroke-width 0.25s ease;
 }
 
 .orbit-spoke.on {
-  opacity: 0.85;
-  stroke-width: 0.38;
+  opacity: 0.9;
+  stroke-width: 0.36;
+  filter: drop-shadow(0 0 1.5px currentColor);
+}
+
+.orbit-anchor {
+  opacity: 0.45;
+  transition: r 0.2s ease, opacity 0.2s ease;
+}
+
+.orbit-anchor.on {
+  opacity: 1;
+  filter: drop-shadow(0 0 2px white);
 }
 
 .orbit-lab-figure {
   position: absolute;
   left: 50%;
-  top: 50%;
-  transform: translate(-50%, -52%);
-  width: min(42%, 250px);
+  top: 48%;
+  transform: translate(-50%, -50%);
+  width: min(52%, 340px);
   z-index: 2;
   pointer-events: none;
+  /* Soft vignette so the photo never looks like a black card */
+  -webkit-mask-image: radial-gradient(
+    ellipse 62% 78% at 50% 48%,
+    #000 42%,
+    rgba(0, 0, 0, 0.85) 62%,
+    transparent 82%
+  );
+  mask-image: radial-gradient(
+    ellipse 62% 78% at 50% 48%,
+    #000 42%,
+    rgba(0, 0, 0, 0.85) 62%,
+    transparent 82%
+  );
 }
 
 .orbit-lab-photo {
   width: 100%;
   height: auto;
   display: block;
-  border-radius: 18px;
-  object-fit: cover;
+  border-radius: 0 !important;
+  background: transparent !important;
+  object-fit: contain;
   mix-blend-mode: screen;
   filter:
-    drop-shadow(0 0 28px rgba(80, 190, 255, 0.35))
-    saturate(1.15)
-    contrast(1.05);
+    contrast(1.12)
+    saturate(1.2)
+    brightness(1.08)
+    drop-shadow(0 0 18px rgba(70, 190, 255, 0.45))
+    drop-shadow(0 0 48px rgba(40, 140, 255, 0.25));
   user-select: none;
+  animation: orbit-figure-glow 6s ease-in-out infinite;
 }
 
-.orbit-lab[data-sex="male"] .orbit-lab-photo,
 .orbit-lab-stage[data-sex="male"] .orbit-lab-photo {
-  mix-blend-mode: normal;
-  border-radius: 0;
-  filter: drop-shadow(0 12px 28px rgba(70, 140, 190, 0.28));
+  mix-blend-mode: lighten;
+  filter:
+    drop-shadow(0 0 22px rgba(70, 160, 220, 0.4))
+    brightness(1.05);
 }
 
-.orbit-lab-figure-scrim {
-  position: absolute;
-  inset: auto 8% -6%;
-  height: 28%;
-  background: linear-gradient(transparent, color-mix(in srgb, #061428 85%, transparent));
-  pointer-events: none;
+@keyframes orbit-figure-glow {
+  0%, 100% { filter: contrast(1.12) saturate(1.2) brightness(1.05) drop-shadow(0 0 16px rgba(70, 190, 255, 0.4)) drop-shadow(0 0 40px rgba(40, 140, 255, 0.2)); }
+  50% { filter: contrast(1.14) saturate(1.28) brightness(1.14) drop-shadow(0 0 26px rgba(90, 210, 255, 0.55)) drop-shadow(0 0 56px rgba(60, 160, 255, 0.3)); }
 }
 
 .orbit-node {
@@ -7444,114 +7541,128 @@ a.mon-event-card:hover {
   position: absolute;
   left: 0;
   top: 0;
-  width: 58px;
-  height: 58px;
-  margin: -29px 0 0 -29px;
+  width: 64px;
+  height: 64px;
+  margin: -32px 0 0 -32px;
   border-radius: 50%;
   display: grid;
   place-items: center;
-  color: var(--cc, #7ec8ff);
+  color: color-mix(in srgb, var(--cc, #9fdfff) 85%, white);
   background:
-    radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--cc) 35%, #fff), transparent 55%),
-    color-mix(in srgb, var(--cc, var(--accent)) 18%, #071525);
-  border: 2px solid color-mix(in srgb, var(--cc, var(--accent)) 70%, #fff);
+    radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.28), transparent 42%),
+    radial-gradient(circle at 50% 55%, color-mix(in srgb, var(--cc) 28%, transparent), rgba(4, 14, 28, 0.55) 72%);
+  border: 1.5px solid color-mix(in srgb, var(--cc, #9fdfff) 75%, white);
+  backdrop-filter: blur(10px) saturate(1.2);
+  -webkit-backdrop-filter: blur(10px) saturate(1.2);
   box-shadow:
-    0 0 0 5px color-mix(in srgb, var(--cc) 16%, transparent),
-    0 10px 22px rgba(0, 0, 0, 0.35);
+    0 0 0 1px rgba(255, 255, 255, 0.08) inset,
+    0 0 0 6px color-mix(in srgb, var(--cc) 12%, transparent),
+    0 0 28px color-mix(in srgb, var(--cc) 35%, transparent),
+    0 12px 28px rgba(0, 0, 0, 0.35);
   transition:
-    transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 0.22s ease;
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.28s ease,
+    border-color 0.2s ease;
 }
 
 .orbit-node-disc svg {
-  width: 24px;
-  height: 24px;
+  width: 25px;
+  height: 25px;
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--cc) 50%, transparent));
 }
 
 .orbit-node-copy {
   position: absolute;
   left: 0;
   top: 0;
-  width: 150px;
+  width: 158px;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
   pointer-events: none;
-  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
+  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
 }
 
 .orbit-node.side-right .orbit-node-copy {
-  transform: translate(38px, -50%);
+  transform: translate(42px, -50%);
   text-align: left;
 }
 
 .orbit-node.side-left .orbit-node-copy {
-  transform: translate(calc(-100% - 38px), -50%);
+  transform: translate(calc(-100% - 42px), -50%);
   text-align: right;
 }
 
 .orbit-node.side-top .orbit-node-copy {
-  transform: translate(-50%, calc(-100% - 40px));
+  transform: translate(-50%, calc(-100% - 44px));
   text-align: center;
   width: max-content;
-  max-width: 180px;
+  max-width: 200px;
 }
 
 .orbit-node.side-bottom .orbit-node-copy {
-  transform: translate(-50%, 40px);
+  transform: translate(-50%, 44px);
   text-align: center;
-  width: 160px;
+  width: 170px;
 }
 
 .orbit-node-copy b {
   font-family: var(--font-display), Manrope, sans-serif;
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   font-weight: 700;
   line-height: 1.2;
-  color: var(--ink);
-  text-shadow: 0 0 12px rgba(0, 0, 0, 0.55);
+  color: #f2f8ff;
+  text-shadow:
+    0 0 18px rgba(40, 120, 200, 0.55),
+    0 1px 2px rgba(0, 0, 0, 0.65);
 }
 
 .orbit-node-copy em {
   font-style: normal;
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   font-weight: 650;
-  color: var(--cc, var(--muted));
+  letter-spacing: 0.01em;
+  color: var(--cc, #9fdfff);
+  text-shadow: 0 0 12px color-mix(in srgb, var(--cc) 40%, transparent);
 }
 
 .orbit-node.is-hot {
-  z-index: 5;
+  z-index: 6;
 }
 
 .orbit-node.is-hot .orbit-node-disc {
-  transform: scale(1.28);
+  transform: scale(1.34);
+  border-color: color-mix(in srgb, var(--cc) 55%, white);
   box-shadow:
-    0 0 0 10px color-mix(in srgb, var(--cc) 22%, transparent),
-    0 16px 36px rgba(0, 0, 0, 0.45),
-    0 0 28px color-mix(in srgb, var(--cc) 45%, transparent);
+    0 0 0 1px rgba(255, 255, 255, 0.18) inset,
+    0 0 0 10px color-mix(in srgb, var(--cc) 18%, transparent),
+    0 0 40px color-mix(in srgb, var(--cc) 55%, transparent),
+    0 18px 40px rgba(0, 0, 0, 0.4);
 }
 
 .orbit-node.is-hot .orbit-node-copy {
-  transform: translate(42px, -50%) scale(1.08);
+  transform: translate(48px, -50%) scale(1.08);
 }
 
 .orbit-node.side-left.is-hot .orbit-node-copy {
-  transform: translate(calc(-100% - 42px), -50%) scale(1.08);
+  transform: translate(calc(-100% - 48px), -50%) scale(1.08);
 }
 
 .orbit-node.side-top.is-hot .orbit-node-copy {
-  transform: translate(-50%, calc(-100% - 46px)) scale(1.08);
+  transform: translate(-50%, calc(-100% - 52px)) scale(1.08);
 }
 
 .orbit-node.side-bottom.is-hot .orbit-node-copy {
-  transform: translate(-50%, 46px) scale(1.08);
+  transform: translate(-50%, 52px) scale(1.08);
 }
 
 .orbit-lab-hint {
-  margin: 12px 0 0;
+  position: relative;
+  z-index: 2;
+  margin: 8px 0 0;
   text-align: center;
   font-size: 0.78rem;
-  color: var(--muted);
+  color: color-mix(in srgb, var(--muted) 85%, #9fdfff);
 }
 
 @media (max-width: 720px) {
@@ -7559,18 +7670,19 @@ a.mon-event-card:hover {
     width: 100%;
   }
   .orbit-lab-figure {
-    width: min(48%, 200px);
+    width: min(58%, 240px);
   }
   .orbit-node-disc {
-    width: 48px;
-    height: 48px;
-    margin: -24px 0 0 -24px;
+    width: 52px;
+    height: 52px;
+    margin: -26px 0 0 -26px;
   }
   .orbit-node-copy {
-    width: 120px;
+    width: 118px;
   }
   .orbit-node-copy b {
     font-size: 0.78rem;
   }
 }
+
 

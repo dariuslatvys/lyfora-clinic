@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth/session";
 import { loadDigitalTwin } from "@/lib/health/load-twin";
@@ -25,27 +24,10 @@ export default async function HealthMapLabPage() {
   }));
 
   return (
-    <div className="stack" style={{ gap: 14 }}>
-      <RadialHealthMapLab
-        locale={locale}
-        sex={sex}
-        categories={mapCategories}
-        geneHint={labels.geneMarkerHint}
-      />
-      <p className="small muted m-0">
-        {locale === "en" ? (
-          <>
-            Preview only —{" "}
-            <Link href="/patient/digital-twin">open the live overview</Link>.
-          </>
-        ) : (
-          <>
-            Tik peržiūra —{" "}
-            <Link href="/patient/digital-twin">atidaryti dabartinę apžvalgą</Link>
-            .
-          </>
-        )}
-      </p>
-    </div>
+    <RadialHealthMapLab
+      locale={locale}
+      sex={sex}
+      categories={mapCategories}
+    />
   );
 }

@@ -7318,18 +7318,18 @@ a.mon-event-card:hover {
 /* Experimental radial health map (map-lab) */
 .orbit-lab {
   position: relative;
-  border: 1px solid color-mix(in srgb, #6ec8ff 18%, var(--line));
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--line));
   border-radius: 28px;
-  padding: 20px 18px 18px;
+  padding: 18px 10px 20px;
   overflow: hidden;
   background:
-    radial-gradient(ellipse 70% 55% at 50% 45%, rgba(56, 160, 255, 0.16), transparent 62%),
-    radial-gradient(ellipse 40% 35% at 18% 20%, rgba(120, 60, 180, 0.12), transparent 55%),
-    radial-gradient(ellipse 35% 30% at 85% 75%, rgba(20, 180, 140, 0.1), transparent 50%),
-    linear-gradient(165deg, #040b16 0%, #071820 45%, #061018 100%);
+    radial-gradient(ellipse 70% 60% at 50% 48%, rgba(86, 210, 140, 0.28), transparent 68%),
+    radial-gradient(ellipse 42% 36% at 12% 16%, rgba(48, 160, 100, 0.2), transparent 58%),
+    radial-gradient(ellipse 38% 32% at 90% 80%, rgba(100, 220, 150, 0.16), transparent 55%),
+    linear-gradient(165deg, #081912 0%, #0d2318 38%, #0a1a12 100%);
   box-shadow:
-    inset 0 1px 0 rgba(140, 210, 255, 0.08),
-    0 24px 60px rgba(0, 0, 0, 0.35);
+    inset 0 1px 0 rgba(140, 220, 170, 0.1),
+    0 20px 50px rgba(0, 0, 0, 0.24);
 }
 
 .orbit-lab::before {
@@ -7338,27 +7338,16 @@ a.mon-event-card:hover {
   inset: 0;
   pointer-events: none;
   background-image:
-    linear-gradient(rgba(120, 200, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(120, 200, 255, 0.035) 1px, transparent 1px);
-  background-size: 42px 42px;
-  mask-image: radial-gradient(ellipse 60% 55% at 50% 48%, black, transparent 75%);
-  opacity: 0.55;
-}
-
-.orbit-lab-head {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-bottom: 4px;
+    linear-gradient(rgba(120, 210, 160, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(120, 210, 160, 0.04) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse 62% 58% at 50% 48%, black, transparent 78%);
+  opacity: 0.5;
 }
 
 .orbit-lab-stage {
   position: relative;
-  width: min(100%, 720px);
+  width: min(100%, 760px);
   aspect-ratio: 1 / 1;
   margin: 0 auto;
   isolation: isolate;
@@ -7374,52 +7363,35 @@ a.mon-event-card:hover {
 .orbit-haze {
   position: absolute;
   border-radius: 50%;
-  filter: blur(28px);
+  filter: blur(30px);
   opacity: 0.55;
 }
 
 .orbit-haze.haze-a {
-  inset: 28% 30%;
-  background: radial-gradient(circle, rgba(90, 200, 255, 0.45), transparent 70%);
+  inset: 26% 28%;
+  background: radial-gradient(circle, rgba(90, 210, 140, 0.4), transparent 70%);
   animation: orbit-breathe 7s ease-in-out infinite;
 }
 
 .orbit-haze.haze-b {
-  width: 34%;
-  height: 34%;
+  width: 32%;
+  height: 32%;
   left: 8%;
-  top: 18%;
-  background: radial-gradient(circle, rgba(160, 90, 255, 0.22), transparent 70%);
+  top: 16%;
+  background: radial-gradient(circle, rgba(50, 160, 100, 0.22), transparent 70%);
 }
 
 .orbit-haze.haze-c {
-  width: 30%;
-  height: 30%;
+  width: 28%;
+  height: 28%;
   right: 10%;
-  bottom: 16%;
-  background: radial-gradient(circle, rgba(40, 220, 170, 0.18), transparent 70%);
-}
-
-.orbit-pulse {
-  position: absolute;
-  left: 50%;
-  top: 48%;
-  width: 58%;
-  height: 58%;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  border: 1px solid rgba(120, 210, 255, 0.18);
-  animation: orbit-ring-pulse 5.5s ease-out infinite;
+  bottom: 14%;
+  background: radial-gradient(circle, rgba(120, 220, 160, 0.16), transparent 70%);
 }
 
 @keyframes orbit-breathe {
-  0%, 100% { transform: scale(1); opacity: 0.5; }
-  50% { transform: scale(1.08); opacity: 0.75; }
-}
-
-@keyframes orbit-ring-pulse {
-  0% { transform: translate(-50%, -50%) scale(0.72); opacity: 0.45; }
-  100% { transform: translate(-50%, -50%) scale(1.25); opacity: 0; }
+  0%, 100% { transform: scale(1); opacity: 0.48; }
+  50% { transform: scale(1.07); opacity: 0.72; }
 }
 
 .orbit-lab-rings {
@@ -7433,69 +7405,83 @@ a.mon-event-card:hover {
 
 .orbit-ring {
   fill: none;
-  stroke: rgba(140, 210, 255, 0.28);
-  stroke-width: 0.22;
-}
-
-.orbit-ring.soft {
-  stroke: rgba(140, 210, 255, 0.12);
-  stroke-width: 0.16;
+  stroke: rgba(140, 220, 170, 0.22);
+  stroke-width: 0.2;
 }
 
 .orbit-ring.mid {
-  stroke: rgba(140, 210, 255, 0.2);
+  stroke: rgba(140, 220, 170, 0.18);
 }
 
 .orbit-ring.main {
-  stroke: rgba(160, 220, 255, 0.42);
-  stroke-width: 0.28;
-  filter: drop-shadow(0 0 2px rgba(100, 200, 255, 0.35));
+  stroke: rgba(150, 230, 180, 0.34);
+  stroke-width: 0.26;
 }
 
-.orbit-spoke {
-  stroke-width: 0.18;
+.orbit-focus-line {
+  stroke-width: 0.45;
+  stroke-dasharray: 1.1 1.15;
+  opacity: 0.95;
+  filter: drop-shadow(0 0 1.4px currentColor);
+  animation: orbit-dash 1.1s linear infinite;
+}
+
+@keyframes orbit-dash {
+  to { stroke-dashoffset: -8; }
+}
+
+.orbit-organ {
+  opacity: 0.55;
+  filter: url(#orbitSoftGlow);
+  animation: orbit-organ-pulse 1.6s ease-in-out infinite;
+}
+
+.orbit-organ.heart {
+  opacity: 0.72;
+}
+
+.orbit-organ.outline {
+  stroke-width: 1.1;
+  opacity: 0.85;
+  fill: none !important;
+  animation: orbit-outline-pulse 1.4s ease-in-out infinite;
+}
+
+.orbit-organ.body {
   opacity: 0.22;
-  stroke-linecap: round;
-  transition: opacity 0.25s ease, stroke-width 0.25s ease;
 }
 
-.orbit-spoke.on {
-  opacity: 0.9;
-  stroke-width: 0.36;
-  filter: drop-shadow(0 0 1.5px currentColor);
+@keyframes orbit-organ-pulse {
+  0%, 100% { opacity: 0.42; }
+  50% { opacity: 0.78; }
 }
 
-.orbit-anchor {
-  opacity: 0.45;
-  transition: r 0.2s ease, opacity 0.2s ease;
-}
-
-.orbit-anchor.on {
-  opacity: 1;
-  filter: drop-shadow(0 0 2px white);
+@keyframes orbit-outline-pulse {
+  0%, 100% { opacity: 0.55; stroke-width: 0.9; }
+  50% { opacity: 0.95; stroke-width: 1.35; }
 }
 
 .orbit-lab-figure {
   position: absolute;
   left: 50%;
-  top: 48%;
+  top: 50%;
   transform: translate(-50%, -50%);
-  width: min(52%, 340px);
+  width: min(44%, 300px);
   z-index: 2;
   pointer-events: none;
-  /* Soft vignette so the photo never looks like a black card */
   -webkit-mask-image: radial-gradient(
-    ellipse 62% 78% at 50% 48%,
+    ellipse 62% 78% at 50% 46%,
     #000 42%,
-    rgba(0, 0, 0, 0.85) 62%,
+    rgba(0, 0, 0, 0.7) 62%,
     transparent 82%
   );
   mask-image: radial-gradient(
-    ellipse 62% 78% at 50% 48%,
+    ellipse 62% 78% at 50% 46%,
     #000 42%,
-    rgba(0, 0, 0, 0.85) 62%,
+    rgba(0, 0, 0, 0.7) 62%,
     transparent 82%
   );
+  transition: filter 0.35s ease;
 }
 
 .orbit-lab-photo {
@@ -7507,25 +7493,43 @@ a.mon-event-card:hover {
   object-fit: contain;
   mix-blend-mode: screen;
   filter:
-    contrast(1.12)
+    contrast(1.1)
     saturate(1.2)
-    brightness(1.08)
-    drop-shadow(0 0 18px rgba(70, 190, 255, 0.45))
-    drop-shadow(0 0 48px rgba(40, 140, 255, 0.25));
+    brightness(1.22)
+    hue-rotate(-12deg)
+    drop-shadow(0 0 24px rgba(70, 200, 130, 0.42));
   user-select: none;
-  animation: orbit-figure-glow 6s ease-in-out infinite;
+}
+
+.orbit-lab-figure.focus-heart .orbit-lab-photo,
+.orbit-lab-figure.focus-brain .orbit-lab-photo,
+.orbit-lab-figure.focus-pelvis .orbit-lab-photo,
+.orbit-lab-figure.focus-gut .orbit-lab-photo {
+  filter:
+    contrast(1.12)
+    saturate(1.25)
+    brightness(1.18)
+    drop-shadow(0 0 26px color-mix(in srgb, var(--focus-c, #6bcf9b) 55%, transparent));
+}
+
+.orbit-lab-figure.focus-body .orbit-lab-photo {
+  filter:
+    contrast(1.16)
+    saturate(1.3)
+    brightness(1.28)
+    drop-shadow(0 0 34px rgba(120, 230, 170, 0.55));
+}
+
+.orbit-lab-figure.focus-outline .orbit-lab-photo {
+  filter:
+    contrast(1.2)
+    saturate(1.35)
+    brightness(1.1)
+    drop-shadow(0 0 28px color-mix(in srgb, var(--focus-c, #f0626b) 60%, transparent));
 }
 
 .orbit-lab-stage[data-sex="male"] .orbit-lab-photo {
   mix-blend-mode: lighten;
-  filter:
-    drop-shadow(0 0 22px rgba(70, 160, 220, 0.4))
-    brightness(1.05);
-}
-
-@keyframes orbit-figure-glow {
-  0%, 100% { filter: contrast(1.12) saturate(1.2) brightness(1.05) drop-shadow(0 0 16px rgba(70, 190, 255, 0.4)) drop-shadow(0 0 40px rgba(40, 140, 255, 0.2)); }
-  50% { filter: contrast(1.14) saturate(1.28) brightness(1.14) drop-shadow(0 0 26px rgba(90, 210, 255, 0.55)) drop-shadow(0 0 56px rgba(60, 160, 255, 0.3)); }
 }
 
 .orbit-node {
@@ -7537,132 +7541,94 @@ a.mon-event-card:hover {
   color: inherit;
 }
 
-.orbit-node-disc {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 64px;
-  height: 64px;
-  margin: -32px 0 0 -32px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  color: color-mix(in srgb, var(--cc, #9fdfff) 85%, white);
-  background:
-    radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.28), transparent 42%),
-    radial-gradient(circle at 50% 55%, color-mix(in srgb, var(--cc) 28%, transparent), rgba(4, 14, 28, 0.55) 72%);
-  border: 1.5px solid color-mix(in srgb, var(--cc, #9fdfff) 75%, white);
-  backdrop-filter: blur(10px) saturate(1.2);
-  -webkit-backdrop-filter: blur(10px) saturate(1.2);
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.08) inset,
-    0 0 0 6px color-mix(in srgb, var(--cc) 12%, transparent),
-    0 0 28px color-mix(in srgb, var(--cc) 35%, transparent),
-    0 12px 28px rgba(0, 0, 0, 0.35);
-  transition:
-    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 0.28s ease,
-    border-color 0.2s ease;
-}
-
-.orbit-node-disc svg {
-  width: 25px;
-  height: 25px;
-  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--cc) 50%, transparent));
-}
-
 .orbit-node-copy {
   position: absolute;
   left: 0;
   top: 0;
-  width: 158px;
+  width: 168px;
   display: flex;
   flex-direction: column;
   gap: 4px;
-  pointer-events: none;
-  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
+  padding: 8px 10px;
+  border-radius: 14px;
+  background: color-mix(in srgb, #07140f 55%, transparent);
+  border: 1px solid color-mix(in srgb, var(--cc, var(--accent)) 35%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+  transition:
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .orbit-node.side-right .orbit-node-copy {
-  transform: translate(42px, -50%);
+  transform: translate(14px, -50%);
   text-align: left;
 }
 
 .orbit-node.side-left .orbit-node-copy {
-  transform: translate(calc(-100% - 42px), -50%);
+  transform: translate(calc(-100% - 14px), -50%);
   text-align: right;
 }
 
 .orbit-node.side-top .orbit-node-copy {
-  transform: translate(-50%, calc(-100% - 44px));
+  transform: translate(-50%, calc(-100% - 18px));
   text-align: center;
   width: max-content;
   max-width: 200px;
 }
 
 .orbit-node.side-bottom .orbit-node-copy {
-  transform: translate(-50%, 44px);
+  transform: translate(-50%, 16px);
   text-align: center;
-  width: 170px;
+  width: 176px;
 }
 
 .orbit-node-copy b {
   font-family: var(--font-display), Manrope, sans-serif;
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   font-weight: 700;
-  line-height: 1.2;
-  color: #f2f8ff;
-  text-shadow:
-    0 0 18px rgba(40, 120, 200, 0.55),
-    0 1px 2px rgba(0, 0, 0, 0.65);
+  line-height: 1.25;
+  color: #eef8f1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
 }
 
 .orbit-node-copy em {
   font-style: normal;
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   font-weight: 650;
-  letter-spacing: 0.01em;
-  color: var(--cc, #9fdfff);
-  text-shadow: 0 0 12px color-mix(in srgb, var(--cc) 40%, transparent);
+  color: var(--cc, var(--accent));
 }
 
 .orbit-node.is-hot {
   z-index: 6;
 }
 
-.orbit-node.is-hot .orbit-node-disc {
-  transform: scale(1.34);
-  border-color: color-mix(in srgb, var(--cc) 55%, white);
+.orbit-node.is-hot .orbit-node-copy {
+  border-color: color-mix(in srgb, var(--cc) 70%, white);
+  background: color-mix(in srgb, var(--cc) 16%, #07140f);
   box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.18) inset,
-    0 0 0 10px color-mix(in srgb, var(--cc) 18%, transparent),
-    0 0 40px color-mix(in srgb, var(--cc) 55%, transparent),
-    0 18px 40px rgba(0, 0, 0, 0.4);
+    0 0 0 1px color-mix(in srgb, var(--cc) 25%, transparent),
+    0 14px 34px rgba(0, 0, 0, 0.35),
+    0 0 28px color-mix(in srgb, var(--cc) 28%, transparent);
 }
 
-.orbit-node.is-hot .orbit-node-copy {
-  transform: translate(48px, -50%) scale(1.08);
+.orbit-node.side-right.is-hot .orbit-node-copy {
+  transform: translate(18px, -50%) scale(1.05);
 }
 
 .orbit-node.side-left.is-hot .orbit-node-copy {
-  transform: translate(calc(-100% - 48px), -50%) scale(1.08);
+  transform: translate(calc(-100% - 18px), -50%) scale(1.05);
 }
 
 .orbit-node.side-top.is-hot .orbit-node-copy {
-  transform: translate(-50%, calc(-100% - 52px)) scale(1.08);
+  transform: translate(-50%, calc(-100% - 22px)) scale(1.05);
 }
 
 .orbit-node.side-bottom.is-hot .orbit-node-copy {
-  transform: translate(-50%, 52px) scale(1.08);
-}
-
-.orbit-lab-hint {
-  position: relative;
-  z-index: 2;
-  margin: 8px 0 0;
-  text-align: center;
-  font-size: 0.78rem;
-  color: color-mix(in srgb, var(--muted) 85%, #9fdfff);
+  transform: translate(-50%, 20px) scale(1.05);
 }
 
 @media (max-width: 720px) {
@@ -7670,19 +7636,16 @@ a.mon-event-card:hover {
     width: 100%;
   }
   .orbit-lab-figure {
-    width: min(58%, 240px);
-  }
-  .orbit-node-disc {
-    width: 52px;
-    height: 52px;
-    margin: -26px 0 0 -26px;
+    width: min(56%, 240px);
   }
   .orbit-node-copy {
-    width: 118px;
+    width: 128px;
+    padding: 6px 8px;
   }
   .orbit-node-copy b {
-    font-size: 0.78rem;
+    font-size: 0.76rem;
   }
 }
+
 
 

@@ -7320,12 +7320,12 @@ a.mon-event-card:hover {
   position: relative;
   border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--line));
   border-radius: 28px;
-  padding: 22px 12px 24px;
+  padding: 18px 10px 20px;
   overflow: hidden;
   background:
-    radial-gradient(ellipse 58% 52% at 50% 48%, rgba(72, 190, 120, 0.38), transparent 72%),
-    radial-gradient(ellipse 42% 36% at 12% 16%, rgba(48, 160, 100, 0.22), transparent 58%),
-    radial-gradient(ellipse 38% 32% at 90% 80%, rgba(100, 220, 150, 0.18), transparent 55%),
+    radial-gradient(ellipse 58% 52% at 50% 48%, rgba(72, 190, 120, 0.34), transparent 72%),
+    radial-gradient(ellipse 42% 36% at 12% 16%, rgba(48, 160, 100, 0.2), transparent 58%),
+    radial-gradient(ellipse 38% 32% at 90% 80%, rgba(100, 220, 150, 0.16), transparent 55%),
     linear-gradient(165deg, #0a1f14 0%, #0f2a1a 40%, #0c2016 100%);
   box-shadow:
     inset 0 1px 0 rgba(140, 220, 170, 0.1),
@@ -7338,16 +7338,16 @@ a.mon-event-card:hover {
   inset: 0;
   pointer-events: none;
   background-image:
-    linear-gradient(rgba(120, 210, 160, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(120, 210, 160, 0.04) 1px, transparent 1px);
-  background-size: 44px 44px;
-  mask-image: radial-gradient(ellipse 62% 58% at 50% 48%, black, transparent 78%);
-  opacity: 0.5;
+    linear-gradient(rgba(120, 210, 160, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(120, 210, 160, 0.035) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 60% 56% at 50% 48%, black, transparent 78%);
+  opacity: 0.45;
 }
 
 .orbit-lab-stage {
   position: relative;
-  width: min(100%, 760px);
+  width: min(100%, 780px);
   aspect-ratio: 1 / 1;
   margin: 0 auto;
   isolation: isolate;
@@ -7368,30 +7368,30 @@ a.mon-event-card:hover {
 }
 
 .orbit-haze.haze-a {
-  inset: 22% 26%;
-  background: radial-gradient(circle, rgba(90, 210, 140, 0.55), transparent 72%);
+  inset: 24% 28%;
+  background: radial-gradient(circle, rgba(90, 210, 140, 0.5), transparent 72%);
   animation: orbit-breathe 7s ease-in-out infinite;
 }
 
 .orbit-haze.haze-b {
-  width: 32%;
-  height: 32%;
+  width: 30%;
+  height: 30%;
   left: 8%;
   top: 16%;
-  background: radial-gradient(circle, rgba(50, 160, 100, 0.22), transparent 70%);
+  background: radial-gradient(circle, rgba(50, 160, 100, 0.2), transparent 70%);
 }
 
 .orbit-haze.haze-c {
-  width: 28%;
-  height: 28%;
+  width: 26%;
+  height: 26%;
   right: 10%;
   bottom: 14%;
-  background: radial-gradient(circle, rgba(120, 220, 160, 0.16), transparent 70%);
+  background: radial-gradient(circle, rgba(120, 220, 160, 0.14), transparent 70%);
 }
 
 @keyframes orbit-breathe {
-  0%, 100% { transform: scale(1); opacity: 0.48; }
-  50% { transform: scale(1.07); opacity: 0.72; }
+  0%, 100% { transform: scale(1); opacity: 0.45; }
+  50% { transform: scale(1.06); opacity: 0.7; }
 }
 
 .orbit-lab-rings,
@@ -7403,27 +7403,34 @@ a.mon-event-card:hover {
   pointer-events: none;
 }
 
-.orbit-lab-rings {
-  z-index: 1;
-}
-
-.orbit-lab-focus {
-  z-index: 4;
-}
+.orbit-lab-rings { z-index: 1; }
+.orbit-lab-focus { z-index: 4; }
 
 .orbit-ring {
   fill: none;
-  stroke: rgba(140, 220, 170, 0.22);
-  stroke-width: 0.2;
+  stroke: rgba(140, 220, 170, 0.2);
+  stroke-width: 0.18;
 }
 
-.orbit-ring.mid {
-  stroke: rgba(140, 220, 170, 0.18);
+.orbit-ring.soft {
+  stroke: rgba(140, 220, 170, 0.14);
 }
 
 .orbit-ring.main {
-  stroke: rgba(150, 230, 180, 0.34);
-  stroke-width: 0.26;
+  stroke: rgba(160, 235, 190, 0.38);
+  stroke-width: 0.28;
+}
+
+.orbit-tick {
+  stroke: rgba(170, 235, 195, 0.42);
+  stroke-width: 0.28;
+  stroke-linecap: round;
+}
+
+.orbit-spoke {
+  stroke: rgba(150, 220, 180, 0.22);
+  stroke-width: 0.18;
+  stroke-dasharray: 0.55 0.7;
 }
 
 .orbit-focus-line {
@@ -7444,9 +7451,7 @@ a.mon-event-card:hover {
   animation: orbit-organ-pulse 1.6s ease-in-out infinite;
 }
 
-.orbit-organ.heart {
-  opacity: 0.72;
-}
+.orbit-organ.heart { opacity: 0.72; }
 
 .orbit-organ.outline {
   stroke-width: 1.1;
@@ -7455,9 +7460,7 @@ a.mon-event-card:hover {
   animation: orbit-outline-pulse 1.4s ease-in-out infinite;
 }
 
-.orbit-organ.body {
-  opacity: 0.22;
-}
+.orbit-organ.body { opacity: 0.22; }
 
 @keyframes orbit-organ-pulse {
   0%, 100% { opacity: 0.42; }
@@ -7474,7 +7477,7 @@ a.mon-event-card:hover {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: min(42%, 280px);
+  width: min(40%, 268px);
   z-index: 2;
   pointer-events: none;
   background: transparent;
@@ -7541,30 +7544,64 @@ a.mon-event-card:hover {
     drop-shadow(0 0 28px color-mix(in srgb, var(--focus-c, #f0626b) 60%, transparent));
 }
 
+/* Nodes: icon orb on the ring + label outside */
 .orbit-node {
   position: absolute;
-  z-index: 3;
-  width: 0;
-  height: 0;
+  z-index: 5;
+  width: 56px;
+  height: 56px;
+  margin: -28px 0 0 -28px;
   text-decoration: none;
   color: inherit;
+  transition: opacity 0.25s ease, filter 0.25s ease;
+}
+
+.orbit-node.is-dim {
+  opacity: 0.38;
+  filter: saturate(0.7);
+}
+
+.orbit-node-orb {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #e8fff0;
+  background:
+    radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--cc) 28%, #0d2418), #07140f 72%);
+  border: 1.5px solid color-mix(in srgb, var(--cc) 72%, white 8%);
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--cc) 12%, transparent),
+    0 0 22px color-mix(in srgb, var(--cc) 35%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  transition:
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.22s ease,
+    border-color 0.22s ease;
+}
+
+.orbit-node-orb svg {
+  width: 23px;
+  height: 23px;
 }
 
 .orbit-node-copy {
   position: absolute;
-  left: 0;
-  top: 0;
-  width: 168px;
+  left: 50%;
+  top: 50%;
+  width: 152px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 8px 10px;
-  border-radius: 14px;
-  background: color-mix(in srgb, #07140f 55%, transparent);
-  border: 1px solid color-mix(in srgb, var(--cc, var(--accent)) 35%, transparent);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+  gap: 3px;
+  padding: 7px 10px;
+  border-radius: 13px;
+  background: color-mix(in srgb, #06140f 78%, transparent);
+  border: 1px solid color-mix(in srgb, var(--cc, var(--accent)) 34%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+  pointer-events: none;
   transition:
     transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
     border-color 0.2s ease,
@@ -7573,31 +7610,31 @@ a.mon-event-card:hover {
 }
 
 .orbit-node.side-right .orbit-node-copy {
-  transform: translate(18px, -50%);
+  transform: translate(30px, -50%);
   text-align: left;
 }
 
 .orbit-node.side-left .orbit-node-copy {
-  transform: translate(calc(-100% - 18px), -50%);
+  transform: translate(calc(-100% - 30px), -50%);
   text-align: right;
 }
 
 .orbit-node.side-top .orbit-node-copy {
-  transform: translate(-50%, calc(-100% - 22px));
-  text-align: center;
   width: max-content;
-  max-width: 190px;
+  max-width: 176px;
+  transform: translate(-50%, calc(-100% - 30px));
+  text-align: center;
 }
 
 .orbit-node.side-bottom .orbit-node-copy {
-  transform: translate(-50%, 18px);
+  width: 156px;
+  transform: translate(-50%, 30px);
   text-align: center;
-  width: 172px;
 }
 
 .orbit-node-copy b {
   font-family: var(--font-display), Manrope, sans-serif;
-  font-size: 0.9rem;
+  font-size: 0.84rem;
   font-weight: 700;
   line-height: 1.25;
   color: #eef8f1;
@@ -7606,38 +7643,50 @@ a.mon-event-card:hover {
 
 .orbit-node-copy em {
   font-style: normal;
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 650;
+  letter-spacing: 0.01em;
   color: var(--cc, var(--accent));
 }
 
 .orbit-node.is-hot {
-  z-index: 6;
+  z-index: 8;
+  opacity: 1;
+  filter: none;
+}
+
+.orbit-node.is-hot .orbit-node-orb {
+  transform: scale(1.12);
+  border-color: color-mix(in srgb, var(--cc) 85%, white);
+  box-shadow:
+    0 0 0 5px color-mix(in srgb, var(--cc) 18%, transparent),
+    0 0 30px color-mix(in srgb, var(--cc) 48%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
 
 .orbit-node.is-hot .orbit-node-copy {
   border-color: color-mix(in srgb, var(--cc) 70%, white);
   background: color-mix(in srgb, var(--cc) 16%, #07140f);
   box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--cc) 25%, transparent),
-    0 14px 34px rgba(0, 0, 0, 0.35),
-    0 0 28px color-mix(in srgb, var(--cc) 28%, transparent);
+    0 0 0 1px color-mix(in srgb, var(--cc) 22%, transparent),
+    0 16px 36px rgba(0, 0, 0, 0.38),
+    0 0 28px color-mix(in srgb, var(--cc) 26%, transparent);
 }
 
 .orbit-node.side-right.is-hot .orbit-node-copy {
-  transform: translate(18px, -50%) scale(1.05);
+  transform: translate(34px, -50%) scale(1.04);
 }
 
 .orbit-node.side-left.is-hot .orbit-node-copy {
-  transform: translate(calc(-100% - 18px), -50%) scale(1.05);
+  transform: translate(calc(-100% - 34px), -50%) scale(1.04);
 }
 
 .orbit-node.side-top.is-hot .orbit-node-copy {
-  transform: translate(-50%, calc(-100% - 22px)) scale(1.05);
+  transform: translate(-50%, calc(-100% - 34px)) scale(1.04);
 }
 
 .orbit-node.side-bottom.is-hot .orbit-node-copy {
-  transform: translate(-50%, 20px) scale(1.05);
+  transform: translate(-50%, 34px) scale(1.04);
 }
 
 @media (max-width: 720px) {
@@ -7645,16 +7694,38 @@ a.mon-event-card:hover {
     width: 100%;
   }
   .orbit-lab-figure {
-    width: min(56%, 240px);
+    width: min(48%, 220px);
+  }
+  .orbit-node {
+    width: 42px;
+    height: 42px;
+    margin: -21px 0 0 -21px;
+  }
+  .orbit-node-orb svg {
+    width: 18px;
+    height: 18px;
   }
   .orbit-node-copy {
-    width: 128px;
+    width: 124px;
     padding: 6px 8px;
   }
   .orbit-node-copy b {
-    font-size: 0.76rem;
+    font-size: 0.72rem;
+  }
+  .orbit-node.side-right .orbit-node-copy {
+    transform: translate(28px, -50%);
+  }
+  .orbit-node.side-left .orbit-node-copy {
+    transform: translate(calc(-100% - 28px), -50%);
+  }
+  .orbit-node.side-top .orbit-node-copy {
+    transform: translate(-50%, calc(-100% - 28px));
+  }
+  .orbit-node.side-bottom .orbit-node-copy {
+    transform: translate(-50%, 28px);
   }
 }
+
 
 
 

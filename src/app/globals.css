@@ -7223,3 +7223,94 @@ a.patient-cal-event:hover {
     grid-template-columns: 1fr;
   }
 }
+
+/* Monitoring / patient calendar event cards */
+.mon-event-panel {
+  padding-bottom: 14px;
+}
+
+.mon-event-list {
+  max-height: min(70vh, 720px);
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.mon-event-card {
+  display: block;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  overflow: hidden;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.mon-event-card.is-selected {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--line));
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+}
+
+a.mon-event-card:hover {
+  border-color: var(--accent);
+}
+
+.mon-event-card-inner {
+  display: grid;
+  grid-template-columns: 5px 1fr;
+  gap: 0;
+  min-height: 72px;
+}
+
+.mon-event-rail {
+  background: var(--accent);
+}
+
+.mon-event-rail.mon-kind.visit,
+.mon-kind.visit {
+  background: #3b82f6;
+}
+.mon-event-rail.mon-kind.vaccine,
+.mon-kind.vaccine {
+  background: #22c55e;
+}
+.mon-event-rail.mon-kind.lab,
+.mon-kind.lab {
+  background: #f59e0b;
+}
+.mon-event-rail.mon-kind.screen,
+.mon-kind.screen {
+  background: #ef4444;
+}
+.mon-event-rail.mon-kind.prevent,
+.mon-kind.prevent {
+  background: #8b5cf6;
+}
+.mon-event-rail.mon-kind.consult,
+.mon-kind.consult {
+  background: #06b6d4;
+}
+
+.mon-event-body {
+  padding: 12px 14px;
+}
+
+.mon-event-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.mon-event-meta .eyebrow {
+  display: block;
+  margin-bottom: 2px;
+}
+
+.page-head-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}

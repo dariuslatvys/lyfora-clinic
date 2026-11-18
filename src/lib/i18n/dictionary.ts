@@ -21,8 +21,8 @@ export const dict = {
     labs: "Tyrimai",
     myDna: "Mano DNR",
     deathClock: "Death Clock",
-    visits: "Vizitai",
-    calendar: "Kalendorius",
+    visits: "Vizitai ir kalendorius",
+    calendar: "Vizitai ir kalendorius",
     referrals: "Siuntimai",
     referralsBlurb:
       "Siuntimai tyrimams ir specialistams — išduoti, atlikti ir planuojami.",
@@ -176,8 +176,8 @@ export const dict = {
     labs: "Labs",
     myDna: "My DNA",
     deathClock: "Death Clock",
-    visits: "Visits",
-    calendar: "Calendar",
+    visits: "Visits & calendar",
+    calendar: "Visits & calendar",
     referrals: "Referrals",
     referralsBlurb:
       "Referrals for tests and specialists — issued, completed and scheduled.",

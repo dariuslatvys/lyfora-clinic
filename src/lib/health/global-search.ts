@@ -226,11 +226,6 @@ function buildPages(locale: Locale, labels: ReturnType<typeof t>): IndexedDoc[] 
       aliases: "sveikatos kortele health card ehr diagnozės stebėsena monitoring",
     },
     {
-      href: "/patient/calendar",
-      title: labels.calendar,
-      aliases: "kalendorius calendar grafikas priminimai skiepai psa stebėsena",
-    },
-    {
       href: "/patient/labs",
       title: labels.labs,
       aliases: "tyrimai labs markers kraujo tyrimai cholesterol",
@@ -243,7 +238,8 @@ function buildPages(locale: Locale, labels: ReturnType<typeof t>): IndexedDoc[] 
     {
       href: "/patient/visits",
       title: labels.visits,
-      aliases: "vizitai visits appointments",
+      aliases:
+        "vizitai visits appointments kalendorius calendar grafikas priminimai skiepai psa stebėsena",
     },
     {
       href: "/patient/prescriptions",

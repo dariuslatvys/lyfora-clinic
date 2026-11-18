@@ -10,11 +10,10 @@ import type { Dictionary } from "@/lib/i18n/dictionary";
 const items = [
   { href: "/patient/digital-twin", key: "navOverview" as const, icon: "home" },
   { href: "/patient/health-card", key: "healthCard" as const, icon: "card" },
-  { href: "/patient/calendar", key: "calendar" as const, icon: "cal" },
+  { href: "/patient/visits", key: "visits" as const, icon: "cal" },
   { href: "/patient/labs", key: "labs" as const, icon: "flask" },
   { href: "/patient/dna", key: "myDna" as const, icon: "dna" },
   { href: "/patient/consultations", key: "consultations" as const, icon: "consult" },
-  { href: "/patient/visits", key: "visits" as const, icon: "vis" },
   { href: "/patient/referrals", key: "referrals" as const, icon: "send" },
   { href: "/patient/prescriptions", key: "prescriptions" as const, icon: "rx" },
   { href: "/patient/recommendations", key: "recommendations" as const, icon: "bulb" },

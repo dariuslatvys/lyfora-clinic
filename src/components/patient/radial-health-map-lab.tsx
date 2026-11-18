@@ -14,43 +14,55 @@ import {
 type Slot = {
   x: number;
   y: number;
-  lx: number;
-  ly: number;
   deg: number;
   side: "left" | "right" | "top" | "bottom";
 };
 
+/** Focus point in body-image local % (0–100 of the hologram frame). */
 type BodyFocus = {
   x: number;
   y: number;
   mode: "heart" | "brain" | "pelvis" | "gut" | "body" | "outline";
 };
 
+/**
+ * Calibrated to woman-hologram anatomy (head→feet in the PNG).
+ * Do NOT use stage %, or ovaries land on the knees.
+ */
 const FOCUS_BY_ID: Record<string, BodyFocus> = {
-  cardio_metabolic: { x: 51, y: 36, mode: "heart" },
-  cardiovascular: { x: 51, y: 36, mode: "heart" },
-  mental: { x: 50, y: 18, mode: "brain" },
-  reproductive: { x: 50, y: 58, mode: "pelvis" },
-  hormones_women: { x: 50, y: 58, mode: "pelvis" },
-  pharmacogenetics: { x: 50, y: 48, mode: "gut" },
+  cardio_metabolic: { x: 51, y: 30, mode: "heart" },
+  cardiovascular: { x: 51, y: 30, mode: "heart" },
+  mental: { x: 50, y: 12, mode: "brain" },
+  reproductive: { x: 50, y: 52, mode: "pelvis" },
+  hormones_women: { x: 50, y: 52, mode: "pelvis" },
+  pharmacogenetics: { x: 50, y: 43, mode: "gut" },
   physical: { x: 50, y: 48, mode: "body" },
   oncology: { x: 50, y: 42, mode: "outline" },
-  metabolic: { x: 50, y: 48, mode: "gut" },
+  metabolic: { x: 50, y: 43, mode: "gut" },
   immune: { x: 50, y: 40, mode: "body" },
-  hormones_men: { x: 50, y: 55, mode: "pelvis" },
+  hormones_men: { x: 50, y: 54, mode: "pelvis" },
 };
 
-const ICON_RING = 41.5;
-const LABEL_RING = 49.5;
-const CX = 50;
-const CY = 49;
+/** Figure box as % of the square stage (matches CSS). */
+const FIG_W = 38;
+const FIG_H = FIG_W * (1280 / 720);
+const FIG_LEFT = 50 - FIG_W / 2;
+const FIG_TOP = 50 - FIG_H / 2;
 
-/**
- * Even polar slots. Start offset so the crown stays open and pairs mirror L/R.
- * Degrees: 0 = right, 90 = bottom.
- */
+const ICON_RING = 37.5;
+const CX = 50;
+const CY = 50;
+
+function bodyToStage(local: { x: number; y: number }) {
+  return {
+    x: FIG_LEFT + (local.x / 100) * FIG_W,
+    y: FIG_TOP + (local.y / 100) * FIG_H,
+  };
+}
+
 function slotsForCount(n: number): Slot[] {
   const step = 360 / n;
+  // Open the crown a touch; keep L/R symmetry
   const start = -90 + step / 2;
   return Array.from({ length: n }, (_, i) => {
     const deg = start + step * i;
@@ -58,17 +70,15 @@ function slotsForCount(n: number): Slot[] {
     const cos = Math.cos(rad);
     const sin = Math.sin(rad);
     let side: Slot["side"] = "right";
-    if (deg >= -55 && deg <= -35) side = "top";
-    else if (deg > -35 && deg < 55) side = "right";
-    else if (deg >= 55 && deg <= 125) side = "bottom";
-    else if (deg > 125 && deg < 235) side = "left";
+    if (deg >= -70 && deg <= -40) side = "top";
+    else if (deg > -40 && deg < 50) side = "right";
+    else if (deg >= 50 && deg <= 130) side = "bottom";
+    else if (deg > 130 && deg < 230) side = "left";
     else side = "top";
     return {
       deg,
       x: CX + ICON_RING * cos,
       y: CY + ICON_RING * sin,
-      lx: CX + LABEL_RING * cos,
-      ly: CY + LABEL_RING * sin,
       side,
     };
   });
@@ -99,7 +109,7 @@ function CategoryGlyph({ id }: { id: string }) {
     viewBox: "0 0 24 24",
     fill: "none",
     stroke: "currentColor",
-    strokeWidth: 1.6,
+    strokeWidth: 1.55,
     strokeLinecap: "round" as const,
     strokeLinejoin: "round" as const,
     "aria-hidden": true,
@@ -107,52 +117,51 @@ function CategoryGlyph({ id }: { id: string }) {
   const paths: Record<string, ReactNode> = {
     reproductive: (
       <>
-        <circle cx="12" cy="9" r="4.2" />
-        <path d="M12 13.2v6.3" />
-        <path d="M9.4 17.2h5.2" />
+        <circle cx="12" cy="8.5" r="4" />
+        <path d="M12 12.5v6.8" />
+        <path d="M9.2 16.8h5.6" />
       </>
     ),
     hormones_women: (
       <>
-        <circle cx="12" cy="9" r="4.2" />
-        <path d="M12 13.2v6.3" />
-        <path d="M9.4 17.2h5.2" />
+        <circle cx="12" cy="8.5" r="4" />
+        <path d="M12 12.5v6.8" />
+        <path d="M9.2 16.8h5.6" />
       </>
     ),
     oncology: (
       <>
-        <path d="M12 3.5 13.7 8l4.6.4-3.5 3.2 1.1 4.5L12 13.8 8.1 16.1l1.1-4.5L5.7 8.4 10.3 8z" />
-        <circle cx="12" cy="12" r="1.1" fill="currentColor" stroke="none" />
+        <path d="M12 4.2 13.4 8.4l4.4.4-3.4 3 1 4.3L12 13.9 8.6 16.1l1-4.3-3.4-3 4.4-.4z" />
       </>
     ),
     cardio_metabolic: (
-      <path d="M19.4 7.8c-1.6-1.9-4.3-2-5.9-.3L12 9l-1.5-1.5C8.9 5.8 6.2 5.9 4.6 7.8c-1.7 2-1.5 5.1.6 6.8L12 20l6.8-5.4c2.1-1.7 2.3-4.8.6-6.8Z" />
+      <path d="M19.2 8c-1.5-1.8-4.1-1.9-5.7-.3L12 9.2l-1.5-1.5C8.9 6.1 6.3 6.2 4.8 8c-1.6 1.9-1.4 4.8.6 6.4L12 19.6l6.6-5.2c2-1.6 2.2-4.5.6-6.4Z" />
     ),
     cardiovascular: (
-      <path d="M19.4 7.8c-1.6-1.9-4.3-2-5.9-.3L12 9l-1.5-1.5C8.9 5.8 6.2 5.9 4.6 7.8c-1.7 2-1.5 5.1.6 6.8L12 20l6.8-5.4c2.1-1.7 2.3-4.8.6-6.8Z" />
+      <path d="M19.2 8c-1.5-1.8-4.1-1.9-5.7-.3L12 9.2l-1.5-1.5C8.9 6.1 6.3 6.2 4.8 8c-1.6 1.9-1.4 4.8.6 6.4L12 19.6l6.6-5.2c2-1.6 2.2-4.5.6-6.4Z" />
     ),
     physical: (
       <>
-        <circle cx="12" cy="5.2" r="1.7" />
-        <path d="M8.2 10.4 12 9l3.8 1.4 2.2 4.4" />
-        <path d="M12 9.1v5.4l-3.4 5" />
-        <path d="M12 14.5l3.5 4.9" />
-        <path d="M8.2 10.4 5.8 14.8" />
+        <circle cx="12" cy="5" r="1.65" />
+        <path d="M8.4 10.2 12 8.8l3.6 1.4 2 4.2" />
+        <path d="M12 9v5.2l-3.2 5" />
+        <path d="M12 14.2 15.3 19" />
+        <path d="M8.4 10.2 6.1 14.6" />
       </>
     ),
     mental: (
       <>
-        <path d="M9.2 14.8c-2.4-.8-4-3.1-3.7-5.7.3-2.8 2.8-4.9 5.6-4.8 2.6.1 4.8 2.1 5.2 4.7.3 2.2-.8 4.2-2.7 5.2v2.6H9.2v-2Z" />
-        <path d="M10.2 19h3.6" />
-        <path d="M10.8 21h2.4" />
-        <path d="M10.2 9.2c.6-.8 1.5-1.2 2.5-1.2" />
+        <path d="M8.8 14.2c-2.2-.7-3.6-2.8-3.3-5.1C5.8 6.4 8.2 4.5 10.9 4.6c2.4.1 4.4 1.9 4.7 4.2.3 2-.7 3.8-2.4 4.7v2.4H8.8v-1.7Z" />
+        <path d="M10 18.4h4" />
+        <path d="M10.6 20.4h2.8" />
+        <path d="M9.6 8.6c.7-.9 1.7-1.3 2.8-1.2" />
       </>
     ),
     pharmacogenetics: (
       <>
-        <path d="M9.2 3.8h5.6" />
-        <path d="M10.4 3.8v5.1L6.8 16a3.4 3.4 0 0 0 2.9 5.2h4.6A3.4 3.4 0 0 0 17.2 16l-3.6-7.1V3.8" />
-        <path d="M8.2 14.8h7.6" />
+        <path d="M9.4 3.6h5.2" />
+        <path d="M10.5 3.6v5L7 15.4A3.2 3.2 0 0 0 9.7 20h4.6a3.2 3.2 0 0 0 2.7-4.6L13.5 8.6v-5" />
+        <path d="M8.4 14.4h7.2" />
       </>
     ),
     metabolic: (
@@ -165,15 +174,15 @@ function CategoryGlyph({ id }: { id: string }) {
     ),
     immune: (
       <>
-        <path d="M12 3.5 18.2 6v5.2c0 4.2-2.8 7.9-6.2 9.3C8.6 19.1 5.8 15.4 5.8 11.2V6Z" />
-        <path d="M9.4 12.1 11.2 14l3.4-3.8" />
+        <path d="M12 3.6 17.8 6v4.8c0 4-2.6 7.4-5.8 8.8C8.8 18.2 6.2 14.8 6.2 10.8V6Z" />
+        <path d="M9.6 11.8 11.3 13.6l3.2-3.6" />
       </>
     ),
     hormones_men: (
       <>
-        <circle cx="10" cy="14" r="4.2" />
-        <path d="M13.1 10.9 19 5" />
-        <path d="M14.4 5H19v4.6" />
+        <circle cx="10" cy="14" r="4" />
+        <path d="M13 11 18.6 5.4" />
+        <path d="M14.4 5.4H18.6V9.6" />
       </>
     ),
   };
@@ -181,7 +190,7 @@ function CategoryGlyph({ id }: { id: string }) {
   return <svg {...common}>{paths[id] || paths.physical}</svg>;
 }
 
-function OrganFocus({
+function BodyFocusMarks({
   mode,
   x,
   y,
@@ -192,71 +201,35 @@ function OrganFocus({
   y: number;
   accent: string;
 }) {
-  if (mode === "heart") {
+  if (mode === "body") {
     return (
-      <ellipse
-        cx={x}
-        cy={y}
-        rx="5.8"
-        ry="4.4"
-        className="orbit-organ heart"
-        style={{ fill: accent }}
+      <span
+        className="orbit-body-mark is-body"
+        style={{ background: accent }}
       />
     );
   }
-  if (mode === "brain") {
+  if (mode === "outline") {
     return (
-      <ellipse
-        cx={x}
-        cy={y}
-        rx="7.2"
-        ry="5.6"
-        className="orbit-organ brain"
-        style={{ fill: accent }}
+      <span
+        className="orbit-body-mark is-outline"
+        style={{ borderColor: accent, boxShadow: `0 0 18px ${accent}` }}
       />
     );
   }
   if (mode === "pelvis") {
     return (
-      <g className="orbit-organ pelvis" style={{ fill: accent }}>
-        <ellipse cx="46.2" cy={y} rx="3.4" ry="2.8" />
-        <ellipse cx="53.8" cy={y} rx="3.4" ry="2.8" />
-      </g>
-    );
-  }
-  if (mode === "gut") {
-    return (
-      <ellipse
-        cx={x}
-        cy={y}
-        rx="7.2"
-        ry="9.2"
-        className="orbit-organ gut"
-        style={{ fill: accent }}
-      />
-    );
-  }
-  if (mode === "body") {
-    return (
-      <ellipse
-        cx="50"
-        cy="48"
-        rx="15"
-        ry="31"
-        className="orbit-organ body"
-        style={{ fill: accent }}
-      />
+      <span className="orbit-body-mark is-pelvis" style={{ left: `${x}%`, top: `${y}%` }}>
+        <i style={{ background: accent, left: "-18%" }} />
+        <i style={{ background: accent, left: "18%" }} />
+        <i className="core" style={{ background: accent }} />
+      </span>
     );
   }
   return (
-    <ellipse
-      cx="50"
-      cy="48"
-      rx="15.5"
-      ry="32"
-      className="orbit-organ outline"
-      fill="none"
-      stroke={accent}
+    <span
+      className={`orbit-body-mark is-${mode}`}
+      style={{ left: `${x}%`, top: `${y}%`, background: accent }}
     />
   );
 }
@@ -279,7 +252,7 @@ export function RadialHealthMapLab({
 
   const figureSrc =
     sex === "female"
-      ? "/brand/health-map/woman-hologram-v4.png"
+      ? "/brand/health-map/woman-hologram-v5.png"
       : "/brand/body-twin-hub.png";
 
   const active = hovered ? focusFor(hovered) : null;
@@ -291,6 +264,7 @@ export function RadialHealthMapLab({
   const accent = activeTile
     ? COLOUR_HEX[activeTile.colour as RiskColour]
     : "#6bcf9b";
+  const stageFocus = active ? bodyToStage(active) : null;
 
   return (
     <div className="orbit-lab rise-in">
@@ -301,51 +275,28 @@ export function RadialHealthMapLab({
         data-hot={hovered ? "1" : "0"}
       >
         <div className="orbit-lab-atmosphere" aria-hidden>
-          <span className="orbit-haze haze-a" />
-          <span className="orbit-haze haze-b" />
-          <span className="orbit-haze haze-c" />
+          <span className="orbit-haze haze-core" />
+          <span className="orbit-haze haze-left" />
+          <span className="orbit-haze haze-right" />
+          <span className="orbit-vignette" />
         </div>
 
         <svg className="orbit-lab-rings" viewBox="0 0 100 100" aria-hidden>
-          <defs>
-            <radialGradient id="orbitCoreGlow" cx="50%" cy="49%" r="46%">
-              <stop offset="0%" stopColor="rgba(90, 210, 145, 0.3)" />
-              <stop offset="55%" stopColor="rgba(40, 140, 90, 0.1)" />
-              <stop offset="100%" stopColor="rgba(0,0,0,0)" />
-            </radialGradient>
-          </defs>
-          <circle cx={CX} cy={CY} r="42" fill="url(#orbitCoreGlow)" />
-          <circle
-            cx={CX}
-            cy={CY}
-            r="28"
-            className="orbit-ring soft"
-            strokeDasharray="0.4 1.6"
-          />
           <circle
             cx={CX}
             cy={CY}
             r={ICON_RING}
             className="orbit-ring main"
-            strokeDasharray="1.1 1.2"
+            strokeDasharray="1.05 1.25"
           />
           {slots.map((s, i) => (
-            <g key={`tick-${i}`}>
-              <line
-                x1={CX + (ICON_RING - 2.2) * Math.cos((s.deg * Math.PI) / 180)}
-                y1={CY + (ICON_RING - 2.2) * Math.sin((s.deg * Math.PI) / 180)}
-                x2={CX + (ICON_RING + 1.4) * Math.cos((s.deg * Math.PI) / 180)}
-                y2={CY + (ICON_RING + 1.4) * Math.sin((s.deg * Math.PI) / 180)}
-                className="orbit-tick"
-              />
-              <line
-                x1={s.x}
-                y1={s.y}
-                x2={s.lx}
-                y2={s.ly}
-                className="orbit-spoke"
-              />
-            </g>
+            <circle
+              key={`dot-${i}`}
+              cx={s.x}
+              cy={s.y}
+              r="0.55"
+              className="orbit-anchor-dot"
+            />
           ))}
         </svg>
 
@@ -353,9 +304,12 @@ export function RadialHealthMapLab({
           className={`orbit-lab-figure${active ? ` focus-${active.mode}` : ""}`}
           aria-hidden
           style={
-            active
-              ? ({ ["--focus-c" as string]: accent } as CSSProperties)
-              : undefined
+            {
+              width: `${FIG_W}%`,
+              ...(active
+                ? { ["--focus-c" as string]: accent }
+                : {}),
+            } as CSSProperties
           }
         >
           <Image
@@ -367,37 +321,24 @@ export function RadialHealthMapLab({
             priority
             unoptimized
           />
-        </div>
-
-        <svg className="orbit-lab-focus" viewBox="0 0 100 100" aria-hidden>
-          <defs>
-            <filter
-              id="orbitSoftGlow"
-              x="-40%"
-              y="-40%"
-              width="180%"
-              height="180%"
-            >
-              <feGaussianBlur stdDeviation="1.35" result="b" />
-              <feMerge>
-                <feMergeNode in="b" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
-          </defs>
           {active ? (
-            <OrganFocus
+            <BodyFocusMarks
               mode={active.mode}
               x={active.x}
               y={active.y}
               accent={accent}
             />
           ) : null}
-          {active && activeSlot ? (
+        </div>
+
+        <svg className="orbit-lab-focus" viewBox="0 0 100 100" aria-hidden>
+          {active && activeSlot && stageFocus ? (
             <path
               d={`M ${activeSlot.x} ${activeSlot.y} Q ${
-                (activeSlot.x + active.x) / 2
-              } ${(activeSlot.y + active.y) / 2 - 3} ${active.x} ${active.y}`}
+                (activeSlot.x + stageFocus.x) / 2
+              } ${(activeSlot.y + stageFocus.y) / 2 - 2.5} ${stageFocus.x} ${
+                stageFocus.y
+              }`}
               className="orbit-focus-line"
               style={{ stroke: accent }}
               fill="none"
@@ -420,8 +361,6 @@ export function RadialHealthMapLab({
                 left: `${s.x}%`,
                 top: `${s.y}%`,
                 ["--cc" as string]: COLOUR_HEX[c.colour as RiskColour],
-                ["--lx" as string]: `${s.lx - s.x}%`,
-                ["--ly" as string]: `${s.ly - s.y}%`,
               }}
               onMouseEnter={() => setHovered(c.id)}
               onMouseLeave={() => setHovered(null)}

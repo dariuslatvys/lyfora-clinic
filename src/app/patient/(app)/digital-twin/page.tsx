@@ -159,6 +159,33 @@ export default async function DigitalTwinPage() {
         </div>
       </section>
 
+      <div
+        className="panel"
+        style={{
+          padding: "12px 14px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 12,
+          flexWrap: "wrap",
+          borderColor: "color-mix(in srgb, var(--accent) 45%, var(--line))",
+        }}
+      >
+        <div>
+          <p className="eyebrow m-0">
+            {locale === "en" ? "Preview" : "Peržiūra"}
+          </p>
+          <p className="m-0 small">
+            {locale === "en"
+              ? "Try the radial health map (does not replace the mosaic below)."
+              : "Išbandyk radialų sveikatos žemėlapį (mozaikos apačioje nekeičia)."}
+          </p>
+        </div>
+        <Link href="/patient/map-lab" className="btn sm">
+          {labels.mapLab}
+        </Link>
+      </div>
+
       <OverviewPanels
         locale={locale}
         sex={(current.patient.sex as "male" | "female") || "male"}

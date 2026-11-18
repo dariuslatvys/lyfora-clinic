@@ -9,6 +9,7 @@ import type { Dictionary } from "@/lib/i18n/dictionary";
 
 const items = [
   { href: "/patient/digital-twin", key: "navOverview" as const, icon: "home" },
+  { href: "/patient/map-lab", key: "mapLab" as const, icon: "orbit" },
   { href: "/patient/health-card", key: "healthCard" as const, icon: "card" },
   { href: "/patient/visits", key: "visits" as const, icon: "cal" },
   { href: "/patient/labs", key: "labs" as const, icon: "flask" },
@@ -26,6 +27,15 @@ const items = [
 
 const ICONS: Record<string, ReactNode> = {
   home: <path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" />,
+  orbit: (
+    <g>
+      <circle cx="12" cy="12" r="3" />
+      <circle cx="12" cy="12" r="7.5" strokeDasharray="2 2" />
+      <circle cx="12" cy="3.5" r="1.4" fill="currentColor" stroke="none" />
+      <circle cx="19.2" cy="15.2" r="1.4" fill="currentColor" stroke="none" />
+      <circle cx="4.8" cy="15.2" r="1.4" fill="currentColor" stroke="none" />
+    </g>
+  ),
   card: (
     <g>
       <rect x="3" y="4" width="18" height="16" rx="2" />

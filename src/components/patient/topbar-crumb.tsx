@@ -12,6 +12,7 @@ export function TopbarCrumb({ labels }: { labels: Dictionary }) {
     if (pathname.startsWith("/patient/privacy")) return labels.privacy;
     if (pathname.startsWith("/patient/marketplace")) return labels.marketplace;
     if (pathname.startsWith("/patient/labs")) return labels.labs;
+    if (pathname.startsWith("/patient/map-lab")) return labels.mapLab;
     if (pathname.startsWith("/patient/health-card")) return labels.healthCard;
     if (pathname.startsWith("/patient/calendar")) return labels.visits;
     if (pathname.startsWith("/patient/consultations")) return labels.consultations;

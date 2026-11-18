@@ -11,47 +11,37 @@ import {
   type HealthCategoryId,
 } from "@/lib/health/categories";
 
-type Slot = {
-  x: number;
-  y: number;
-  deg: number;
-  side: "left" | "right" | "top" | "bottom";
-};
+type Slot = { deg: number };
 
-/** Focus point in body-image local % (0–100 of the hologram frame). */
+/** Focus in body-image local % (0–100 of hologram frame). */
 type BodyFocus = {
   x: number;
   y: number;
   mode: "heart" | "brain" | "pelvis" | "gut" | "body" | "outline";
 };
 
-/**
- * Calibrated to woman-hologram anatomy (head→feet in the PNG).
- * Do NOT use stage %, or ovaries land on the knees.
- */
 const FOCUS_BY_ID: Record<string, BodyFocus> = {
-  cardio_metabolic: { x: 51, y: 30, mode: "heart" },
-  cardiovascular: { x: 51, y: 30, mode: "heart" },
-  mental: { x: 50, y: 12, mode: "brain" },
-  // Lower abdomen / ovaries — never the crotch midline
-  reproductive: { x: 50, y: 41, mode: "pelvis" },
-  hormones_women: { x: 50, y: 41, mode: "pelvis" },
-  pharmacogenetics: { x: 50, y: 39, mode: "gut" },
-  // Whole-body glow; line anchors at the chest
-  physical: { x: 50, y: 28, mode: "body" },
-  oncology: { x: 50, y: 30, mode: "outline" },
-  metabolic: { x: 50, y: 39, mode: "gut" },
-  immune: { x: 50, y: 28, mode: "body" },
-  hormones_men: { x: 50, y: 44, mode: "pelvis" },
+  cardio_metabolic: { x: 51, y: 29, mode: "heart" },
+  cardiovascular: { x: 51, y: 29, mode: "heart" },
+  mental: { x: 50, y: 11, mode: "brain" },
+  // Lower abdomen / ovaries — never crotch
+  reproductive: { x: 50, y: 40, mode: "pelvis" },
+  hormones_women: { x: 50, y: 40, mode: "pelvis" },
+  pharmacogenetics: { x: 50, y: 38, mode: "gut" },
+  // Full-body wash; line anchors at sternum
+  physical: { x: 50, y: 27, mode: "body" },
+  oncology: { x: 50, y: 29, mode: "outline" },
+  metabolic: { x: 50, y: 38, mode: "gut" },
+  immune: { x: 50, y: 27, mode: "body" },
+  hormones_men: { x: 50, y: 43, mode: "pelvis" },
 };
 
-/** Figure box as % of the square stage (matches CSS). */
-const FIG_W = 38;
+/** Figure box as % of square stage (kept in sync with CSS). */
+const FIG_W = 34;
 const FIG_H = FIG_W * (1280 / 720);
 const FIG_LEFT = 50 - FIG_W / 2;
 const FIG_TOP = 50 - FIG_H / 2;
-
-const ICON_RING = 37.5;
+const ORBIT_R = 39;
 const CX = 50;
 const CY = 50;
 
@@ -64,26 +54,8 @@ function bodyToStage(local: { x: number; y: number }) {
 
 function slotsForCount(n: number): Slot[] {
   const step = 360 / n;
-  // Open the crown a touch; keep L/R symmetry
   const start = -90 + step / 2;
-  return Array.from({ length: n }, (_, i) => {
-    const deg = start + step * i;
-    const rad = (deg * Math.PI) / 180;
-    const cos = Math.cos(rad);
-    const sin = Math.sin(rad);
-    let side: Slot["side"] = "right";
-    if (deg >= -70 && deg <= -40) side = "top";
-    else if (deg > -40 && deg < 50) side = "right";
-    else if (deg >= 50 && deg <= 130) side = "bottom";
-    else if (deg > 130 && deg < 230) side = "left";
-    else side = "top";
-    return {
-      deg,
-      x: CX + ICON_RING * cos,
-      y: CY + ICON_RING * sin,
-      side,
-    };
-  });
+  return Array.from({ length: n }, (_, i) => ({ deg: start + step * i }));
 }
 
 function orderForSex(
@@ -103,7 +75,7 @@ function orderForSex(
 }
 
 function focusFor(id: string): BodyFocus {
-  return FOCUS_BY_ID[id] || { x: 50, y: 45, mode: "body" };
+  return FOCUS_BY_ID[id] || { x: 50, y: 40, mode: "body" };
 }
 
 function CategoryGlyph({ id }: { id: string }) {
@@ -111,7 +83,7 @@ function CategoryGlyph({ id }: { id: string }) {
     viewBox: "0 0 24 24",
     fill: "none",
     stroke: "currentColor",
-    strokeWidth: 1.55,
+    strokeWidth: 1.5,
     strokeLinecap: "round" as const,
     strokeLinejoin: "round" as const,
     "aria-hidden": true,
@@ -119,76 +91,72 @@ function CategoryGlyph({ id }: { id: string }) {
   const paths: Record<string, ReactNode> = {
     reproductive: (
       <>
-        <circle cx="12" cy="8.5" r="4" />
-        <path d="M12 12.5v6.8" />
-        <path d="M9.2 16.8h5.6" />
+        <circle cx="12" cy="8.2" r="3.8" />
+        <path d="M12 12v7" />
+        <path d="M9.3 16.5h5.4" />
       </>
     ),
     hormones_women: (
       <>
-        <circle cx="12" cy="8.5" r="4" />
-        <path d="M12 12.5v6.8" />
-        <path d="M9.2 16.8h5.6" />
+        <circle cx="12" cy="8.2" r="3.8" />
+        <path d="M12 12v7" />
+        <path d="M9.3 16.5h5.4" />
       </>
     ),
     oncology: (
-      <>
-        <path d="M12 4.2 13.4 8.4l4.4.4-3.4 3 1 4.3L12 13.9 8.6 16.1l1-4.3-3.4-3 4.4-.4z" />
-      </>
+      <path d="M12 4.4 13.3 8.4l4.2.4-3.2 2.9.9 4.1L12 13.7 8.8 15.8l.9-4.1-3.2-2.9 4.2-.4z" />
     ),
     cardio_metabolic: (
-      <path d="M19.2 8c-1.5-1.8-4.1-1.9-5.7-.3L12 9.2l-1.5-1.5C8.9 6.1 6.3 6.2 4.8 8c-1.6 1.9-1.4 4.8.6 6.4L12 19.6l6.6-5.2c2-1.6 2.2-4.5.6-6.4Z" />
+      <path d="M19 8.2c-1.4-1.7-3.9-1.8-5.4-.3L12 9.4l-1.6-1.5C8.9 6.4 6.4 6.5 5 8.2c-1.5 1.8-1.3 4.5.6 6L12 19.2l6.4-5c1.9-1.5 2.1-4.2.6-6Z" />
     ),
     cardiovascular: (
-      <path d="M19.2 8c-1.5-1.8-4.1-1.9-5.7-.3L12 9.2l-1.5-1.5C8.9 6.1 6.3 6.2 4.8 8c-1.6 1.9-1.4 4.8.6 6.4L12 19.6l6.6-5.2c2-1.6 2.2-4.5.6-6.4Z" />
+      <path d="M19 8.2c-1.4-1.7-3.9-1.8-5.4-.3L12 9.4l-1.6-1.5C8.9 6.4 6.4 6.5 5 8.2c-1.5 1.8-1.3 4.5.6 6L12 19.2l6.4-5c1.9-1.5 2.1-4.2.6-6Z" />
     ),
     physical: (
       <>
-        <circle cx="12" cy="5" r="1.65" />
-        <path d="M8.4 10.2 12 8.8l3.6 1.4 2 4.2" />
-        <path d="M12 9v5.2l-3.2 5" />
-        <path d="M12 14.2 15.3 19" />
-        <path d="M8.4 10.2 6.1 14.6" />
+        <circle cx="12" cy="5" r="1.6" />
+        <path d="M8.5 10.2 12 8.9l3.5 1.3 2 4" />
+        <path d="M12 9v5.1l-3.1 4.8" />
+        <path d="M12 14.1 15.2 19" />
+        <path d="M8.5 10.2 6.3 14.4" />
       </>
     ),
     mental: (
       <>
-        <path d="M8.8 14.2c-2.2-.7-3.6-2.8-3.3-5.1C5.8 6.4 8.2 4.5 10.9 4.6c2.4.1 4.4 1.9 4.7 4.2.3 2-.7 3.8-2.4 4.7v2.4H8.8v-1.7Z" />
-        <path d="M10 18.4h4" />
-        <path d="M10.6 20.4h2.8" />
-        <path d="M9.6 8.6c.7-.9 1.7-1.3 2.8-1.2" />
+        <path d="M8.9 14c-2.1-.7-3.4-2.7-3.1-4.9.3-2.5 2.5-4.3 5-4.2 2.3.1 4.2 1.8 4.5 4 .3 1.9-.7 3.6-2.3 4.4v2.2H8.9V14Z" />
+        <path d="M10.1 18.2h3.8" />
+        <path d="M10.6 20.2h2.8" />
       </>
     ),
     pharmacogenetics: (
       <>
-        <path d="M9.4 3.6h5.2" />
-        <path d="M10.5 3.6v5L7 15.4A3.2 3.2 0 0 0 9.7 20h4.6a3.2 3.2 0 0 0 2.7-4.6L13.5 8.6v-5" />
-        <path d="M8.4 14.4h7.2" />
+        <path d="M9.5 3.8h5" />
+        <path d="M10.6 3.8v4.8L7.2 15a3 3 0 0 0 2.5 4.4h4.6A3 3 0 0 0 16.8 15l-3.4-6.4V3.8" />
+        <path d="M8.5 14.2h7" />
       </>
     ),
     metabolic: (
       <>
         <path d="M12 4v16" />
-        <path d="M8 8c2.4 1.2 5.6 1.2 8 0" />
-        <path d="M7 12c3 1.6 7 1.6 10 0" />
-        <path d="M8 16c2.4 1.2 5.6 1.2 8 0" />
+        <path d="M8.2 8.2c2.3 1.1 5.3 1.1 7.6 0" />
+        <path d="M7.2 12c2.8 1.5 6.8 1.5 9.6 0" />
+        <path d="M8.2 15.8c2.3 1.1 5.3 1.1 7.6 0" />
       </>
     ),
     immune: (
       <>
-        <path d="M12 3.6 17.8 6v4.8c0 4-2.6 7.4-5.8 8.8C8.8 18.2 6.2 14.8 6.2 10.8V6Z" />
-        <path d="M9.6 11.8 11.3 13.6l3.2-3.6" />
+        <path d="M12 3.8 17.5 6v4.6c0 3.8-2.5 7-5.5 8.3C9 17.6 6.5 14.4 6.5 10.6V6Z" />
+        <path d="M9.7 11.6 11.3 13.3l3-3.4" />
       </>
     ),
     hormones_men: (
       <>
-        <circle cx="10" cy="14" r="4" />
-        <path d="M13 11 18.6 5.4" />
-        <path d="M14.4 5.4H18.6V9.6" />
+        <circle cx="10.2" cy="14" r="3.8" />
+        <path d="M13 11.2 18.2 6" />
+        <path d="M14.4 6H18.2v3.8" />
       </>
     ),
   };
-
   return <svg {...common}>{paths[id] || paths.physical}</svg>;
 }
 
@@ -204,37 +172,31 @@ function BodyFocusMarks({
   accent: string;
 }) {
   if (mode === "body") {
-    return (
-      <span
-        className="orbit-body-mark is-body"
-        style={{ background: accent }}
-      />
-    );
+    return <span className="twin-mark is-body" style={{ background: accent }} />;
   }
   if (mode === "outline") {
     return (
       <span
-        className="orbit-body-mark is-outline"
-        style={{ borderColor: accent, boxShadow: `0 0 18px ${accent}` }}
+        className="twin-mark is-outline"
+        style={{ borderColor: accent, boxShadow: `0 0 24px ${accent}66` }}
       />
     );
   }
   if (mode === "pelvis") {
-    // Soft lower-abdomen band + lateral ovary glows (no crotch spotlight)
     return (
       <span
-        className="orbit-body-mark is-pelvis"
+        className="twin-mark is-pelvis"
         style={{ left: `${x}%`, top: `${y}%`, ["--cc" as string]: accent }}
       >
         <i className="band" style={{ background: accent }} />
-        <i className="ovary" style={{ background: accent, left: "-26%" }} />
-        <i className="ovary" style={{ background: accent, left: "26%" }} />
+        <i className="ovary" style={{ background: accent, left: "-28%" }} />
+        <i className="ovary" style={{ background: accent, left: "28%" }} />
       </span>
     );
   }
   return (
     <span
-      className={`orbit-body-mark is-${mode}`}
+      className={`twin-mark is-${mode}`}
       style={{ left: `${x}%`, top: `${y}%`, background: accent }}
     />
   );
@@ -269,64 +231,79 @@ export function RadialHealthMapLab({
   const activeSlot = activeIndex >= 0 ? slots[activeIndex] : null;
   const accent = activeTile
     ? COLOUR_HEX[activeTile.colour as RiskColour]
-    : "#6bcf9b";
+    : "#5ee4a8";
   const stageFocus = active ? bodyToStage(active) : null;
+  const activeOrbit = activeSlot
+    ? {
+        x: CX + ORBIT_R * Math.cos((activeSlot.deg * Math.PI) / 180),
+        y: CY + ORBIT_R * Math.sin((activeSlot.deg * Math.PI) / 180),
+      }
+    : null;
 
   return (
-    <div className="orbit-lab rise-in">
+    <div className="twin-lab rise-in">
       <div
-        className="orbit-lab-stage"
+        className="twin-stage"
         data-sex={sex}
         data-focus={active?.mode || ""}
         data-hot={hovered ? "1" : "0"}
       >
-        <div className="orbit-lab-atmosphere" aria-hidden>
-          <span className="orbit-haze haze-core" />
-          <span className="orbit-haze haze-left" />
-          <span className="orbit-haze haze-right" />
-          <span className="orbit-vignette" />
+        <div className="twin-void" aria-hidden>
+          <span className="twin-bloom" />
+          <span className="twin-scan" />
+          <span className="twin-vignette" />
         </div>
 
-        <svg className="orbit-lab-rings" viewBox="0 0 100 100" aria-hidden>
+        <svg className="twin-orbit" viewBox="0 0 100 100" aria-hidden>
+          <defs>
+            <linearGradient id="twinOrbitGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="rgba(120,240,180,0.05)" />
+              <stop offset="45%" stopColor="rgba(140,245,200,0.45)" />
+              <stop offset="100%" stopColor="rgba(120,240,180,0.08)" />
+            </linearGradient>
+          </defs>
           <circle
             cx={CX}
             cy={CY}
-            r={ICON_RING}
-            className="orbit-ring main"
-            strokeDasharray="1.05 1.25"
+            r={ORBIT_R}
+            className="twin-orbit-ring"
+            stroke="url(#twinOrbitGrad)"
           />
-          {slots.map((s, i) => (
-            <circle
-              key={`dot-${i}`}
-              cx={s.x}
-              cy={s.y}
-              r="0.55"
-              className="orbit-anchor-dot"
-            />
-          ))}
+          {slots.map((s, i) => {
+            const rad = (s.deg * Math.PI) / 180;
+            return (
+              <circle
+                key={i}
+                cx={CX + ORBIT_R * Math.cos(rad)}
+                cy={CY + ORBIT_R * Math.sin(rad)}
+                r="0.45"
+                className="twin-orbit-dot"
+              />
+            );
+          })}
         </svg>
 
         <div
-          className={`orbit-lab-figure${active ? ` focus-${active.mode}` : ""}`}
+          className={`twin-figure${active ? ` focus-${active.mode}` : ""}`}
           aria-hidden
           style={
             {
               width: `${FIG_W}%`,
-              ...(active
-                ? { ["--focus-c" as string]: accent }
-                : {}),
+              ...(active ? { ["--focus-c" as string]: accent } : {}),
             } as CSSProperties
           }
         >
+          <div className="twin-figure-glow" />
           <Image
             src={figureSrc}
             alt=""
             width={520}
             height={920}
-            className="orbit-lab-photo"
+            className="twin-photo"
             priority
             unoptimized
           />
+          <span className="twin-scanline" />
           {active ? (
             <BodyFocusMarks
               mode={active.mode}
@@ -337,35 +314,47 @@ export function RadialHealthMapLab({
           ) : null}
         </div>
 
-        <svg className="orbit-lab-focus" viewBox="0 0 100 100" aria-hidden>
-          {active && activeSlot && stageFocus ? (
-            <path
-              d={`M ${activeSlot.x} ${activeSlot.y} Q ${
-                (activeSlot.x + stageFocus.x) / 2
-              } ${(activeSlot.y + stageFocus.y) / 2 - 2.5} ${stageFocus.x} ${
-                stageFocus.y
-              }`}
-              className="orbit-focus-line"
-              style={{ stroke: accent }}
-              fill="none"
-            />
-          ) : null}
+        <svg className="twin-focus-layer" viewBox="0 0 100 100" aria-hidden>
+          {active && activeOrbit && stageFocus
+            ? (() => {
+                // Bend the beam outward so it never cuts through the crotch
+                const mx = (activeOrbit.x + stageFocus.x) / 2;
+                const my = (activeOrbit.y + stageFocus.y) / 2;
+                const vx = mx - CX;
+                const vy = my - CY;
+                const qx = mx + vx * 0.42;
+                const qy = my + vy * 0.42;
+                return (
+                  <path
+                    d={`M ${activeOrbit.x} ${activeOrbit.y} Q ${qx} ${qy} ${stageFocus.x} ${stageFocus.y}`}
+                    className="twin-focus-line"
+                    style={{ stroke: accent }}
+                    fill="none"
+                  />
+                );
+              })()
+            : null}
         </svg>
 
         {tiles.map((c, i) => {
           const s = slots[i]!;
           const isHot = hovered === c.id;
           const isDim = !!hovered && !isHot;
+          const rad = (s.deg * Math.PI) / 180;
+          const x = CX + ORBIT_R * Math.cos(rad);
+          const y = CY + ORBIT_R * Math.sin(rad);
+          // Keep chips readable: labels flip to outer side of orbit
+          const outward = s.deg > -90 && s.deg < 90 ? "right" : "left";
           return (
             <Link
               key={c.id}
               href={`/patient/digital-twin/${c.id}`}
-              className={`orbit-node side-${s.side}${isHot ? " is-hot" : ""}${
+              className={`twin-chip side-${outward}${isHot ? " is-hot" : ""}${
                 isDim ? " is-dim" : ""
               }`}
               style={{
-                left: `${s.x}%`,
-                top: `${s.y}%`,
+                left: `${x}%`,
+                top: `${y}%`,
                 ["--cc" as string]: COLOUR_HEX[c.colour as RiskColour],
               }}
               onMouseEnter={() => setHovered(c.id)}
@@ -373,12 +362,13 @@ export function RadialHealthMapLab({
               onFocus={() => setHovered(c.id)}
               onBlur={() => setHovered(null)}
             >
-              <span className="orbit-node-orb" aria-hidden>
+              <span className="twin-chip-orb" aria-hidden>
                 <CategoryGlyph id={c.id} />
               </span>
-              <span className="orbit-node-copy">
+              <span className="twin-chip-copy">
                 <b>{c.title}</b>
                 <em>
+                  <i />
                   {c.colourLabel}
                   {c.geneticBadge ? ` · ${c.geneticMark || "DNR"}` : ""}
                 </em>

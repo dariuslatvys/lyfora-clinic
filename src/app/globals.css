@@ -7541,35 +7541,41 @@ a.mon-event-card:hover {
 .orbit-body-mark.is-pelvis i {
   position: absolute;
   top: 0;
-  width: 9px;
-  height: 8px;
-  border-radius: 50%;
   transform: translate(-50%, -50%);
-  opacity: 0.75;
-  box-shadow: 0 0 12px currentColor;
   animation: orbit-organ-pulse 1.5s ease-in-out infinite;
 }
 
-.orbit-body-mark.is-pelvis i.core {
-  width: 14px;
-  height: 12px;
+.orbit-body-mark.is-pelvis i.band {
   left: 0;
-  opacity: 0.7;
+  width: 46px;
+  height: 18px;
+  border-radius: 40%;
+  opacity: 0.28;
+  filter: blur(4px);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--cc, currentColor) 50%, transparent);
+}
+
+.orbit-body-mark.is-pelvis i.ovary {
+  width: 9px;
+  height: 8px;
+  border-radius: 50%;
+  opacity: 0.8;
+  box-shadow: 0 0 14px currentColor;
 }
 
 .orbit-body-mark.is-body {
-  inset: 8% 18% 6%;
+  inset: 6% 20% 18%;
   width: auto;
   height: auto;
   left: auto;
   top: auto;
   transform: none;
-  border-radius: 46% / 48%;
-  opacity: 0.2;
+  border-radius: 46% / 42%;
+  opacity: 0.18;
 }
 
 .orbit-body-mark.is-outline {
-  inset: 6% 16% 4%;
+  inset: 5% 18% 16%;
   width: auto;
   height: auto;
   left: auto;
@@ -7577,7 +7583,7 @@ a.mon-event-card:hover {
   transform: none;
   background: transparent !important;
   border: 2px solid;
-  border-radius: 46% / 48%;
+  border-radius: 46% / 42%;
   opacity: 0.85;
   filter: none;
   animation: orbit-outline-pulse 1.35s ease-in-out infinite;

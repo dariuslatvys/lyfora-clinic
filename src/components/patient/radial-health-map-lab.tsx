@@ -33,14 +33,16 @@ const FOCUS_BY_ID: Record<string, BodyFocus> = {
   cardio_metabolic: { x: 51, y: 30, mode: "heart" },
   cardiovascular: { x: 51, y: 30, mode: "heart" },
   mental: { x: 50, y: 12, mode: "brain" },
-  reproductive: { x: 50, y: 52, mode: "pelvis" },
-  hormones_women: { x: 50, y: 52, mode: "pelvis" },
-  pharmacogenetics: { x: 50, y: 43, mode: "gut" },
-  physical: { x: 50, y: 48, mode: "body" },
-  oncology: { x: 50, y: 42, mode: "outline" },
-  metabolic: { x: 50, y: 43, mode: "gut" },
-  immune: { x: 50, y: 40, mode: "body" },
-  hormones_men: { x: 50, y: 54, mode: "pelvis" },
+  // Lower abdomen / ovaries — never the crotch midline
+  reproductive: { x: 50, y: 41, mode: "pelvis" },
+  hormones_women: { x: 50, y: 41, mode: "pelvis" },
+  pharmacogenetics: { x: 50, y: 39, mode: "gut" },
+  // Whole-body glow; line anchors at the chest
+  physical: { x: 50, y: 28, mode: "body" },
+  oncology: { x: 50, y: 30, mode: "outline" },
+  metabolic: { x: 50, y: 39, mode: "gut" },
+  immune: { x: 50, y: 28, mode: "body" },
+  hormones_men: { x: 50, y: 44, mode: "pelvis" },
 };
 
 /** Figure box as % of the square stage (matches CSS). */
@@ -218,11 +220,15 @@ function BodyFocusMarks({
     );
   }
   if (mode === "pelvis") {
+    // Soft lower-abdomen band + lateral ovary glows (no crotch spotlight)
     return (
-      <span className="orbit-body-mark is-pelvis" style={{ left: `${x}%`, top: `${y}%` }}>
-        <i style={{ background: accent, left: "-18%" }} />
-        <i style={{ background: accent, left: "18%" }} />
-        <i className="core" style={{ background: accent }} />
+      <span
+        className="orbit-body-mark is-pelvis"
+        style={{ left: `${x}%`, top: `${y}%`, ["--cc" as string]: accent }}
+      >
+        <i className="band" style={{ background: accent }} />
+        <i className="ovary" style={{ background: accent, left: "-26%" }} />
+        <i className="ovary" style={{ background: accent, left: "26%" }} />
       </span>
     );
   }

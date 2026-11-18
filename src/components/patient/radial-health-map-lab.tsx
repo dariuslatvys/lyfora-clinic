@@ -37,11 +37,11 @@ const FOCUS_BY_ID: Record<string, BodyFocus> = {
 };
 
 /** Figure box as % of square stage (kept in sync with CSS). */
-const FIG_W = 34;
+const FIG_W = 36;
 const FIG_H = FIG_W * (1280 / 720);
 const FIG_LEFT = 50 - FIG_W / 2;
 const FIG_TOP = 50 - FIG_H / 2;
-const ORBIT_R = 39;
+const ORBIT_R = 40;
 const CX = 50;
 const CY = 50;
 
@@ -268,18 +268,7 @@ export function RadialHealthMapLab({
             className="twin-orbit-ring"
             stroke="url(#twinOrbitGrad)"
           />
-          {slots.map((s, i) => {
-            const rad = (s.deg * Math.PI) / 180;
-            return (
-              <circle
-                key={i}
-                cx={CX + ORBIT_R * Math.cos(rad)}
-                cy={CY + ORBIT_R * Math.sin(rad)}
-                r="0.45"
-                className="twin-orbit-dot"
-              />
-            );
-          })}
+
         </svg>
 
         <div

@@ -37,13 +37,32 @@ const FOCUS_BY_ID: Record<string, BodyFocus> = {
 };
 
 /** Figure box as % of square stage (kept in sync with CSS). */
-const FIG_W = 36;
+const FIG_W = 34;
 const FIG_H = FIG_W * (1280 / 720);
 const FIG_LEFT = 50 - FIG_W / 2;
 const FIG_TOP = 50 - FIG_H / 2;
-const ORBIT_R = 40;
+const ORBIT_R = 39;
 const CX = 50;
 const CY = 50;
+
+const PARTICLES = [
+  [18, 22],
+  [78, 18],
+  [12, 48],
+  [86, 44],
+  [22, 72],
+  [74, 76],
+  [42, 14],
+  [58, 86],
+  [8, 34],
+  [91, 62],
+  [34, 82],
+  [66, 12],
+  [28, 38],
+  [70, 58],
+  [16, 64],
+  [84, 28],
+] as const;
 
 function bodyToStage(local: { x: number; y: number }) {
   return {
@@ -178,7 +197,7 @@ function BodyFocusMarks({
     return (
       <span
         className="twin-mark is-outline"
-        style={{ borderColor: accent, boxShadow: `0 0 24px ${accent}66` }}
+        style={{ borderColor: accent, boxShadow: `0 0 28px ${accent}55` }}
       />
     );
   }
@@ -190,14 +209,19 @@ function BodyFocusMarks({
       >
         <i className="ovary" style={{ background: accent, left: "-30%" }} />
         <i className="ovary" style={{ background: accent, left: "30%" }} />
+        <i className="ping" style={{ borderColor: accent }} />
       </span>
     );
   }
   return (
     <span
       className={`twin-mark is-${mode}`}
-      style={{ left: `${x}%`, top: `${y}%`, background: accent }}
-    />
+      style={{ left: `${x}%`, top: `${y}%`, ["--cc" as string]: accent }}
+    >
+      <i className="core" style={{ background: accent }} />
+      <i className="halo" style={{ borderColor: accent }} />
+      <i className="ring" style={{ borderColor: accent }} />
+    </span>
   );
 }
 
@@ -219,7 +243,7 @@ export function RadialHealthMapLab({
 
   const figureSrc =
     sex === "female"
-      ? "/brand/health-map/woman-hologram-v5.png"
+      ? "/brand/health-map/woman-hologram-v6.webp"
       : "/brand/body-twin-hub.png";
 
   const active = hovered ? focusFor(hovered) : null;
@@ -248,19 +272,24 @@ export function RadialHealthMapLab({
         data-hot={hovered ? "1" : "0"}
       >
         <div className="twin-void" aria-hidden>
+          <span className="twin-atmos twin-atmos-a" />
+          <span className="twin-atmos twin-atmos-b" />
           <span className="twin-bloom" />
           <span className="twin-scan" />
+          <span className="twin-floor" />
           <span className="twin-vignette" />
         </div>
 
         <svg className="twin-orbit" viewBox="0 0 100 100" aria-hidden>
           <defs>
             <linearGradient id="twinOrbitGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="rgba(120,240,180,0.05)" />
-              <stop offset="45%" stopColor="rgba(140,245,200,0.45)" />
-              <stop offset="100%" stopColor="rgba(120,240,180,0.08)" />
+              <stop offset="0%" stopColor="rgba(120,240,180,0.04)" />
+              <stop offset="40%" stopColor="rgba(160,255,210,0.55)" />
+              <stop offset="100%" stopColor="rgba(80,200,160,0.06)" />
             </linearGradient>
           </defs>
+
+          <circle cx={CX} cy={CY} r={ORBIT_R + 7} className="twin-orbit-soft" />
           <circle
             cx={CX}
             cy={CY}
@@ -268,7 +297,18 @@ export function RadialHealthMapLab({
             className="twin-orbit-ring"
             stroke="url(#twinOrbitGrad)"
           />
+          <circle cx={CX} cy={CY} r={ORBIT_R - 6.5} className="twin-orbit-inner" />
 
+          {PARTICLES.map(([px, py], i) => (
+            <circle
+              key={`${px}-${py}`}
+              cx={px}
+              cy={py}
+              r={i % 3 === 0 ? 0.28 : 0.18}
+              className="twin-particle"
+              style={{ animationDelay: `${(i % 8) * 0.45}s` }}
+            />
+          ))}
         </svg>
 
         <div
@@ -282,16 +322,18 @@ export function RadialHealthMapLab({
           }
         >
           <div className="twin-figure-glow" />
+          <div className="twin-figure-rim" />
           <Image
             src={figureSrc}
             alt=""
-            width={520}
-            height={920}
+            width={720}
+            height={1280}
             className="twin-photo"
             priority
             unoptimized
           />
           <span className="twin-scanline" />
+          <span className="twin-mesh" />
           {active ? (
             <BodyFocusMarks
               mode={active.mode}
@@ -303,21 +345,46 @@ export function RadialHealthMapLab({
         </div>
 
         <svg className="twin-focus-layer" viewBox="0 0 100 100" aria-hidden>
+          <defs>
+            <filter id="twinBeamGlow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="0.5" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
           {active && activeOrbit && stageFocus
             ? (() => {
                 // Route outside the silhouette — never through the crotch
                 const leftSide = activeOrbit.x < CX;
                 const qx = leftSide
-                  ? Math.min(activeOrbit.x, stageFocus.x) - 9
-                  : Math.max(activeOrbit.x, stageFocus.x) + 9;
-                const qy = (activeOrbit.y * 0.45 + stageFocus.y * 0.55);
+                  ? Math.min(activeOrbit.x, stageFocus.x) - 10
+                  : Math.max(activeOrbit.x, stageFocus.x) + 10;
+                const qy = activeOrbit.y * 0.42 + stageFocus.y * 0.58;
+                const d = `M ${activeOrbit.x} ${activeOrbit.y} Q ${qx} ${qy} ${stageFocus.x} ${stageFocus.y}`;
                 return (
-                  <path
-                    d={`M ${activeOrbit.x} ${activeOrbit.y} Q ${qx} ${qy} ${stageFocus.x} ${stageFocus.y}`}
-                    className="twin-focus-line"
-                    style={{ stroke: accent }}
-                    fill="none"
-                  />
+                  <g filter="url(#twinBeamGlow)">
+                    <path
+                      d={d}
+                      className="twin-focus-line twin-focus-line-soft"
+                      style={{ stroke: accent }}
+                      fill="none"
+                    />
+                    <path
+                      d={d}
+                      className="twin-focus-line"
+                      style={{ stroke: accent }}
+                      fill="none"
+                    />
+                    <circle
+                      cx={stageFocus.x}
+                      cy={stageFocus.y}
+                      r={1.1}
+                      fill={accent}
+                      className="twin-focus-dot"
+                    />
+                  </g>
                 );
               })()
             : null}
@@ -363,6 +430,13 @@ export function RadialHealthMapLab({
             </Link>
           );
         })}
+
+        <div className="twin-hud" aria-hidden>
+          <span className="twin-hud-tag">Lyfora twin</span>
+          <span className="twin-hud-meta">
+            {hovered && activeTile ? activeTile.title : "Sveikatos žemėlapis"}
+          </span>
+        </div>
       </div>
     </div>
   );

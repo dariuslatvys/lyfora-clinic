@@ -7315,34 +7315,27 @@ a.mon-event-card:hover {
   flex-wrap: wrap;
 }
 
-/* Experimental twin map — hologram stage + always-readable category rail */
+/* Experimental twin map — one cohesive BioTwin dark stage */
 .twin-lab {
   position: relative;
   border-radius: 28px;
   padding: 1px;
   overflow: hidden;
-  background: linear-gradient(135deg, rgba(140, 230, 190, 0.2), rgba(30, 60, 50, 0.1) 50%, rgba(90, 180, 150, 0.16));
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.22);
-}
-
-.twin-shell {
-  display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
-  gap: 0;
-  border-radius: 27px;
-  overflow: hidden;
-  background: #07110e;
-  min-height: min(72vh, 720px);
+  background: linear-gradient(135deg, rgba(140, 230, 190, 0.18), rgba(30, 60, 50, 0.08) 55%, rgba(90, 180, 150, 0.14));
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.24);
 }
 
 .twin-stage {
   position: relative;
-  min-height: 560px;
+  width: min(100%, 920px);
+  aspect-ratio: 1 / 1;
+  margin: 0 auto;
   isolation: isolate;
+  border-radius: 27px;
   overflow: hidden;
   background:
-    radial-gradient(ellipse 48% 42% at 50% 46%, rgba(56, 180, 130, 0.18), transparent 70%),
-    radial-gradient(ellipse 80% 70% at 50% 100%, #0a1813 0%, #050c0a 60%, #030806 100%);
+    radial-gradient(ellipse 42% 38% at 50% 46%, rgba(56, 180, 130, 0.16), transparent 70%),
+    radial-gradient(ellipse 90% 80% at 50% 100%, #0a1813 0%, #050c0a 55%, #030806 100%);
 }
 
 .twin-void {
@@ -7355,34 +7348,34 @@ a.mon-event-card:hover {
 .twin-atmos {
   position: absolute;
   border-radius: 50%;
-  filter: blur(42px);
-  opacity: 0.45;
+  filter: blur(40px);
+  opacity: 0.4;
   mix-blend-mode: screen;
 }
 
 .twin-atmos-a {
-  width: 46%;
-  height: 36%;
+  width: 40%;
+  height: 32%;
   left: 10%;
   top: 14%;
-  background: radial-gradient(circle, rgba(60, 170, 140, 0.3), transparent 70%);
+  background: radial-gradient(circle, rgba(60, 170, 140, 0.28), transparent 70%);
   animation: twin-drift 16s ease-in-out infinite;
 }
 
 .twin-atmos-b {
-  width: 42%;
+  width: 44%;
   height: 34%;
-  right: 8%;
+  right: 6%;
   bottom: 12%;
-  background: radial-gradient(circle, rgba(40, 140, 160, 0.22), transparent 72%);
+  background: radial-gradient(circle, rgba(40, 140, 160, 0.2), transparent 72%);
   animation: twin-drift 20s ease-in-out infinite reverse;
 }
 
 .twin-bloom {
   position: absolute;
-  inset: 32% 30%;
+  inset: 30% 32%;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(100, 230, 160, 0.12), transparent 72%);
+  background: radial-gradient(circle, rgba(100, 230, 160, 0.14), transparent 72%);
   filter: blur(28px);
   animation: twin-breathe 8s ease-in-out infinite;
   z-index: 0;
@@ -7390,13 +7383,13 @@ a.mon-event-card:hover {
 
 .twin-floor {
   position: absolute;
-  left: 18%;
-  right: 18%;
-  bottom: 6%;
-  height: 16%;
+  left: 22%;
+  right: 22%;
+  bottom: 7%;
+  height: 15%;
   border-radius: 50%;
-  background: radial-gradient(ellipse at center, rgba(90, 220, 170, 0.14), transparent 70%);
-  filter: blur(16px);
+  background: radial-gradient(ellipse at center, rgba(90, 220, 170, 0.12), transparent 70%);
+  filter: blur(14px);
 }
 
 .twin-vignette {
@@ -7405,16 +7398,16 @@ a.mon-event-card:hover {
   z-index: 7;
   pointer-events: none;
   background: radial-gradient(
-    ellipse 70% 68% at 50% 48%,
-    transparent 48%,
-    rgba(3, 8, 6, 0.45) 82%,
-    rgba(2, 5, 4, 0.75) 100%
+    ellipse 66% 62% at 50% 48%,
+    transparent 46%,
+    rgba(3, 8, 6, 0.42) 80%,
+    rgba(2, 5, 4, 0.78) 100%
   );
 }
 
 @keyframes twin-breathe {
-  0%, 100% { transform: scale(1); opacity: 0.4; }
-  50% { transform: scale(1.06); opacity: 0.72; }
+  0%, 100% { transform: scale(1); opacity: 0.38; }
+  50% { transform: scale(1.05); opacity: 0.68; }
 }
 
 @keyframes twin-drift {
@@ -7437,13 +7430,13 @@ a.mon-event-card:hover {
 .twin-orbit-soft,
 .twin-orbit-ring {
   fill: none;
-  stroke: rgba(150, 230, 190, 0.16);
+  stroke: rgba(150, 230, 190, 0.14);
   stroke-width: 0.12;
 }
 
 .twin-orbit-ring {
-  stroke: rgba(160, 240, 200, 0.28);
   stroke-width: 0.16;
+  opacity: 0.85;
 }
 
 .twin-focus-line {
@@ -7460,9 +7453,7 @@ a.mon-event-card:hover {
   animation: none;
 }
 
-.twin-focus-dot {
-  opacity: 0.95;
-}
+.twin-focus-dot { opacity: 0.95; }
 
 @keyframes twin-dash {
   to { stroke-dashoffset: -5.5; }
@@ -7471,11 +7462,9 @@ a.mon-event-card:hover {
 .twin-figure {
   position: absolute;
   left: 50%;
-  top: 48%;
+  top: 50%;
   transform: translate(-50%, -50%);
   z-index: 3;
-  width: 62%;
-  max-height: 92%;
   pointer-events: none;
   background: transparent !important;
   animation: twin-figure-breathe 7s ease-in-out infinite;
@@ -7488,12 +7477,11 @@ a.mon-event-card:hover {
 
 .twin-figure-glow {
   position: absolute;
-  inset: 12% 18%;
+  inset: 12% 16%;
   border-radius: 50%;
   background: radial-gradient(circle, rgba(90, 220, 150, 0.12), transparent 70%);
   filter: blur(16px);
   z-index: 0;
-  pointer-events: none;
 }
 
 .twin-photo {
@@ -7501,7 +7489,6 @@ a.mon-event-card:hover {
   z-index: 1;
   width: 100%;
   height: auto;
-  max-height: min(620px, 88vh);
   display: block;
   border-radius: 0 !important;
   background: transparent !important;
@@ -7510,9 +7497,9 @@ a.mon-event-card:hover {
   visibility: visible !important;
   filter:
     contrast(1.08)
-    saturate(1.2)
-    brightness(1.14)
-    drop-shadow(0 0 18px rgba(70, 200, 140, 0.35));
+    saturate(1.18)
+    brightness(1.12)
+    drop-shadow(0 0 20px rgba(70, 200, 140, 0.32));
   user-select: none;
   -webkit-user-drag: none;
   transition: filter 0.25s ease;
@@ -7526,7 +7513,7 @@ a.mon-event-card:hover {
   background: linear-gradient(
     180deg,
     transparent 0%,
-    rgba(160, 255, 200, 0.06) 50%,
+    rgba(160, 255, 200, 0.055) 50%,
     transparent 56%
   );
   background-size: 100% 220%;
@@ -7544,7 +7531,6 @@ a.mon-event-card:hover {
   mix-blend-mode: lighten;
 }
 
-/* Focus never washes out the hologram — only soft accent bloom */
 .twin-figure.focus-heart .twin-photo,
 .twin-figure.focus-brain .twin-photo,
 .twin-figure.focus-pelvis .twin-photo,
@@ -7552,10 +7538,10 @@ a.mon-event-card:hover {
 .twin-figure.focus-body .twin-photo,
 .twin-figure.focus-outline .twin-photo {
   filter:
-    contrast(1.08)
-    saturate(1.16)
-    brightness(1.12)
-    drop-shadow(0 0 26px color-mix(in srgb, var(--focus-c, #5ee4a8) 40%, transparent));
+    contrast(1.1)
+    saturate(1.2)
+    brightness(1.14)
+    drop-shadow(0 0 24px color-mix(in srgb, var(--focus-c, #5ee4a8) 42%, transparent));
 }
 
 .twin-mark {
@@ -7678,6 +7664,115 @@ a.mon-event-card:hover {
   50% { opacity: 0.9; }
 }
 
+/* Always fully readable — never dim siblings */
+.twin-chip {
+  position: absolute;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: max-content;
+  max-width: 220px;
+  margin: 0;
+  padding: 8px 14px 8px 8px;
+  text-decoration: none;
+  color: inherit;
+  border-radius: 999px;
+  background: rgba(10, 22, 18, 0.88);
+  border: 1px solid color-mix(in srgb, var(--cc, #5ee4a8) 34%, rgba(255, 255, 255, 0.12));
+  backdrop-filter: blur(14px) saturate(1.15);
+  -webkit-backdrop-filter: blur(14px) saturate(1.15);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+  transform: translate(-50%, -50%);
+  opacity: 1 !important;
+  filter: none !important;
+  transition:
+    transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.twin-chip.side-left {
+  flex-direction: row-reverse;
+  padding: 8px 8px 8px 14px;
+  text-align: right;
+}
+
+.twin-chip-orb {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #f5fff8;
+  background: color-mix(in srgb, var(--cc) 28%, rgba(8, 20, 15, 0.95));
+  border: 1px solid color-mix(in srgb, var(--cc) 58%, rgba(255, 255, 255, 0.18));
+  box-shadow: 0 0 14px color-mix(in srgb, var(--cc) 28%, transparent);
+}
+
+.twin-chip-orb svg {
+  width: 16px;
+  height: 16px;
+}
+
+.twin-chip-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.twin-chip-copy b {
+  font-family: var(--font-display), Manrope, sans-serif;
+  font-size: 0.76rem;
+  font-weight: 720;
+  line-height: 1.15;
+  color: #f6fcf8;
+  letter-spacing: -0.02em;
+}
+
+.twin-chip-copy em {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-style: normal;
+  font-size: 0.62rem;
+  font-weight: 650;
+  color: var(--cc, #5ee4a8);
+  letter-spacing: 0.01em;
+}
+
+.twin-chip-copy em i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--cc, #5ee4a8);
+  box-shadow: 0 0 6px var(--cc, #5ee4a8);
+}
+
+.twin-chip.side-left .twin-chip-copy em {
+  flex-direction: row-reverse;
+}
+
+.twin-chip.is-hot {
+  z-index: 8;
+  transform: translate(-50%, -50%) scale(1.04);
+  background: color-mix(in srgb, var(--cc) 14%, rgba(10, 22, 18, 0.94));
+  border-color: color-mix(in srgb, var(--cc) 72%, white);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--cc) 22%, transparent),
+    0 14px 36px rgba(0, 0, 0, 0.4),
+    0 0 24px color-mix(in srgb, var(--cc) 20%, transparent);
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+.twin-chip.is-hot .twin-chip-orb {
+  box-shadow: 0 0 18px color-mix(in srgb, var(--cc) 45%, transparent);
+}
+
 .twin-hud {
   position: absolute;
   left: 18px;
@@ -7710,203 +7805,38 @@ a.mon-event-card:hover {
   letter-spacing: -0.02em;
   color: rgba(245, 252, 248, 0.92);
   text-shadow: 0 2px 16px rgba(0, 0, 0, 0.45);
-  max-width: 240px;
-}
-
-/* Always-readable TwinMe-style category rail */
-.twin-rail {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  padding: 22px 18px 18px;
-  background:
-    linear-gradient(180deg, #f3f6f5 0%, #eef2f1 100%);
-  color: #0b2420;
-  border-left: 1px solid rgba(120, 160, 140, 0.18);
-}
-
-.twin-rail-head h3 {
-  margin: 4px 0 0;
-  font-family: var(--font-display), Manrope, sans-serif;
-  font-size: 1.35rem;
-  font-weight: 780;
-  letter-spacing: -0.03em;
-  color: #08262e;
-  line-height: 1.15;
-}
-
-.twin-rail-kicker {
-  margin: 0;
-  font-size: 0.68rem;
-  font-weight: 750;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #3f6f68;
-}
-
-.twin-rail-note {
-  margin: 8px 0 0;
-  font-size: 0.82rem;
-  line-height: 1.4;
-  color: #4a6560;
-}
-
-.twin-rail-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  overflow: auto;
-  padding-right: 2px;
-  max-height: none;
-  flex: 1;
-}
-
-.twin-row {
-  display: grid;
-  grid-template-columns: 40px minmax(0, 1fr) 34px;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 10px 10px 10px;
-  text-decoration: none;
-  color: inherit;
-  border-radius: 16px;
-  background: #ffffff;
-  border: 1px solid rgba(12, 40, 34, 0.1);
-  box-shadow: none;
-  opacity: 1 !important;
-  filter: none !important;
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.twin-row:hover,
-.twin-row.is-hot,
-.twin-row:focus-visible {
-  border-color: color-mix(in srgb, var(--cc, #45c08a) 65%, #08262e);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--cc, #45c08a) 28%, transparent);
-  background: #ffffff;
-  transform: none;
-  outline: none;
-  opacity: 1 !important;
-  filter: none !important;
-}
-
-.twin-row-orb {
-  width: 40px;
-  height: 40px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  color: #f4fffa;
-  background: #08262e;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cc, #45c08a) 22%, transparent);
-}
-
-.twin-row-orb svg {
-  width: 17px;
-  height: 17px;
-}
-
-.twin-row-copy {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.twin-row-copy b {
-  font-family: var(--font-display), Manrope, sans-serif;
-  font-size: 0.86rem;
-  font-weight: 720;
-  letter-spacing: -0.015em;
-  color: #08262e;
-  line-height: 1.2;
-}
-
-.twin-row-copy em {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-style: normal;
-  font-size: 0.72rem;
-  font-weight: 650;
-  color: color-mix(in srgb, var(--cc, #45c08a) 80%, #08262e);
-}
-
-.twin-row-copy em i {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--cc, #45c08a);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cc, #45c08a) 18%, transparent);
-}
-
-.twin-row-go {
-  width: 34px;
-  height: 34px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: #08262e;
-  color: #fff;
-  font-size: 1.1rem;
-  font-weight: 500;
-  line-height: 1;
-}
-
-.twin-row.is-hot .twin-row-go,
-.twin-row:hover .twin-row-go {
-  background: color-mix(in srgb, var(--cc, #45c08a) 70%, #08262e);
-}
-
-@media (max-width: 900px) {
-  .twin-shell {
-    grid-template-columns: 1fr;
-    min-height: 0;
-  }
-  .twin-stage {
-    min-height: 420px;
-    aspect-ratio: 1 / 1.05;
-  }
-  .twin-rail {
-    border-left: none;
-    border-top: 1px solid rgba(120, 160, 140, 0.18);
-  }
-  .twin-focus-layer {
-    display: none;
-  }
+  max-width: 260px;
 }
 
 @media (max-width: 720px) {
   .twin-lab {
     border-radius: 20px;
   }
-  .twin-shell {
+  .twin-stage {
+    width: 100%;
     border-radius: 19px;
   }
-  .twin-stage {
-    min-height: 360px;
+  .twin-chip {
+    max-width: 148px;
+    gap: 6px;
+    padding: 5px 9px 5px 5px;
   }
-  .twin-rail {
-    padding: 16px 12px 14px;
+  .twin-chip.side-left {
+    padding: 5px 5px 5px 9px;
   }
-  .twin-rail-head h3 {
-    font-size: 1.15rem;
+  .twin-chip-orb {
+    width: 28px;
+    height: 28px;
   }
-  .twin-row {
-    grid-template-columns: 36px minmax(0, 1fr) 30px;
-    gap: 8px;
-    padding: 9px;
-    border-radius: 14px;
+  .twin-chip-orb svg {
+    width: 13px;
+    height: 13px;
   }
-  .twin-row-orb {
-    width: 36px;
-    height: 36px;
+  .twin-chip-copy b {
+    font-size: 0.64rem;
   }
-  .twin-row-copy b {
-    font-size: 0.8rem;
+  .twin-chip-copy em {
+    font-size: 0.54rem;
   }
   .twin-hud {
     left: 12px;
@@ -7916,6 +7846,7 @@ a.mon-event-card:hover {
     font-size: 0.78rem;
   }
 }
+
 
 
 

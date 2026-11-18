@@ -102,7 +102,12 @@ export default async function DigitalTwinPage() {
         <div className="hero-top">
           <span className="eyebrow">{today}</span>
           <div className="quick quick-top">
-            <Link href="/patient/urgent" className="btn">
+            <Link href="/patient/digital-twin/map-lab" className="btn">
+              {locale === "en"
+                ? "Experimental map"
+                : "Eksperimentinis žemėlapis"}
+            </Link>
+            <Link href="/patient/urgent" className="btn ghost">
               {labels.urgentConsult}
             </Link>
             <Link href="/patient/visits" className="btn ghost">
@@ -117,13 +122,6 @@ export default async function DigitalTwinPage() {
           <h1 className="overview-hello">
             {labels.goodMorning}, {firstName(name)}
           </h1>
-          <p className="small m-0 mb-1">
-            <Link href="/patient/digital-twin/map-lab" className="diag-link">
-              {locale === "en"
-                ? "Try experimental radial health map →"
-                : "Išbandyti eksperimentinį radialų žemėlapį →"}
-            </Link>
-          </p>
           <p className="diag-line">
             <span className="eyebrow" style={{ marginRight: 8 }}>
               {labels.diagnosisSummary}

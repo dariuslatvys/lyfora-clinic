@@ -7573,3 +7573,21 @@ a.mon-event-card:hover {
     font-size: 0.78rem;
   }
 }
+
+.overview-tabs a.overview-lab-tab {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  text-decoration: none;
+  color: var(--ink-soft);
+  border: 1px dashed color-mix(in srgb, var(--accent) 45%, var(--line));
+  font-size: 0.86rem;
+  font-weight: 650;
+}
+
+.overview-tabs a.overview-lab-tab:hover {
+  color: var(--ink);
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}

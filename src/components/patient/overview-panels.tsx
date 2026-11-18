@@ -116,13 +116,6 @@ export function OverviewPanels({
           >
             {labels.cardSummary}
           </button>
-          <Link
-            href="/patient/digital-twin/map-lab"
-            className="overview-lab-tab"
-            role="tab"
-          >
-            {locale === "en" ? "Map lab" : "Žemėlapio lab"}
-          </Link>
         </div>
       ) : null}
 

@@ -102,12 +102,7 @@ export default async function DigitalTwinPage() {
         <div className="hero-top">
           <span className="eyebrow">{today}</span>
           <div className="quick quick-top">
-            <Link href="/patient/digital-twin/map-lab" className="btn">
-              {locale === "en"
-                ? "Experimental map"
-                : "Eksperimentinis žemėlapis"}
-            </Link>
-            <Link href="/patient/urgent" className="btn ghost">
+            <Link href="/patient/urgent" className="btn">
               {labels.urgentConsult}
             </Link>
             <Link href="/patient/visits" className="btn ghost">

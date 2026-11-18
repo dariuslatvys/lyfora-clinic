@@ -24,16 +24,16 @@ const FOCUS_BY_ID: Record<string, BodyFocus> = {
   cardio_metabolic: { x: 51, y: 29, mode: "heart" },
   cardiovascular: { x: 51, y: 29, mode: "heart" },
   mental: { x: 50, y: 11, mode: "brain" },
-  // Lower abdomen / ovaries — never crotch
-  reproductive: { x: 50, y: 40, mode: "pelvis" },
-  hormones_women: { x: 50, y: 40, mode: "pelvis" },
-  pharmacogenetics: { x: 50, y: 38, mode: "gut" },
+  // Ovaries (lateral) — not belly midline, not crotch
+  reproductive: { x: 57, y: 44, mode: "pelvis" },
+  hormones_women: { x: 57, y: 44, mode: "pelvis" },
+  pharmacogenetics: { x: 50, y: 37, mode: "gut" },
   // Full-body wash; line anchors at sternum
   physical: { x: 50, y: 27, mode: "body" },
   oncology: { x: 50, y: 29, mode: "outline" },
-  metabolic: { x: 50, y: 38, mode: "gut" },
+  metabolic: { x: 50, y: 37, mode: "gut" },
   immune: { x: 50, y: 27, mode: "body" },
-  hormones_men: { x: 50, y: 43, mode: "pelvis" },
+  hormones_men: { x: 50, y: 44, mode: "pelvis" },
 };
 
 /** Figure box as % of square stage (kept in sync with CSS). */
@@ -186,11 +186,10 @@ function BodyFocusMarks({
     return (
       <span
         className="twin-mark is-pelvis"
-        style={{ left: `${x}%`, top: `${y}%`, ["--cc" as string]: accent }}
+        style={{ left: "50%", top: `${y}%`, ["--cc" as string]: accent }}
       >
-        <i className="band" style={{ background: accent }} />
-        <i className="ovary" style={{ background: accent, left: "-28%" }} />
-        <i className="ovary" style={{ background: accent, left: "28%" }} />
+        <i className="ovary" style={{ background: accent, left: "-30%" }} />
+        <i className="ovary" style={{ background: accent, left: "30%" }} />
       </span>
     );
   }

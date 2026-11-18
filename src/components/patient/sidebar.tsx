@@ -9,7 +9,6 @@ import type { Dictionary } from "@/lib/i18n/dictionary";
 
 const items = [
   { href: "/patient/digital-twin", key: "navOverview" as const, icon: "home" },
-  { href: "/patient/map-lab", key: "mapLab" as const, icon: "orbit" },
   { href: "/patient/health-card", key: "healthCard" as const, icon: "card" },
   { href: "/patient/visits", key: "visits" as const, icon: "cal" },
   { href: "/patient/labs", key: "labs" as const, icon: "flask" },

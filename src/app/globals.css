@@ -7319,13 +7319,15 @@ a.mon-event-card:hover {
 .twin-lab {
   position: relative;
   border-radius: 32px;
-  padding: 8px;
+  padding: 10px;
   overflow: hidden;
-  background: #070d0b;
-  border: 1px solid rgba(110, 210, 160, 0.12);
+  background:
+    radial-gradient(ellipse 50% 42% at 50% 46%, rgba(40, 140, 100, 0.18), transparent 70%),
+    #060b09;
+  border: 1px solid rgba(110, 210, 160, 0.14);
   box-shadow:
-    inset 0 1px 0 rgba(160, 255, 200, 0.04),
-    0 30px 80px rgba(0, 0, 0, 0.45);
+    inset 0 1px 0 rgba(160, 255, 200, 0.05),
+    0 28px 70px rgba(0, 0, 0, 0.4);
 }
 
 .twin-stage {
@@ -7565,21 +7567,12 @@ a.mon-event-card:hover {
   animation: twin-pulse 1.5s ease-in-out infinite;
 }
 
-.twin-mark.is-pelvis i.band {
-  left: 0;
-  width: 44px;
-  height: 16px;
-  border-radius: 40%;
-  opacity: 0.26;
-  filter: blur(5px);
-}
-
 .twin-mark.is-pelvis i.ovary {
-  width: 8px;
-  height: 7px;
+  width: 10px;
+  height: 9px;
   border-radius: 50%;
-  opacity: 0.78;
-  box-shadow: 0 0 12px currentColor;
+  opacity: 0.85;
+  box-shadow: 0 0 14px currentColor;
 }
 
 .twin-mark.is-body {

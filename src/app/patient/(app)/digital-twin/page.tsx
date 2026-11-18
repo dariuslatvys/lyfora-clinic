@@ -29,13 +29,22 @@ function firstName(full: string) {
   return full.split(/\s+/)[0] || full;
 }
 
-export default async function DigitalTwinPage() {
+export default async function DigitalTwinPage({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const current = await getCurrentUser();
   if (!current?.patient) redirect("/login/patient");
   const locale = (current.user.locale as "lt" | "en") || "lt";
   const labels = t(locale);
   const twin = loadDigitalTwin(current.patient.id, locale);
   if (!twin) redirect("/login/patient");
+  const params = (await searchParams) || {};
+  const viewRaw = params.view;
+  const view = Array.isArray(viewRaw) ? viewRaw[0] : viewRaw;
+  const initialTab =
+    view === "lab" ? ("lab" as const) : view === "summary" ? ("summary" as const) : undefined;
 
   const name = patientDisplayName(current.patient.sex, locale);
   const attention = twin.categories.filter((c) => RANK[c.colour] >= 3);
@@ -157,9 +166,11 @@ export default async function DigitalTwinPage() {
       <OverviewPanels
         locale={locale}
         sex={(current.patient.sex as "male" | "female") || "male"}
+        initialTab={initialTab}
         labels={{
           healthMapTitle: labels.healthMapTitle,
           cardSummary: labels.cardSummary,
+          mapLab: labels.mapLab,
           categoriesTitle: labels.categoriesTitle,
           categoriesHint: labels.categoriesHint,
           geneMarkerHint: labels.geneMarkerHint,

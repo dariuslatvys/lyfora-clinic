@@ -1,33 +1,6 @@
 import { redirect } from "next/navigation";
-import { getCurrentUser } from "@/lib/auth/session";
-import { loadDigitalTwin } from "@/lib/health/load-twin";
-import { t } from "@/lib/i18n/dictionary";
-import { RadialHealthMapLab } from "@/components/patient/radial-health-map-lab";
 
-export default async function HealthMapLabPage() {
-  const current = await getCurrentUser();
-  if (!current?.patient) redirect("/login/patient");
-  const locale = (current.user.locale as "lt" | "en") || "lt";
-  const labels = t(locale);
-  const sex =
-    current.patient.sex === "female" ? ("female" as const) : ("male" as const);
-  const twin = loadDigitalTwin(current.patient.id, locale);
-  if (!twin) redirect("/login/patient");
-
-  const mapCategories = twin.categories.map((c) => ({
-    id: c.id,
-    title: labels.categoryNames[c.id] || c.id,
-    colour: c.colour,
-    colourLabel: labels.colourLabels[c.colour],
-    geneticBadge: c.geneticBadge || c.rare.length > 0,
-    geneticMark: labels.geneMarkShort,
-  }));
-
-  return (
-    <RadialHealthMapLab
-      locale={locale}
-      sex={sex}
-      categories={mapCategories}
-    />
-  );
+/** Experimental map lives under Apžvalga tabs now. */
+export default function HealthMapLabPage() {
+  redirect("/patient/digital-twin?view=lab");
 }

@@ -6,6 +6,7 @@ import type { BodyMapCategory } from "@/components/patient/body-map";
 import { WomenHealthMap } from "@/components/patient/women-health-map";
 import { MenHealthMap } from "@/components/patient/men-health-map";
 import { CategoryCard } from "@/components/patient/category-card";
+import { RadialHealthMapLab } from "@/components/patient/radial-health-map-lab";
 import { PILL_CLASS, type RiskColour } from "@/lib/health/colours";
 import type { FlaggedLab } from "@/lib/health/marker-colour";
 import { formatMarkerReading } from "@/lib/health/marker-display";
@@ -31,6 +32,8 @@ export type OverviewVisit = {
 type Labels = {
   healthMapTitle: string;
   cardSummary: string;
+  /** When set, shows the experimental radial map as a third tab. */
+  mapLab?: string;
   categoriesTitle: string;
   categoriesHint: string;
   geneMarkerHint: string;
@@ -68,6 +71,7 @@ export function OverviewPanels({
   interactive = true,
   sex = "male",
   hrefForCategory,
+  initialTab,
 }: {
   locale: "lt" | "en";
   labels: Labels;
@@ -84,11 +88,17 @@ export function OverviewPanels({
   interactive?: boolean;
   sex?: "male" | "female";
   hrefForCategory?: (categoryId: string) => string | null | undefined;
+  initialTab?: "map" | "summary" | "lab";
 }) {
-  const [tab, setTab] = useState<"map" | "summary">(
-    mode === "summary" ? "summary" : "map"
-  );
+  const [tab, setTab] = useState<"map" | "summary" | "lab">(() => {
+    if (mode === "summary") return "summary";
+    if (initialTab === "lab" && labels.mapLab) return "lab";
+    if (initialTab === "summary") return "summary";
+    return "map";
+  });
+
   const showSummary = mode === "summary" || tab === "summary";
+  const showLab = mode === "full" && tab === "lab";
 
   return (
     <section className="stack overview-section" style={{ gap: 12 }}>
@@ -116,10 +126,27 @@ export function OverviewPanels({
           >
             {labels.cardSummary}
           </button>
+          {labels.mapLab ? (
+            <button
+              type="button"
+              role="tab"
+              className={tab === "lab" ? "on" : undefined}
+              aria-selected={tab === "lab"}
+              onClick={() => setTab("lab")}
+            >
+              {labels.mapLab}
+            </button>
+          ) : null}
         </div>
       ) : null}
 
-      {!showSummary ? (
+      {showLab && labels.mapLab ? (
+        <RadialHealthMapLab
+          locale={locale}
+          sex={sex}
+          categories={categories}
+        />
+      ) : !showSummary ? (
         sex === "female" ? (
           <WomenHealthMap
             categories={categories}

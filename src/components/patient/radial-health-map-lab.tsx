@@ -317,13 +317,12 @@ export function RadialHealthMapLab({
         <svg className="twin-focus-layer" viewBox="0 0 100 100" aria-hidden>
           {active && activeOrbit && stageFocus
             ? (() => {
-                // Bend the beam outward so it never cuts through the crotch
-                const mx = (activeOrbit.x + stageFocus.x) / 2;
-                const my = (activeOrbit.y + stageFocus.y) / 2;
-                const vx = mx - CX;
-                const vy = my - CY;
-                const qx = mx + vx * 0.42;
-                const qy = my + vy * 0.42;
+                // Route outside the silhouette — never through the crotch
+                const leftSide = activeOrbit.x < CX;
+                const qx = leftSide
+                  ? Math.min(activeOrbit.x, stageFocus.x) - 9
+                  : Math.max(activeOrbit.x, stageFocus.x) + 9;
+                const qy = (activeOrbit.y * 0.45 + stageFocus.y * 0.55);
                 return (
                   <path
                     d={`M ${activeOrbit.x} ${activeOrbit.y} Q ${qx} ${qy} ${stageFocus.x} ${stageFocus.y}`}

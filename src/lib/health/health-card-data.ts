@@ -9,6 +9,7 @@ export type HealthCardTabId =
   | "past"
   | "meds"
   | "vacc"
+  | "mon"
   | "proc"
   | "hist"
   | "docs";
@@ -104,6 +105,7 @@ export type HealthCardDoc = {
 
 export type HealthCardModel = {
   patientName: string;
+  sex: "male" | "female";
   sexLt: string;
   sexEn: string;
   age: number | null;
@@ -960,6 +962,7 @@ export function buildHealthCard(input: {
 
   return {
     patientName: input.patientName,
+    sex: input.sex === "female" ? "female" : "male",
     sexLt: input.sex === "female" ? "Moteris" : "Vyras",
     sexEn: input.sex === "female" ? "Female" : "Male",
     age: ageFromDob(input.dob),

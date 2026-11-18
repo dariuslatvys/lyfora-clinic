@@ -26,6 +26,7 @@ import {
 } from "@/lib/health/colours";
 import { MedToleranceCheck } from "@/components/patient/med-tolerance-check";
 import type { PharmaSnpRow } from "@/components/patient/pharma-genes-tabs";
+import { MonitoringPane } from "@/components/patient/monitoring-pane";
 
 const TAB_ORDER: { id: HealthCardTabId; labelKey: keyof Dictionary }[] = [
   { id: "sum", labelKey: "cardSummary" },
@@ -33,6 +34,7 @@ const TAB_ORDER: { id: HealthCardTabId; labelKey: keyof Dictionary }[] = [
   { id: "past", labelKey: "cardPastIllnesses" },
   { id: "meds", labelKey: "cardMeds" },
   { id: "vacc", labelKey: "cardVaccines" },
+  { id: "mon", labelKey: "cardMonitoring" },
   { id: "proc", labelKey: "cardProcedures" },
   { id: "hist", labelKey: "cardVisitHistory" },
   { id: "docs", labelKey: "cardDocuments" },
@@ -129,6 +131,13 @@ export function HealthCardTabs({
         />
       ) : null}
       {tab === "vacc" ? <VaccinesPane locale={locale} card={card} /> : null}
+      {tab === "mon" ? (
+        <MonitoringPane
+          locale={locale}
+          sex={card.sex}
+          vaccines={card.vaccines}
+        />
+      ) : null}
       {tab === "proc" ? <ProceduresPane locale={locale} card={card} /> : null}
       {tab === "hist" ? <HistoryPane locale={locale} card={card} /> : null}
       {tab === "docs" ? <DocsPane locale={locale} card={card} /> : null}

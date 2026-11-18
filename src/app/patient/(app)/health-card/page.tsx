@@ -8,16 +8,39 @@ import {
   parseStoredAnswers,
   questionnaireStorageKey,
 } from "@/lib/health/questionnaire";
-import { buildHealthCard } from "@/lib/health/health-card-data";
+import {
+  buildHealthCard,
+  type HealthCardTabId,
+} from "@/lib/health/health-card-data";
 import { HealthCardTabs } from "@/components/patient/health-card-tabs";
 import { loadDigitalTwin } from "@/lib/health/load-twin";
 import { ensurePetraitisPatient } from "@/lib/health/petraitis-patient";
 
-export default async function HealthCardPage() {
+const CARD_TABS: HealthCardTabId[] = [
+  "sum",
+  "dx",
+  "past",
+  "meds",
+  "vacc",
+  "mon",
+  "proc",
+  "hist",
+  "docs",
+];
+
+export default async function HealthCardPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ tab?: string }>;
+}) {
   const current = await getCurrentUser();
   if (!current?.patient) redirect("/login/patient");
   const locale = (current.user.locale as "lt" | "en") || "lt";
   const labels = t(locale);
+  const query = (await searchParams) || {};
+  const initialTab = CARD_TABS.includes(query.tab as HealthCardTabId)
+    ? (query.tab as HealthCardTabId)
+    : "sum";
 
   ensureSchema();
   ensurePetraitisPatient();
@@ -65,6 +88,7 @@ export default async function HealthCardPage() {
         labels={labels}
         card={card}
         pharmaSnps={pharmaSnps}
+        initialTab={initialTab}
       />
     </div>
   );

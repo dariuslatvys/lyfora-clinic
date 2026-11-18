@@ -10,10 +10,11 @@ import type { Dictionary } from "@/lib/i18n/dictionary";
 const items = [
   { href: "/patient/digital-twin", key: "navOverview" as const, icon: "home" },
   { href: "/patient/health-card", key: "healthCard" as const, icon: "card" },
+  { href: "/patient/calendar", key: "calendar" as const, icon: "cal" },
   { href: "/patient/labs", key: "labs" as const, icon: "flask" },
   { href: "/patient/dna", key: "myDna" as const, icon: "dna" },
   { href: "/patient/consultations", key: "consultations" as const, icon: "consult" },
-  { href: "/patient/visits", key: "visits" as const, icon: "cal" },
+  { href: "/patient/visits", key: "visits" as const, icon: "vis" },
   { href: "/patient/referrals", key: "referrals" as const, icon: "send" },
   { href: "/patient/prescriptions", key: "prescriptions" as const, icon: "rx" },
   { href: "/patient/recommendations", key: "recommendations" as const, icon: "bulb" },
@@ -61,6 +62,12 @@ const ICONS: Record<string, ReactNode> = {
     <g>
       <rect x="3" y="5" width="18" height="16" rx="2" />
       <path d="M3 10h18M8 3v4M16 3v4" />
+    </g>
+  ),
+  vis: (
+    <g>
+      <rect x="4" y="3" width="16" height="18" rx="2" />
+      <path d="M8 8h8M8 12h8M8 16h5" />
     </g>
   ),
   send: (

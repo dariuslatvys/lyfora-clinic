@@ -223,7 +223,12 @@ function buildPages(locale: Locale, labels: ReturnType<typeof t>): IndexedDoc[] 
     {
       href: "/patient/health-card",
       title: labels.healthCard,
-      aliases: "sveikatos kortele health card ehr diagnozės",
+      aliases: "sveikatos kortele health card ehr diagnozės stebėsena monitoring",
+    },
+    {
+      href: "/patient/calendar",
+      title: labels.calendar,
+      aliases: "kalendorius calendar grafikas priminimai skiepai psa stebėsena",
     },
     {
       href: "/patient/labs",

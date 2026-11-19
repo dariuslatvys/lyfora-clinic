@@ -362,7 +362,10 @@ export function RadialHealthMapLab({
   const organTwins = organsFor(activeId);
 
   return (
-    <div className="twin-lab rise-in">
+    <div
+      className="twin-lab rise-in"
+      onMouseLeave={() => setActiveId(null)}
+    >
       <div
         className="twin-stage"
         data-sex={sex}
@@ -452,9 +455,7 @@ export function RadialHealthMapLab({
                 ["--cc" as string]: COLOUR_HEX[c.colour as RiskColour],
               }}
               onMouseEnter={() => setActiveId(c.id)}
-              onMouseLeave={() => setActiveId(null)}
               onFocus={() => setActiveId(c.id)}
-              onBlur={() => setActiveId(null)}
             >
               <span className="twin-chip-orb" aria-hidden>
                 <CategoryGlyph id={c.id} />

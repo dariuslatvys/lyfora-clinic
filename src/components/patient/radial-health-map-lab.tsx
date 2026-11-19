@@ -16,7 +16,7 @@ import {
   type HealthCategoryId,
 } from "@/lib/health/categories";
 
-/** Heart upper-right, then clockwise. */
+/** Heart upper-right, then clockwise — angles avoid head (top) and feet (bottom). */
 const LAB_ORDER_FEMALE: HealthCategoryId[] = [
   "cardio_metabolic",
   "oncology",
@@ -25,6 +25,10 @@ const LAB_ORDER_FEMALE: HealthCategoryId[] = [
   "mental",
   "reproductive",
 ];
+
+/** Fixed orbit degrees so chips never sit on the head or get clipped at the feet. */
+const LAB_DEGREES_FEMALE = [-38, 18, 62, 128, 178, 228];
+const LAB_DEGREES_MALE = [-40, 10, 55, 125, 175, 220, 250];
 
 const LAB_LABELS_LT: Partial<Record<HealthCategoryId, string>> = {
   oncology: "Onkologija",
@@ -36,8 +40,6 @@ const LAB_LABELS_LT: Partial<Record<HealthCategoryId, string>> = {
   reproductive: "Moters sveikata",
   hormones_women: "Moters sveikata",
 };
-
-type Slot = { deg: number };
 
 /** Focus as % inside the circular portal (0–100). */
 type BodyFocus = {
@@ -53,21 +55,15 @@ type OrganTwin = {
 };
 
 const FOCUS_BY_ID: Record<string, BodyFocus> = {
-  // Heart
   cardio_metabolic: { x: 48, y: 34, kind: "point" },
   cardiovascular: { x: 48, y: 34, kind: "point" },
-  // Brain — top of head, not mouth/face
   mental: { x: 50, y: 14, kind: "point" },
-  // Ovaries — lateral lower abdomen, not groin midline
   reproductive: { x: 50, y: 48, kind: "ovaries" },
   hormones_women: { x: 50, y: 48, kind: "ovaries" },
-  // Liver / gut
   pharmacogenetics: { x: 52, y: 42, kind: "point" },
   metabolic: { x: 52, y: 42, kind: "point" },
-  // Chest / muscle — single soft point, no body oval
   physical: { x: 50, y: 36, kind: "point" },
   immune: { x: 50, y: 36, kind: "point" },
-  // Lungs / torso — point only, no outline oval
   oncology: { x: 50, y: 32, kind: "point" },
   hormones_men: { x: 50, y: 48, kind: "point" },
 };
@@ -78,11 +74,6 @@ const ORGAN_BY_ID: Record<string, OrganTwin[]> = {
       id: "heart",
       label: "Širdis",
       src: "/brand/health-map/organ-heart-hologram.jpg",
-    },
-    {
-      id: "lungs",
-      label: "Plaučiai",
-      src: "/brand/health-map/organ-lungs-hologram.jpg",
     },
   ],
   cardiovascular: [
@@ -104,11 +95,6 @@ const ORGAN_BY_ID: Record<string, OrganTwin[]> = {
       id: "lungs",
       label: "Plaučiai",
       src: "/brand/health-map/organ-lungs-hologram.jpg",
-    },
-    {
-      id: "heart",
-      label: "Širdis",
-      src: "/brand/health-map/organ-heart-hologram.jpg",
     },
   ],
   immune: [
@@ -155,24 +141,11 @@ const ORGAN_BY_ID: Record<string, OrganTwin[]> = {
   ],
 };
 
-const DEFAULT_ORGANS: OrganTwin[] = [
-  {
-    id: "heart",
-    label: "Širdis",
-    src: "/brand/health-map/organ-heart-hologram.jpg",
-  },
-  {
-    id: "lungs",
-    label: "Plaučiai",
-    src: "/brand/health-map/organ-lungs-hologram.jpg",
-  },
-];
-
 /** Portal + orbit geometry (% of square stage). */
-const PORTAL_R = 28;
-const ORBIT_R = 42;
+const PORTAL_R = 26;
+const ORBIT_R = 40;
 const CX = 50;
-const CY = 48;
+const CY = 50;
 
 const FEMALE_TWIN_SRC = "/brand/health-map/woman-hologram-v9.png";
 const FEMALE_TWIN_FALLBACK = "/brand/health-map/woman-hologram-v8.png";
@@ -187,19 +160,11 @@ function orbitPoint(deg: number) {
 }
 
 function focusToStage(local: BodyFocus) {
-  // Map portal-local % into stage % (portal is a circle centered on stage)
   const d = PORTAL_R * 2;
   return {
     x: CX - PORTAL_R + (local.x / 100) * d,
     y: CY - PORTAL_R + (local.y / 100) * d,
   };
-}
-
-function slotsForCount(n: number): Slot[] {
-  const step = 360 / n;
-  // Rotate right: first chip ~1–2 o’clock, never on the head
-  const start = -45;
-  return Array.from({ length: n }, (_, i) => ({ deg: start + step * i }));
 }
 
 function orderForSex(
@@ -215,7 +180,15 @@ function orderForSex(
   const rest = categories.filter(
     (c) => !order.includes(c.id as HealthCategoryId)
   );
-  return [...ordered, ...rest].slice(0, 8);
+  return [...ordered, ...rest].slice(0, 7);
+}
+
+function degreesFor(sex: "male" | "female", count: number): number[] {
+  const preset =
+    sex === "female" ? LAB_DEGREES_FEMALE : LAB_DEGREES_MALE;
+  if (count <= preset.length) return preset.slice(0, count);
+  const step = 360 / count;
+  return Array.from({ length: count }, (_, i) => -40 + step * i);
 }
 
 function focusFor(id: string): BodyFocus {
@@ -223,8 +196,8 @@ function focusFor(id: string): BodyFocus {
 }
 
 function organsFor(id: string | null): OrganTwin[] {
-  if (!id) return DEFAULT_ORGANS;
-  return ORGAN_BY_ID[id] || DEFAULT_ORGANS;
+  if (!id) return [];
+  return ORGAN_BY_ID[id] || [];
 }
 
 function labTitle(id: string, fallback: string) {
@@ -338,7 +311,10 @@ export function RadialHealthMapLab({
     () => orderForSex(categories, sex),
     [categories, sex]
   );
-  const slots = useMemo(() => slotsForCount(tiles.length), [tiles.length]);
+  const degrees = useMemo(
+    () => degreesFor(sex, tiles.length),
+    [sex, tiles.length]
+  );
   const [activeId, setActiveId] = useState<string | null>(null);
   const [figureSrc, setFigureSrc] = useState(
     sex === "female" ? FEMALE_TWIN_SRC : MALE_TWIN_SRC
@@ -353,12 +329,13 @@ export function RadialHealthMapLab({
   const activeIndex = activeId
     ? tiles.findIndex((t) => t.id === activeId)
     : -1;
-  const activeSlot = activeIndex >= 0 ? slots[activeIndex] : null;
+  const activeDeg = activeIndex >= 0 ? degrees[activeIndex] : null;
   const accent = activeTile
     ? COLOUR_HEX[activeTile.colour as RiskColour]
     : "#5ee4a8";
   const stageFocus = active ? focusToStage(active) : null;
-  const activeOrbit = activeSlot ? orbitPoint(activeSlot.deg) : null;
+  const activeOrbit =
+    activeDeg != null ? orbitPoint(activeDeg) : null;
   const organTwins = organsFor(activeId);
 
   return (
@@ -366,140 +343,167 @@ export function RadialHealthMapLab({
       className="twin-lab rise-in"
       onMouseLeave={() => setActiveId(null)}
     >
-      <div
-        className="twin-stage"
-        data-sex={sex}
-        data-hot={activeId ? "1" : "0"}
-      >
-        <div className="twin-void" aria-hidden />
-
-        <svg className="twin-orbit" viewBox="0 0 100 100" aria-hidden>
-          <defs>
-            <linearGradient
-              id={`twinOrbitGrad-${uid}`}
-              x1="0%"
-              y1="0%"
-              x2="100%"
-              y2="100%"
-            >
-              <stop offset="0%" stopColor="rgba(120,240,180,0.05)" />
-              <stop offset="50%" stopColor="rgba(160,245,200,0.4)" />
-              <stop offset="100%" stopColor="rgba(90,200,150,0.06)" />
-            </linearGradient>
-          </defs>
-          {/* Concentric HUD rings — Patient Twin style */}
-          <circle cx={CX} cy={CY} r={PORTAL_R - 3} className="twin-ring-inner" />
-          <circle cx={CX} cy={CY} r={PORTAL_R} className="twin-portal-rim" />
-          <circle cx={CX} cy={CY} r={PORTAL_R + 4} className="twin-ring-mid" />
-          <circle
-            cx={CX}
-            cy={CY}
-            r={ORBIT_R}
-            className="twin-orbit-ring"
-            stroke={`url(#twinOrbitGrad-${uid})`}
-          />
-        </svg>
-
+      <div className="twin-frame">
         <div
-          className="twin-portal"
-          aria-hidden
-          style={
-            {
-              width: `${PORTAL_R * 2}%`,
-              height: `${PORTAL_R * 2}%`,
-              ...(active ? { ["--focus-c" as string]: accent } : {}),
-            } as CSSProperties
-          }
+          className="twin-stage"
+          data-sex={sex}
+          data-hot={activeId ? "1" : "0"}
         >
-          <img
-            src={figureSrc}
-            alt=""
-            width={1024}
-            height={1024}
-            className="twin-photo"
-            decoding="async"
-            fetchPriority="high"
-            onError={() => {
-              if (sex === "female" && figureSrc !== FEMALE_TWIN_FALLBACK) {
-                setFigureSrc(FEMALE_TWIN_FALLBACK);
-              }
-            }}
-          />
-          {active ? <FocusPing focus={active} accent={accent} /> : null}
-        </div>
+          <div className="twin-void" aria-hidden />
 
-        <svg className="twin-focus-layer" viewBox="0 0 100 100" aria-hidden>
-          {active && activeOrbit && stageFocus ? (
-            <path
-              d={`M ${activeOrbit.x} ${activeOrbit.y} Q ${(activeOrbit.x + stageFocus.x) / 2} ${(activeOrbit.y + stageFocus.y) / 2 - 4} ${stageFocus.x} ${stageFocus.y}`}
-              className="twin-focus-line"
-              style={{ stroke: accent }}
-              fill="none"
+          <svg className="twin-orbit" viewBox="0 0 100 100" aria-hidden>
+            <defs>
+              <linearGradient
+                id={`twinOrbitGrad-${uid}`}
+                x1="0%"
+                y1="0%"
+                x2="100%"
+                y2="100%"
+              >
+                <stop offset="0%" stopColor="rgba(120,240,180,0.05)" />
+                <stop offset="50%" stopColor="rgba(160,245,200,0.4)" />
+                <stop offset="100%" stopColor="rgba(90,200,150,0.06)" />
+              </linearGradient>
+            </defs>
+            <circle
+              cx={CX}
+              cy={CY}
+              r={PORTAL_R - 3}
+              className="twin-ring-inner"
             />
-          ) : null}
-        </svg>
+            <circle
+              cx={CX}
+              cy={CY}
+              r={PORTAL_R}
+              className="twin-portal-rim"
+            />
+            <circle
+              cx={CX}
+              cy={CY}
+              r={PORTAL_R + 4}
+              className="twin-ring-mid"
+            />
+            <circle
+              cx={CX}
+              cy={CY}
+              r={ORBIT_R}
+              className="twin-orbit-ring"
+              stroke={`url(#twinOrbitGrad-${uid})`}
+            />
+          </svg>
 
-        {tiles.map((c, i) => {
-          const s = slots[i]!;
-          const isHot = activeId === c.id;
-          const { x, y } = orbitPoint(s.deg);
-          const outward = s.deg > -90 && s.deg < 90 ? "right" : "left";
-          return (
-            <Link
-              key={c.id}
-              href={`/patient/digital-twin/${c.id}`}
-              className={`twin-chip side-${outward}${isHot ? " is-hot" : ""}`}
-              style={{
-                left: `${x}%`,
-                top: `${y}%`,
-                ["--cc" as string]: COLOUR_HEX[c.colour as RiskColour],
+          <div
+            className="twin-portal"
+            aria-hidden
+            style={
+              {
+                width: `${PORTAL_R * 2}%`,
+                height: `${PORTAL_R * 2}%`,
+                ...(active ? { ["--focus-c" as string]: accent } : {}),
+              } as CSSProperties
+            }
+          >
+            <img
+              src={figureSrc}
+              alt=""
+              width={1024}
+              height={1024}
+              className="twin-photo"
+              decoding="async"
+              fetchPriority="high"
+              onError={() => {
+                if (
+                  sex === "female" &&
+                  figureSrc !== FEMALE_TWIN_FALLBACK
+                ) {
+                  setFigureSrc(FEMALE_TWIN_FALLBACK);
+                }
               }}
-              onMouseEnter={() => setActiveId(c.id)}
-              onFocus={() => setActiveId(c.id)}
-            >
-              <span className="twin-chip-orb" aria-hidden>
-                <CategoryGlyph id={c.id} />
-              </span>
-              <span className="twin-chip-copy">
-                <b>{labTitle(c.id, c.title)}</b>
-                <em>
-                  <i />
-                  {c.colourLabel}
-                  {c.geneticBadge ? ` · ${c.geneticMark || "DNR"}` : ""}
-                </em>
-              </span>
-            </Link>
-          );
-        })}
+            />
+            {active ? <FocusPing focus={active} accent={accent} /> : null}
+          </div>
+
+          <svg className="twin-focus-layer" viewBox="0 0 100 100" aria-hidden>
+            {active && activeOrbit && stageFocus ? (
+              <path
+                d={`M ${activeOrbit.x} ${activeOrbit.y} Q ${(activeOrbit.x + stageFocus.x) / 2} ${(activeOrbit.y + stageFocus.y) / 2 - 4} ${stageFocus.x} ${stageFocus.y}`}
+                className="twin-focus-line"
+                style={{ stroke: accent }}
+                fill="none"
+              />
+            ) : null}
+          </svg>
+
+          {tiles.map((c, i) => {
+            const deg = degrees[i] ?? -40 + (360 / tiles.length) * i;
+            const isHot = activeId === c.id;
+            const { x, y } = orbitPoint(deg);
+            const outward = deg > -90 && deg < 90 ? "right" : "left";
+            return (
+              <Link
+                key={c.id}
+                href={`/patient/digital-twin/${c.id}`}
+                className={`twin-chip side-${outward}${isHot ? " is-hot" : ""}`}
+                style={{
+                  left: `${x}%`,
+                  top: `${y}%`,
+                  ["--cc" as string]: COLOUR_HEX[c.colour as RiskColour],
+                }}
+                onMouseEnter={() => setActiveId(c.id)}
+                onFocus={() => setActiveId(c.id)}
+              >
+                <span className="twin-chip-orb" aria-hidden>
+                  <CategoryGlyph id={c.id} />
+                </span>
+                <span className="twin-chip-copy">
+                  <b>{labTitle(c.id, c.title)}</b>
+                  <em>
+                    <i />
+                    {c.colourLabel}
+                    {c.geneticBadge ? ` · ${c.geneticMark || "DNR"}` : ""}
+                  </em>
+                </span>
+              </Link>
+            );
+          })}
+        </div>
       </div>
 
       <aside
-        className={`twin-organs${activeId ? " is-hot" : ""}`}
+        className={`twin-organs${organTwins.length ? " is-on" : ""}`}
         aria-label="Organų dvyniai"
+        aria-hidden={organTwins.length === 0}
       >
-        <header className="twin-organs-head">
-          <span>Organų dvyniai</span>
-          <em>
-            {activeTile ? labTitle(activeTile.id, activeTile.title) : "Apžvalga"}
-          </em>
-        </header>
-        <div className="twin-organs-row">
-          {organTwins.map((organ) => (
-            <figure key={organ.id} className="twin-organ">
-              <span className="twin-organ-portal" aria-hidden>
-                <img
-                  src={organ.src}
-                  alt=""
-                  width={512}
-                  height={512}
-                  className="twin-organ-photo"
-                  decoding="async"
-                />
-              </span>
-              <figcaption>{organ.label}</figcaption>
-            </figure>
-          ))}
-        </div>
+        {organTwins.length ? (
+          <>
+            <header className="twin-organs-head">
+              <span>Organų dvynys</span>
+              <em>{activeTile ? labTitle(activeTile.id, activeTile.title) : ""}</em>
+            </header>
+            <div className="twin-organs-row">
+              {organTwins.map((organ) => (
+                <figure key={organ.id} className="twin-organ">
+                  <span className="twin-organ-portal" aria-hidden>
+                    <img
+                      src={organ.src}
+                      alt=""
+                      width={512}
+                      height={512}
+                      className="twin-organ-photo"
+                      decoding="async"
+                    />
+                  </span>
+                  <figcaption>{organ.label}</figcaption>
+                </figure>
+              ))}
+            </div>
+          </>
+        ) : (
+          <p className="twin-organs-hint">
+            Užveskite pelę ant srities — čia pasirodys organo holograma
+            (pvz. plaučiai, širdis).
+          </p>
+        )}
       </aside>
     </div>
   );

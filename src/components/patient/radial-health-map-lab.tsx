@@ -12,10 +12,30 @@ import {
 import type { BodyMapCategory } from "@/components/patient/body-map";
 import { COLOUR_HEX, type RiskColour } from "@/lib/health/colours";
 import {
-  FEMALE_OVERVIEW_ORDER,
   MALE_OVERVIEW_ORDER,
   type HealthCategoryId,
 } from "@/lib/health/categories";
+
+/** Experimental map: heart at 12 o’clock, then clockwise. */
+const LAB_ORDER_FEMALE: HealthCategoryId[] = [
+  "cardio_metabolic",
+  "oncology",
+  "physical",
+  "pharmacogenetics",
+  "mental",
+  "reproductive",
+];
+
+const LAB_LABELS_LT: Partial<Record<HealthCategoryId, string>> = {
+  oncology: "Onkologija",
+  cardio_metabolic: "Širdis ir kraujagyslės",
+  cardiovascular: "Širdis ir kraujagyslės",
+  physical: "Fizinė sveikata",
+  pharmacogenetics: "Farmakogenetika",
+  mental: "Psichika ir emocinė sveikata",
+  reproductive: "Moters sveikata",
+  hormones_women: "Moters sveikata",
+};
 
 type Slot = { deg: number };
 
@@ -79,7 +99,8 @@ function bodyToStage(local: { x: number; y: number }) {
 
 function slotsForCount(n: number): Slot[] {
   const step = 360 / n;
-  const start = -90 + step / 2;
+  // First category at 12 o’clock (top)
+  const start = -90;
   return Array.from({ length: n }, (_, i) => ({ deg: start + step * i }));
 }
 
@@ -88,7 +109,7 @@ function orderForSex(
   sex: "male" | "female"
 ): BodyMapCategory[] {
   const order =
-    sex === "female" ? FEMALE_OVERVIEW_ORDER : MALE_OVERVIEW_ORDER;
+    sex === "female" ? LAB_ORDER_FEMALE : MALE_OVERVIEW_ORDER;
   const byId = new Map(categories.map((c) => [c.id, c]));
   const ordered = order
     .map((id) => byId.get(id))
@@ -103,10 +124,8 @@ function focusFor(id: string): BodyFocus {
   return FOCUS_BY_ID[id] || { x: 50, y: 40, mode: "body" };
 }
 
-function shortTitle(title: string) {
-  // Keep orbit labels short like BioTwin floating nodes
-  const cut = title.split(/[,\u2013\-–]/)[0]?.trim() || title;
-  return cut.length > 28 ? `${cut.slice(0, 26)}…` : cut;
+function labTitle(id: string, fallback: string) {
+  return LAB_LABELS_LT[id as HealthCategoryId] || fallback;
 }
 
 function CategoryGlyph({ id }: { id: string }) {
@@ -452,7 +471,7 @@ export function RadialHealthMapLab({
                 <CategoryGlyph id={c.id} />
               </span>
               <span className="twin-chip-copy">
-                <b>{shortTitle(c.title)}</b>
+                <b>{labTitle(c.id, c.title)}</b>
                 <em>
                   <i />
                   {c.colourLabel}
@@ -466,7 +485,9 @@ export function RadialHealthMapLab({
         <div className="twin-hud" aria-hidden>
           <span className="twin-hud-tag">The human virtual twin</span>
           <span className="twin-hud-meta">
-            {activeTile ? activeTile.title : "Lyfora sveikatos žemėlapis"}
+            {activeTile
+              ? labTitle(activeTile.id, activeTile.title)
+              : "Lyfora sveikatos žemėlapis"}
           </span>
         </div>
       </div>

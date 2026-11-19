@@ -113,8 +113,8 @@ function bodyToStage(local: { x: number; y: number }) {
 
 function slotsForCount(n: number): Slot[] {
   const step = 360 / n;
-  // First category at 12 o’clock (top)
-  const start = -90;
+  // Rotate right: first category (Širdis) at ~1–2 o’clock, not on the head
+  const start = -50;
   return Array.from({ length: n }, (_, i) => ({ deg: start + step * i }));
 }
 
@@ -393,7 +393,6 @@ export function RadialHealthMapLab({
               }
             }}
           />
-          <span className="twin-scanline" />
           {active ? (
             <BodyFocusMarks
               mode={active.mode}

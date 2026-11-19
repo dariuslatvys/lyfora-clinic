@@ -7475,17 +7475,11 @@ a.mon-event-card:hover {
 .twin-figure {
   position: absolute;
   left: 50%;
-  top: 49%;
+  top: 50%;
   transform: translate(-50%, -50%);
   z-index: 3;
   pointer-events: none;
   background: transparent !important;
-  animation: twin-figure-breathe 7s ease-in-out infinite;
-}
-
-@keyframes twin-figure-breathe {
-  0%, 100% { transform: translate(-50%, -50%) scale(1); }
-  50% { transform: translate(-50%, -50.35%) scale(1.012); }
 }
 
 .twin-figure-glow {

@@ -59,13 +59,27 @@ const FOCUS_BY_ID: Record<string, BodyFocus> = {
   hormones_men: { x: 50, y: 44, mode: "pelvis" },
 };
 
-const FIG_W = 30;
+/** Smaller figure + tall elliptical orbit so chips clear head/feet. */
+const FIG_W = 22;
 const FIG_H = FIG_W * (1280 / 720);
 const FIG_LEFT = 50 - FIG_W / 2;
-const FIG_TOP = 48 - FIG_H / 2;
-const ORBIT_R = 38;
+const FIG_TOP = 50 - FIG_H / 2;
+const ORBIT_RX = 42;
+const ORBIT_RY = 40;
 const CX = 50;
-const CY = 49;
+const CY = 50;
+
+function orbitPoint(deg: number) {
+  const rad = (deg * Math.PI) / 180;
+  // Extra outward push at poles (top/bottom) where chips used to cover the body
+  const pole = Math.abs(Math.sin(rad));
+  const rx = ORBIT_RX + pole * 1;
+  const ry = ORBIT_RY + pole * 2;
+  return {
+    x: CX + rx * Math.cos(rad),
+    y: CY + ry * Math.sin(rad),
+  };
+}
 
 const FEMALE_TWIN_SRC = "/brand/health-map/woman-hologram-v7.png";
 const FEMALE_TWIN_FALLBACK = "/brand/health-map/woman-hologram-v5.png";
@@ -295,12 +309,7 @@ export function RadialHealthMapLab({
     ? COLOUR_HEX[activeTile.colour as RiskColour]
     : "#5ee4a8";
   const stageFocus = active ? bodyToStage(active) : null;
-  const activeOrbit = activeSlot
-    ? {
-        x: CX + ORBIT_R * Math.cos((activeSlot.deg * Math.PI) / 180),
-        y: CY + ORBIT_R * Math.sin((activeSlot.deg * Math.PI) / 180),
-      }
-    : null;
+  const activeOrbit = activeSlot ? orbitPoint(activeSlot.deg) : null;
 
   return (
     <div className="twin-lab rise-in">
@@ -311,12 +320,6 @@ export function RadialHealthMapLab({
         data-hot={activeId ? "1" : "0"}
       >
         <div className="twin-void" aria-hidden>
-          <img
-            className="twin-stage-bg"
-            src="/brand/health-map/twin-stage-bg.jpg"
-            alt=""
-            decoding="async"
-          />
           <span className="twin-atmos twin-atmos-a" />
           <span className="twin-atmos twin-atmos-b" />
           <span className="twin-bloom" />
@@ -333,16 +336,23 @@ export function RadialHealthMapLab({
               x2="100%"
               y2="100%"
             >
-              <stop offset="0%" stopColor="rgba(120,240,180,0.04)" />
-              <stop offset="50%" stopColor="rgba(180,255,220,0.38)" />
-              <stop offset="100%" stopColor="rgba(90,200,160,0.05)" />
+              <stop offset="0%" stopColor="rgba(120,240,180,0.05)" />
+              <stop offset="50%" stopColor="rgba(180,255,220,0.4)" />
+              <stop offset="100%" stopColor="rgba(90,200,160,0.06)" />
             </linearGradient>
           </defs>
-          <circle cx={CX} cy={CY} r={ORBIT_R + 7} className="twin-orbit-soft" />
-          <circle
+          <ellipse
             cx={CX}
             cy={CY}
-            r={ORBIT_R}
+            rx={ORBIT_RX + 6}
+            ry={ORBIT_RY + 5}
+            className="twin-orbit-soft"
+          />
+          <ellipse
+            cx={CX}
+            cy={CY}
+            rx={ORBIT_RX}
+            ry={ORBIT_RY}
             className="twin-orbit-ring"
             stroke={`url(#twinOrbitGrad-${uid})`}
           />
@@ -351,7 +361,7 @@ export function RadialHealthMapLab({
               key={`${px}-${py}`}
               cx={px}
               cy={py}
-              r={i % 3 === 0 ? 0.32 : 0.18}
+              r={i % 3 === 0 ? 0.28 : 0.16}
               className="twin-particle"
               style={{ animationDelay: `${(i % 8) * 0.4}s` }}
             />
@@ -448,9 +458,7 @@ export function RadialHealthMapLab({
         {tiles.map((c, i) => {
           const s = slots[i]!;
           const isHot = activeId === c.id;
-          const rad = (s.deg * Math.PI) / 180;
-          const x = CX + ORBIT_R * Math.cos(rad);
-          const y = CY + ORBIT_R * Math.sin(rad);
+          const { x, y } = orbitPoint(s.deg);
           const outward = s.deg > -90 && s.deg < 90 ? "right" : "left";
           return (
             <Link

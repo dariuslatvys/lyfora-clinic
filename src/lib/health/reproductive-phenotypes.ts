@@ -52,24 +52,24 @@ export const REPRODUCTIVE_PHENOTYPES: ReproductivePhenotype[] = [
   },
   {
     id: "endometriosis",
-    nameLt: "Endometriozė",
-    nameEn: "Endometriosis",
+    nameLt: "Endometriozė ar adenomiozė",
+    nameEn: "Endometriosis or adenomyosis",
     shortLt:
-      "Audinys, panašus į gimdos gleivinę, auga už gimdos ribų ir gali sukelti skausmą.",
+      "Abi susijusios su endometriumu: endometriozėje panašus audinys auga už gimdos ribų, adenomiozėje — įauga į gimdos raumeninį sluoksnį. Abi gali sukelti skausmą; tai signalas, ne diagnozė.",
     shortEn:
-      "Tissue like the uterine lining grows outside the uterus and can cause pain.",
+      "Both involve endometrial-type tissue: endometriosis grows outside the uterus, adenomyosis into the uterine muscle wall. Either can cause pain; this is a signal, not a diagnosis.",
     impactLt:
-      "Skausmas mėnesinių metu, lytinių santykių metu ar tuštinantis / šlapinantis — dažnas signalas, kurį verta aptarti anksčiau.",
+      "Skausmas mėnesinių metu, lytinių santykių metu, tuštinantis / šlapinantis ar gausios mėnesinės — dažni signalai, kuriuos verta aptarti anksčiau.",
     impactEn:
-      "Pain with periods, sex, or bowel / bladder function is a common signal worth discussing earlier.",
+      "Pain with periods, sex, bowel / bladder function, or heavy periods are common signals worth discussing earlier.",
     fertilityLt:
-      "Gali apsunkinti pastoti; ankstyvas įtarimas padeda greičiau kreiptis į ginekologą.",
+      "Abi būklės gali apsunkinti pastoti; ankstyvas įtarimas padeda greičiau kreiptis į ginekologą.",
     fertilityEn:
-      "Can make conception harder; earlier suspicion helps you see a gynaecologist sooner.",
+      "Either condition can make conception harder; earlier suspicion helps you see a gynaecologist sooner.",
     dailyLt:
-      "Skausmas ir nuovargis kartais trukdo darbui, mokslams ir santykiams; gydymas gali gerokai palengvinti savijautą.",
+      "Skausmas, gausios mėnesinės ir nuovargis kartais trukdo darbui, mokslams ir santykiams; gydymas gali gerokai palengvinti savijautą.",
     dailyEn:
-      "Pain and fatigue can disrupt work, study and relationships; treatment often improves quality of life.",
+      "Pain, heavy periods and fatigue can disrupt work, study and relationships; treatment often improves quality of life.",
   },
   {
     id: "early_perimenopause",
@@ -348,10 +348,10 @@ export const DEMO_PMOS_REPORT: PmosReport = {
     },
     {
       kind: "ruled_out",
-      titleLt: "Endometriozė (NICE)",
-      titleEn: "Endometriosis (NICE)",
-      detailLt: "0 požymių — endometriozės signalo nėra.",
-      detailEn: "0 signs — no endometriosis signal.",
+      titleLt: "Endometriozė ar adenomiozė (NICE)",
+      titleEn: "Endometriosis or adenomyosis (NICE)",
+      detailLt: "0 požymių — endometriozės / adenomiozės signalo nėra.",
+      detailEn: "0 signs — no endometriosis / adenomyosis signal.",
     },
     {
       kind: "ruled_out",

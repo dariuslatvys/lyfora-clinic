@@ -194,8 +194,8 @@ export default async function CategoryDetailPage({
               : "Ši skiltis rodo genetinį atsaką į vaistus — kurios veikliosios medžiagos paprastai toleruojamos, o kurioms gali būti netoleravimas. Tai signalas gydytojui, o ne savaiminis recepto keitimas."
             : cat.id === "reproductive"
               ? locale === "en"
-                ? "This area covers your cycle, hormones, fertility and four key phenotypes (PMOS, endometriosis, early perimenopause, menopause). Signals come from the women’s questionnaire, lab results and genetics (SNPs below)."
-                : "Ši sritis apima ciklą, hormonus, vaisingumą ir keturis pagrindinius fenotipus (PMOS, endometriozę, ankstyvą perimenopauzę, menopauzę). Duomenys imami iš moters klausimyno, laboratorinių tyrimų ir genetikos (SNP — žemiau)."
+                ? "This area covers your cycle, hormones, fertility and four key phenotypes (PMOS, endometriosis or adenomyosis, early perimenopause, menopause). Signals come from the women’s questionnaire, lab results and genetics (SNPs below)."
+                : "Ši sritis apima ciklą, hormonus, vaisingumą ir keturis pagrindinius fenotipus (PMOS, endometriozę ar adenomiozę, ankstyvą perimenopauzę, menopauzę). Duomenys imami iš moters klausimyno, laboratorinių tyrimų ir genetikos (SNP — žemiau)."
               : cat.summary}
         </p>
       </section>

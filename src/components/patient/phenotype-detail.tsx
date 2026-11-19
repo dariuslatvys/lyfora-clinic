@@ -76,8 +76,8 @@ export function PhenotypeDetailView({
         <p className="pmos-section-lead">
           {phenotype.id === "endometriosis"
             ? locale === "en"
-              ? "NICE endometriosis suspicion signs were not present in your answers (no activity-limiting period pain pattern, painkillers help, no bowel/bladder pain markers). So there is no endometriosis signal right now."
-              : "NICE endometriozės įtarimo požymių Jūsų atsakymuose nėra (skausmas netrukdo veiklai, nuskausminamieji padeda, nėra tuštinimosi / šlapinimosi skausmo žymenų). Todėl endometriozės signalo dabar nėra."
+              ? "NICE-style suspicion signs for endometriosis / adenomyosis were not present in your answers (no activity-limiting period pain pattern, painkillers help, no bowel/bladder pain markers). So there is no endometriosis or adenomyosis signal right now."
+              : "NICE tipo endometriozės / adenomiozės įtarimo požymių Jūsų atsakymuose nėra (skausmas netrukdo veiklai, nuskausminamieji padeda, nėra tuštinimosi / šlapinimosi skausmo žymenų). Todėl endometriozės ar adenomiozės signalo dabar nėra."
             : phenotype.id === "early_perimenopause"
               ? locale === "en"
                 ? "You are 26, the current cycle gap is under 4 months, and there are no hot flushes. Early-onset perimenopause was ruled out in the evaluation order before PMOS."

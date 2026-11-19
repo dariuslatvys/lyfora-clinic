@@ -7318,8 +7318,11 @@ a.mon-event-card:hover {
 /* Experimental twin map — circular HUD portal (reference style) */
 .twin-lab {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   border-radius: 28px;
-  padding: 0;
+  padding: 0 0 14px;
   overflow: hidden;
   background: #050c0a;
   box-shadow: 0 28px 70px rgba(0, 0, 0, 0.4);
@@ -7610,16 +7613,15 @@ a.mon-event-card:hover {
     0 0 24px color-mix(in srgb, var(--cc) 20%, transparent);
 }
 
-/* Organ Twins dock — separate holographic organs (heart, lungs, …) */
+/* Organ Twins strip — under Patient Twin so chips stay clear */
 .twin-organs {
-  position: absolute;
-  left: 4%;
-  bottom: 4%;
-  z-index: 6;
-  width: min(42%, 280px);
-  padding: 10px 12px 12px;
+  position: relative;
+  z-index: 2;
+  width: min(92%, 520px);
+  margin: 0 auto;
+  padding: 12px 14px 14px;
   border-radius: 18px;
-  background: rgba(6, 18, 14, 0.72);
+  background: rgba(6, 18, 14, 0.78);
   border: 1px solid rgba(110, 210, 160, 0.22);
   backdrop-filter: blur(16px) saturate(1.15);
   -webkit-backdrop-filter: blur(16px) saturate(1.15);
@@ -7628,8 +7630,7 @@ a.mon-event-card:hover {
     inset 0 0 24px rgba(40, 140, 100, 0.06);
   transition:
     border-color 0.25s ease,
-    box-shadow 0.25s ease,
-    transform 0.25s ease;
+    box-shadow 0.25s ease;
 }
 
 .twin-organs.is-hot {
@@ -7644,12 +7645,12 @@ a.mon-event-card:hover {
   align-items: baseline;
   justify-content: space-between;
   gap: 8px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .twin-organs-head span {
   font-family: var(--font-display), Manrope, sans-serif;
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   font-weight: 720;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -7658,22 +7659,23 @@ a.mon-event-card:hover {
 
 .twin-organs-head em {
   font-style: normal;
-  font-size: 0.58rem;
+  font-size: 0.62rem;
   font-weight: 600;
   color: rgba(150, 210, 180, 0.72);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 55%;
+  max-width: 60%;
 }
 
 .twin-organs-row {
   display: flex;
-  gap: 10px;
+  justify-content: center;
+  gap: 18px;
 }
 
 .twin-organ {
-  flex: 1;
+  flex: 0 1 140px;
   margin: 0;
   min-width: 0;
   text-align: center;
@@ -7681,6 +7683,8 @@ a.mon-event-card:hover {
 
 .twin-organ-portal {
   display: block;
+  width: min(100%, 132px);
+  margin: 0 auto;
   aspect-ratio: 1 / 1;
   border-radius: 50%;
   overflow: hidden;
@@ -7703,8 +7707,8 @@ a.mon-event-card:hover {
 }
 
 .twin-organ figcaption {
-  margin-top: 6px;
-  font-size: 0.62rem;
+  margin-top: 7px;
+  font-size: 0.68rem;
   font-weight: 650;
   color: rgba(210, 245, 225, 0.88);
   letter-spacing: -0.01em;
@@ -7737,18 +7741,28 @@ a.mon-event-card:hover {
   .twin-chip-copy em {
     font-size: 0.52rem;
   }
+  .twin-lab {
+    gap: 10px;
+    padding-bottom: 10px;
+  }
   .twin-organs {
-    left: 3%;
-    right: 3%;
-    width: auto;
-    bottom: 3%;
-    padding: 8px 10px 10px;
+    width: min(94%, 420px);
+    padding: 10px 12px 12px;
+  }
+  .twin-organs-row {
+    gap: 12px;
+  }
+  .twin-organ {
+    flex-basis: 112px;
+  }
+  .twin-organ-portal {
+    width: min(100%, 108px);
   }
   .twin-organs-head span {
-    font-size: 0.58rem;
+    font-size: 0.62rem;
   }
   .twin-organ figcaption {
-    font-size: 0.55rem;
+    font-size: 0.58rem;
   }
 }
 

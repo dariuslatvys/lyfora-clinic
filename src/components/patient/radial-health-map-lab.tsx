@@ -470,34 +470,36 @@ export function RadialHealthMapLab({
             </Link>
           );
         })}
-
-        <aside
-          className={`twin-organs${activeId ? " is-hot" : ""}`}
-          aria-label="Organų dvyniai"
-        >
-          <header className="twin-organs-head">
-            <span>Organų dvyniai</span>
-            <em>{activeTile ? labTitle(activeTile.id, activeTile.title) : "Apžvalga"}</em>
-          </header>
-          <div className="twin-organs-row">
-            {organTwins.map((organ) => (
-              <figure key={organ.id} className="twin-organ">
-                <span className="twin-organ-portal" aria-hidden>
-                  <img
-                    src={organ.src}
-                    alt=""
-                    width={512}
-                    height={512}
-                    className="twin-organ-photo"
-                    decoding="async"
-                  />
-                </span>
-                <figcaption>{organ.label}</figcaption>
-              </figure>
-            ))}
-          </div>
-        </aside>
       </div>
+
+      <aside
+        className={`twin-organs${activeId ? " is-hot" : ""}`}
+        aria-label="Organų dvyniai"
+      >
+        <header className="twin-organs-head">
+          <span>Organų dvyniai</span>
+          <em>
+            {activeTile ? labTitle(activeTile.id, activeTile.title) : "Apžvalga"}
+          </em>
+        </header>
+        <div className="twin-organs-row">
+          {organTwins.map((organ) => (
+            <figure key={organ.id} className="twin-organ">
+              <span className="twin-organ-portal" aria-hidden>
+                <img
+                  src={organ.src}
+                  alt=""
+                  width={512}
+                  height={512}
+                  className="twin-organ-photo"
+                  decoding="async"
+                />
+              </span>
+              <figcaption>{organ.label}</figcaption>
+            </figure>
+          ))}
+        </div>
+      </aside>
     </div>
   );
 }

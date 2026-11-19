@@ -85,23 +85,23 @@ const ORGAN_BY_ID: Record<string, OrganTwin[]> = {
   ],
   oncology: [
     {
-      id: "lungs",
-      label: "Plaučiai",
-      src: "/brand/health-map/organ-lungs-hologram.png",
+      id: "lymph",
+      label: "Limfinė sistema",
+      src: "/brand/health-map/organ-lymph-hologram.png",
     },
   ],
   physical: [
     {
-      id: "lungs",
-      label: "Plaučiai",
-      src: "/brand/health-map/organ-lungs-hologram.png",
+      id: "muscles",
+      label: "Raumenys",
+      src: "/brand/health-map/organ-muscles-hologram.png",
     },
   ],
   immune: [
     {
-      id: "lungs",
-      label: "Plaučiai",
-      src: "/brand/health-map/organ-lungs-hologram.png",
+      id: "lymph",
+      label: "Limfinė sistema",
+      src: "/brand/health-map/organ-lymph-hologram.png",
     },
   ],
   mental: [
@@ -336,7 +336,6 @@ export function RadialHealthMapLab({
   const stageFocus = active ? focusToStage(active) : null;
   const activeOrbit =
     activeDeg != null ? orbitPoint(activeDeg) : null;
-  const organTwins = organsFor(activeId);
 
   return (
     <div
@@ -439,11 +438,11 @@ export function RadialHealthMapLab({
             const isHot = activeId === c.id;
             const { x, y } = orbitPoint(deg);
             const outward = deg > -90 && deg < 90 ? "right" : "left";
+            const chipOrgans = isHot ? organsFor(c.id) : [];
             return (
-              <Link
+              <div
                 key={c.id}
-                href={`/patient/digital-twin/${c.id}`}
-                className={`twin-chip side-${outward}${isHot ? " is-hot" : ""}`}
+                className={`twin-chip-anchor side-${outward}${isHot ? " is-hot" : ""}`}
                 style={{
                   left: `${x}%`,
                   top: `${y}%`,
@@ -452,49 +451,41 @@ export function RadialHealthMapLab({
                 onMouseEnter={() => setActiveId(c.id)}
                 onFocus={() => setActiveId(c.id)}
               >
-                <span className="twin-chip-orb" aria-hidden>
-                  <CategoryGlyph id={c.id} />
-                </span>
-                <span className="twin-chip-copy">
-                  <b>{labTitle(c.id, c.title)}</b>
-                  <em>
-                    <i />
-                    {c.colourLabel}
-                    {c.geneticBadge ? ` · ${c.geneticMark || "DNR"}` : ""}
-                  </em>
-                </span>
-              </Link>
-            );
-          })}
-
-          {organTwins.length && activeTile ? (
-            <aside
-              className={`twin-organ-float side-${
-                activeDeg != null && activeDeg > -90 && activeDeg < 90
-                  ? "left"
-                  : "right"
-              }`}
-              aria-label={labTitle(activeTile.id, activeTile.title)}
-            >
-              <p className="twin-organ-float-title">
-                {labTitle(activeTile.id, activeTile.title)}
-              </p>
-              <div className="twin-organ-float-row">
-                {organTwins.map((organ) => (
-                  <figure key={organ.id} className="twin-organ-float-fig">
+                {chipOrgans.map((organ) => (
+                  <figure
+                    key={organ.id}
+                    className="twin-chip-organ"
+                    aria-hidden
+                  >
                     <img
                       src={organ.src}
                       alt=""
-                      width={512}
-                      height={512}
-                      className="twin-organ-float-photo"
+                      width={256}
+                      height={256}
+                      className="twin-chip-organ-photo"
                       decoding="async"
                     />
                   </figure>
                 ))}
+                <Link
+                  href={`/patient/digital-twin/${c.id}`}
+                  className={`twin-chip side-${outward}${isHot ? " is-hot" : ""}`}
+                >
+                  <span className="twin-chip-orb" aria-hidden>
+                    <CategoryGlyph id={c.id} />
+                  </span>
+                  <span className="twin-chip-copy">
+                    <b>{labTitle(c.id, c.title)}</b>
+                    <em>
+                      <i />
+                      {c.colourLabel}
+                      {c.geneticBadge ? ` · ${c.geneticMark || "DNR"}` : ""}
+                    </em>
+                  </span>
+                </Link>
               </div>
-            </aside>
-          ) : null}
+            );
+          })}
         </div>
       </div>
     </div>

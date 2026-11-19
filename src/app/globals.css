@@ -7502,8 +7502,50 @@ a.mon-event-card:hover {
   50% { opacity: 1; }
 }
 
-.twin-chip {
+.twin-chip-anchor {
   position: absolute;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+}
+
+.twin-chip-anchor.side-right {
+  flex-direction: row;
+}
+
+.twin-chip-anchor.side-left {
+  flex-direction: row-reverse;
+}
+
+.twin-chip-anchor.is-hot {
+  z-index: 9;
+}
+
+.twin-chip-organ {
+  flex: 0 0 auto;
+  width: 72px;
+  height: 72px;
+  margin: 0;
+  pointer-events: none;
+  animation: twin-organ-in 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.twin-chip-organ-photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter:
+    drop-shadow(0 0 14px rgba(50, 200, 140, 0.5))
+    saturate(1.15)
+    brightness(1.1);
+}
+
+.twin-chip {
+  position: relative;
   z-index: 5;
   display: flex;
   align-items: center;
@@ -7522,7 +7564,7 @@ a.mon-event-card:hover {
   box-shadow:
     0 10px 28px rgba(0, 0, 0, 0.4),
     0 0 16px rgba(40, 160, 110, 0.08);
-  transform: translate(-50%, -50%);
+  transform: none;
   opacity: 1 !important;
   filter: none !important;
   transition:
@@ -7599,7 +7641,7 @@ a.mon-event-card:hover {
 
 .twin-chip.is-hot {
   z-index: 8;
-  transform: translate(-50%, -50%) scale(1.04);
+  transform: scale(1.04);
   border-color: color-mix(in srgb, var(--cc) 65%, white);
   box-shadow:
     0 0 0 1px color-mix(in srgb, var(--cc) 22%, transparent),
@@ -7607,71 +7649,15 @@ a.mon-event-card:hover {
     0 0 24px color-mix(in srgb, var(--cc) 20%, transparent);
 }
 
-/* Floating organ hologram — upper side, translucent, category title only */
-.twin-organ-float {
-  position: absolute;
-  top: 4%;
-  z-index: 7;
-  width: min(32%, 210px);
-  padding: 0;
-  margin: 0;
-  pointer-events: none;
-  text-align: center;
-  animation: twin-organ-in 0.28s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.twin-organ-float.side-right {
-  right: 1%;
-  left: auto;
-}
-
-.twin-organ-float.side-left {
-  left: 1%;
-  right: auto;
-}
-
 @keyframes twin-organ-in {
   from {
     opacity: 0;
-    transform: translateY(8px) scale(0.96);
+    transform: scale(0.86);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: scale(1);
   }
-}
-
-.twin-organ-float-title {
-  margin: 0 0 6px;
-  font-family: var(--font-display), Manrope, sans-serif;
-  font-size: 0.72rem;
-  font-weight: 720;
-  letter-spacing: -0.01em;
-  color: rgba(220, 250, 235, 0.92);
-  text-shadow: 0 0 18px rgba(60, 200, 140, 0.45);
-}
-
-.twin-organ-float-row {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-}
-
-.twin-organ-float-fig {
-  margin: 0;
-  width: 100%;
-}
-
-.twin-organ-float-photo {
-  display: block;
-  width: 100%;
-  height: auto;
-  object-fit: contain;
-  opacity: 0.92;
-  filter:
-    drop-shadow(0 0 18px rgba(50, 200, 140, 0.45))
-    saturate(1.15)
-    brightness(1.08);
 }
 
 @media (max-width: 720px) {
@@ -7704,13 +7690,9 @@ a.mon-event-card:hover {
   .twin-chip-copy em {
     font-size: 0.52rem;
   }
-  .twin-organ-float {
-    top: 0;
-    right: 0;
-    width: min(38%, 150px);
-  }
-  .twin-organ-float-title {
-    font-size: 0.58rem;
+  .twin-chip-organ {
+    width: 56px;
+    height: 56px;
   }
 }
 

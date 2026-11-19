@@ -73,70 +73,70 @@ const ORGAN_BY_ID: Record<string, OrganTwin[]> = {
     {
       id: "heart",
       label: "Širdis",
-      src: "/brand/health-map/organ-heart-hologram.jpg",
+      src: "/brand/health-map/organ-heart-hologram.png",
     },
   ],
   cardiovascular: [
     {
       id: "heart",
       label: "Širdis",
-      src: "/brand/health-map/organ-heart-hologram.jpg",
+      src: "/brand/health-map/organ-heart-hologram.png",
     },
   ],
   oncology: [
     {
       id: "lungs",
       label: "Plaučiai",
-      src: "/brand/health-map/organ-lungs-hologram.jpg",
+      src: "/brand/health-map/organ-lungs-hologram.png",
     },
   ],
   physical: [
     {
       id: "lungs",
       label: "Plaučiai",
-      src: "/brand/health-map/organ-lungs-hologram.jpg",
+      src: "/brand/health-map/organ-lungs-hologram.png",
     },
   ],
   immune: [
     {
       id: "lungs",
       label: "Plaučiai",
-      src: "/brand/health-map/organ-lungs-hologram.jpg",
+      src: "/brand/health-map/organ-lungs-hologram.png",
     },
   ],
   mental: [
     {
       id: "brain",
       label: "Smegenys",
-      src: "/brand/health-map/organ-brain-hologram.jpg",
+      src: "/brand/health-map/organ-brain-hologram.png",
     },
   ],
   reproductive: [
     {
       id: "uterus",
       label: "Gimda ir kiaušidės",
-      src: "/brand/health-map/organ-uterus-hologram.jpg",
+      src: "/brand/health-map/organ-uterus-hologram.png",
     },
   ],
   hormones_women: [
     {
       id: "uterus",
       label: "Gimda ir kiaušidės",
-      src: "/brand/health-map/organ-uterus-hologram.jpg",
+      src: "/brand/health-map/organ-uterus-hologram.png",
     },
   ],
   pharmacogenetics: [
     {
       id: "liver",
       label: "Kepenys",
-      src: "/brand/health-map/organ-liver-hologram.jpg",
+      src: "/brand/health-map/organ-liver-hologram.png",
     },
   ],
   metabolic: [
     {
       id: "liver",
       label: "Kepenys",
-      src: "/brand/health-map/organ-liver-hologram.jpg",
+      src: "/brand/health-map/organ-liver-hologram.png",
     },
   ],
 };
@@ -466,45 +466,37 @@ export function RadialHealthMapLab({
               </Link>
             );
           })}
-        </div>
-      </div>
 
-      <aside
-        className={`twin-organs${organTwins.length ? " is-on" : ""}`}
-        aria-label="Organų dvyniai"
-        aria-hidden={organTwins.length === 0}
-      >
-        {organTwins.length ? (
-          <>
-            <header className="twin-organs-head">
-              <span>Organų dvynys</span>
-              <em>{activeTile ? labTitle(activeTile.id, activeTile.title) : ""}</em>
-            </header>
-            <div className="twin-organs-row">
-              {organTwins.map((organ) => (
-                <figure key={organ.id} className="twin-organ">
-                  <span className="twin-organ-portal" aria-hidden>
+          {organTwins.length && activeTile ? (
+            <aside
+              className={`twin-organ-float side-${
+                activeDeg != null && activeDeg > -90 && activeDeg < 90
+                  ? "left"
+                  : "right"
+              }`}
+              aria-label={labTitle(activeTile.id, activeTile.title)}
+            >
+              <p className="twin-organ-float-title">
+                {labTitle(activeTile.id, activeTile.title)}
+              </p>
+              <div className="twin-organ-float-row">
+                {organTwins.map((organ) => (
+                  <figure key={organ.id} className="twin-organ-float-fig">
                     <img
                       src={organ.src}
                       alt=""
                       width={512}
                       height={512}
-                      className="twin-organ-photo"
+                      className="twin-organ-float-photo"
                       decoding="async"
                     />
-                  </span>
-                  <figcaption>{organ.label}</figcaption>
-                </figure>
-              ))}
-            </div>
-          </>
-        ) : (
-          <p className="twin-organs-hint">
-            Užveskite pelę ant srities — čia pasirodys organo holograma
-            (pvz. plaučiai, širdis).
-          </p>
-        )}
-      </aside>
+                  </figure>
+                ))}
+              </div>
+            </aside>
+          ) : null}
+        </div>
+      </div>
     </div>
   );
 }

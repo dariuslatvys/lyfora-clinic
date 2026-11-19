@@ -7346,7 +7346,7 @@ a.mon-event-card:hover {
   width: 100%;
   aspect-ratio: 1 / 1;
   margin: 0 auto;
-  isolation: isolate;
+  /* No isolation — hologram must blend into the green stage, not a black plate */
   border-radius: 0;
   overflow: visible;
   background: transparent;
@@ -7413,7 +7413,7 @@ a.mon-event-card:hover {
   to { stroke-dashoffset: -5; }
 }
 
-/* Circular portal — figure lives inside the ring */
+/* Circular portal — transparent; figure has real alpha (no black plate) */
 .twin-portal {
   position: absolute;
   left: 50%;
@@ -7421,31 +7421,29 @@ a.mon-event-card:hover {
   transform: translate(-50%, -50%);
   z-index: 3;
   border-radius: 50%;
-  overflow: hidden;
+  overflow: visible;
   pointer-events: none;
-  background:
-    radial-gradient(circle at 50% 42%, rgba(50, 170, 120, 0.16), transparent 62%);
-  box-shadow:
-    inset 0 0 40px rgba(40, 160, 110, 0.12),
-    0 0 60px rgba(40, 150, 100, 0.14);
+  background: transparent;
+  box-shadow: none;
 }
 
 .twin-photo {
   position: absolute;
   left: 50%;
-  top: 52%;
+  top: 50%;
   transform: translate(-50%, -50%);
-  width: 88%;
+  width: 108%;
   height: auto;
+  max-width: none;
   display: block;
   object-fit: contain;
-  opacity: 0.94;
-  mix-blend-mode: screen;
+  opacity: 0.96;
+  mix-blend-mode: normal;
   filter:
-    contrast(1.08)
-    saturate(1.18)
-    brightness(1.12)
-    drop-shadow(0 12px 28px rgba(30, 140, 100, 0.35));
+    contrast(1.06)
+    saturate(1.12)
+    brightness(1.08)
+    drop-shadow(0 0 28px rgba(40, 180, 120, 0.35));
   user-select: none;
   -webkit-user-drag: none;
 }
@@ -7453,21 +7451,6 @@ a.mon-event-card:hover {
 .twin-stage[data-sex="male"] .twin-photo {
   mix-blend-mode: screen;
   opacity: 0.95;
-}
-
-/* Soft floor reflection under portal */
-.twin-portal::after {
-  content: "";
-  position: absolute;
-  left: 18%;
-  right: 18%;
-  bottom: 4%;
-  height: 18%;
-  border-radius: 50%;
-  background: radial-gradient(ellipse at center, rgba(70, 200, 140, 0.22), transparent 70%);
-  filter: blur(10px);
-  pointer-events: none;
-  z-index: 0;
 }
 
 .twin-ping {
@@ -7624,113 +7607,71 @@ a.mon-event-card:hover {
     0 0 24px color-mix(in srgb, var(--cc) 20%, transparent);
 }
 
-/* Organ twin — only appears on hover, clearly BELOW the map, never over chips */
-.twin-organs {
-  position: relative;
-  z-index: 2;
-  width: min(92%, 420px);
-  min-height: 72px;
-  margin: 0 auto 18px;
-  padding: 14px 16px;
-  border-radius: 18px;
-  background: rgba(6, 18, 14, 0.55);
-  border: 1px dashed rgba(110, 210, 160, 0.2);
-  transition:
-    border-color 0.25s ease,
-    background 0.25s ease,
-    box-shadow 0.25s ease;
-}
-
-.twin-organs.is-on {
-  background: rgba(6, 18, 14, 0.88);
-  border-style: solid;
-  border-color: rgba(130, 230, 180, 0.4);
-  box-shadow:
-    0 18px 40px rgba(0, 0, 0, 0.4),
-    0 0 28px rgba(60, 180, 120, 0.16);
-}
-
-.twin-organs-hint {
+/* Floating organ hologram — upper side, translucent, category title only */
+.twin-organ-float {
+  position: absolute;
+  top: 4%;
+  z-index: 7;
+  width: min(32%, 210px);
+  padding: 0;
   margin: 0;
+  pointer-events: none;
   text-align: center;
-  font-size: 0.72rem;
-  font-weight: 550;
-  line-height: 1.35;
-  color: rgba(160, 200, 180, 0.7);
+  animation: twin-organ-in 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.twin-organs-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 10px;
+.twin-organ-float.side-right {
+  right: 1%;
+  left: auto;
 }
 
-.twin-organs-head span {
+.twin-organ-float.side-left {
+  left: 1%;
+  right: auto;
+}
+
+@keyframes twin-organ-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.twin-organ-float-title {
+  margin: 0 0 6px;
   font-family: var(--font-display), Manrope, sans-serif;
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-weight: 720;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: rgba(190, 245, 215, 0.9);
+  letter-spacing: -0.01em;
+  color: rgba(220, 250, 235, 0.92);
+  text-shadow: 0 0 18px rgba(60, 200, 140, 0.45);
 }
 
-.twin-organs-head em {
-  font-style: normal;
-  font-size: 0.62rem;
-  font-weight: 600;
-  color: rgba(150, 210, 180, 0.72);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 60%;
-}
-
-.twin-organs-row {
+.twin-organ-float-row {
   display: flex;
   justify-content: center;
-  gap: 18px;
+  gap: 8px;
 }
 
-.twin-organ {
-  flex: 0 1 160px;
+.twin-organ-float-fig {
   margin: 0;
-  min-width: 0;
-  text-align: center;
+  width: 100%;
 }
 
-.twin-organ-portal {
-  display: block;
-  width: min(100%, 148px);
-  margin: 0 auto;
-  aspect-ratio: 1 / 1;
-  border-radius: 50%;
-  overflow: hidden;
-  background:
-    radial-gradient(circle at 50% 45%, rgba(50, 170, 120, 0.22), transparent 62%),
-    #020805;
-  border: 1px solid rgba(100, 220, 160, 0.35);
-  box-shadow:
-    inset 0 0 18px rgba(40, 160, 110, 0.18),
-    0 0 18px rgba(40, 150, 100, 0.18);
-}
-
-.twin-organ-photo {
+.twin-organ-float-photo {
   display: block;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  mix-blend-mode: screen;
-  filter: contrast(1.08) saturate(1.2) brightness(1.08);
-}
-
-.twin-organ figcaption {
-  margin-top: 7px;
-  font-size: 0.72rem;
-  font-weight: 650;
-  color: rgba(210, 245, 225, 0.88);
-  letter-spacing: -0.01em;
+  height: auto;
+  object-fit: contain;
+  opacity: 0.92;
+  filter:
+    drop-shadow(0 0 18px rgba(50, 200, 140, 0.45))
+    saturate(1.15)
+    brightness(1.08);
 }
 
 @media (max-width: 720px) {
@@ -7763,19 +7704,13 @@ a.mon-event-card:hover {
   .twin-chip-copy em {
     font-size: 0.52rem;
   }
-  .twin-organs {
-    width: min(94%, 380px);
-    margin-bottom: 14px;
-    padding: 12px;
+  .twin-organ-float {
+    top: 0;
+    right: 0;
+    width: min(38%, 150px);
   }
-  .twin-organ {
-    flex-basis: 120px;
-  }
-  .twin-organ-portal {
-    width: min(100%, 112px);
-  }
-  .twin-organs-hint {
-    font-size: 0.64rem;
+  .twin-organ-float-title {
+    font-size: 0.58rem;
   }
 }
 

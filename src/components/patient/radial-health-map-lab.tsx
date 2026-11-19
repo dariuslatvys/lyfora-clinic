@@ -16,7 +16,7 @@ import {
   type HealthCategoryId,
 } from "@/lib/health/categories";
 
-/** Experimental map: heart at 12 o’clock, then clockwise. */
+/** Heart upper-right, then clockwise. */
 const LAB_ORDER_FEMALE: HealthCategoryId[] = [
   "cardio_metabolic",
   "oncology",
@@ -39,82 +39,166 @@ const LAB_LABELS_LT: Partial<Record<HealthCategoryId, string>> = {
 
 type Slot = { deg: number };
 
+/** Focus as % inside the circular portal (0–100). */
 type BodyFocus = {
   x: number;
   y: number;
-  mode: "heart" | "brain" | "pelvis" | "gut" | "body" | "outline";
+  kind: "point" | "ovaries";
+};
+
+type OrganTwin = {
+  id: string;
+  label: string;
+  src: string;
 };
 
 const FOCUS_BY_ID: Record<string, BodyFocus> = {
-  cardio_metabolic: { x: 51, y: 29, mode: "heart" },
-  cardiovascular: { x: 51, y: 29, mode: "heart" },
-  mental: { x: 50, y: 11, mode: "brain" },
-  reproductive: { x: 57, y: 44, mode: "pelvis" },
-  hormones_women: { x: 57, y: 44, mode: "pelvis" },
-  pharmacogenetics: { x: 50, y: 37, mode: "gut" },
-  physical: { x: 50, y: 27, mode: "body" },
-  oncology: { x: 50, y: 29, mode: "outline" },
-  metabolic: { x: 50, y: 37, mode: "gut" },
-  immune: { x: 50, y: 27, mode: "body" },
-  hormones_men: { x: 50, y: 44, mode: "pelvis" },
+  // Heart
+  cardio_metabolic: { x: 48, y: 34, kind: "point" },
+  cardiovascular: { x: 48, y: 34, kind: "point" },
+  // Brain — top of head, not mouth/face
+  mental: { x: 50, y: 14, kind: "point" },
+  // Ovaries — lateral lower abdomen, not groin midline
+  reproductive: { x: 50, y: 48, kind: "ovaries" },
+  hormones_women: { x: 50, y: 48, kind: "ovaries" },
+  // Liver / gut
+  pharmacogenetics: { x: 52, y: 42, kind: "point" },
+  metabolic: { x: 52, y: 42, kind: "point" },
+  // Chest / muscle — single soft point, no body oval
+  physical: { x: 50, y: 36, kind: "point" },
+  immune: { x: 50, y: 36, kind: "point" },
+  // Lungs / torso — point only, no outline oval
+  oncology: { x: 50, y: 32, kind: "point" },
+  hormones_men: { x: 50, y: 48, kind: "point" },
 };
 
-/** Compact figure + elliptical orbit — chips must clear head/feet. */
-const FIG_W = 20;
-const FIG_H = FIG_W * (1280 / 720);
-const FIG_LEFT = 50 - FIG_W / 2;
-const FIG_TOP = 50 - FIG_H / 2;
-const ORBIT_RX = 43;
-const ORBIT_RY = 41;
+const ORGAN_BY_ID: Record<string, OrganTwin[]> = {
+  cardio_metabolic: [
+    {
+      id: "heart",
+      label: "Širdis",
+      src: "/brand/health-map/organ-heart-hologram.jpg",
+    },
+    {
+      id: "lungs",
+      label: "Plaučiai",
+      src: "/brand/health-map/organ-lungs-hologram.jpg",
+    },
+  ],
+  cardiovascular: [
+    {
+      id: "heart",
+      label: "Širdis",
+      src: "/brand/health-map/organ-heart-hologram.jpg",
+    },
+  ],
+  oncology: [
+    {
+      id: "lungs",
+      label: "Plaučiai",
+      src: "/brand/health-map/organ-lungs-hologram.jpg",
+    },
+  ],
+  physical: [
+    {
+      id: "lungs",
+      label: "Plaučiai",
+      src: "/brand/health-map/organ-lungs-hologram.jpg",
+    },
+    {
+      id: "heart",
+      label: "Širdis",
+      src: "/brand/health-map/organ-heart-hologram.jpg",
+    },
+  ],
+  immune: [
+    {
+      id: "lungs",
+      label: "Plaučiai",
+      src: "/brand/health-map/organ-lungs-hologram.jpg",
+    },
+  ],
+  mental: [
+    {
+      id: "brain",
+      label: "Smegenys",
+      src: "/brand/health-map/organ-brain-hologram.jpg",
+    },
+  ],
+  reproductive: [
+    {
+      id: "uterus",
+      label: "Gimda ir kiaušidės",
+      src: "/brand/health-map/organ-uterus-hologram.jpg",
+    },
+  ],
+  hormones_women: [
+    {
+      id: "uterus",
+      label: "Gimda ir kiaušidės",
+      src: "/brand/health-map/organ-uterus-hologram.jpg",
+    },
+  ],
+  pharmacogenetics: [
+    {
+      id: "liver",
+      label: "Kepenys",
+      src: "/brand/health-map/organ-liver-hologram.jpg",
+    },
+  ],
+  metabolic: [
+    {
+      id: "liver",
+      label: "Kepenys",
+      src: "/brand/health-map/organ-liver-hologram.jpg",
+    },
+  ],
+};
+
+const DEFAULT_ORGANS: OrganTwin[] = [
+  {
+    id: "heart",
+    label: "Širdis",
+    src: "/brand/health-map/organ-heart-hologram.jpg",
+  },
+  {
+    id: "lungs",
+    label: "Plaučiai",
+    src: "/brand/health-map/organ-lungs-hologram.jpg",
+  },
+];
+
+/** Portal + orbit geometry (% of square stage). */
+const PORTAL_R = 28;
+const ORBIT_R = 42;
 const CX = 50;
-const CY = 50;
+const CY = 48;
+
+const FEMALE_TWIN_SRC = "/brand/health-map/woman-hologram-v9.png";
+const FEMALE_TWIN_FALLBACK = "/brand/health-map/woman-hologram-v8.png";
+const MALE_TWIN_SRC = "/brand/body-twin-hub.png";
 
 function orbitPoint(deg: number) {
   const rad = (deg * Math.PI) / 180;
-  // Extra outward push at poles (top/bottom) where chips used to cover the body
-  const pole = Math.abs(Math.sin(rad));
-  const rx = ORBIT_RX + pole * 1.2;
-  const ry = ORBIT_RY + pole * 3;
   return {
-    x: CX + rx * Math.cos(rad),
-    y: CY + ry * Math.sin(rad),
+    x: CX + ORBIT_R * Math.cos(rad),
+    y: CY + ORBIT_R * Math.sin(rad),
   };
 }
 
-const FEMALE_TWIN_SRC = "/brand/health-map/woman-hologram-v7.png";
-const FEMALE_TWIN_FALLBACK = "/brand/health-map/woman-hologram-v5.png";
-const MALE_TWIN_SRC = "/brand/body-twin-hub.png";
-
-const PARTICLES = [
-  [14, 20],
-  [86, 16],
-  [10, 52],
-  [90, 48],
-  [18, 78],
-  [82, 74],
-  [38, 10],
-  [62, 88],
-  [6, 36],
-  [94, 64],
-  [28, 86],
-  [72, 12],
-  [22, 42],
-  [78, 56],
-  [44, 92],
-  [56, 8],
-] as const;
-
-function bodyToStage(local: { x: number; y: number }) {
+function focusToStage(local: BodyFocus) {
+  // Map portal-local % into stage % (portal is a circle centered on stage)
+  const d = PORTAL_R * 2;
   return {
-    x: FIG_LEFT + (local.x / 100) * FIG_W,
-    y: FIG_TOP + (local.y / 100) * FIG_H,
+    x: CX - PORTAL_R + (local.x / 100) * d,
+    y: CY - PORTAL_R + (local.y / 100) * d,
   };
 }
 
 function slotsForCount(n: number): Slot[] {
   const step = 360 / n;
-  // Rotate right: first category (Širdis) at ~1–2 o’clock, not on the head
-  const start = -50;
+  // Rotate right: first chip ~1–2 o’clock, never on the head
+  const start = -45;
   return Array.from({ length: n }, (_, i) => ({ deg: start + step * i }));
 }
 
@@ -135,7 +219,12 @@ function orderForSex(
 }
 
 function focusFor(id: string): BodyFocus {
-  return FOCUS_BY_ID[id] || { x: 50, y: 40, mode: "body" };
+  return FOCUS_BY_ID[id] || { x: 50, y: 40, kind: "point" };
+}
+
+function organsFor(id: string | null): OrganTwin[] {
+  if (!id) return DEFAULT_ORGANS;
+  return ORGAN_BY_ID[id] || DEFAULT_ORGANS;
 }
 
 function labTitle(id: string, fallback: string) {
@@ -199,78 +288,38 @@ function CategoryGlyph({ id }: { id: string }) {
         <path d="M8.5 14.2h7" />
       </>
     ),
-    metabolic: (
-      <>
-        <path d="M12 4v16" />
-        <path d="M8.2 8.2c2.3 1.1 5.3 1.1 7.6 0" />
-        <path d="M7.2 12c2.8 1.5 6.8 1.5 9.6 0" />
-        <path d="M8.2 15.8c2.3 1.1 5.3 1.1 7.6 0" />
-      </>
-    ),
-    immune: (
-      <>
-        <path d="M12 3.8 17.5 6v4.6c0 3.8-2.5 7-5.5 8.3C9 17.6 6.5 14.4 6.5 10.6V6Z" />
-        <path d="M9.7 11.6 11.3 13.3l3-3.4" />
-      </>
-    ),
-    hormones_men: (
-      <>
-        <circle cx="10.2" cy="14" r="3.8" />
-        <path d="M13 11.2 18.2 6" />
-        <path d="M14.4 6H18.2v3.8" />
-      </>
-    ),
   };
   return <svg {...common}>{paths[id] || paths.physical}</svg>;
 }
 
-function BodyFocusMarks({
-  mode,
-  x,
-  y,
+function FocusPing({
+  focus,
   accent,
 }: {
-  mode: BodyFocus["mode"];
-  x: number;
-  y: number;
+  focus: BodyFocus;
   accent: string;
 }) {
-  if (mode === "body") {
+  if (focus.kind === "ovaries") {
     return (
       <span
-        className="twin-mark is-body"
-        style={{ background: accent, ["--cc" as string]: accent }}
-      />
-    );
-  }
-  if (mode === "outline") {
-    return (
-      <span
-        className="twin-mark is-outline"
-        style={{ borderColor: accent, boxShadow: `0 0 24px ${accent}44` }}
-      />
-    );
-  }
-  if (mode === "pelvis") {
-    return (
-      <span
-        className="twin-mark is-pelvis"
-        style={{ left: "50%", top: `${y}%`, ["--cc" as string]: accent }}
+        className="twin-ping is-ovaries"
+        style={{ ["--cc" as string]: accent }}
       >
-        <i className="ovary" style={{ background: accent, left: "-30%" }} />
-        <i className="ovary" style={{ background: accent, left: "30%" }} />
-        <i className="ping" style={{ borderColor: accent }} />
+        <i style={{ left: "36%", background: accent }} />
+        <i style={{ left: "64%", background: accent }} />
       </span>
     );
   }
   return (
     <span
-      className={`twin-mark is-${mode}`}
-      style={{ left: `${x}%`, top: `${y}%`, ["--cc" as string]: accent }}
+      className="twin-ping is-point"
+      style={{
+        left: `${focus.x}%`,
+        top: `${focus.y}%`,
+        ["--cc" as string]: accent,
+      }}
     >
-      <i className="core" style={{ background: accent }} />
-      <i className="halo" style={{ borderColor: accent }} />
-      <i className="ring" style={{ borderColor: accent }} />
+      <i style={{ background: accent }} />
     </span>
   );
 }
@@ -308,24 +357,18 @@ export function RadialHealthMapLab({
   const accent = activeTile
     ? COLOUR_HEX[activeTile.colour as RiskColour]
     : "#5ee4a8";
-  const stageFocus = active ? bodyToStage(active) : null;
+  const stageFocus = active ? focusToStage(active) : null;
   const activeOrbit = activeSlot ? orbitPoint(activeSlot.deg) : null;
+  const organTwins = organsFor(activeId);
 
   return (
     <div className="twin-lab rise-in">
       <div
         className="twin-stage"
         data-sex={sex}
-        data-focus={active?.mode || ""}
         data-hot={activeId ? "1" : "0"}
       >
-        <div className="twin-void" aria-hidden>
-          <span className="twin-atmos twin-atmos-a" />
-          <span className="twin-atmos twin-atmos-b" />
-          <span className="twin-bloom" />
-          <span className="twin-floor" />
-          <span className="twin-vignette" />
-        </div>
+        <div className="twin-void" aria-hidden />
 
         <svg className="twin-orbit" viewBox="0 0 100 100" aria-hidden>
           <defs>
@@ -337,53 +380,39 @@ export function RadialHealthMapLab({
               y2="100%"
             >
               <stop offset="0%" stopColor="rgba(120,240,180,0.05)" />
-              <stop offset="50%" stopColor="rgba(180,255,220,0.4)" />
-              <stop offset="100%" stopColor="rgba(90,200,160,0.06)" />
+              <stop offset="50%" stopColor="rgba(160,245,200,0.4)" />
+              <stop offset="100%" stopColor="rgba(90,200,150,0.06)" />
             </linearGradient>
           </defs>
-          <ellipse
+          {/* Concentric HUD rings — Patient Twin style */}
+          <circle cx={CX} cy={CY} r={PORTAL_R - 3} className="twin-ring-inner" />
+          <circle cx={CX} cy={CY} r={PORTAL_R} className="twin-portal-rim" />
+          <circle cx={CX} cy={CY} r={PORTAL_R + 4} className="twin-ring-mid" />
+          <circle
             cx={CX}
             cy={CY}
-            rx={ORBIT_RX + 6}
-            ry={ORBIT_RY + 5}
-            className="twin-orbit-soft"
-          />
-          <ellipse
-            cx={CX}
-            cy={CY}
-            rx={ORBIT_RX}
-            ry={ORBIT_RY}
+            r={ORBIT_R}
             className="twin-orbit-ring"
             stroke={`url(#twinOrbitGrad-${uid})`}
           />
-          {PARTICLES.map(([px, py], i) => (
-            <circle
-              key={`${px}-${py}`}
-              cx={px}
-              cy={py}
-              r={i % 3 === 0 ? 0.28 : 0.16}
-              className="twin-particle"
-              style={{ animationDelay: `${(i % 8) * 0.4}s` }}
-            />
-          ))}
         </svg>
 
         <div
-          className={`twin-figure${active ? ` focus-${active.mode}` : ""}`}
+          className="twin-portal"
           aria-hidden
           style={
             {
-              width: `${FIG_W}%`,
+              width: `${PORTAL_R * 2}%`,
+              height: `${PORTAL_R * 2}%`,
               ...(active ? { ["--focus-c" as string]: accent } : {}),
             } as CSSProperties
           }
         >
-          <div className="twin-figure-glow" />
           <img
             src={figureSrc}
             alt=""
-            width={720}
-            height={1280}
+            width={1024}
+            height={1024}
             className="twin-photo"
             decoding="async"
             fetchPriority="high"
@@ -393,65 +422,18 @@ export function RadialHealthMapLab({
               }
             }}
           />
-          {active ? (
-            <BodyFocusMarks
-              mode={active.mode}
-              x={active.x}
-              y={active.y}
-              accent={accent}
-            />
-          ) : null}
+          {active ? <FocusPing focus={active} accent={accent} /> : null}
         </div>
 
         <svg className="twin-focus-layer" viewBox="0 0 100 100" aria-hidden>
-          <defs>
-            <filter
-              id={`twinBeamGlow-${uid}`}
-              x="-50%"
-              y="-50%"
-              width="200%"
-              height="200%"
-            >
-              <feGaussianBlur stdDeviation="0.45" result="blur" />
-              <feMerge>
-                <feMergeNode in="blur" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
-          </defs>
-          {active && activeOrbit && stageFocus
-            ? (() => {
-                const leftSide = activeOrbit.x < CX;
-                const qx = leftSide
-                  ? Math.min(activeOrbit.x, stageFocus.x) - 9
-                  : Math.max(activeOrbit.x, stageFocus.x) + 9;
-                const qy = activeOrbit.y * 0.4 + stageFocus.y * 0.6;
-                const d = `M ${activeOrbit.x} ${activeOrbit.y} Q ${qx} ${qy} ${stageFocus.x} ${stageFocus.y}`;
-                return (
-                  <g filter={`url(#twinBeamGlow-${uid})`}>
-                    <path
-                      d={d}
-                      className="twin-focus-line twin-focus-line-soft"
-                      style={{ stroke: accent }}
-                      fill="none"
-                    />
-                    <path
-                      d={d}
-                      className="twin-focus-line"
-                      style={{ stroke: accent }}
-                      fill="none"
-                    />
-                    <circle
-                      cx={stageFocus.x}
-                      cy={stageFocus.y}
-                      r={1.05}
-                      fill={accent}
-                      className="twin-focus-dot"
-                    />
-                  </g>
-                );
-              })()
-            : null}
+          {active && activeOrbit && stageFocus ? (
+            <path
+              d={`M ${activeOrbit.x} ${activeOrbit.y} Q ${(activeOrbit.x + stageFocus.x) / 2} ${(activeOrbit.y + stageFocus.y) / 2 - 4} ${stageFocus.x} ${stageFocus.y}`}
+              className="twin-focus-line"
+              style={{ stroke: accent }}
+              fill="none"
+            />
+          ) : null}
         </svg>
 
         {tiles.map((c, i) => {
@@ -489,14 +471,32 @@ export function RadialHealthMapLab({
           );
         })}
 
-        <div className="twin-hud" aria-hidden>
-          <span className="twin-hud-tag">The human virtual twin</span>
-          <span className="twin-hud-meta">
-            {activeTile
-              ? labTitle(activeTile.id, activeTile.title)
-              : "Lyfora sveikatos žemėlapis"}
-          </span>
-        </div>
+        <aside
+          className={`twin-organs${activeId ? " is-hot" : ""}`}
+          aria-label="Organų dvyniai"
+        >
+          <header className="twin-organs-head">
+            <span>Organų dvyniai</span>
+            <em>{activeTile ? labTitle(activeTile.id, activeTile.title) : "Apžvalga"}</em>
+          </header>
+          <div className="twin-organs-row">
+            {organTwins.map((organ) => (
+              <figure key={organ.id} className="twin-organ">
+                <span className="twin-organ-portal" aria-hidden>
+                  <img
+                    src={organ.src}
+                    alt=""
+                    width={512}
+                    height={512}
+                    className="twin-organ-photo"
+                    decoding="async"
+                  />
+                </span>
+                <figcaption>{organ.label}</figcaption>
+              </figure>
+            ))}
+          </div>
+        </aside>
       </div>
     </div>
   );

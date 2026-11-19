@@ -59,13 +59,13 @@ const FOCUS_BY_ID: Record<string, BodyFocus> = {
   hormones_men: { x: 50, y: 44, mode: "pelvis" },
 };
 
-/** Smaller figure + tall elliptical orbit so chips clear head/feet. */
-const FIG_W = 22;
+/** Compact figure + elliptical orbit — chips must clear head/feet. */
+const FIG_W = 20;
 const FIG_H = FIG_W * (1280 / 720);
 const FIG_LEFT = 50 - FIG_W / 2;
 const FIG_TOP = 50 - FIG_H / 2;
-const ORBIT_RX = 42;
-const ORBIT_RY = 40;
+const ORBIT_RX = 43;
+const ORBIT_RY = 41;
 const CX = 50;
 const CY = 50;
 
@@ -73,8 +73,8 @@ function orbitPoint(deg: number) {
   const rad = (deg * Math.PI) / 180;
   // Extra outward push at poles (top/bottom) where chips used to cover the body
   const pole = Math.abs(Math.sin(rad));
-  const rx = ORBIT_RX + pole * 1;
-  const ry = ORBIT_RY + pole * 2;
+  const rx = ORBIT_RX + pole * 1.2;
+  const ry = ORBIT_RY + pole * 3;
   return {
     x: CX + rx * Math.cos(rad),
     y: CY + ry * Math.sin(rad),

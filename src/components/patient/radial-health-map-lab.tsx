@@ -30,15 +30,30 @@ const LAB_ORDER_FEMALE: HealthCategoryId[] = [
 const LAB_DEGREES_FEMALE = [-38, 18, 62, 128, 178, 228];
 const LAB_DEGREES_MALE = [-40, 10, 55, 125, 175, 220, 250];
 
-const LAB_LABELS_LT: Partial<Record<HealthCategoryId, string>> = {
-  oncology: "Onkologija",
-  cardio_metabolic: "Širdis ir kraujagyslės",
-  cardiovascular: "Širdis ir kraujagyslės",
-  physical: "Fizinė sveikata",
-  pharmacogenetics: "Farmakogenetika",
-  mental: "Psichika ir emocinė sveikata",
-  reproductive: "Moters sveikata",
-  hormones_women: "Moters sveikata",
+const LAB_LABELS: Record<
+  "lt" | "en",
+  Partial<Record<HealthCategoryId, string>>
+> = {
+  lt: {
+    oncology: "Onkologija",
+    cardio_metabolic: "Širdis ir kraujagyslės",
+    cardiovascular: "Širdis ir kraujagyslės",
+    physical: "Fizinė sveikata",
+    pharmacogenetics: "Farmakogenetika",
+    mental: "Psichika ir emocinė sveikata",
+    reproductive: "Moters sveikata",
+    hormones_women: "Moters sveikata",
+  },
+  en: {
+    oncology: "Oncology",
+    cardio_metabolic: "Heart & vessels",
+    cardiovascular: "Heart & vessels",
+    physical: "Physical health",
+    pharmacogenetics: "Pharmacogenetics",
+    mental: "Mental & emotional health",
+    reproductive: "Women's health",
+    hormones_women: "Women's health",
+  },
 };
 
 /** Focus as % inside the circular portal (0–100). */
@@ -200,8 +215,8 @@ function organsFor(id: string | null): OrganTwin[] {
   return ORGAN_BY_ID[id] || [];
 }
 
-function labTitle(id: string, fallback: string) {
-  return LAB_LABELS_LT[id as HealthCategoryId] || fallback;
+function labTitle(id: string, fallback: string, locale: "lt" | "en" = "lt") {
+  return LAB_LABELS[locale][id as HealthCategoryId] || fallback;
 }
 
 function CategoryGlyph({ id }: { id: string }) {
@@ -298,6 +313,7 @@ function FocusPing({
 }
 
 export function RadialHealthMapLab({
+  locale = "lt",
   sex,
   categories,
 }: {
@@ -475,7 +491,7 @@ export function RadialHealthMapLab({
                     <CategoryGlyph id={c.id} />
                   </span>
                   <span className="twin-chip-copy">
-                    <b>{labTitle(c.id, c.title)}</b>
+                    <b>{labTitle(c.id, c.title, locale)}</b>
                     <em>
                       <i />
                       {c.colourLabel}

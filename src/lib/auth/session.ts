@@ -5,6 +5,7 @@ import { eq } from "drizzle-orm";
 import { ensureSchema, getDb } from "@/lib/db";
 import { users, patients } from "@/lib/db/schema";
 import { sessionSigningSecret } from "@/lib/auth/secrets";
+import { localeCookieName, parseLocaleCookie } from "@/lib/auth/locale-cookie";
 
 export const sessionCookieName = "lyfora_session";
 const TTL_MS = 1000 * 60 * 60 * 24 * 14;
@@ -85,7 +86,12 @@ export async function getCurrentUser() {
       user.role === "patient"
         ? db.select().from(patients).where(eq(patients.userId, user.id)).get()
         : null;
-    return { user, patient };
+    // Cookie wins for immediate UI language switches (and read-only DB hosts).
+    const cookieLocale = parseLocaleCookie(jar.get(localeCookieName)?.value);
+    const effectiveUser = cookieLocale
+      ? { ...user, locale: cookieLocale }
+      : user;
+    return { user: effectiveUser, patient };
   } catch {
     // Missing SESSION_SECRET (or DB) on a hosted instance — treat as logged out.
     return null;

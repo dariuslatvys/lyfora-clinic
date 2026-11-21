@@ -7315,30 +7315,27 @@ a.mon-event-card:hover {
   flex-wrap: wrap;
 }
 
-/* Experimental twin map — circular HUD portal (reference style) */
+/* Experimental twin map — flat page color, no lighter inset square */
 .twin-lab {
   position: relative;
   display: flex;
   flex-direction: column;
   gap: 0;
-  border-radius: 28px;
+  border-radius: 0;
   padding: 0;
   overflow: visible;
-  background: #050c0a;
-  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.4);
+  background: var(--bg);
+  box-shadow: none;
 }
 
-/* Outer frame keeps stage green wash clipped; chips can sit in the pad. */
 .twin-frame {
   position: relative;
   width: min(100%, 920px);
   margin: 0 auto;
   padding: 56px 72px;
-  border-radius: 28px;
+  border-radius: 0;
   overflow: visible;
-  background:
-    radial-gradient(circle at 50% 48%, rgba(50, 170, 120, 0.18), transparent 48%),
-    radial-gradient(ellipse 90% 70% at 50% 100%, #0a1813 0%, #07110e 55%, #050c0a 100%);
+  background: var(--bg);
 }
 
 .twin-stage {
@@ -7346,21 +7343,13 @@ a.mon-event-card:hover {
   width: 100%;
   aspect-ratio: 1 / 1;
   margin: 0 auto;
-  /* No isolation — hologram must blend into the green stage, not a black plate */
   border-radius: 0;
   overflow: visible;
   background: transparent;
 }
 
 .twin-void {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  background:
-    radial-gradient(circle at 50% 52%, rgba(70, 200, 140, 0.1), transparent 38%),
-    radial-gradient(circle at 28% 28%, rgba(40, 120, 90, 0.1), transparent 42%),
-    radial-gradient(circle at 74% 36%, rgba(50, 140, 110, 0.08), transparent 44%);
+  display: none;
 }
 
 .twin-orbit,
@@ -7376,10 +7365,10 @@ a.mon-event-card:hover {
 .twin-focus-layer { z-index: 4; }
 
 .twin-portal-rim {
-  fill: rgba(40, 160, 110, 0.05);
-  stroke: rgba(90, 230, 160, 0.55);
+  fill: none;
+  stroke: rgba(90, 230, 160, 0.45);
   stroke-width: 0.4;
-  filter: drop-shadow(0 0 1.4px rgba(80, 220, 150, 0.55));
+  filter: none;
 }
 
 .twin-ring-inner {
@@ -7439,11 +7428,7 @@ a.mon-event-card:hover {
   object-fit: contain;
   opacity: 0.96;
   mix-blend-mode: normal;
-  filter:
-    contrast(1.06)
-    saturate(1.12)
-    brightness(1.08)
-    drop-shadow(0 0 28px rgba(40, 180, 120, 0.35));
+  filter: contrast(1.06) saturate(1.12) brightness(1.05);
   user-select: none;
   -webkit-user-drag: none;
 }
@@ -7663,7 +7648,7 @@ a.mon-event-card:hover {
 @media (max-width: 720px) {
   .twin-lab,
   .twin-frame {
-    border-radius: 20px;
+    border-radius: 0;
   }
   .twin-frame {
     padding: 44px 28px 36px;

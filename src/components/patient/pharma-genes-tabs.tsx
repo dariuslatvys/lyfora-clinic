@@ -245,7 +245,7 @@ export function PharmaGenesTabs({
             risk: "By risk",
             tolerance: "Medicine tolerance check",
             effectBlurb:
-              "Medicine groups first — those with a reaction signal on top, then groups without a signal. Each group names the active substance you may be sensitive to.",
+              "Cholesterol / lipid medicines are listed first, then other groups (reaction signals before quiet groups). Each group names the active substance you may be sensitive to.",
             riskBlurb:
               "Genes sorted by your personal risk colour — highest first.",
             toleranceBlurb:
@@ -261,7 +261,7 @@ export function PharmaGenesTabs({
             risk: "Pagal riziką",
             tolerance: "Vaistų toleravimo tikrinimas",
             effectBlurb:
-              "Pirma vaistų grupės su reakcijos signalu, žemiau — be signalo. Kiekvienoje grupėje aiškiai matote veikliąją medžiagą, kuriai yra jautrumas.",
+              "Pirma — cholesterolio / lipidų vaistai, toliau kitos grupės (su reakcijos signalu prieš be signalo). Kiekvienoje grupėje matote veikliąją medžiagą, kuriai yra jautrumas.",
             riskBlurb:
               "Genai surikiuoti pagal jūsų rizikos spalvą — didžiausia rizika pirmiausia.",
             toleranceBlurb:
@@ -328,8 +328,10 @@ export function PharmaGenesTabs({
       groups: Map<string, { label: string; rows: PharmaSnpRow[] }>;
     }[];
 
-    // Groups with a reaction signal first, then quieter groups.
+    // Cholesterol / lipids always first; then reaction-signal groups, then quiet ones.
     return [...buckets].sort((a, b) => {
+      if (a.purpose.id === "cholesterol") return -1;
+      if (b.purpose.id === "cholesterol") return 1;
       const aRows = [...a.groups.values()].flatMap((g) => g.rows);
       const bRows = [...b.groups.values()].flatMap((g) => g.rows);
       const aHit = hasReaction(aRows) ? 1 : 0;
